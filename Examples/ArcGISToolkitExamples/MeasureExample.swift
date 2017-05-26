@@ -22,7 +22,7 @@ class MeasureExample: MapViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //mapView.map = AGSMap(basemapType: .topographic, latitude: 0, longitude: 0, levelOfDetail: 0)
+        // set a map on our mapView
         let portalItem = AGSPortalItem(portal: AGSPortal.arcGISOnline(withLoginRequired: false), itemID: "22839dfed86f42b6ac0f7bea9677ee07")
         let map = AGSMap(item: portalItem)
         mapView.map = map
