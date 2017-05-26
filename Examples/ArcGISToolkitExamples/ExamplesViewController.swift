@@ -22,7 +22,12 @@ class ExamplesViewController: VCListViewController {
         self.title = "Toolkit Samples"
         
         self.viewControllerInfos = [
+            ("Popup", PopupExample.self, nil),
+            ("Switch Basemap", SwitchBasemapExample.self, nil),
             ("Measure", MeasureExample.self, nil),
+            ("North Arrow", NorthArrowExample.self, nil),
+            ("Sketch", SketchExample.self, nil),
+            ("Job Manager", JobManagerExample.self, nil),
             ("Scalebar", ScalebarExample.self, nil),
             ("Legend", LegendExample.self, nil)
         ]

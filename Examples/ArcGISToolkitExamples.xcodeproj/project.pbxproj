@@ -16,8 +16,13 @@
 		88A01D7E1EA188EF00CD9621 /* ArcGISToolkit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 88B689A41E96E9AC00B67FAB /* ArcGISToolkit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		88B689C81E96EDF400B67FAB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689BE1E96EDF400B67FAB /* AppDelegate.swift */; };
 		88B689C91E96EDF400B67FAB /* ExamplesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689BF1E96EDF400B67FAB /* ExamplesViewController.swift */; };
+		88B689CA1E96EDF400B67FAB /* JobManagerExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689C01E96EDF400B67FAB /* JobManagerExample.swift */; };
 		88B689CB1E96EDF400B67FAB /* MeasureExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689C11E96EDF400B67FAB /* MeasureExample.swift */; };
+		88B689CC1E96EDF400B67FAB /* NorthArrowExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689C21E96EDF400B67FAB /* NorthArrowExample.swift */; };
+		88B689CD1E96EDF400B67FAB /* PopupExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689C31E96EDF400B67FAB /* PopupExample.swift */; };
 		88B689CE1E96EDF400B67FAB /* ScalebarExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689C41E96EDF400B67FAB /* ScalebarExample.swift */; };
+		88B689CF1E96EDF400B67FAB /* SketchExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689C51E96EDF400B67FAB /* SketchExample.swift */; };
+		88B689D01E96EDF400B67FAB /* SwitchBasemapExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689C61E96EDF400B67FAB /* SwitchBasemapExample.swift */; };
 		88B689D11E96EDF400B67FAB /* VCListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689C71E96EDF400B67FAB /* VCListViewController.swift */; };
 		E48405751E9BE7E600927208 /* LegendExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48405741E9BE7E600927208 /* LegendExample.swift */; };
 /* End PBXBuildFile section */
@@ -71,8 +76,13 @@
 		88B6899F1E96E9AB00B67FAB /* ArcGISToolkit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ArcGISToolkit.xcodeproj; path = ../Toolkit/ArcGISToolkit.xcodeproj; sourceTree = "<group>"; };
 		88B689BE1E96EDF400B67FAB /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		88B689BF1E96EDF400B67FAB /* ExamplesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExamplesViewController.swift; sourceTree = "<group>"; };
+		88B689C01E96EDF400B67FAB /* JobManagerExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JobManagerExample.swift; sourceTree = "<group>"; };
 		88B689C11E96EDF400B67FAB /* MeasureExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeasureExample.swift; sourceTree = "<group>"; };
+		88B689C21E96EDF400B67FAB /* NorthArrowExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NorthArrowExample.swift; sourceTree = "<group>"; };
+		88B689C31E96EDF400B67FAB /* PopupExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopupExample.swift; sourceTree = "<group>"; };
 		88B689C41E96EDF400B67FAB /* ScalebarExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScalebarExample.swift; sourceTree = "<group>"; };
+		88B689C51E96EDF400B67FAB /* SketchExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SketchExample.swift; sourceTree = "<group>"; };
+		88B689C61E96EDF400B67FAB /* SwitchBasemapExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwitchBasemapExample.swift; sourceTree = "<group>"; };
 		88B689C71E96EDF400B67FAB /* VCListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VCListViewController.swift; sourceTree = "<group>"; };
 		E48405741E9BE7E600927208 /* LegendExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegendExample.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -134,9 +144,14 @@
 		88B689D21E96EDFE00B67FAB /* Examples */ = {
 			isa = PBXGroup;
 			children = (
+				88B689C01E96EDF400B67FAB /* JobManagerExample.swift */,
 				E48405741E9BE7E600927208 /* LegendExample.swift */,
 				88B689C11E96EDF400B67FAB /* MeasureExample.swift */,
+				88B689C21E96EDF400B67FAB /* NorthArrowExample.swift */,
+				88B689C31E96EDF400B67FAB /* PopupExample.swift */,
 				88B689C41E96EDF400B67FAB /* ScalebarExample.swift */,
+				88B689C51E96EDF400B67FAB /* SketchExample.swift */,
+				88B689C61E96EDF400B67FAB /* SwitchBasemapExample.swift */,
 			);
 			name = Examples;
 			sourceTree = "<group>";
@@ -241,8 +256,13 @@
 			files = (
 				88B689C81E96EDF400B67FAB /* AppDelegate.swift in Sources */,
 				88B689CB1E96EDF400B67FAB /* MeasureExample.swift in Sources */,
+				88B689CC1E96EDF400B67FAB /* NorthArrowExample.swift in Sources */,
 				88B689D11E96EDF400B67FAB /* VCListViewController.swift in Sources */,
 				88B689CE1E96EDF400B67FAB /* ScalebarExample.swift in Sources */,
+				88B689CF1E96EDF400B67FAB /* SketchExample.swift in Sources */,
+				88B689CD1E96EDF400B67FAB /* PopupExample.swift in Sources */,
+				88B689CA1E96EDF400B67FAB /* JobManagerExample.swift in Sources */,
+				88B689D01E96EDF400B67FAB /* SwitchBasemapExample.swift in Sources */,
 				88B689C91E96EDF400B67FAB /* ExamplesViewController.swift in Sources */,
 				E48405751E9BE7E600927208 /* LegendExample.swift in Sources */,
 			);
