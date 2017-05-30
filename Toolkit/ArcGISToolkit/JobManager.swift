@@ -29,7 +29,7 @@ private let _jobManagerSharedInstance = JobManager(jobManagerID: "shared")
  Then when the JobManager is re-created on launch of an app, it will deserialize the Jobs and provide them for you via it's
  Job's property.
  
- The JobManager works with any AGSJob subclass. Such as AGSSyncGeodatabaseJob, AGSGenerateGeodatabaseJob, AGSExportTileCacheJob, AGSEstimateTileCacheSizeJob, AGSGenerateOfflineMapJob, etc.
+ The JobManager works with any AGSJob subclass. Such as AGSSyncGeodatabaseJob, AGSGenerateGeodatabaseJob, AGSExportTileCacheJob, AGSEstimateTileCacheSizeJob, AGSGenerateOfflineMapJob, AGSOfflineMapSyncJob, etc.
  
  Use the shared instance of the JobManager, or create your own with a unique ID. When you kick off a Job, register it with the JobManager.
  
