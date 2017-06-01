@@ -6,6 +6,13 @@ The scalebar uses geodetic calculations to provide accurate results for maps of 
 
 ### Usage
 
+```swift
+        let scalebar = Scalebar(mapView: mapView)
+        scalebar.style = .alternatingBar
+        scalebar.units = .metric
+        scalebar.alignment = .left
+        view.addSubview(sb)
+```
 
 ### Styles
 
