@@ -1,4 +1,4 @@
-#Scalebar
+# Scalebar
 
 A scalebar displays the representation of an accurate linear measurement on the map. It provides a visual indication through which users can determine the size of features or the distance between features on a map. A scale bar is a line or bar divided into parts. It is labeled with its ground length, usually in multiples of map units, such as tens of kilometers or hundreds of miles. 
 
@@ -9,15 +9,15 @@ The scalebar uses geodetic calculations to provide accurate results for maps of 
 
 ### Styles
 
-* line ![](Scalebar/line.png)
+* line ![line](Scalebar/Images/line.png)
 
-* graduated line ![](Scalebar/graduated-line.png)
+* graduated line ![graduated line](Scalebar/Images/graduated-line.png)
 
-* bar ![](Scalebar/bar.png)
+* bar ![bar](Scalebar/Images/bar.png)
 
-* alternating bar ![](Scalebar/alternating-bar.png)
+* alternating bar ![alternating bar](Scalebar/Images/alternating-bar.png)
 
-* dual unit line ![](Scalebar/dual-unit-line.png)
+* dual unit line ![dual unit line](Scalebar/Images/dual-unit-line.png)
 
 ### Units
 
