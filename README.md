@@ -4,7 +4,7 @@ Toolkit components that will simplify your iOS app development with ArcGIS Runti
 
 ## Features
 
-* [Scalebar](Documentation/Scalebar/README.md)
+* [Scalebar](Documentation/Scalebar)
 * Legend
 
 ## Requirements
