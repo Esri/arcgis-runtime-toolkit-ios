@@ -9,13 +9,13 @@ The scalebar uses geodetic calculations to provide accurate results for maps of 
 
 ### Styles
 
-
+| Style | Example |
 |-------------|--------|
-|  line |  ![line](Images/line.png) |
-|	graduated line|	![graduated line](Images/graduated-line.png)|
-|	bar |![bar](Images/bar.png)	|
-|	alternating bar|	![alternating bar](Images/alternating-bar.png) |
-|	dual unit line|	![dual unit line](Images/dual-unit-line.png) |
+|  `line` |  ![line](Images/line.png) |
+|	`graduated line`|	![graduated line](Images/graduated-line.png)|
+|	`bar` |![bar](Images/bar.png)	|
+|	`alternatingBar`|	![alternating bar](Images/alternating-bar.png) |
+|	`dualUnitLine`|	![dual unit line](Images/dual-unit-line.png) |
 
 
 
