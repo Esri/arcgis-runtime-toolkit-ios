@@ -1,8 +1,8 @@
 # arcgis-runtime-toolkit-ios
-Toolkit components that will simplify your iOS app development with ArcGIS Runtime
+Toolkit components that will simplify your iOS app development with ArcGIS Runtime. Check out the [Examples](/Examples) project to see these components in action or read through the [Documentation](/Documentation) to learn more about them.
 
 
-## Features
+## Toolkit Components
 
 * [Scalebar](Documentation/Scalebar)
 * Legend
@@ -16,7 +16,7 @@ Toolkit components that will simplify your iOS app development with ArcGIS Runti
 
 #### Manual
  1. Ensure you have downloaded and installed __ArcGIS Runtime SDK for iOS__ as described [here](https://developers.arcgis.com/ios/latest/swift/guide/install.htm#ESRI_SECTION1_D57435A2BEBC4D29AFA3A4CAA722506A)
- 2. Clone this repo. 
+ 2. Clone or download this repo. 
  3. Drag and Drop the `Toolkit/ArcGISToolkit.xcodeproj` file into your project through the XCode Project Navigator pane.
  4. Add `import ArcGISToolit` in your source code and start using the toolkit components 
 
@@ -27,7 +27,7 @@ Toolkit components that will simplify your iOS app development with ArcGIS Runti
 
 ## Additional Resources
 
-* New to ArcGIS Runtime? Explore the documentation : [Guide](https://developers.arcgis.com/ios) | [API Reference](https://developers.arcgis.com/ios/latest/api-reference/)
+* New to ArcGIS Runtime? Explore the documentation : [Guide](https://developers.arcgis.com/ios) | [API Reference](https://developers.arcgis.com/ios/latest/api-reference/), and check out the [Samples](https://github.com/Esri/arcgis-runtime-samples-ios)
 * Got a question? Ask the community on our [forum](http://geonet.esri.com/community/developers/native-app-developers/arcgis-runtime-sdk-for-ios)
 
 ## Issues
