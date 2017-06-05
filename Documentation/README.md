@@ -1,3 +1,3 @@
 ### Table of Contents
 
-- [Scalebar](Scalebar.md)
+- [Scalebar](Scalebar)
