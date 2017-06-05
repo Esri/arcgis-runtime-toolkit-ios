@@ -23,7 +23,7 @@ class MeasureExample: MapViewController {
         super.viewDidLoad()
         
         // set a map on our mapView
-        let portalItem = AGSPortalItem(portal: AGSPortal.arcGISOnline(withLoginRequired: false), itemID: "22839dfed86f42b6ac0f7bea9677ee07")
+        let portalItem = AGSPortalItem(portal: AGSPortal.arcGISOnline(withLoginRequired: false), itemID: "80ea1e5a79e345888cc9a31128685ed1")
         let map = AGSMap(item: portalItem)
         mapView.map = map
         
