@@ -26,7 +26,7 @@ class LegendExample: MapViewController {
         super.viewDidLoad()
         
         // create and set map on mapView
-        portalItem = AGSPortalItem(portal: portal, itemID: "22839dfed86f42b6ac0f7bea9677ee07")
+        portalItem = AGSPortalItem(portal: portal, itemID: "1966ef409a344d089b001df85332608f")
         map = AGSMap(item: portalItem!)
         mapView.map = map
         
