@@ -23,7 +23,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
     var lastSelectedFeatureLayer : AGSFeatureLayer?
     var addNewFeatureButton : UIBarButtonItem
     
-    var geoViewController: UIViewController
+    weak var geoViewController: UIViewController?
     var geoView: AGSGeoView
     var useNavigationControllerIfAvailable : Bool = true
     
@@ -81,7 +81,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
             }
         }
         
-        geoViewController.present(fvc, animated: true, completion: nil)
+        geoViewController?.present(fvc, animated: true, completion: nil)
     }
     
     
@@ -90,10 +90,10 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         
         // if old pvc is being shown still for some reason, dismiss it
         if pvc?.view?.window != nil {
-            if pvc == geoViewController.navigationController?.topViewController{
-                _ = geoViewController.navigationController?.popViewController(animated: true)
+            if pvc == geoViewController?.navigationController?.topViewController{
+                _ = geoViewController?.navigationController?.popViewController(animated: true)
             }
-            else if pvc == geoViewController.presentedViewController{
+            else if pvc == geoViewController?.presentedViewController{
                 pvc?.dismiss(animated: true, completion: nil)
             }
         }
@@ -138,14 +138,14 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         if popups.count > 0{
             if self.pvc == nil{
                 
-                let containerStyle : AGSPopupsViewControllerContainerStyle = useNavigationControllerIfAvailable && geoViewController.navigationController != nil ? .navigationController : .navigationBar
+                let containerStyle : AGSPopupsViewControllerContainerStyle = useNavigationControllerIfAvailable && geoViewController?.navigationController != nil ? .navigationController : .navigationBar
                 
                 self.pvc = AGSPopupsViewController(popups: popups, containerStyle: containerStyle)
                 self.pvc?.geometryEditingStyle = .toolbar
                 self.pvc?.customDoneButton = nil
                 self.pvc?.delegate = self
                 
-                if useNavigationControllerIfAvailable, let nc = geoViewController.navigationController{
+                if useNavigationControllerIfAvailable, let nc = geoViewController?.navigationController{
                     // set a back button for the pvc in the nav controller, showing modally, this is handled for us
                     // need to do this so we can clean up (unselect feature, etc) when `back` is tapped
                     let doneViewingBbi = UIBarButtonItem(title: "Back", style: .plain, target: self, action: #selector(doneViewingInNavController))
@@ -155,7 +155,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
                     nc.pushViewController(self.pvc!, animated: true)
                 }
                 else{
-                    geoViewController.present(self.pvc!, animated: true, completion: nil)
+                    geoViewController?.present(self.pvc!, animated: true, completion: nil)
                 }
                 
             }
@@ -188,7 +188,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         
         editingGeometry = true
         
-        if let nc = geoViewController.navigationController{
+        if let geoViewController = geoViewController, let nc = geoViewController.navigationController{
             // if there is a navigationController available add button to go back to popups when done editing geometry
             geoViewControllerOriginalRightBarButtonItems = geoViewController.navigationItem.rightBarButtonItems
             let backToPvcButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(navigateBackToPopupsFromGeometryEditing))
@@ -216,7 +216,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         
         editingGeometry = false
         
-        if let nc = geoViewController.navigationController{
+        if let geoViewController = geoViewController, let nc = geoViewController.navigationController{
             // if there is a navigationController available reset to original buttons
             geoViewController.navigationItem.rightBarButtonItems = geoViewControllerOriginalRightBarButtonItems
             geoViewControllerOriginalRightBarButtonItems = nil
@@ -229,7 +229,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
             }
         }
         else{
-            geoViewController.present(pvc, animated: true, completion: nil)
+            geoViewController?.present(pvc, animated: true, completion: nil)
         }
     }
     
