@@ -14,22 +14,12 @@ Toolkit components that will simplify your iOS app development with ArcGIS Runti
 
 ## Instructions
 
-#### Manual
  1. Ensure you have downloaded and installed __ArcGIS Runtime SDK for iOS__ as described [here](https://developers.arcgis.com/ios/latest/swift/guide/install.htm#ESRI_SECTION1_D57435A2BEBC4D29AFA3A4CAA722506A)
  2. Clone or download this repo. 
  3. Drag and Drop the `Toolkit/ArcGISToolkit.xcodeproj` file into your project through the XCode Project Navigator pane.
  4. Add `import ArcGISToolit` in your source code and start using the toolkit components 
 
-<!--
-//Can't get cocopoads to work because a dynamic framework (toolkit) cannot have a dependency on a static framework (sdk cocopad). Need to figure out how to deliver sdk as dynamic framework cocoapod
 
-#### Cocoapods
- 1. Add `pod ArcGIS-Runtime-SDK-iOS-Toolkit` to your podfile
- 2. Run `pod install`. This will install the toolkit and also the ArcGIS Runtime SDK for iOS which the toolkit depends upon.	
- 3. Add `import ArcGISToolit` in your source code and start using the toolkit components 
-
- New to cocoapods? Visit [cocoapods.org](https://cocoapods.org/)
- -->
 
 ## Additional Resources
 
