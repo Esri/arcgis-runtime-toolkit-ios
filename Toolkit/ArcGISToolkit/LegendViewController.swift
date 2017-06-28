@@ -310,7 +310,16 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
             
             // if we're showing the layerContent, add it to our legend array
             if showAtScale {
-                legendArray.append(layerContent)
+                if let featureCollectionLayer = layerContent as? AGSFeatureCollectionLayer {
+                    // only show Feature Collection layer if the sublayer count is > 1
+                    // but always show the sublayers (the call to `updateLayerLegend`)
+                    if featureCollectionLayer.layers.count > 1 {
+                        legendArray.append(layerContent)
+                    }
+                }
+                else {
+                    legendArray.append(layerContent)
+                }
                 updateLayerLegend(layerContent)
             }
         }
