@@ -13,7 +13,7 @@ A Legend View Controller displays a legend for a set of layers in a Map or Scene
 		
 ```
 
-To see it in action, refer to [LegendExample.swift](../../Examples/ArcGISToolkitExamples/LegendExample.swift)
+To see it in action, try out the [Examples](../../Examples) and refer to [LegendExample.swift](../../Examples/ArcGISToolkitExamples/LegendExample.swift) in the project.
 
 
 
