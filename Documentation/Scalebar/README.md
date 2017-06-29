@@ -14,7 +14,7 @@ The scalebar uses geodetic calculations to provide accurate measurements for map
         view.addSubview(sb)
 ```
 
-To see it in action, refer to [ScalebarExample.swift](../../Examples/ArcGISToolkitExamples/ScalebarExample.swift)
+To see it in action, try out the [Examples](../../Examples) and refer to [ScalebarExample.swift](../../Examples/ArcGISToolkitExamples/ScalebarExample.swift) in the project.
 
 
 ### Styles

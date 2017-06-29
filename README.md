@@ -5,7 +5,7 @@ Toolkit components that will simplify your iOS app development with ArcGIS Runti
 ## Toolkit Components
 
 * [Scalebar](Documentation/Scalebar)
-* Legend View Controller
+* [Legend View Controller](Documentation/LegendViewController)
 * Measure Toolbar
 
 ## Requirements
