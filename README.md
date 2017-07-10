@@ -6,7 +6,7 @@ Toolkit components that will simplify your iOS app development with ArcGIS Runti
 
 * [Scalebar](Documentation/Scalebar)
 * [Legend View Controller](Documentation/LegendViewController)
-* Measure Toolbar
+* [Measure Toolbar](Documentation/MeasureToolbar)
 
 ## Requirements
 * [ArcGIS Runtime SDK for iOS](https://developers.arcgis.com/en/ios/) 100.1 (or higher)
