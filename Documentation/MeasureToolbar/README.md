@@ -1,6 +1,6 @@
 # MeasureToolbar
 
-The MeasureToolbar provides an all-in-one toolbar that you can add to your application to give your user full measure capabilities.
+The MeasureToolbar provides an all-in-one toolbar that you can add to your application to give your user full measure capabilities. The user can sketch on the associated map view and get immediate feedback with geodetic measurements for length or area.
 
 ### Usage
 
