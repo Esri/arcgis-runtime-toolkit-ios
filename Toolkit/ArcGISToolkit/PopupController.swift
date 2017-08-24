@@ -114,12 +114,17 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         
         let c = mapView.identifyLayers(atScreenPoint: screenPoint, tolerance: 10, returnPopupsOnly: true, maximumResultsPerLayer: 12) { [weak self] (identifyResults, error) -> Void in
             
-            if error == nil {
+            if let identifyResults = identifyResults {
                 var popups = [AGSPopup]()
-                for identifyResult in identifyResults! {
-                    popups.append(contentsOf: identifyResult.popups)
-                    identifyResult.sublayerResults.forEach{popups.append(contentsOf: $0.popups)}
+                
+                func processIdentifyResults(identifyResults: [AGSIdentifyLayerResult]){
+                    for identifyResult in identifyResults {
+                        popups.append(contentsOf: identifyResult.popups)
+                        processIdentifyResults(identifyResults: identifyResult.sublayerResults)
+                    }
                 }
+                processIdentifyResults(identifyResults: identifyResults)
+                
                 self?.showPopups(popups)
             }
             else if let error = error {
