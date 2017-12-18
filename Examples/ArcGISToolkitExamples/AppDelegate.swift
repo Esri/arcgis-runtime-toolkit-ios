@@ -47,11 +47,5 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 
-    // This is for the JobManagerExample, if a background fetch happens, we tell the shared JobManager to check the status of the jobs
-    // so that we can get notified of any status updates or completions.
-    func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        JobManager.shared.application(application: application, performFetchWithCompletionHandler: completionHandler)
-    }
-
 }
 
