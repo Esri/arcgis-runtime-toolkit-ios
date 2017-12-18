@@ -95,6 +95,15 @@ class JobTableViewCell: UITableViewCell{
         else if job is AGSOfflineMapSyncJob{
             return "Offline Map Sync"
         }
+        else if job is AGSGeoprocessingJob{
+            return "Geoprocessing"
+        }
+        else if job is AGSExportVectorTilesJob{
+            return "Export Vector Tiles"
+        }
+        else if job is AGSDownloadPreplannedOfflineMapJob{
+            return "Download Preplanned Offline Map"
+        }
         return "Other"
     }
     

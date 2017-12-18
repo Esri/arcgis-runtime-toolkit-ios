@@ -48,6 +48,6 @@ public class NorthArrowController: NSObject {
     }
     
     func degreesToRadians(degrees : Double) -> CGFloat {
-        return CGFloat(degrees * M_PI / 180)
+        return CGFloat(degrees * Double.pi / 180)
     }
 }
