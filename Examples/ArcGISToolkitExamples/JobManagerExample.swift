@@ -178,19 +178,16 @@ class JobManagerExample: TableViewController {
     
     func kickOffJob(){
         
-        if (i % 2) == 1{
+        if (i % 2) == 0{
             let url = URL(string: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Sync/WildfireSync/FeatureServer")!
             generateGDB(URL: url, syncModel: .layer, extent: nil)
         }
         else{
-            
+
             let portalItem = AGSPortalItem(url: URL(string:"https://www.arcgis.com/home/item.html?id=acc027394bc84c2fb04d1ed317aac674")!)!
             let map = AGSMap(item: portalItem)
-            // redlands
-            //let env = AGSEnvelope(xMin: -13043477.056623, yMin: 4035962.602360, xMax: -13042929.369122, yMax: 4036936.269027, spatialReference: AGSSpatialReference.webMercator())
             // naperville
             let env = AGSEnvelope(xMin: -9825684.031125, yMin: 5102237.935062, xMax: -9798254.961608, yMax: 5151000.725314, spatialReference: AGSSpatialReference.webMercator())
-            
             takeOffline(map: map, extent: env)
         }
         
