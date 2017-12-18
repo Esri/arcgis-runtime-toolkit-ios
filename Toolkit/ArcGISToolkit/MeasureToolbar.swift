@@ -619,8 +619,8 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
                 return
             }
             
-            if let error = error{
-                guard (error as NSError).domain != NSCocoaErrorDomain && (error as NSError).code != NSUserCancelledError else{
+            if let error = error as? NSError{
+                guard error.domain != NSCocoaErrorDomain && error.code != NSUserCancelledError else{
                     return
                 }
             }
@@ -638,8 +638,8 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
                         return
                     }
                     
-                    if let error = error{
-                        guard (error as NSError).domain != NSCocoaErrorDomain && (error as NSError).code != NSUserCancelledError else{
+                    if let error = error as? NSError{
+                        guard error.domain != NSCocoaErrorDomain && error.code != NSUserCancelledError else{
                             return
                         }
                     }
