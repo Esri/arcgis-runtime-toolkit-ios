@@ -15,7 +15,6 @@
 		88B689FF1E96EFD700B67FAB /* JobManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689F21E96EFD700B67FAB /* JobManager.swift */; };
 		88B68A001E96EFD700B67FAB /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689F31E96EFD700B67FAB /* MapViewController.swift */; };
 		88B68A011E96EFD700B67FAB /* MeasureToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689F41E96EFD700B67FAB /* MeasureToolbar.swift */; };
-		88B68A021E96EFD700B67FAB /* NorthArrowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689F51E96EFD700B67FAB /* NorthArrowController.swift */; };
 		88B68A031E96EFD700B67FAB /* PopupController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689F61E96EFD700B67FAB /* PopupController.swift */; };
 		88B68A041E96EFD700B67FAB /* Scalebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689F71E96EFD700B67FAB /* Scalebar.swift */; };
 		88B68A051E96EFD700B67FAB /* SketchToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689F81E96EFD700B67FAB /* SketchToolbar.swift */; };
@@ -24,6 +23,7 @@
 		88B68A081E96EFD700B67FAB /* UnitsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689FB1E96EFD700B67FAB /* UnitsViewController.swift */; };
 		88B68A741E9D7F6300B67FAB /* Coalescer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B68A731E9D7F6300B67FAB /* Coalescer.swift */; };
 		88ECCC931DF92F22000C967E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 88ECCC921DF92F22000C967E /* Assets.xcassets */; };
+		E47F7FC61FE98602000EEBE6 /* Compass.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47F7FC51FE98602000EEBE6 /* Compass.swift */; };
 		E48405731E9BE7B700927208 /* LegendViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48405721E9BE7B700927208 /* LegendViewController.swift */; };
 		E484057A1E9C262D00927208 /* Legend.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E48405791E9C262D00927208 /* Legend.storyboard */; };
 /* End PBXBuildFile section */
@@ -39,7 +39,6 @@
 		88B689F21E96EFD700B67FAB /* JobManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JobManager.swift; sourceTree = "<group>"; };
 		88B689F31E96EFD700B67FAB /* MapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
 		88B689F41E96EFD700B67FAB /* MeasureToolbar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeasureToolbar.swift; sourceTree = "<group>"; };
-		88B689F51E96EFD700B67FAB /* NorthArrowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NorthArrowController.swift; sourceTree = "<group>"; };
 		88B689F61E96EFD700B67FAB /* PopupController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopupController.swift; sourceTree = "<group>"; };
 		88B689F71E96EFD700B67FAB /* Scalebar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Scalebar.swift; sourceTree = "<group>"; };
 		88B689F81E96EFD700B67FAB /* SketchToolbar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SketchToolbar.swift; sourceTree = "<group>"; };
@@ -48,6 +47,7 @@
 		88B689FB1E96EFD700B67FAB /* UnitsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnitsViewController.swift; sourceTree = "<group>"; };
 		88B68A731E9D7F6300B67FAB /* Coalescer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Coalescer.swift; sourceTree = "<group>"; };
 		88ECCC921DF92F22000C967E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ArcGISToolkit/Assets.xcassets; sourceTree = "<group>"; };
+		E47F7FC51FE98602000EEBE6 /* Compass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Compass.swift; sourceTree = "<group>"; };
 		E48405721E9BE7B700927208 /* LegendViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegendViewController.swift; sourceTree = "<group>"; };
 		E48405791E9C262D00927208 /* Legend.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Legend.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -121,12 +121,12 @@
 				88B689F21E96EFD700B67FAB /* JobManager.swift */,
 				E48405721E9BE7B700927208 /* LegendViewController.swift */,
 				88B689F41E96EFD700B67FAB /* MeasureToolbar.swift */,
-				88B689F51E96EFD700B67FAB /* NorthArrowController.swift */,
 				88B689F61E96EFD700B67FAB /* PopupController.swift */,
 				88B689F71E96EFD700B67FAB /* Scalebar.swift */,
 				88B689F81E96EFD700B67FAB /* SketchToolbar.swift */,
 				88B689F91E96EFD700B67FAB /* SwitchBasemapViewController.swift */,
 				88B689FB1E96EFD700B67FAB /* UnitsViewController.swift */,
+				E47F7FC51FE98602000EEBE6 /* Compass.swift */,
 			);
 			name = Components;
 			sourceTree = "<group>";
@@ -219,7 +219,6 @@
 				88B68A031E96EFD700B67FAB /* PopupController.swift in Sources */,
 				88B689FC1E96EFD700B67FAB /* CancelGroup.swift in Sources */,
 				E48405731E9BE7B700927208 /* LegendViewController.swift in Sources */,
-				88B68A021E96EFD700B67FAB /* NorthArrowController.swift in Sources */,
 				88B689FF1E96EFD700B67FAB /* JobManager.swift in Sources */,
 				88B68A011E96EFD700B67FAB /* MeasureToolbar.swift in Sources */,
 				88B68A071E96EFD700B67FAB /* TableViewController.swift in Sources */,
@@ -227,6 +226,7 @@
 				88B68A051E96EFD700B67FAB /* SketchToolbar.swift in Sources */,
 				88B68A741E9D7F6300B67FAB /* Coalescer.swift in Sources */,
 				88B68A001E96EFD700B67FAB /* MapViewController.swift in Sources */,
+				E47F7FC61FE98602000EEBE6 /* Compass.swift in Sources */,
 				88B689FE1E96EFD700B67FAB /* FeatureTypesViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
