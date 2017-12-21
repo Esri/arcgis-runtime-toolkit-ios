@@ -23,7 +23,7 @@ public class Compass: UIImageView {
     }
     public var autoHide: Bool = true { // Auto hides when north is up
         didSet {
-            isHidden = (mapView.rotation == 0.0) && autoHide
+            animateCompass()
         }
     }
     public var width: CGFloat = 30.0 {
@@ -57,8 +57,8 @@ public class Compass: UIImageView {
         self.addGestureRecognizer(tapGestureRecognizer)
         self.isUserInteractionEnabled = true
         
-        // Set whether we're hidden or not
-        isHidden = (mapView.rotation == 0.0) && autoHide
+        // animate the compass visibility, if necessary
+        animateCompass()
     }
     
     required public init?(coder aDecoder: NSCoder) {
@@ -74,6 +74,15 @@ public class Compass: UIImageView {
         mapView.setViewpointRotation(0, completion: nil)
         isHidden = autoHide
     }
+    
+    func animateCompass() {
+        let alpha: CGFloat = (mapView.rotation == 0.0) && autoHide ? 0.0 : 1.0
+        if alpha != self.alpha {
+            UIView.animate(withDuration: 0.25) {
+                self.alpha = alpha
+            }
+        }
+    }
 
     override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if (keyPath == #keyPath(AGSMapView.rotation)) && (context == &kvoContext) {
@@ -82,7 +91,8 @@ public class Compass: UIImageView {
             let transform = CGAffineTransform(rotationAngle: mapRotation)
             self.transform = transform
             
-            isHidden = (mapView.rotation == 0.0) && autoHide
+            // animate the compass visibility, if necessary
+            animateCompass()
         }
         else {
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
