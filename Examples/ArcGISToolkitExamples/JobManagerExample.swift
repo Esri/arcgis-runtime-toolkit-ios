@@ -86,9 +86,6 @@ class JobTableViewCell: UITableViewCell{
         else if job is AGSEstimateTileCacheSizeJob{
             return "Estimate Tile Cache Size"
         }
-        else if job is AGSEstimateTileCacheSizeJob{
-            return "Estimate Tile Cache Size"
-        }
         else if job is AGSGenerateOfflineMapJob{
             return "Offline Map"
         }
@@ -208,7 +205,7 @@ class JobManagerExample: TableViewController {
     
     override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "JobCell") as! JobTableViewCell
-        let job = jobs[(indexPath as NSIndexPath).row]
+        let job = jobs[indexPath.row]
         cell.configureWithJob(job: job)
         return cell
     }
@@ -246,7 +243,6 @@ class JobManagerExample: TableViewController {
             
             // return if error or no featureServiceInfo
             guard error == nil else{
-                print("error: \(error!)")
                 return
             }
             
