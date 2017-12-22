@@ -19,6 +19,7 @@
 		88B689CB1E96EDF400B67FAB /* MeasureExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689C11E96EDF400B67FAB /* MeasureExample.swift */; };
 		88B689CE1E96EDF400B67FAB /* ScalebarExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689C41E96EDF400B67FAB /* ScalebarExample.swift */; };
 		88B689D11E96EDF400B67FAB /* VCListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689C71E96EDF400B67FAB /* VCListViewController.swift */; };
+		E46893271FEDAE29008ADA79 /* CompassExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46893261FEDAE29008ADA79 /* CompassExample.swift */; };
 		E48405751E9BE7E600927208 /* LegendExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48405741E9BE7E600927208 /* LegendExample.swift */; };
 /* End PBXBuildFile section */
 
@@ -74,6 +75,7 @@
 		88B689C11E96EDF400B67FAB /* MeasureExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeasureExample.swift; sourceTree = "<group>"; };
 		88B689C41E96EDF400B67FAB /* ScalebarExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScalebarExample.swift; sourceTree = "<group>"; };
 		88B689C71E96EDF400B67FAB /* VCListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VCListViewController.swift; sourceTree = "<group>"; };
+		E46893261FEDAE29008ADA79 /* CompassExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassExample.swift; sourceTree = "<group>"; };
 		E48405741E9BE7E600927208 /* LegendExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegendExample.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -134,6 +136,7 @@
 		88B689D21E96EDFE00B67FAB /* Examples */ = {
 			isa = PBXGroup;
 			children = (
+				E46893261FEDAE29008ADA79 /* CompassExample.swift */,
 				E48405741E9BE7E600927208 /* LegendExample.swift */,
 				88B689C11E96EDF400B67FAB /* MeasureExample.swift */,
 				88B689C41E96EDF400B67FAB /* ScalebarExample.swift */,
@@ -262,6 +265,7 @@
 				88B689CE1E96EDF400B67FAB /* ScalebarExample.swift in Sources */,
 				88B689C91E96EDF400B67FAB /* ExamplesViewController.swift in Sources */,
 				E48405751E9BE7E600927208 /* LegendExample.swift in Sources */,
+				E46893271FEDAE29008ADA79 /* CompassExample.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
