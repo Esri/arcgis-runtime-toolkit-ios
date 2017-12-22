@@ -18,7 +18,7 @@
 		88B689C91E96EDF400B67FAB /* ExamplesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689BF1E96EDF400B67FAB /* ExamplesViewController.swift */; };
 		88B689CA1E96EDF400B67FAB /* JobManagerExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689C01E96EDF400B67FAB /* JobManagerExample.swift */; };
 		88B689CB1E96EDF400B67FAB /* MeasureExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689C11E96EDF400B67FAB /* MeasureExample.swift */; };
-		88B689CC1E96EDF400B67FAB /* NorthArrowExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689C21E96EDF400B67FAB /* NorthArrowExample.swift */; };
+		88B689CC1E96EDF400B67FAB /* CompassExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689C21E96EDF400B67FAB /* CompassExample.swift */; };
 		88B689CD1E96EDF400B67FAB /* PopupExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689C31E96EDF400B67FAB /* PopupExample.swift */; };
 		88B689CE1E96EDF400B67FAB /* ScalebarExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689C41E96EDF400B67FAB /* ScalebarExample.swift */; };
 		88B689CF1E96EDF400B67FAB /* SketchExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689C51E96EDF400B67FAB /* SketchExample.swift */; };
@@ -78,7 +78,7 @@
 		88B689BF1E96EDF400B67FAB /* ExamplesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExamplesViewController.swift; sourceTree = "<group>"; };
 		88B689C01E96EDF400B67FAB /* JobManagerExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JobManagerExample.swift; sourceTree = "<group>"; };
 		88B689C11E96EDF400B67FAB /* MeasureExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeasureExample.swift; sourceTree = "<group>"; };
-		88B689C21E96EDF400B67FAB /* NorthArrowExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NorthArrowExample.swift; sourceTree = "<group>"; };
+		88B689C21E96EDF400B67FAB /* CompassExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CompassExample.swift; sourceTree = "<group>"; };
 		88B689C31E96EDF400B67FAB /* PopupExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopupExample.swift; sourceTree = "<group>"; };
 		88B689C41E96EDF400B67FAB /* ScalebarExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScalebarExample.swift; sourceTree = "<group>"; };
 		88B689C51E96EDF400B67FAB /* SketchExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SketchExample.swift; sourceTree = "<group>"; };
@@ -144,10 +144,10 @@
 		88B689D21E96EDFE00B67FAB /* Examples */ = {
 			isa = PBXGroup;
 			children = (
+				88B689C21E96EDF400B67FAB /* CompassExample.swift */,
 				88B689C01E96EDF400B67FAB /* JobManagerExample.swift */,
 				E48405741E9BE7E600927208 /* LegendExample.swift */,
 				88B689C11E96EDF400B67FAB /* MeasureExample.swift */,
-				88B689C21E96EDF400B67FAB /* NorthArrowExample.swift */,
 				88B689C31E96EDF400B67FAB /* PopupExample.swift */,
 				88B689C41E96EDF400B67FAB /* ScalebarExample.swift */,
 				88B689C51E96EDF400B67FAB /* SketchExample.swift */,
@@ -273,7 +273,7 @@
 			files = (
 				88B689C81E96EDF400B67FAB /* AppDelegate.swift in Sources */,
 				88B689CB1E96EDF400B67FAB /* MeasureExample.swift in Sources */,
-				88B689CC1E96EDF400B67FAB /* NorthArrowExample.swift in Sources */,
+				88B689CC1E96EDF400B67FAB /* CompassExample.swift in Sources */,
 				88B689D11E96EDF400B67FAB /* VCListViewController.swift in Sources */,
 				88B689CE1E96EDF400B67FAB /* ScalebarExample.swift in Sources */,
 				88B689CF1E96EDF400B67FAB /* SketchExample.swift in Sources */,
