@@ -28,18 +28,26 @@ public class Compass: UIImageView {
     }
     public var width: CGFloat = 30.0 {
         didSet {
-            widthAnchor.constraint(equalToConstant: width).isActive = true
+            widthConstraint?.isActive = false
+            widthConstraint = widthAnchor.constraint(equalToConstant: width)
+            widthConstraint?.isActive = true
         }
     }
     public var height: CGFloat = 30 {
         didSet {
-            heightAnchor.constraint(equalToConstant: height).isActive = true
+            heightConstraint?.isActive = false
+            heightConstraint = heightAnchor.constraint(equalToConstant: height)
+            heightConstraint?.isActive = true
         }
     }
     
     private var mapView: AGSMapView
     private var kvoContext = 0
     
+    // the width and height constraints
+    private var widthConstraint:NSLayoutConstraint?
+    private var heightConstraint:NSLayoutConstraint?
+
     public init(mapView: AGSMapView) {
         self.mapView = mapView
         

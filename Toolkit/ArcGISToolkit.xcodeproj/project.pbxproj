@@ -117,6 +117,7 @@
 		88B689EE1E96EF3300B67FAB /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				E47F7FC51FE98602000EEBE6 /* Compass.swift */,
 				88B689F11E96EFD700B67FAB /* FeatureTypesViewController.swift */,
 				88B689F21E96EFD700B67FAB /* JobManager.swift */,
 				E48405721E9BE7B700927208 /* LegendViewController.swift */,
@@ -126,7 +127,6 @@
 				88B689F81E96EFD700B67FAB /* SketchToolbar.swift */,
 				88B689F91E96EFD700B67FAB /* SwitchBasemapViewController.swift */,
 				88B689FB1E96EFD700B67FAB /* UnitsViewController.swift */,
-				E47F7FC51FE98602000EEBE6 /* Compass.swift */,
 			);
 			name = Components;
 			sourceTree = "<group>";

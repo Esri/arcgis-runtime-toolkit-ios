@@ -144,10 +144,10 @@
 		88B689D21E96EDFE00B67FAB /* Examples */ = {
 			isa = PBXGroup;
 			children = (
+				88B689C21E96EDF400B67FAB /* CompassExample.swift */,
 				88B689C01E96EDF400B67FAB /* JobManagerExample.swift */,
 				E48405741E9BE7E600927208 /* LegendExample.swift */,
 				88B689C11E96EDF400B67FAB /* MeasureExample.swift */,
-				88B689C21E96EDF400B67FAB /* CompassExample.swift */,
 				88B689C31E96EDF400B67FAB /* PopupExample.swift */,
 				88B689C41E96EDF400B67FAB /* ScalebarExample.swift */,
 				88B689C51E96EDF400B67FAB /* SketchExample.swift */,
