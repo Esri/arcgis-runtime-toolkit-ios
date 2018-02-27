@@ -1,8 +1,8 @@
 # Job Manager
 
-Jobs by definition are long running operations and especially when using mobile devices, applications are paused, resumed and killed based on the rules they have in the platforms. Our jobs supports pause and resume workflows but we don't have easy way to implement persistence to the application lifecycles without quite a bit custom code.
+Jobs by definition are long running operations and especially when using mobile devices, applications are backgrounded, terminated and re-launched based on rules specific to each platform. Our jobs supports pause and resume workflows but we don't have an easy way to implement persistence to the application lifecycles without quite a bit custom code.
 
-The Job Manager is a toolkit component that you can just plug into the application and then give it tasks you want to persist when the application is paused and an easy way to rehydrate when the application is resumed.
+The Job Manager is a toolkit component that you can just plug into the application and then give it tasks you want to persist when the application is backgrounded/terminated and an easy way to rehydrate when the application is re-launched.
 
 ### Usage
 
