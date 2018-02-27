@@ -5,7 +5,7 @@ Toolkit components that will simplify your iOS app development with ArcGIS Runti
 ## Toolkit Components
 
 * [Compass](Documentation/Compass)
-* [JobManager](Documentation/JobManager)
+* [Job Manager](Documentation/JobManager)
 * [Legend View Controller](Documentation/LegendViewController)
 * [Measure Toolbar](Documentation/MeasureToolbar)
 * [Scalebar](Documentation/Scalebar)
