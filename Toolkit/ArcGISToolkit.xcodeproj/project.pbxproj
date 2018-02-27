@@ -16,6 +16,8 @@
 		88B68A071E96EFD700B67FAB /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689FA1E96EFD700B67FAB /* TableViewController.swift */; };
 		88B68A081E96EFD700B67FAB /* UnitsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689FB1E96EFD700B67FAB /* UnitsViewController.swift */; };
 		88B68A741E9D7F6300B67FAB /* Coalescer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B68A731E9D7F6300B67FAB /* Coalescer.swift */; };
+		88DBC29F1FE83D4400255921 /* JobManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88DBC29E1FE83D4400255921 /* JobManager.swift */; };
+		88DBC2A31FE83DB800255921 /* CancelGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88DBC2A21FE83DB800255921 /* CancelGroup.swift */; };
 		88ECCC931DF92F22000C967E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 88ECCC921DF92F22000C967E /* Assets.xcassets */; };
 		E46893291FEDAE36008ADA79 /* Compass.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46893281FEDAE36008ADA79 /* Compass.swift */; };
 		E48405731E9BE7B700927208 /* LegendViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48405721E9BE7B700927208 /* LegendViewController.swift */; };
@@ -34,6 +36,8 @@
 		88B689FA1E96EFD700B67FAB /* TableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
 		88B689FB1E96EFD700B67FAB /* UnitsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnitsViewController.swift; sourceTree = "<group>"; };
 		88B68A731E9D7F6300B67FAB /* Coalescer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Coalescer.swift; sourceTree = "<group>"; };
+		88DBC29E1FE83D4400255921 /* JobManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobManager.swift; sourceTree = "<group>"; };
+		88DBC2A21FE83DB800255921 /* CancelGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CancelGroup.swift; sourceTree = "<group>"; };
 		88ECCC921DF92F22000C967E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ArcGISToolkit/Assets.xcassets; sourceTree = "<group>"; };
 		E46893281FEDAE36008ADA79 /* Compass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compass.swift; sourceTree = "<group>"; };
 		E48405721E9BE7B700927208 /* LegendViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegendViewController.swift; sourceTree = "<group>"; };
@@ -97,6 +101,7 @@
 				88B689FA1E96EFD700B67FAB /* TableViewController.swift */,
 				E48405791E9C262D00927208 /* Legend.storyboard */,
 				88B68A731E9D7F6300B67FAB /* Coalescer.swift */,
+				88DBC2A21FE83DB800255921 /* CancelGroup.swift */,
 			);
 			name = Misc;
 			sourceTree = "<group>";
@@ -109,6 +114,7 @@
 				88B689F41E96EFD700B67FAB /* MeasureToolbar.swift */,
 				88B689F71E96EFD700B67FAB /* Scalebar.swift */,
 				88B689FB1E96EFD700B67FAB /* UnitsViewController.swift */,
+				88DBC29E1FE83D4400255921 /* JobManager.swift */,
 			);
 			name = Components;
 			sourceTree = "<group>";
@@ -195,10 +201,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				88DBC29F1FE83D4400255921 /* JobManager.swift in Sources */,
 				88B68A041E96EFD700B67FAB /* Scalebar.swift in Sources */,
 				88B68A081E96EFD700B67FAB /* UnitsViewController.swift in Sources */,
 				E48405731E9BE7B700927208 /* LegendViewController.swift in Sources */,
 				88B68A011E96EFD700B67FAB /* MeasureToolbar.swift in Sources */,
+				88DBC2A31FE83DB800255921 /* CancelGroup.swift in Sources */,
 				88B68A071E96EFD700B67FAB /* TableViewController.swift in Sources */,
 				88B689FD1E96EFD700B67FAB /* Extensions.swift in Sources */,
 				88B68A741E9D7F6300B67FAB /* Coalescer.swift in Sources */,
