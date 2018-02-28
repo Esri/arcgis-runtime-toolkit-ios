@@ -28,7 +28,8 @@ Toolkit components that will simplify your iOS app development with ArcGIS Runti
  1. Ensure you have downloaded and installed __ArcGIS Runtime SDK for iOS__ as described [here](https://developers.arcgis.com/ios/latest/swift/guide/install.htm#ESRI_SECTION1_D57435A2BEBC4D29AFA3A4CAA722506A)
  2. Clone or download this repo. 
  3. Drag and Drop the `Toolkit/ArcGISToolkit.xcodeproj` file into your project through the XCode Project Navigator pane.
- 4. Add `import ArcGISToolit` in your source code and start using the toolkit components 
+ 4. Drag the `ArcGISToolkit.framework` from the `ArcGISToolkit.xcodeproj/ArcGISToolkit/Products` folder to the "TARGETS" settings for your application and drop it in the "Embedded Binaries" section in the "General" tab
+ 5. Add `import ArcGISToolkit` in your source code and start using the toolkit components 
 
 
 
