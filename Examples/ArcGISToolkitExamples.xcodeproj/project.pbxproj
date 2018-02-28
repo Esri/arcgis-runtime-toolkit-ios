@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		21CECC3C20168C540019E982 /* TimeSliderExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21CECC3B20168C540019E982 /* TimeSliderExample.swift */; };
 		883904441DF6022A001F3188 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 883904421DF6022A001F3188 /* Main.storyboard */; };
 		883904461DF6022A001F3188 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 883904451DF6022A001F3188 /* Assets.xcassets */; };
 		883904491DF6022A001F3188 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 883904471DF6022A001F3188 /* LaunchScreen.storyboard */; };
@@ -67,6 +68,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		21CECC3B20168C540019E982 /* TimeSliderExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeSliderExample.swift; sourceTree = "<group>"; };
 		8839043B1DF6022A001F3188 /* ArcGISToolkitExamples.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ArcGISToolkitExamples.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		883904431DF6022A001F3188 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		883904451DF6022A001F3188 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -152,6 +154,7 @@
 				88B689C41E96EDF400B67FAB /* ScalebarExample.swift */,
 				88B689C51E96EDF400B67FAB /* SketchExample.swift */,
 				88B689C61E96EDF400B67FAB /* SwitchBasemapExample.swift */,
+				21CECC3B20168C540019E982 /* TimeSliderExample.swift */,
 			);
 			name = Examples;
 			sourceTree = "<group>";
@@ -275,6 +278,7 @@
 				88B689CB1E96EDF400B67FAB /* MeasureExample.swift in Sources */,
 				88B689CC1E96EDF400B67FAB /* CompassExample.swift in Sources */,
 				88B689D11E96EDF400B67FAB /* VCListViewController.swift in Sources */,
+				21CECC3C20168C540019E982 /* TimeSliderExample.swift in Sources */,
 				88B689CE1E96EDF400B67FAB /* ScalebarExample.swift in Sources */,
 				88B689CF1E96EDF400B67FAB /* SketchExample.swift in Sources */,
 				88B689CD1E96EDF400B67FAB /* PopupExample.swift in Sources */,

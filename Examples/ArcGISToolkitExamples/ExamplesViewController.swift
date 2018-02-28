@@ -29,9 +29,9 @@ class ExamplesViewController: VCListViewController {
             ("Sketch", SketchExample.self, nil),
             ("Job Manager", JobManagerExample.self, nil),
             ("Scalebar", ScalebarExample.self, nil),
-            ("Legend", LegendExample.self, nil)
+            ("Legend", LegendExample.self, nil),
+            ("Time Slider", TimeSliderExample.self, nil)
         ]
-        
     }
 
     override func didReceiveMemoryWarning() {

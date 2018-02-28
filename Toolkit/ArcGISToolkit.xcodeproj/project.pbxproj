@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		21CECC3A20166E160019E982 /* TimeSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21CECC3920166E160019E982 /* TimeSlider.swift */; };
 		881233751DF601A700B2EA8E /* ArcGISToolkit.h in Headers */ = {isa = PBXBuildFile; fileRef = 881233731DF601A700B2EA8E /* ArcGISToolkit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		881233841DF601E900B2EA8E /* ArcGIS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 881233831DF601E900B2EA8E /* ArcGIS.framework */; };
 		88B689FC1E96EFD700B67FAB /* CancelGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689EF1E96EFD700B67FAB /* CancelGroup.swift */; };
@@ -29,6 +30,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		21CECC3920166E160019E982 /* TimeSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeSlider.swift; sourceTree = "<group>"; };
 		881233701DF601A700B2EA8E /* ArcGISToolkit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ArcGISToolkit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		881233731DF601A700B2EA8E /* ArcGISToolkit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ArcGISToolkit.h; sourceTree = "<group>"; };
 		881233741DF601A700B2EA8E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -126,6 +128,7 @@
 				88B689F71E96EFD700B67FAB /* Scalebar.swift */,
 				88B689F81E96EFD700B67FAB /* SketchToolbar.swift */,
 				88B689F91E96EFD700B67FAB /* SwitchBasemapViewController.swift */,
+				21CECC3920166E160019E982 /* TimeSlider.swift */,
 				88B689FB1E96EFD700B67FAB /* UnitsViewController.swift */,
 			);
 			name = Components;
@@ -226,6 +229,7 @@
 				88B68A051E96EFD700B67FAB /* SketchToolbar.swift in Sources */,
 				88B68A741E9D7F6300B67FAB /* Coalescer.swift in Sources */,
 				88B68A001E96EFD700B67FAB /* MapViewController.swift in Sources */,
+				21CECC3A20166E160019E982 /* TimeSlider.swift in Sources */,
 				E47F7FC61FE98602000EEBE6 /* Compass.swift in Sources */,
 				88B689FE1E96EFD700B67FAB /* FeatureTypesViewController.swift in Sources */,
 			);
