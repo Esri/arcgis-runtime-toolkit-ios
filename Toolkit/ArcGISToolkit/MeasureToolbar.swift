@@ -93,11 +93,11 @@ class MeasureResultView : UIView{
         stackView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         stackView.heightAnchor.constraint(equalToConstant: 32).isActive = true
         
-        valueLabel.setContentCompressionResistancePriority(500, for: .horizontal)
-        valueLabel.setContentHuggingPriority(1000, for: .horizontal)
+        valueLabel.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 500), for: .horizontal)
+        valueLabel.setContentHuggingPriority(UILayoutPriority(rawValue: 1000), for: .horizontal)
         
-        unitButton.setContentCompressionResistancePriority(499, for: .horizontal)
-        unitButton.setContentHuggingPriority(1000, for: .horizontal)
+        unitButton.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 499), for: .horizontal)
+        unitButton.setContentHuggingPriority(UILayoutPriority(rawValue: 1000), for: .horizontal)
         
         let tgr = UITapGestureRecognizer(target: self, action: #selector(buttonTap))
         addGestureRecognizer(tgr)
@@ -111,7 +111,7 @@ class MeasureResultView : UIView{
         return true
     }
     
-    func buttonTap(){
+    @objc func buttonTap(){
         guard unitButton.isHidden == false else{
             return
         }
@@ -376,18 +376,18 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
         let space : CGFloat = 2
         
         let c1 = resultView.leadingAnchor.constraint(greaterThanOrEqualTo: leftHiddenPlaceholderView.trailingAnchor, constant: space)
-        c1.priority = UILayoutPriorityRequired
+        c1.priority = UILayoutPriority.required
         
         // have to give this just below required, otherwise before the left and right views are setup in 
         // their proper locations we can get constraint errors
         let c2 = resultView.trailingAnchor.constraint(lessThanOrEqualTo: rightHiddenPlaceholderView.leadingAnchor, constant: -space)
-        c2.priority = UILayoutPriorityRequired-1
+        c2.priority = UILayoutPriority(rawValue: UILayoutPriority.RawValue(Int(UILayoutPriority.required.rawValue)-1))
         
         let c3 = NSLayoutConstraint(item: resultView, attribute: .centerX, relatedBy: .greaterThanOrEqual, toItem: toolbar, attribute: .centerX, multiplier: 1, constant: 0)
-        c3.priority = UILayoutPriorityRequired
+        c3.priority = UILayoutPriority.required
         
         let c4 = NSLayoutConstraint(item: resultView, attribute: .centerX, relatedBy: .lessThanOrEqual, toItem: toolbar, attribute: .centerX, multiplier: 1, constant: 0)
-        c4.priority = UILayoutPriorityDefaultLow
+        c4.priority = UILayoutPriority.defaultLow
         
         NSLayoutConstraint.activate([c1, c2, c3, c4])
         
