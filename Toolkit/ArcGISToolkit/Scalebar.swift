@@ -242,7 +242,7 @@ public class Scalebar: UIView {
         }
     }
     
-    public var font : UIFont = UIFont.systemFont(ofSize: 9.0, weight: UIFontWeightSemibold){
+    public var font : UIFont = UIFont.systemFont(ofSize: 9.0, weight: UIFont.Weight.semibold){
         didSet{
             recalculateFontProperties()
             updateScaleDisplay(forceRedraw: true)
@@ -283,13 +283,13 @@ public class Scalebar: UIView {
     private func recalculateFontProperties(){
         
         let zeroText = "0"
-        zeroStringWidth = zeroText.size(attributes: [NSFontAttributeName: font]).width
+        zeroStringWidth = zeroText.size(withAttributes: [NSAttributedStringKey.font: font]).width
         
         let fontHeightText = "Ay"
-        fontHeight = fontHeightText.size(attributes: [NSFontAttributeName: font]).height
+        fontHeight = fontHeightText.size(withAttributes: [NSAttributedStringKey.font: font]).height
         
         let unitsMaxText = " km"
-        maxRightUnitsPad = unitsMaxText.size(attributes: [NSFontAttributeName: font]).width
+        maxRightUnitsPad = unitsMaxText.size(withAttributes: [NSAttributedStringKey.font: font]).width
     }
     
     // set a minScale if you only want the scalebar to appear when you reach a large enough scale
@@ -619,9 +619,9 @@ internal extension ScalebarRenderer{
         // use a string with at least a few characters in case the number string only has 1
         // the dividers will be decimal values and we want to make sure they all fit
         // very basic hueristics...
-        let minSegmentTestString = (scaleDisplay.mapLengthString.characters.count > 3) ? scaleDisplay.mapLengthString : "9.9"
+        let minSegmentTestString = (scaleDisplay.mapLengthString.count > 3) ? scaleDisplay.mapLengthString : "9.9"
         // use 1.5 because the last segment, the text is right justified insted of center, which makes it harder to squeeze text in
-        let minSegmentWidth = (minSegmentTestString.size(attributes: [NSFontAttributeName: scalebar.font]).width * 1.5) + (Scalebar.labelXPad * 2)
+        let minSegmentWidth = (minSegmentTestString.size(withAttributes: [NSAttributedStringKey.font: scalebar.font]).width * 1.5) + (Scalebar.labelXPad * 2)
         var maxNumSegments : Int = Int(lineDisplayLength / minSegmentWidth)
         maxNumSegments = min(maxNumSegments, 4) // cap it at 4
         let numSegments: Int = ScalebarUnits.numSegmentsForDistance(distance: scaleDisplay.lineMapLength, maxNumSegments: maxNumSegments)
@@ -637,7 +637,7 @@ internal extension ScalebarRenderer{
             currSegmentX += segmentScreenLength
             let segmentMapLength = Double((segmentScreenLength * CGFloat(index + 1)) / lineDisplayLength) * scaleDisplay.lineMapLength
             let segmentText = Scalebar.numberFormatter.string(from: NSNumber(value: segmentMapLength)) ?? ""
-            let segmentTextWidth = segmentText.size(attributes: [NSFontAttributeName: scalebar.font]).width
+            let segmentTextWidth = segmentText.size(withAttributes: [NSAttributedStringKey.font: scalebar.font]).width
             
             let segmentInfo = SegmentInfo(index: index, segmentScreenLength: segmentScreenLength, xOffset: currSegmentX, segmentMapLength: segmentMapLength, text: segmentText, textWidth: segmentTextWidth)
             
@@ -659,9 +659,9 @@ internal extension ScalebarRenderer{
         // draw text shadow
         if let shadowColor = scalebar.textShadowColor{
             
-            let shadowAttrs = [NSFontAttributeName: scalebar.font,
-                               NSParagraphStyleAttributeName: paragraphStyle,
-                               NSForegroundColorAttributeName: shadowColor]
+            let shadowAttrs = [NSAttributedStringKey.font: scalebar.font,
+                               NSAttributedStringKey.paragraphStyle: paragraphStyle,
+                               NSAttributedStringKey.foregroundColor: shadowColor]
             
             let shadowFrame = frame.offsetBy(dx: shadowOffset.x, dy: shadowOffset.y)
             
@@ -669,9 +669,9 @@ internal extension ScalebarRenderer{
         }
         
         // draw text
-        let attrs = [NSFontAttributeName: scalebar.font,
-                     NSParagraphStyleAttributeName: paragraphStyle,
-                     NSForegroundColorAttributeName: textColor]
+        let attrs = [NSAttributedStringKey.font: scalebar.font,
+                     NSAttributedStringKey.paragraphStyle: paragraphStyle,
+                     NSAttributedStringKey.foregroundColor: textColor]
         
         text.draw(with: frame, options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
     }
@@ -711,7 +711,7 @@ internal extension ScalebarRenderer{
                 // draw units off the end
                 
                 let unitsText = " \(scaleDisplay.displayUnit.abbreviation)"
-                let unitsTextWidth = unitsText.size(attributes: [NSFontAttributeName: scalebar.font]).width
+                let unitsTextWidth = unitsText.size(withAttributes: [NSAttributedStringKey.font: scalebar.font]).width
                 
                 let unitsTextFrame = CGRect(x: segmentTextFrame.maxX,
                                               y: textY,
@@ -1361,10 +1361,10 @@ internal class ScalebarDualUnitLineStyleRenderer : ScalebarRenderer{
         // draw top text
         
         let topUnitsText = " \(scaleDisplay.displayUnit.abbreviation)"
-        let topUnitsTextWidth = topUnitsText.size(attributes: [NSFontAttributeName: scalebar.font]).width
+        let topUnitsTextWidth = topUnitsText.size(withAttributes: [NSAttributedStringKey.font: scalebar.font]).width
         
         let topText = "\(scaleDisplay.mapLengthString)\(topUnitsText)"
-        let topTextWidth = topText.size(attributes: [NSFontAttributeName: scalebar.font]).width
+        let topTextWidth = topText.size(withAttributes: [NSAttributedStringKey.font: scalebar.font]).width
         let topTextMapLengthStringWidth = topTextWidth - topUnitsTextWidth
         
         let topTextFrame = CGRect(x: lineX + lineScreenLength + halfLineWidth - topTextMapLengthStringWidth,
@@ -1378,10 +1378,10 @@ internal class ScalebarDualUnitLineStyleRenderer : ScalebarRenderer{
         if let numberString = Scalebar.numberFormatter.string(from: NSNumber(value: otherLineMapLength)){
             
             let bottomUnitsText = " \(otherDisplayUnits.abbreviation)"
-            let bottomUnitsTextWidth = bottomUnitsText.size(attributes: [NSFontAttributeName: scalebar.font]).width
+            let bottomUnitsTextWidth = bottomUnitsText.size(withAttributes: [NSAttributedStringKey.font: scalebar.font]).width
             
             let bottomText = "\(numberString)\(bottomUnitsText)"
-            let bottomTextWidth = bottomText.size(attributes: [NSFontAttributeName: scalebar.font]).width
+            let bottomTextWidth = bottomText.size(withAttributes: [NSAttributedStringKey.font: scalebar.font]).width
             let bottomTextNumberStringWidth = bottomTextWidth - bottomUnitsTextWidth
             
             let bottomTextFrame = CGRect(x: lineX + otherLineScreenLength + halfLineWidth - bottomTextNumberStringWidth,
