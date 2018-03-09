@@ -93,10 +93,10 @@ class MeasureResultView : UIView{
         stackView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         stackView.heightAnchor.constraint(equalToConstant: 32).isActive = true
         
-        valueLabel.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 499), for: .horizontal)
+        valueLabel.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 500), for: .horizontal)
         valueLabel.setContentHuggingPriority(.required, for: .horizontal)
         
-        unitButton.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 500), for: .horizontal)
+        unitButton.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 499), for: .horizontal)
         unitButton.setContentHuggingPriority(.required, for: .horizontal)
         
         let tgr = UITapGestureRecognizer(target: self, action: #selector(buttonTap))
