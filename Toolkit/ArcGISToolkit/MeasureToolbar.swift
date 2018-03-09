@@ -93,11 +93,11 @@ class MeasureResultView : UIView{
         stackView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         stackView.heightAnchor.constraint(equalToConstant: 32).isActive = true
         
-        valueLabel.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 500), for: .horizontal)
-        valueLabel.setContentHuggingPriority(UILayoutPriority(rawValue: 1000), for: .horizontal)
+        valueLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        valueLabel.setContentHuggingPriority(.required, for: .horizontal)
         
-        unitButton.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 499), for: .horizontal)
-        unitButton.setContentHuggingPriority(UILayoutPriority(rawValue: 1000), for: .horizontal)
+        unitButton.setContentCompressionResistancePriority(.required, for: .horizontal)
+        unitButton.setContentHuggingPriority(.required, for: .horizontal)
         
         let tgr = UITapGestureRecognizer(target: self, action: #selector(buttonTap))
         addGestureRecognizer(tgr)
@@ -381,7 +381,7 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
         // have to give this just below required, otherwise before the left and right views are setup in 
         // their proper locations we can get constraint errors
         let c2 = resultView.trailingAnchor.constraint(lessThanOrEqualTo: rightHiddenPlaceholderView.leadingAnchor, constant: -space)
-        c2.priority = UILayoutPriority(rawValue: UILayoutPriority.RawValue(Int(UILayoutPriority.required.rawValue)-1))
+        c2.priority = UILayoutPriority(rawValue: 999)
         
         let c3 = NSLayoutConstraint(item: resultView, attribute: .centerX, relatedBy: .greaterThanOrEqual, toItem: toolbar, attribute: .centerX, multiplier: 1, constant: 0)
         c3.priority = UILayoutPriority.required
