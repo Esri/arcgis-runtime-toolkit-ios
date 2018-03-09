@@ -93,10 +93,10 @@ class MeasureResultView : UIView{
         stackView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         stackView.heightAnchor.constraint(equalToConstant: 32).isActive = true
         
-        valueLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        valueLabel.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 499), for: .horizontal)
         valueLabel.setContentHuggingPriority(.required, for: .horizontal)
         
-        unitButton.setContentCompressionResistancePriority(.required, for: .horizontal)
+        unitButton.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 500), for: .horizontal)
         unitButton.setContentHuggingPriority(.required, for: .horizontal)
         
         let tgr = UITapGestureRecognizer(target: self, action: #selector(buttonTap))
@@ -376,7 +376,7 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
         let space : CGFloat = 2
         
         let c1 = resultView.leadingAnchor.constraint(greaterThanOrEqualTo: leftHiddenPlaceholderView.trailingAnchor, constant: space)
-        c1.priority = UILayoutPriority.required
+        c1.priority = .required
         
         // have to give this just below required, otherwise before the left and right views are setup in 
         // their proper locations we can get constraint errors
@@ -384,10 +384,10 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
         c2.priority = UILayoutPriority(rawValue: 999)
         
         let c3 = NSLayoutConstraint(item: resultView, attribute: .centerX, relatedBy: .greaterThanOrEqual, toItem: toolbar, attribute: .centerX, multiplier: 1, constant: 0)
-        c3.priority = UILayoutPriority.required
+        c3.priority = .required
         
         let c4 = NSLayoutConstraint(item: resultView, attribute: .centerX, relatedBy: .lessThanOrEqual, toItem: toolbar, attribute: .centerX, multiplier: 1, constant: 0)
-        c4.priority = UILayoutPriority.defaultLow
+        c4.priority = .defaultLow
         
         NSLayoutConstraint.activate([c1, c2, c3, c4])
         
