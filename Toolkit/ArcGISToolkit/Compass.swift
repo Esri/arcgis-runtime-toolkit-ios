@@ -78,7 +78,7 @@ public class Compass: UIImageView {
         mapView.removeObserver(self, forKeyPath: #keyPath(AGSMapView.rotation), context: &kvoContext)
     }
     
-    func compassTapped(){
+    @objc func compassTapped(){
         mapView.setViewpointRotation(0, completion: nil)
         isHidden = autoHide
     }
