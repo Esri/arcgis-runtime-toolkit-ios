@@ -60,7 +60,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
     
     var addingNewFeature : Bool = false
     
-    func addNewFeatureTap(){
+    @objc func addNewFeatureTap(){
         
         // if old pvc is being shown still for some reason, dismiss it
         self.cleanupLastPopupsViewController()
@@ -170,7 +170,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         }
     }
     
-    func doneViewingInNavController(){
+    @objc func doneViewingInNavController(){
         guard let pvc = self.pvc else {
             return
         }
@@ -213,7 +213,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         
     }
     
-    func navigateBackToPopupsFromGeometryEditing(){
+    @objc func navigateBackToPopupsFromGeometryEditing(){
         
         guard let pvc = self.pvc else{
             return
