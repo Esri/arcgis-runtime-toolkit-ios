@@ -25,7 +25,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
     
     weak var geoViewController: UIViewController?
     var geoView: AGSGeoView
-    var useNavigationControllerIfAvailable : Bool = true
+    public var useNavigationControllerIfAvailable : Bool = true
     
     public init(geoViewController: UIViewController, geoView: AGSGeoView, takeOverGeoViewDelegate: Bool = true, showAddFeatureButton: Bool = true){
         
