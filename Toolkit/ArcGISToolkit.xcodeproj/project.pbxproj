@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		881233751DF601A700B2EA8E /* ArcGISToolkit.h in Headers */ = {isa = PBXBuildFile; fileRef = 881233731DF601A700B2EA8E /* ArcGISToolkit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		881233841DF601E900B2EA8E /* ArcGIS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 881233831DF601E900B2EA8E /* ArcGIS.framework */; };
+		883EA74920741A4C006D6F72 /* PopupController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 883EA74820741A4C006D6F72 /* PopupController.swift */; };
 		88B689FD1E96EFD700B67FAB /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689F01E96EFD700B67FAB /* Extensions.swift */; };
 		88B68A001E96EFD700B67FAB /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689F31E96EFD700B67FAB /* MapViewController.swift */; };
 		88B68A011E96EFD700B67FAB /* MeasureToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689F41E96EFD700B67FAB /* MeasureToolbar.swift */; };
@@ -29,6 +30,7 @@
 		881233731DF601A700B2EA8E /* ArcGISToolkit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ArcGISToolkit.h; sourceTree = "<group>"; };
 		881233741DF601A700B2EA8E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		881233831DF601E900B2EA8E /* ArcGIS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ArcGIS.framework; path = "~/Library/SDKs/ArcGIS/iOS/Frameworks/Dynamic/ArcGIS.framework"; sourceTree = "<absolute>"; };
+		883EA74820741A4C006D6F72 /* PopupController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopupController.swift; sourceTree = "<group>"; };
 		88B689F01E96EFD700B67FAB /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		88B689F31E96EFD700B67FAB /* MapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
 		88B689F41E96EFD700B67FAB /* MeasureToolbar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeasureToolbar.swift; sourceTree = "<group>"; };
@@ -115,6 +117,7 @@
 				88B689F71E96EFD700B67FAB /* Scalebar.swift */,
 				88B689FB1E96EFD700B67FAB /* UnitsViewController.swift */,
 				88DBC29E1FE83D4400255921 /* JobManager.swift */,
+				883EA74820741A4C006D6F72 /* PopupController.swift */,
 			);
 			name = Components;
 			sourceTree = "<group>";
@@ -205,6 +208,7 @@
 				88B68A041E96EFD700B67FAB /* Scalebar.swift in Sources */,
 				88B68A081E96EFD700B67FAB /* UnitsViewController.swift in Sources */,
 				E48405731E9BE7B700927208 /* LegendViewController.swift in Sources */,
+				883EA74920741A4C006D6F72 /* PopupController.swift in Sources */,
 				88B68A011E96EFD700B67FAB /* MeasureToolbar.swift in Sources */,
 				88DBC2A31FE83DB800255921 /* CancelGroup.swift in Sources */,
 				88B68A071E96EFD700B67FAB /* TableViewController.swift in Sources */,

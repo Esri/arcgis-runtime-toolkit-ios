@@ -1,4 +1,4 @@
-// Copyright 2017 Esri.
+// Copyright 2016 Esri.
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,29 +13,31 @@
 
 import UIKit
 import ArcGISToolkit
+import ArcGIS
 
-class ExamplesViewController: VCListViewController {
-
+class PopupExample: MapViewController {
+    
+    let portal = AGSPortal.arcGISOnline(withLoginRequired: false)
+    var portalItem : AGSPortalItem?
+    var map : AGSMap?
+    
+    var popupController : PopupController?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        self.title = "Toolkit Samples"
         
-        self.viewControllerInfos = [
-            ("Compass", CompassExample.self, nil),
-            ("Measure", MeasureExample.self, nil),
-            ("Scalebar", ScalebarExample.self, nil),
-            ("Legend", LegendExample.self, nil),
-            ("Job Manager", JobManagerExample.self, nil),
-            ("Popup Controller", PopupExample.self, nil)
-        ]
+        portalItem = AGSPortalItem(portal: portal, itemID: "22839dfed86f42b6ac0f7bea9677ee07")
+        map = AGSMap(item: portalItem!)
+        mapView.map = map
         
+        popupController = PopupController(geoViewController: self, geoView: mapView)
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
-
+    
 }
+
