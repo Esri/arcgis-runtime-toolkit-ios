@@ -458,14 +458,14 @@ public class TimeSlider: UIControl {
     /*
      A Boolean value indicating whether playback buttons are visible or not. Default is true.
      */
-    public var isPlaybackButtonsVisible: Bool = true {
+    public var playbackButtonsVisible: Bool = true {
         didSet {
             layoutIfNeeded()
             UIView.animate(withDuration: 0.25) {
                 self.heightConstraint?.constant = self.heightConstraintConstant()
-                self.playPauseButton?.isHidden = !self.isPlaybackButtonsVisible
-                self.forwardButton?.isHidden = !self.isPlaybackButtonsVisible
-                self.backButton?.isHidden = !self.isPlaybackButtonsVisible
+                self.playPauseButton?.isHidden = !self.playbackButtonsVisible
+                self.forwardButton?.isHidden = !self.playbackButtonsVisible
+                self.backButton?.isHidden = !self.playbackButtonsVisible
                 self.refresh()
             }
         }
@@ -1284,7 +1284,7 @@ public class TimeSlider: UIControl {
         if isSliderVisible {
             //
             var trackLayerOriginY = bounds.midY + 20
-            if !isPlaybackButtonsVisible {
+            if !playbackButtonsVisible {
                 trackLayerOriginY = bounds.midY - CGFloat(trackHeight / 2)
             }
             
@@ -1332,7 +1332,7 @@ public class TimeSlider: UIControl {
         
         // Set frames for playback buttons
         // if they are visible
-        if isPlaybackButtonsVisible {
+        if playbackButtonsVisible {
             //
             // Set frames for buttons
             let paddingBetweenButtons: CGFloat = 2.0
@@ -1864,10 +1864,10 @@ public class TimeSlider: UIControl {
         //
         // The constant value is based on whether
         // slider and/or playback buttons are visible
-        if isSliderVisible && isPlaybackButtonsVisible {
+        if isSliderVisible && playbackButtonsVisible {
             return 140.0
         }
-        else if isSliderVisible && !isPlaybackButtonsVisible {
+        else if isSliderVisible && !playbackButtonsVisible {
             return 100.0
         }
         else {
