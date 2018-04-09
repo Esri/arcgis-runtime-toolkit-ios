@@ -54,7 +54,9 @@ class TimeSliderExample: MapViewController {
             }
             
             // Zoom to full extent of layer
-            self?.mapView.setViewpoint(AGSViewpoint(targetExtent: mapImageLayer.fullExtent!), completion: nil)
+            if let fullExtent = mapImageLayer.fullExtent {
+                self?.mapView.setViewpoint(AGSViewpoint(targetExtent:fullExtent), completion: nil)
+            }
             
             self?.timeSlider?.initializeTimeProperties(timeAwareLayer: mapImageLayer, completion: { [weak self] (error) in
                 guard error == nil else {
