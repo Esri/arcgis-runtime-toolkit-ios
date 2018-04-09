@@ -19,7 +19,7 @@ import ArcGIS
 // MARK: - Time Slider Control
 
 /*
-Controls how labels on the slider are displayed.
+ Controls how labels on the slider are displayed.
  */
 public enum TimeSliderLabelMode {
     case none
@@ -74,7 +74,7 @@ public class TimeSlider: UIControl {
                 if !internalUpdate {
                     //
                     // Range is enabled only if both times are not same.
-                    isRangeEnabled = startTime == endTime ? false : true
+                    isRangeEnabled = (startTime != endTime)
                 }
             }
             // This means there is only one thumb needs to be displayed and current extent start and end times are same.
@@ -99,9 +99,15 @@ public class TimeSlider: UIControl {
                 
                 // Update current extent start time
                 updateCurrentExtentStartTime(endTime)
-
+                
                 // Start and end time must be same.
                 currentExtentEndTime = currentExtentStartTime
+            }
+            // Set start and end time to nil if
+            // current extent is nil
+            else if currentExtent == nil {
+                currentExtentStartTime = nil
+                currentExtentEndTime = nil
             }
             
             // Refresh the view
@@ -188,6 +194,12 @@ public class TimeSlider: UIControl {
             //
             // Set current extent if it's nil.
             if currentExtent == nil, let fullExtent = fullExtent {
+                currentExtent = fullExtent
+            }
+            else if fullExtent == nil {
+                timeSteps?.removeAll()
+                tickMarks?.removeAll()
+                removeTickMarkLabels()
                 currentExtent = fullExtent
             }
             else {
@@ -415,17 +427,17 @@ public class TimeSlider: UIControl {
             // More than 50 width and height
             // is too big for the iOS control.
             // So, restrict it.
-            if thumbSize.width > 50.0 {
-                thumbSize.width = 50.0
+            if thumbSize.width > maximumThumbSize {
+                thumbSize.width = maximumThumbSize
             }
-            if thumbSize.height > 50.0 {
-                thumbSize.height = 50.0
+            if thumbSize.height > maximumThumbSize {
+                thumbSize.height = maximumThumbSize
             }
             
             // Set side padding of the track layer for the new thumb size
             // so thumb has enough space to go all the way to end.
             trackLayerSidePadding = (thumbSize.width / 2.0) + labelSidePadding
-
+            
             // Refresh the view.
             refresh()
         }
@@ -499,7 +511,7 @@ public class TimeSlider: UIControl {
                 //
                 // Set the pause image
                 playPauseButton?.setBackgroundImage(pauseImage?.imageWithColor(playbackButtonsFillColor), for: .normal)
-            
+                
                 // Invalidate timer, in case this button is tapped multiple times
                 timer.invalidate()
                 
@@ -635,6 +647,7 @@ public class TimeSlider: UIControl {
     private let currentExtentStartTimeLabel: CATextLayer = CATextLayer()
     private let currentExtentEndTimeLabel: CATextLayer = CATextLayer()
     
+    private let maximumThumbSize: CGFloat = 50.0
     private var trackLayerSidePadding: CGFloat = 30.0
     private let labelSidePadding: CGFloat = 10.0
     private let labelPadding: CGFloat = 3.0
@@ -691,7 +704,7 @@ public class TimeSlider: UIControl {
         //
         // Stop playing
         isPlaying = false
-
+        
         // Set preview location from touch
         previousLocation = touch.location(in: self)
         
@@ -700,7 +713,7 @@ public class TimeSlider: UIControl {
         if !lowerThumbLayer.isPinned && lowerThumbLayer.frame.contains(previousLocation) {
             lowerThumbLayer.isHighlighted = true
         }
-        if  !upperThumbLayer.isPinned && isRangeEnabled && upperThumbLayer.frame.contains(previousLocation) {
+        if !upperThumbLayer.isPinned && isRangeEnabled && upperThumbLayer.frame.contains(previousLocation) {
             upperThumbLayer.isHighlighted = true
         }
         
@@ -729,7 +742,7 @@ public class TimeSlider: UIControl {
             updateCurrentExtentStartTime(Date(timeIntervalSince1970: selectedValue))
         }
         else if upperThumbLayer.isHighlighted {
-            updateCurrentExtentEndTime(Date(timeIntervalSince1970:selectedValue))
+            updateCurrentExtentEndTime(Date(timeIntervalSince1970: selectedValue))
         }
         
         // If range is not enabled
@@ -836,7 +849,7 @@ public class TimeSlider: UIControl {
                         self?.findTimeStepIntervalAndIsRangeTimeFilteringSupported(for: timeAwareLayer, completion: { (arg0) in
                             if let (timeInterval, supportsRangeFiltering) = arg0 {
                                 supportsRangeTimeFiltering = supportsRangeFiltering
-
+                                
                                 // We are looking for the greater time interval than we already have it.
                                 if let timeInterval = timeInterval {
                                     if var timeAwareLayersStepInterval = timeAwareLayersStepInterval {
@@ -862,7 +875,7 @@ public class TimeSlider: UIControl {
                 // If full extent or time step interval is not available then
                 // we cannot initialize the slider. Finish with error.
                 if timeAwareLayersFullExtent == nil || timeAwareLayersStepInterval == nil {
-                    completion(NSError(domain: "", code: AGSErrorCode.commonFileNotFound.rawValue, userInfo: [NSLocalizedDescriptionKey : "There are no time aware layers to initialize time slider."]))
+                    completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonNoData.rawValue, userInfo: [NSLocalizedDescriptionKey : "There are no time aware layers to initialize time slider."]))
                 }
                 else {
                     //
@@ -910,8 +923,6 @@ public class TimeSlider: UIControl {
                 // then only we can initialize the time slider.
                 if timeAwareLayer.supportsTimeFiltering && timeAwareLayer.isTimeFilteringEnabled {
                     //
-
-                    
                     // This is an async operation to find out time step interval and
                     // whether range time filtering is supported by the layer.
                     self?.findTimeStepIntervalAndIsRangeTimeFilteringSupported(for: timeAwareLayer, completion: { [weak self] (arg0) in
@@ -921,7 +932,7 @@ public class TimeSlider: UIControl {
                             // available then the layer does not have information
                             // required to initialize time slider. Finish with an error.
                             guard let timeInterval = timeInterval, let fullTimeExtent = timeAwareLayer.fullTimeExtent else {
-                                completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonInvalidArgument.rawValue, userInfo: [NSLocalizedDescriptionKey : "The layer does not have time information to initialize time slider."]))
+                                completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonNoData.rawValue, userInfo: [NSLocalizedDescriptionKey : "The layer does not have time information to initialize time slider."]))
                                 return
                             }
                             
@@ -945,12 +956,12 @@ public class TimeSlider: UIControl {
                     })
                 }
                 else {
-                    completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonInvalidArgument.rawValue, userInfo: [NSLocalizedDescriptionKey : "The layer either does not support time filtering or is not enabled."]))
+                    completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonNoData.rawValue, userInfo: [NSLocalizedDescriptionKey : "The layer either does not support time filtering or is not enabled."]))
                 }
             })
         }
         else {
-            completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonInvalidArgument.rawValue, userInfo: [NSLocalizedDescriptionKey : "The layer is not loadable to initialize time slider."]))
+            completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonNoData.rawValue, userInfo: [NSLocalizedDescriptionKey : "The layer is not loadable to initialize time slider."]))
         }
     }
     
@@ -1176,12 +1187,8 @@ public class TimeSlider: UIControl {
         upperThumbLayer.contentsScale = UIScreen.main.scale
         layer.addSublayer(upperThumbLayer)
         
-        //
-        // Add labels
-        //let labelFrame: CGRect = CGRect(x: 0.0, y: 0.0, width: 75.0, height: 14.0)
-        
         // Add the minimum value label
-        fullExtentStartTimeLabel.isHidden = !fullExtentLabelsVisible
+        fullExtentStartTimeLabel.isHidden = !(fullExtentLabelsVisible && isSliderVisible)
         fullExtentStartTimeLabel.foregroundColor = fullExtentLabelColor.cgColor
         fullExtentStartTimeLabel.alignmentMode = kCAAlignmentCenter
         fullExtentStartTimeLabel.frame = CGRect.zero
@@ -1190,7 +1197,7 @@ public class TimeSlider: UIControl {
         layer.addSublayer(fullExtentStartTimeLabel)
         
         // Add the minimum value label
-        fullExtentEndTimeLabel.isHidden = !fullExtentLabelsVisible
+        fullExtentEndTimeLabel.isHidden = !(fullExtentLabelsVisible && isSliderVisible)
         fullExtentEndTimeLabel.foregroundColor = fullExtentLabelColor.cgColor
         fullExtentEndTimeLabel.alignmentMode = kCAAlignmentCenter
         fullExtentEndTimeLabel.frame = CGRect.zero
@@ -1199,7 +1206,7 @@ public class TimeSlider: UIControl {
         layer.addSublayer(fullExtentEndTimeLabel)
         
         // Add the lower value label
-        currentExtentStartTimeLabel.isHidden = labelMode == .thumbs ? true : false && isSliderVisible ? true : false
+        currentExtentStartTimeLabel.isHidden = !(labelMode == .thumbs && isSliderVisible)
         currentExtentStartTimeLabel.foregroundColor = currentExtentLabelColor.cgColor
         currentExtentStartTimeLabel.alignmentMode = kCAAlignmentCenter
         currentExtentStartTimeLabel.frame = CGRect.zero
@@ -1208,7 +1215,7 @@ public class TimeSlider: UIControl {
         layer.addSublayer(currentExtentStartTimeLabel)
         
         // Add the upper value label
-        currentExtentEndTimeLabel.isHidden = labelMode == .thumbs ? true : false && isSliderVisible ? true : false
+        currentExtentEndTimeLabel.isHidden = !(labelMode == .thumbs && isSliderVisible)
         currentExtentEndTimeLabel.foregroundColor = currentExtentLabelColor.cgColor
         currentExtentEndTimeLabel.alignmentMode = kCAAlignmentCenter
         currentExtentEndTimeLabel.frame = CGRect.zero
@@ -1254,7 +1261,7 @@ public class TimeSlider: UIControl {
     private func refresh() {
         //
         // Calculate time steps
-        if timeSteps == nil {
+        if let timeSteps = self.timeSteps, timeSteps.isEmpty || self.timeSteps == nil {
             calculateTimeSteps()
         }
         
@@ -1297,21 +1304,29 @@ public class TimeSlider: UIControl {
             positionTickMarks()
             
             // Set lower thumb layer frame
-            if let startTime = currentExtentStartTime {
+            if let startTime = currentExtentStartTime, fullExtent != nil {
                 let lowerThumbCenter = CGFloat(position(for: startTime.timeIntervalSince1970))
                 let lowerThumbOrigin = CGPoint(x: trackLayerSidePadding + lowerThumbCenter - thumbSize.width / 2.0, y: trackLayerFrame.midY - thumbSize.height / 2.0)
                 let lowerThumbFrame = CGRect(origin: lowerThumbOrigin, size: thumbSize)
+                lowerThumbLayer.isHidden = !self.isSliderVisible
                 lowerThumbLayer.frame = lowerThumbFrame
                 lowerThumbLayer.setNeedsDisplay()
             }
+            else {
+                lowerThumbLayer.isHidden = true
+            }
             
             // Set upper thumb layer frame
-            if let endTime = currentExtentEndTime, isRangeEnabled {
+            if let endTime = currentExtentEndTime, isRangeEnabled, fullExtent != nil  {
                 let upperThumbCenter = CGFloat(position(for: endTime.timeIntervalSince1970))
                 let upperThumbOrigin = CGPoint(x: trackLayerSidePadding + upperThumbCenter - thumbSize.width / 2.0, y: trackLayerFrame.midY - thumbSize.height / 2.0)
                 let upperThumbFrame = CGRect(origin: upperThumbOrigin, size: thumbSize)
+                self.upperThumbLayer.isHidden = !self.isSliderVisible
                 upperThumbLayer.frame = upperThumbFrame
                 upperThumbLayer.setNeedsDisplay()
+            }
+            else {
+                upperThumbLayer.isHidden = true
             }
         }
         
@@ -1362,6 +1377,7 @@ public class TimeSlider: UIControl {
             //
             let startTimeString = fullExtentDateFormatter.string(from: fullExtentStartTime)
             fullExtentStartTimeLabel.string = startTimeString
+            fullExtentStartTimeLabel.isHidden = !(fullExtentLabelsVisible && isSliderVisible)
             let startTimeLabelSize: CGSize = startTimeString.size(attributes: [NSFontAttributeName: fullExtentLabelFont])
             var startTimeLabelX = trackLayer.frame.minX - (startTimeLabelSize.width / 2)
             if startTimeLabelX < bounds.minX + labelSidePadding {
@@ -1373,12 +1389,17 @@ public class TimeSlider: UIControl {
             let startTimeLabelY = max(thumbStartTimeLabelY, tickLayerStartTimeLabelY)
             fullExtentStartTimeLabel.frame = CGRect(x: startTimeLabelX, y: startTimeLabelY, width: startTimeLabelSize.width, height: startTimeLabelSize.height)
         }
+        else {
+            fullExtentStartTimeLabel.string = ""
+            fullExtentStartTimeLabel.isHidden = true
+        }
         
         // Update full extent end time label
         if let fullExtentEndTime = fullExtent?.endTime {
             //
             let endTimeString = fullExtentDateFormatter.string(from: fullExtentEndTime)
             fullExtentEndTimeLabel.string = endTimeString
+            fullExtentEndTimeLabel.isHidden = !(fullExtentLabelsVisible && isSliderVisible)
             let endTimeLabelSize: CGSize = endTimeString.size(attributes: [NSFontAttributeName: fullExtentLabelFont])
             var endTimeLabelX = trackLayer.frame.maxX - (fullExtentEndTimeLabel.frame.width / 2)
             if endTimeLabelX + endTimeLabelSize.width > bounds.maxX - labelSidePadding {
@@ -1389,6 +1410,10 @@ public class TimeSlider: UIControl {
             let tickLayerEndTimeLabelY = tickMarkLayer.frame.maxY + labelPadding
             let endTimeLabelY = max(thumbEndTimeLabelY, tickLayerEndTimeLabelY)
             fullExtentEndTimeLabel.frame = CGRect(x: endTimeLabelX, y: endTimeLabelY, width: endTimeLabelSize.width, height: endTimeLabelSize.height)
+        }
+        else {
+            fullExtentEndTimeLabel.string = ""
+            fullExtentEndTimeLabel.isHidden = true
         }
         
         // Commit the transaction
@@ -1413,7 +1438,7 @@ public class TimeSlider: UIControl {
         
         //
         // Update lower label
-        if let startTime = currentExtentStartTime {
+        if let startTime = currentExtentStartTime, fullExtent != nil  {
             let startTimeString = currentExtentDateFormatter.string(from: startTime)
             currentExtentStartTimeLabel.string = startTimeString
             let startTimeLabelSize: CGSize = startTimeString.size(attributes: [NSFontAttributeName: currentExtentLabelFont] )
@@ -1436,9 +1461,13 @@ public class TimeSlider: UIControl {
             let startTimeLabelY = min(thumbStartTimeLabelY, tickLayerStartTimeLabelY)
             currentExtentStartTimeLabel.frame = CGRect(x: startTimeLabelX, y: startTimeLabelY, width: startTimeLabelSize.width, height: startTimeLabelSize.height)
         }
+        else {
+            currentExtentStartTimeLabel.string = ""
+            currentExtentStartTimeLabel.isHidden = true
+        }
         
         // Update upper label
-        if let endTime = currentExtentEndTime, isRangeEnabled {
+        if let endTime = currentExtentEndTime, isRangeEnabled, fullExtent != nil  {
             let endTimeString = currentExtentDateFormatter.string(from: endTime)
             currentExtentEndTimeLabel.string = endTimeString
             let endTimeLabelSize: CGSize = endTimeString.size(attributes: [NSFontAttributeName: currentExtentLabelFont] )
@@ -1461,11 +1490,15 @@ public class TimeSlider: UIControl {
             let endTimeLabelY = min(thumbEndTimeLabelY, tickLayerEndTimeLabelY)
             currentExtentEndTimeLabel.frame = CGRect(x: endTimeLabelX, y: endTimeLabelY, width: endTimeLabelSize.width, height: endTimeLabelSize.height)
         }
+        else {
+            currentExtentEndTimeLabel.string = ""
+            currentExtentEndTimeLabel.isHidden = true
+        }
         
         // Commit the transaction
         CATransaction.commit()
     }
-
+    
     private func positionTickMarks() {
         //
         // Bail out if time steps are not available
@@ -1635,13 +1668,12 @@ public class TimeSlider: UIControl {
             if keyPath == #keyPath(AGSMap.operationalLayers) {
                 //
                 // Re initialize time slider if the change contains time aware layer.
-                if let geoView = geoView, isChangeContainsTimeAwareLayer(change: change) {
+                if let geoView = geoView, changeContainsTimeAwareLayer(change: change) {
                     initializeTimeProperties(geoView: geoView, completion: { (error) in
                         guard error == nil else {
                             print("error: \(String(describing: error))")
                             return
                         }
-                        print("The time slider re-initialized based on newly added/removed layer.")
                     })
                 }
             }
@@ -1682,7 +1714,7 @@ public class TimeSlider: UIControl {
         //
         // Bail out if full extent start and end times are not available
         var resultPosition: Double = 0.0
-        guard let  fullExtentStartTime = fullExtent?.startTime, let fullExtentEndTime = fullExtent?.endTime else {
+        guard let fullExtentStartTime = fullExtent?.startTime, let fullExtentEndTime = fullExtent?.endTime, fullExtentStartTime != fullExtentEndTime else {
             return resultPosition
         }
         
@@ -1707,7 +1739,7 @@ public class TimeSlider: UIControl {
                 return resultValue
             }
             
-            // Get the result value 
+            // Get the result value
             resultValue = min(max(value, startTime.timeIntervalSince1970), endTime.timeIntervalSince1970)
         }
         else { // Else, the valid value needs to be between full extent start and end times.
@@ -1878,7 +1910,7 @@ public class TimeSlider: UIControl {
         //
         // Make sure the time is within full extent
         let endTime = Date(timeIntervalSince1970: boundCurrentExtentEndTime(value: endTime.timeIntervalSince1970))
-
+        
         // Update end time only if it is different than current
         if endTime != currentExtentEndTime {
             //
@@ -1902,7 +1934,7 @@ public class TimeSlider: UIControl {
         //
         // The default is true
         var supportsRangeTimeFiltering = true
-
+        
         // Get the time interval of the layer
         var timeStepInterval = timeAwareLayer.timeInterval
         
@@ -1963,50 +1995,50 @@ public class TimeSlider: UIControl {
     // called on already loaded object
     private func timeInfo(for layer: AGSLoadable) -> AGSLayerTimeInfo? {
         //
-        // The timeInfo is available on only raster, feature or sub layer. Bail out otherwise.
-        if (layer is AGSArcGISSublayer) || (layer is AGSFeatureLayer) || (layer is AGSRasterLayer) {
-            //
-            // It is expected that this function is
-            // called on already loaded object
-            if layer.loadStatus == .loaded {
-                if let sublayer = layer as? AGSArcGISSublayer {
-                    return sublayer.mapServiceSublayerInfo?.timeInfo
-                }
-                else if let featureLayer = layer as? AGSFeatureLayer, let featureTable = featureLayer.featureTable as? AGSArcGISFeatureTable {
-                    return featureTable.layerInfo?.timeInfo
-                }
-                else if let rasterLayer = layer as? AGSRasterLayer, let imageServiceRaster = rasterLayer.raster as? AGSImageServiceRaster {
-                    return imageServiceRaster.serviceInfo?.timeInfo
-                }
+        // The timeInfo is available on only raster, feature or sub layer.
+        //
+        // It is expected that this function is
+        // called on already loaded object
+        if layer.loadStatus == .loaded {
+            if let sublayer = layer as? AGSArcGISSublayer {
+                return sublayer.mapServiceSublayerInfo?.timeInfo
             }
-            return nil
+            else if let featureLayer = layer as? AGSFeatureLayer, let featureTable = featureLayer.featureTable as? AGSArcGISFeatureTable {
+                return featureTable.layerInfo?.timeInfo
+            }
+            else if let rasterLayer = layer as? AGSRasterLayer, let imageServiceRaster = rasterLayer.raster as? AGSImageServiceRaster {
+                return imageServiceRaster.serviceInfo?.timeInfo
+            }
         }
         return nil
     }
     
     // This function checks whether the observed value of operationalLayers
     // contains any time aware layer.
-    private func isChangeContainsTimeAwareLayer(change: [NSKeyValueChangeKey : Any]?) -> Bool {
+    private func changeContainsTimeAwareLayer(change: [NSKeyValueChangeKey : Any]?) -> Bool {
         let newValue = change?[NSKeyValueChangeKey.newKey] as? Array<AGSLayer>
         let oldValue = change?[NSKeyValueChangeKey.oldKey] as? Array<AGSLayer>
-        var isTimeAware = false
         
-        newValue?.forEach({ (layer) in
-            if layer is AGSTimeAware {
-                isTimeAware = true
+        if let newValue = newValue {
+            for layer in newValue {
+                if layer is AGSTimeAware {
+                    return true
+                }
             }
-        })
+        }
         
-        oldValue?.forEach({ (layer) in
-            if layer is AGSTimeAware {
-                isTimeAware = true
+        if let oldValue = oldValue {
+            for layer in oldValue {
+                if layer is AGSTimeAware {
+                    return true
+                }
             }
-        })
+        }
         
-        return isTimeAware
+        return false
     }
 }
-    
+
 // MARK: - Time Slider Thumb Layer
 
 private class TimeSliderThumbLayer: CALayer {
@@ -2105,6 +2137,9 @@ private class TimeSliderTrackLayer: CALayer {
 
 private class TimeSliderTickMarkLayer: CALayer {
     weak var timeSlider: TimeSlider?
+    private let endTickLinWidth: CGFloat = 6.0
+    private let intermediateTickLinWidth: CGFloat = 2.0
+    private let paddingBetweenTickMarks: CGFloat = 4.0
     
     override func draw(in ctx: CGContext) {
         if let slider = timeSlider {
@@ -2123,8 +2158,8 @@ private class TimeSliderTickMarkLayer: CALayer {
                 // render all tick marks then only
                 // render first and last.
                 if !isThereEnoughSpaceForTickMarks() {
-                    ctx.setLineWidth(6)
-
+                    ctx.setLineWidth(endTickLinWidth)
+                    
                     ctx.beginPath()
                     let firstTickMark = tickMarks[0]
                     if let tickX = firstTickMark.originX {
@@ -2152,12 +2187,12 @@ private class TimeSliderTickMarkLayer: CALayer {
                             // First and last tick marks are
                             // rendered differently than others
                             if i == 0 || i == tickMarksCount - 1  {
-                                ctx.setLineWidth(6)
+                                ctx.setLineWidth(endTickLinWidth)
                                 ctx.move(to: CGPoint(x: CGFloat(tickX), y:bounds.midY - CGFloat(slider.trackHeight / 2)))
                                 ctx.addLine(to: CGPoint(x: CGFloat(tickX), y: bounds.midY + bounds.height / 2))
                             }
                             else {
-                                ctx.setLineWidth(2)
+                                ctx.setLineWidth(intermediateTickLinWidth)
                                 ctx.move(to: CGPoint(x: CGFloat(tickX), y:bounds.midY - CGFloat(slider.trackHeight / 2)))
                                 let tickY = tickMark.isMajorTick ? bounds.midY - bounds.height / 2 : bounds.midY - bounds.height / 3
                                 ctx.addLine(to: CGPoint(x: CGFloat(tickX), y: tickY))
@@ -2173,10 +2208,7 @@ private class TimeSliderTickMarkLayer: CALayer {
     // Checks whether there is enough space to render all tick marks
     private func isThereEnoughSpaceForTickMarks() -> Bool {
         if let tickMarksCount = timeSlider?.tickMarks?.count {
-            let endTickMarkWidths: CGFloat = 6.0 * 2.0
-            let middleTickMarkWidth: CGFloat = 2.0
-            let distanceBetweenTickMarks: CGFloat = 4.0
-            let requiredSpace = (CGFloat(tickMarksCount - 2) * (middleTickMarkWidth + distanceBetweenTickMarks)) + endTickMarkWidths
+            let requiredSpace = (CGFloat(tickMarksCount - 2) * (intermediateTickLinWidth + paddingBetweenTickMarks)) + (endTickLinWidth * 2.0)
             let availableSpace = bounds.width
             if availableSpace > requiredSpace {
                 return true
@@ -2367,7 +2399,7 @@ extension Date {
         if nanoseconds(from: date) > 0 { return (nanoseconds(from: date), .nanosecond) }
         return nil
     }
-        
+    
 }
 
 // MARK: - Color Extension
