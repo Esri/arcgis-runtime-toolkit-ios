@@ -1,4 +1,4 @@
-// Copyright 2017 Esri.
+// Copyright 2016 Esri.
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,29 +13,34 @@
 
 import UIKit
 import ArcGISToolkit
+import ArcGIS
 
-class ExamplesViewController: VCListViewController {
-
+class SketchExample: MapViewController {
+    
+    var sketchToolbar : SketchToolbar!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        self.title = "Toolkit Samples"
         
-        self.viewControllerInfos = [
-            ("Compass", CompassExample.self, nil),
-            ("Measure", MeasureExample.self, nil),
-            ("Scalebar", ScalebarExample.self, nil),
-            ("Legend", LegendExample.self, nil),
-            ("Job Manager", JobManagerExample.self, nil),
-            ("Sketch", SketchExample.self, nil)
-        ]
+        mapView.map = AGSMap(basemapType: .topographic, latitude: 0, longitude: 0, levelOfDetail: 0)
         
+        let toolbarFrame = CGRect(x: 0, y: view.bounds.size.height - 44.0, width: view.bounds.size.width, height: 44.0)
+        
+        // create a SketchToolbar and add it to the view controller
+        sketchToolbar = SketchToolbar(mapView: mapView)
+        sketchToolbar.frame = toolbarFrame
+        sketchToolbar.autoresizingMask = [.flexibleWidth, .flexibleTopMargin]
+        view.addSubview(sketchToolbar)
+        
+        // know when geometry changes
+        sketchToolbar.sketchEditorGeometryChangedHandler = {
+            print("Geometry Changed")
+        }
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
-
 }
