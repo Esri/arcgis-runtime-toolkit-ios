@@ -26,7 +26,8 @@ class ExamplesViewController: VCListViewController {
             ("Measure", MeasureExample.self, nil),
             ("Scalebar", ScalebarExample.self, nil),
             ("Legend", LegendExample.self, nil),
-            ("Job Manager", JobManagerExample.self, nil)
+            ("Job Manager", JobManagerExample.self, nil),
+            ("Switch Basemap", SwitchBasemapExample.self, nil)
         ]
         
     }
