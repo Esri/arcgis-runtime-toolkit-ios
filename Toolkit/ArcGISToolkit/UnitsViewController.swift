@@ -215,7 +215,7 @@ public class UnitsViewController: TableViewController, UINavigationBarDelegate, 
     
     // MARK: TableView delegate/datasource methods
     
-    func tableView(_ tableView: UITableView, didSelectRowAtIndexPath indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         // when the user taps on a unit
         //
 

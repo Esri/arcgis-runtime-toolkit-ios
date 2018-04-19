@@ -210,7 +210,7 @@ class JobManagerExample: TableViewController {
         return cell
     }
     
-    open func tableView(_ tableView: UITableView, didSelectRowAtIndexPath indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
