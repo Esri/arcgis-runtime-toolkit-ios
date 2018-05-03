@@ -18,62 +18,67 @@ import ArcGIS
 
 class TimeSliderExample: MapViewController {
     
-    private var map : AGSMap?
-    private var timeSlider : TimeSlider?
+    private var map = AGSMap(basemap: AGSBasemap.topographic())
+    private var timeSlider = TimeSlider()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Create an instance of a map with ESRI topographic basemap
-        self.map = AGSMap(basemap: AGSBasemap.topographic())
-        self.mapView.map = self.map
+        // Set a map with ESRI topographic basemap to mapView
+        mapView.map = map
         
         // Configure time slider
-        let timeSlider = TimeSlider()
         timeSlider.isHidden = true
         timeSlider.addTarget(self, action: #selector(TimeSliderExample.timeSliderValueChanged(timeSlider:)), for: .valueChanged)
         view.addSubview(timeSlider)
-            
+        
+        //
         // Add constraints to position the slider
         let margin: CGFloat = 10.0
         timeSlider.translatesAutoresizingMaskIntoConstraints = false
         timeSlider.bottomAnchor.constraint(equalTo: mapView.attributionTopAnchor, constant: -margin).isActive = true
-        timeSlider.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: margin).isActive = true
-        timeSlider.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -margin).isActive = true
         
-        // Set time slider 
-        self.timeSlider = timeSlider
+        if #available(iOS 11.0, *) {
+            let layoutMarginsGuide = view.layoutMarginsGuide
+            timeSlider.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
+            timeSlider.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        }
+        else {
+            timeSlider.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: margin).isActive = true
+            timeSlider.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -margin).isActive = true
+        }
         
         // Add layer
         let mapImageLayer = AGSArcGISMapImageLayer(url: URL(string: "https://rtc-100-3.esri.com/arcgis/rest/services/timeSupport/cycle_routes/MapServer")!)
         mapView.map?.operationalLayers.add(mapImageLayer)
         mapImageLayer.load(completion: { [weak self] (error) in
             guard error == nil else {
-                print("error: \(String(describing: error))")
+                self?.showError(error!)
                 return
             }
             
             // Zoom to full extent of layer
             if let fullExtent = mapImageLayer.fullExtent {
-                self?.mapView.setViewpoint(AGSViewpoint(targetExtent:fullExtent.toBuilder().expand(byFactor: 2.5).toGeometry()), completion: nil)
+                //
+                // Expand the full extent envelope so we
+                // can see the all data of the layer
+                let envelopeBuilder = fullExtent.toBuilder()
+                envelopeBuilder.expand(byFactor: 2.5)
+                let expandedFullExtent = envelopeBuilder.toGeometry()
+                self?.mapView.setViewpoint(AGSViewpoint(targetExtent: expandedFullExtent), completion: nil)
             }
             
-            self?.timeSlider?.initializeTimeProperties(timeAwareLayer: mapImageLayer, completion: { [weak self] (error) in
+            self?.timeSlider.initializeTimeProperties(timeAwareLayer: mapImageLayer, completion: { [weak self] (error) in
                 guard error == nil else {
-                    print("error: \(String(describing: error))")
                     self?.showError(error!)
                     return
                 }
-                print("Time slider is successfully initialized!")
-                defer {
-                    self?.timeSlider?.isHidden = false
-                }
+                self?.timeSlider.isHidden = false
             })
         })
     }
     
     @objc func timeSliderValueChanged(timeSlider: TimeSlider) {
-        print("Time slider value changed: (\(String(describing: timeSlider.currentExtent?.startTime)), \(String(describing: timeSlider.currentExtent?.endTime)))")
         if mapView.timeExtent != timeSlider.currentExtent {
             mapView.timeExtent = timeSlider.currentExtent
         }
