@@ -39,9 +39,8 @@ class TimeSliderExample: MapViewController {
         timeSlider.bottomAnchor.constraint(equalTo: mapView.attributionTopAnchor, constant: -margin).isActive = true
         
         if #available(iOS 11.0, *) {
-            let layoutMarginsGuide = view.layoutMarginsGuide
-            timeSlider.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-            timeSlider.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+            timeSlider.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: margin).isActive = true
+            timeSlider.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -margin).isActive = true
         }
         else {
             timeSlider.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: margin).isActive = true
