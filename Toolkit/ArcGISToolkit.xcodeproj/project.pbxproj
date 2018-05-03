@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2140781C209B628200FBFDCC /* TimeSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2140781B209B628200FBFDCC /* TimeSlider.swift */; };
 		881233751DF601A700B2EA8E /* ArcGISToolkit.h in Headers */ = {isa = PBXBuildFile; fileRef = 881233731DF601A700B2EA8E /* ArcGISToolkit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		881233841DF601E900B2EA8E /* ArcGIS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 881233831DF601E900B2EA8E /* ArcGIS.framework */; };
 		88B689FD1E96EFD700B67FAB /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689F01E96EFD700B67FAB /* Extensions.swift */; };
@@ -25,6 +26,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2140781B209B628200FBFDCC /* TimeSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeSlider.swift; sourceTree = "<group>"; };
 		881233701DF601A700B2EA8E /* ArcGISToolkit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ArcGISToolkit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		881233731DF601A700B2EA8E /* ArcGISToolkit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ArcGISToolkit.h; sourceTree = "<group>"; };
 		881233741DF601A700B2EA8E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -115,6 +117,7 @@
 				88B689F71E96EFD700B67FAB /* Scalebar.swift */,
 				88B689FB1E96EFD700B67FAB /* UnitsViewController.swift */,
 				88DBC29E1FE83D4400255921 /* JobManager.swift */,
+				2140781B209B628200FBFDCC /* TimeSlider.swift */,
 			);
 			name = Components;
 			sourceTree = "<group>";
@@ -206,6 +209,7 @@
 				88B68A081E96EFD700B67FAB /* UnitsViewController.swift in Sources */,
 				E48405731E9BE7B700927208 /* LegendViewController.swift in Sources */,
 				88B68A011E96EFD700B67FAB /* MeasureToolbar.swift in Sources */,
+				2140781C209B628200FBFDCC /* TimeSlider.swift in Sources */,
 				88DBC2A31FE83DB800255921 /* CancelGroup.swift in Sources */,
 				88B68A071E96EFD700B67FAB /* TableViewController.swift in Sources */,
 				88B689FD1E96EFD700B67FAB /* Extensions.swift in Sources */,
