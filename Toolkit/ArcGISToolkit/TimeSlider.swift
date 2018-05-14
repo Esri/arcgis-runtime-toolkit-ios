@@ -2432,9 +2432,6 @@ extension Date {
     func offset(from date: Date) -> (duration: Int, component: Calendar.Component)? {
         if years(from: date)   > 0 { return (years(from: date), .year)   }
         if months(from: date)  > 0 { return (months(from: date), .month)  }
-//        if days(from: date)    > 0 { return (days(from: date), .day)    }
-//        if hours(from: date)   > 0 { return (hours(from: date), .hour)   }
-//        if minutes(from: date) > 0 { return (minutes(from: date), .minute) }
         if seconds(from: date) > 0 { return (seconds(from: date), .second) }
         if nanoseconds(from: date) > 0 { return (nanoseconds(from: date), .nanosecond) }
         return nil
