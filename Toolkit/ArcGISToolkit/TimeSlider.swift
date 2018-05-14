@@ -799,11 +799,19 @@ public class TimeSlider: UIControl {
         // Set geoview and it's properties on the slider
         // it will initialize required properties.
         self.geoView = geoView
-        map = geoView.map
-        scene = geoView.scene
+
+        // Set operational layers
         guard let operationalLayers = geoView.operationalLayers, !operationalLayers.isEmpty else {
             completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonNoData.rawValue, userInfo: [NSLocalizedDescriptionKey : "There are no time aware layers to initialize time slider."]))
             return
+        }
+        
+        // Set map/scene
+        if let mapView = geoView as? AGSMapView {
+            map = mapView.map
+        }
+        else if let sceneView = geoView as? AGSSceneView {
+            scene = sceneView.scene
         }
         
         // Start observing
@@ -2088,13 +2096,13 @@ private class TimeSliderThumbLayer: CALayer {
     weak var timeSlider: TimeSlider?
     
     override func draw(in ctx: CGContext) {
-        guard let slider = timeSlider else {
+        guard let slider = timeSlider, slider.isSliderVisible else {
             return
         }
         
         var thumbFrame = bounds.insetBy(dx: 2.0, dy: 2.0)
         if isPinned {
-            let size = CGSize(width: 12, height: 30)
+            let size = CGSize(width: 8, height: 30)
             let origin = CGPoint(x: thumbFrame.midX - size.width / 2.0, y: thumbFrame.midY - size.height / 2.0)
             thumbFrame = CGRect(origin: origin, size: size)
         }
@@ -2129,7 +2137,7 @@ private class TimeSliderTrackLayer: CALayer {
     weak var timeSlider: TimeSlider?
     
     override func draw(in ctx: CGContext) {
-        guard let slider = timeSlider else {
+        guard let slider = timeSlider, slider.isSliderVisible else {
             return
         }
         
@@ -2179,7 +2187,7 @@ private class TimeSliderTickMarkLayer: CALayer {
     private let paddingBetweenTickMarks: CGFloat = 4.0
     
     override func draw(in ctx: CGContext) {
-        guard let slider = timeSlider else {
+        guard let slider = timeSlider, slider.isSliderVisible else {
             return
         }
         
@@ -2579,24 +2587,6 @@ extension AGSTimeValue : Comparable {
 // MARK: - GeoView Extension
 
 extension AGSGeoView {
-    
-    fileprivate var map: AGSMap? {
-        get {
-            if let mapView = self as? AGSMapView {
-                return mapView.map
-            }
-            return nil
-        }
-    }
-    
-    fileprivate var scene: AGSScene? {
-        get {
-            if let sceneView = self as? AGSSceneView {
-                return sceneView.scene
-            }
-            return nil
-        }
-    }
     
     fileprivate var operationalLayers: [AGSLayer]? {
         get {
