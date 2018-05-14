@@ -2,17 +2,16 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "iOS8_HardForward56.png",
+      "filename" : "iOS8_HardForward44.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "iOS8_HardForward72.png",
+      "filename" : "iOS8_HardForward88.png",
       "scale" : "2x"
     },
     {
       "idiom" : "universal",
-      "filename" : "iOS8_HardForward84.png",
       "scale" : "3x"
     }
   ],

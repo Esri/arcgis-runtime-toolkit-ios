@@ -1098,10 +1098,16 @@ public class TimeSlider: UIControl {
                 validTimeStepDelta = endTimeStepIndex + timeSteps >= minTimeStepIndex ? timeSteps : minTimeStepIndex - endTimeStepIndex
             }
             
-            // Get the new start and end time step indexes
-            let newStartTimeStepIndex = !isStartTimePinned && (validTimeStepDelta > 0 || startTimeStepIndex + validTimeStepDelta >= minTimeStepIndex) && ((endTimeStepIndex + validTimeStepDelta <= maxTimeStepIndex) || isEndTimePinned) ?
+            // Get the new start time step index
+            let positiveDeltaChange = validTimeStepDelta > 0 || startTimeStepIndex + validTimeStepDelta >= minTimeStepIndex
+            let deltaChangeResultIsNotGreaterThanMaxIndex = (endTimeStepIndex + validTimeStepDelta <= maxTimeStepIndex) || isEndTimePinned
+            let newStartTimeStepIndex = !isStartTimePinned && positiveDeltaChange && deltaChangeResultIsNotGreaterThanMaxIndex ?
                 startTimeStepIndex + validTimeStepDelta : startTimeStepIndex
-            let newEndTimeStepIndex = !isEndTimePinned && (validTimeStepDelta < 0 || endTimeStepIndex + validTimeStepDelta <= maxTimeStepIndex) && ((startTimeStepIndex + validTimeStepDelta >= minTimeStepIndex) || isStartTimePinned) ?
+            
+            // Get the new end time step index
+            let negativeDeltaChange = validTimeStepDelta < 0 || endTimeStepIndex + validTimeStepDelta <= maxTimeStepIndex
+            let deltaChangeResultIsNotLessThanMinIndex = (startTimeStepIndex + validTimeStepDelta >= minTimeStepIndex) || isStartTimePinned
+            let newEndTimeStepIndex = !isEndTimePinned && negativeDeltaChange && deltaChangeResultIsNotLessThanMinIndex ?
                 endTimeStepIndex + validTimeStepDelta : endTimeStepIndex
             
             // Evaluate how many time steps the start and end were moved by and whether they were able to be moved by the requested number of steps
@@ -1151,7 +1157,7 @@ public class TimeSlider: UIControl {
             var timeStepsToMove = 1
             let moveTimeStepResult = moveTimeStep(timeSteps: timeStepsToMove)
             if !moveTimeStepResult {
-                timeStepsToMove = !isStartTimePinned ? 0 - startTimeStepIndex : 0 - (endTimeStepIndex - startTimeStepIndex - 1)
+                timeStepsToMove = !isStartTimePinned ? -startTimeStepIndex : -(endTimeStepIndex - startTimeStepIndex)
                 moveTimeStep(timeSteps: timeStepsToMove)
             }
         case .repeat(.backward):
@@ -1899,7 +1905,7 @@ public class TimeSlider: UIControl {
         // The constant value is based on whether
         // slider and/or playback buttons are visible
         if isSliderVisible && playbackButtonsVisible {
-            return 140.0
+            return 136.0
         }
         else if isSliderVisible && !playbackButtonsVisible {
             return 100.0
