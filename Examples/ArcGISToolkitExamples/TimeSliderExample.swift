@@ -29,6 +29,7 @@ class TimeSliderExample: MapViewController {
         
         // Configure time slider
         timeSlider.isHidden = true
+        timeSlider.labelMode = .ticks
         timeSlider.addTarget(self, action: #selector(TimeSliderExample.timeSliderValueChanged(timeSlider:)), for: .valueChanged)
         view.addSubview(timeSlider)
         
@@ -48,31 +49,43 @@ class TimeSliderExample: MapViewController {
         }
         
         // Add layer
-        let mapImageLayer = AGSArcGISMapImageLayer(url: URL(string: "https://rtc-100-3.esri.com/arcgis/rest/services/timeSupport/cycle_routes/MapServer")!)
+        let mapImageLayer = AGSArcGISMapImageLayer(url: URL(string: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/911CallsHotspot/MapServer")!)
         mapView.map?.operationalLayers.add(mapImageLayer)
         mapImageLayer.load(completion: { [weak self] (error) in
+            //
+            // Make sure self is around
+            guard let strongSelf = self else {
+                return
+            }
+            
+            // If layer fails to load then
+            // return with an error.
             guard error == nil else {
-                self?.showError(error!)
+                strongSelf.showError(error!)
                 return
             }
             
             // Zoom to full extent of layer
             if let fullExtent = mapImageLayer.fullExtent {
-                //
-                // Expand the full extent envelope so we
-                // can see the all data of the layer
-                let envelopeBuilder = fullExtent.toBuilder()
-                envelopeBuilder.expand(byFactor: 2.5)
-                let expandedFullExtent = envelopeBuilder.toGeometry()
-                self?.mapView.setViewpoint(AGSViewpoint(targetExtent: expandedFullExtent), completion: nil)
+                strongSelf.mapView.setViewpoint(AGSViewpoint(targetExtent: fullExtent), completion: nil)
             }
             
-            self?.timeSlider.initializeTimeProperties(timeAwareLayer: mapImageLayer, completion: { [weak self] (error) in
-                guard error == nil else {
-                    self?.showError(error!)
+            strongSelf.timeSlider.initializeTimeProperties(geoView: strongSelf.mapView, completion: { [weak self] (error) in
+                //
+                // Make sure self is around
+                guard let strongSelf = self else {
                     return
                 }
-                self?.timeSlider.isHidden = false
+                
+                // If time slider fails to init then
+                // return with an error.
+                guard error == nil else {
+                    strongSelf.showError(error!)
+                    return
+                }
+                
+                // Show the time slider
+                strongSelf.timeSlider.isHidden = false
             })
         })
     }

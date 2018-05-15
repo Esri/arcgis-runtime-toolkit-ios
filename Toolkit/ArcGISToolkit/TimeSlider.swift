@@ -25,7 +25,7 @@ public class TimeSlider: UIControl {
     /**
      Controls how labels on the slider are displayed.
      */
-    public enum TimeSliderLabelMode {
+    public enum LabelMode {
         case none
         case thumbs
         case ticks
@@ -209,7 +209,7 @@ public class TimeSlider: UIControl {
             }
             else if fullExtent == nil {
                 timeSteps?.removeAll()
-                tickMarks?.removeAll()
+                tickMarks.removeAll()
                 removeTickMarkLabels()
                 currentExtent = fullExtent
             }
@@ -365,7 +365,7 @@ public class TimeSlider: UIControl {
     /**
      Controls how labels on the slider are displayed. The default is thumbs.
      */
-    public var labelMode: TimeSliderLabelMode = .thumbs {
+    public var labelMode: LabelMode = .thumbs {
         didSet {
             switch labelMode {
             case .none, .ticks:
@@ -466,14 +466,11 @@ public class TimeSlider: UIControl {
      */
     public var playbackButtonsVisible = true {
         didSet {
-            layoutIfNeeded()
-            UIView.transition(with: self, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                self.heightConstraint?.constant = self.heightConstraintConstant()
-                self.playPauseButton?.isHidden = !self.playbackButtonsVisible
-                self.forwardButton?.isHidden = !self.playbackButtonsVisible
-                self.backButton?.isHidden = !self.playbackButtonsVisible
-                self.refresh()
-            })
+            self.heightConstraint?.constant = self.heightConstraintConstant()
+            self.playPauseButton?.isHidden = !self.playbackButtonsVisible
+            self.forwardButton?.isHidden = !self.playbackButtonsVisible
+            self.backButton?.isHidden = !self.playbackButtonsVisible
+            self.refresh()
         }
     }
     
@@ -544,22 +541,19 @@ public class TimeSlider: UIControl {
      */
     public var isSliderVisible = true {
         didSet {
-            layoutIfNeeded()
-            UIView.transition(with: self, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                self.heightConstraint?.constant = self.heightConstraintConstant()
-                self.lowerThumbLayer.isHidden = !self.isSliderVisible
-                self.upperThumbLayer.isHidden = !self.isSliderVisible
-                self.trackLayer.isHidden = !self.isSliderVisible
-                self.tickMarkLayer.isHidden = !self.isSliderVisible
-                self.fullExtentStartTimeLabel.isHidden = !self.isSliderVisible
-                self.fullExtentEndTimeLabel.isHidden = !self.isSliderVisible
-                self.currentExtentStartTimeLabel.isHidden = !self.isSliderVisible
-                self.currentExtentEndTimeLabel.isHidden = !self.isSliderVisible
-                self.tickMarkLabels.forEach({ (tickMarkLabel) in
-                    tickMarkLabel.isHidden = !self.isSliderVisible
-                })
-                self.refresh()
+            self.heightConstraint?.constant = self.heightConstraintConstant()
+            self.lowerThumbLayer.isHidden = !self.isSliderVisible
+            self.upperThumbLayer.isHidden = !self.isSliderVisible
+            self.trackLayer.isHidden = !self.isSliderVisible
+            self.tickMarkLayer.isHidden = !self.isSliderVisible
+            self.fullExtentStartTimeLabel.isHidden = !self.isSliderVisible
+            self.fullExtentEndTimeLabel.isHidden = !self.isSliderVisible
+            self.currentExtentStartTimeLabel.isHidden = !self.isSliderVisible
+            self.currentExtentEndTimeLabel.isHidden = !self.isSliderVisible
+            self.tickMarkLabels.forEach({ (tickMarkLabel) in
+                tickMarkLabel.isHidden = !self.isSliderVisible
             })
+            self.refresh()
         }
     }
     
@@ -653,7 +647,7 @@ public class TimeSlider: UIControl {
     private let paddingBetweenLabels: CGFloat = 5.0
     
     private var tickMarkLabels = [CATextLayer]()
-    fileprivate var tickMarks: [TickMark]?
+    fileprivate var tickMarks = [TickMark]()
     
     private var playPauseButton: UIButton?
     private var forwardButton: UIButton?
@@ -849,39 +843,41 @@ public class TimeSlider: UIControl {
             operationalLayers.forEach({ (layer) in
                 //
                 // The layer must be time aware, supports time filtering and time filtering is enabled.
-                if let timeAwareLayer = layer as? AGSTimeAware, timeAwareLayer.supportsTimeFiltering, timeAwareLayer.isTimeFilteringEnabled {
+                guard let timeAwareLayer = layer as? AGSTimeAware, timeAwareLayer.supportsTimeFiltering, timeAwareLayer.isTimeFilteringEnabled else {
+                    return
+                }
+                
+                //
+                // Get the layer's full time extent and combine with other layer's full extent.
+                if let fullTimeExtent = timeAwareLayer.fullTimeExtent {
+                    timeAwareLayersFullExtent = timeAwareLayersFullExtent == nil ? timeAwareLayer.fullTimeExtent : timeAwareLayersFullExtent?.union(otherTimeExtent: fullTimeExtent)
+                }
+                
+                // This is an async operation to find out time step interval and
+                // whether range time filtering is supported by the layer.
+                dispatchGroup.enter()
+                strongSelf.findTimeStepIntervalAndIsRangeTimeFilteringSupported(for: timeAwareLayer, completion: { (timeInterval, supportsRangeFiltering) in
                     //
-                    // Get the layer's full time extent and combine with other layer's full extent.
-                    if let fullTimeExtent = timeAwareLayer.fullTimeExtent {
-                        timeAwareLayersFullExtent = timeAwareLayersFullExtent == nil ? timeAwareLayer.fullTimeExtent : timeAwareLayersFullExtent?.union(otherTimeExtent: fullTimeExtent)
-                    }
+                    // Set the range filtering value
+                    supportsRangeTimeFiltering = supportsRangeFiltering
                     
-                    // This is an async operation to find out time step interval and
-                    // whether range time filtering is supported by the layer.
-                    dispatchGroup.enter()
-                    strongSelf.findTimeStepIntervalAndIsRangeTimeFilteringSupported(for: timeAwareLayer, completion: { (timeInterval, supportsRangeFiltering) in
-                        //
-                        // Set the range filtering value
-                        supportsRangeTimeFiltering = supportsRangeFiltering
-                        
-                        // We are looking for the greater time interval than we already have it.
-                        if let timeInterval = timeInterval {
-                            if let layersTimeInterval = timeAwareLayersStepInterval {
-                                if timeInterval > layersTimeInterval {
-                                    timeAwareLayersStepInterval = timeInterval
-                                }
-                            }
-                            else {
+                    // We are looking for the greater time interval than we already have it.
+                    if let timeInterval = timeInterval {
+                        if let layersTimeInterval = timeAwareLayersStepInterval {
+                            if timeInterval > layersTimeInterval {
                                 timeAwareLayersStepInterval = timeInterval
                             }
                         }
-                        
-                        // We got all information required.
-                        // Leave the group so we can set time
-                        // properties and notify
-                        dispatchGroup.leave()
-                    })
-                }
+                        else {
+                            timeAwareLayersStepInterval = timeInterval
+                        }
+                    }
+                    
+                    // We got all information required.
+                    // Leave the group so we can set time
+                    // properties and notify
+                    dispatchGroup.leave()
+                })
             })
             
             dispatchGroup.notify(queue: DispatchQueue.main, execute: {
@@ -2193,7 +2189,7 @@ private class TimeSliderTickMarkLayer: CALayer {
     private let paddingBetweenTickMarks: CGFloat = 4.0
     
     override func draw(in ctx: CGContext) {
-        guard let slider = timeSlider, slider.isSliderVisible else {
+        guard let slider = timeSlider, slider.isSliderVisible, slider.tickMarks.isEmpty == false else {
             return
         }
         
@@ -2202,13 +2198,8 @@ private class TimeSliderTickMarkLayer: CALayer {
         let path = UIBezierPath(rect: bounds)
         ctx.addPath(path.cgPath)
         
-        //  Bail out if tick marks are not available
-        guard let tickMarks = slider.tickMarks else {
-            return
-        }
-        
         // Get the tick marks count
-        let tickMarksCount = tickMarks.count
+        let tickMarksCount = slider.tickMarks.count
         
         // Set the tick color
         ctx.setStrokeColor(slider.timeStepIntervalTickColor.cgColor)
@@ -2221,7 +2212,7 @@ private class TimeSliderTickMarkLayer: CALayer {
             
             // Get the first and last tick mark origins
             var tickMarksOriginX = [CGFloat]()
-            if let firstTickX = tickMarks.first?.originX, let lastTickX = tickMarks.last?.originX {
+            if let firstTickX = slider.tickMarks.first?.originX, let lastTickX = slider.tickMarks.last?.originX {
                 tickMarksOriginX.append(firstTickX)
                 tickMarksOriginX.append(lastTickX)
             }
@@ -2238,7 +2229,7 @@ private class TimeSliderTickMarkLayer: CALayer {
             // Loop through all tick marks
             // and render them.
             for i in 0..<tickMarksCount {
-                let tickMark = tickMarks[i]
+                let tickMark = slider.tickMarks[i]
                 if let tickX = tickMark.originX {
                     ctx.beginPath()
                     
@@ -2263,12 +2254,15 @@ private class TimeSliderTickMarkLayer: CALayer {
     
     // Checks whether there is enough space to render all tick marks
     private func isThereEnoughSpaceForTickMarks() -> Bool {
-        if let tickMarksCount = timeSlider?.tickMarks?.count {
-            let requiredSpace = (CGFloat(tickMarksCount - 2) * (intermediateTickLinWidth + paddingBetweenTickMarks)) + (endTickLinWidth * 2.0)
-            let availableSpace = bounds.width
-            if availableSpace > requiredSpace {
-                return true
-            }
+        guard let slider = timeSlider, slider.tickMarks.isEmpty == false else {
+            return false
+        }
+        
+        let tickMarksCount = slider.tickMarks.count
+        let requiredSpace = (CGFloat(tickMarksCount - 2) * (intermediateTickLinWidth + paddingBetweenTickMarks)) + (endTickLinWidth * 2.0)
+        let availableSpace = bounds.width
+        if availableSpace > requiredSpace {
+            return true
         }
         return false
     }
