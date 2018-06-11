@@ -66,6 +66,24 @@ public class TimeSlider: UIControl {
         case oceanBlue
     }
     
+    /**
+     Different date styles of the slider.
+     */
+    public enum DateStyle {
+        case dayShortMonthYear          /*!< Date with d MMM y */
+        case longDate                   /*!< Date with EEEE, MMMM d, y */
+        case longMonthDayYear           /*!< Date with MMMM d y */
+        case longMonthYear              /*!< Date with MMMM y */
+        case shortDate                  /*!< Date with M/d/y */
+        case shortDateLongTime          /*!< Date with M/d/y h:mm:ss a */
+        case shortDateLongTime24        /*!< Date with M/d/y H:mm:ss */
+        case shortDateShortTime         /*!< Date with M/d/y h:mm a*/
+        case shortDateShortTime24       /*!< Date with M/d/y H:mm */
+        case shortMonthYear             /*!< Date with MMM y */
+        case year                       /*!< Date with y */
+        case unknown
+    }
+    
     // MARK: - Public Properties
     
     // MARK: Current Extent Properties
@@ -122,7 +140,7 @@ public class TimeSlider: UIControl {
             }
             
             // Refresh the view
-            refresh()
+            setNeedsLayout()
         }
     }
     
@@ -158,15 +176,13 @@ public class TimeSlider: UIControl {
     }
     
     /**
-     The date formatter used for full extent dates.
+     The date style to use for the labels showing the start and end of the current time extent.
      */
-    public var currentExtentDateFormatter: DateFormatter = {
-        let formatter: DateFormatter = DateFormatter()
-        formatter.locale = Locale.current
-        formatter.timeZone = TimeZone.current
-        formatter.dateStyle = .medium
-        return formatter
-    }()
+    public var currentExtentLabelDateStyle: DateStyle = .shortDateLongTime {
+        didSet {
+            updateCurrentExtentLabelFrames()
+        }
+    }
     
     /**
      A Boolean value that indicates whether the start time of the currentExtent can be
@@ -222,7 +238,7 @@ public class TimeSlider: UIControl {
                     updateCurrentExtentEndTime(endTime)
                 }
             }
-            refresh()
+            setNeedsLayout()
         }
     }
     
@@ -290,15 +306,13 @@ public class TimeSlider: UIControl {
     }
     
     /**
-     The date formatter used for full extent dates.
+     The date style to use for the labels showing the start and end of the slider's entire time extent (full extent).
      */
-    public var fullExtentDateFormatter: DateFormatter = {
-        let formatter: DateFormatter = DateFormatter()
-        formatter.locale = Locale.current
-        formatter.timeZone = TimeZone.current
-        formatter.dateStyle = .medium
-        return formatter
-    }()
+    public var fullExtentLabelDateStyle: DateStyle = .shortDateLongTime {
+        didSet {
+            updateFullExtentLabelFrames()
+        }
+    }
     
     // MARK: Time Step Properties
     
@@ -315,20 +329,18 @@ public class TimeSlider: UIControl {
     public var timeStepInterval: AGSTimeValue? {
         didSet {
             calculateTimeSteps()
-            refresh()
+            setNeedsLayout()
         }
     }
     
     /**
-     The date formatter used for time interval or tick mark dates.
+     The date style used for the labels showing the slider's time step intervals (tick labels).
      */
-    public var timeStepIntervalDateFormatter: DateFormatter = {
-        let formatter: DateFormatter = DateFormatter()
-        formatter.locale = Locale.current
-        formatter.timeZone = TimeZone.current
-        formatter.dateStyle = .medium
-        return formatter
-    }()
+    public var timeStepIntervalLabelDateStyle: DateStyle = .shortDateLongTime {
+        didSet {
+            positionTickMarks()
+        }
+    }
     
     /**
      The time interval or tick mark label color.
@@ -445,7 +457,7 @@ public class TimeSlider: UIControl {
             trackLayerSidePadding = (thumbSize.width / 2.0) + labelSidePadding
             
             // Refresh the view.
-            refresh()
+            setNeedsLayout()
         }
     }
     
@@ -466,11 +478,11 @@ public class TimeSlider: UIControl {
      */
     public var playbackButtonsVisible = true {
         didSet {
-            self.heightConstraint?.constant = self.heightConstraintConstant()
-            self.playPauseButton?.isHidden = !self.playbackButtonsVisible
-            self.forwardButton?.isHidden = !self.playbackButtonsVisible
-            self.backButton?.isHidden = !self.playbackButtonsVisible
-            self.refresh()
+            playPauseButton.isHidden = !playbackButtonsVisible
+            forwardButton.isHidden = !playbackButtonsVisible
+            backButton.isHidden = !playbackButtonsVisible
+            invalidateIntrinsicContentSize()
+            setNeedsLayout()
         }
     }
     
@@ -481,10 +493,9 @@ public class TimeSlider: UIControl {
         didSet {
             //
             // Set new button images created with new fill color
-            let playPauseButtonImage = isPlaying ? pauseImage?.imageWithColor(playbackButtonsFillColor) : playImage?.imageWithColor(playbackButtonsFillColor)
-            playPauseButton?.setBackgroundImage(playPauseButtonImage, for: .normal)
-            forwardButton?.setBackgroundImage(forwardImage?.imageWithColor(playbackButtonsFillColor), for: .normal)
-            backButton?.setBackgroundImage(backImage?.imageWithColor(playbackButtonsFillColor), for: .normal)
+            playPauseButton.tintColor = playbackButtonsFillColor
+            forwardButton.tintColor = playbackButtonsFillColor
+            backButton.tintColor = playbackButtonsFillColor
         }
     }
     
@@ -507,8 +518,8 @@ public class TimeSlider: UIControl {
         didSet {
             if isPlaying {
                 //
-                // Set the pause image
-                playPauseButton?.setBackgroundImage(pauseImage?.imageWithColor(playbackButtonsFillColor), for: .normal)
+                // Set the button state
+                playPauseButton.isSelected = true
                 
                 // Invalidate timer, in case this button is tapped multiple times
                 timer?.invalidate()
@@ -518,8 +529,8 @@ public class TimeSlider: UIControl {
             }
             else {
                 //
-                // Set the play image
-                playPauseButton?.setBackgroundImage(playImage?.imageWithColor(playbackButtonsFillColor), for: .normal)
+                // Set the button state
+                playPauseButton.isSelected = false
                 
                 // Invalidate and nil out timer.
                 timer?.invalidate()
@@ -537,23 +548,34 @@ public class TimeSlider: UIControl {
     public private(set) var geoView: AGSGeoView?
     
     /**
+     Time zone of the slider.
+     */
+    public var timeZone = TimeZone.current {
+        didSet {
+            updateCurrentExtentLabelFrames()
+            updateFullExtentLabelFrames()
+            positionTickMarks()
+        }
+    }
+    
+    /**
      A Boolean value indicating whether slider is visible or not. Default is true.
      */
     public var isSliderVisible = true {
         didSet {
-            self.heightConstraint?.constant = self.heightConstraintConstant()
-            self.lowerThumbLayer.isHidden = !self.isSliderVisible
-            self.upperThumbLayer.isHidden = !self.isSliderVisible
-            self.trackLayer.isHidden = !self.isSliderVisible
-            self.tickMarkLayer.isHidden = !self.isSliderVisible
-            self.fullExtentStartTimeLabel.isHidden = !self.isSliderVisible
-            self.fullExtentEndTimeLabel.isHidden = !self.isSliderVisible
-            self.currentExtentStartTimeLabel.isHidden = !self.isSliderVisible
-            self.currentExtentEndTimeLabel.isHidden = !self.isSliderVisible
-            self.tickMarkLabels.forEach({ (tickMarkLabel) in
-                tickMarkLabel.isHidden = !self.isSliderVisible
+            lowerThumbLayer.isHidden = !isSliderVisible
+            upperThumbLayer.isHidden = !isSliderVisible
+            trackLayer.isHidden = !isSliderVisible
+            tickMarkLayer.isHidden = !isSliderVisible
+            fullExtentStartTimeLabel.isHidden = !isSliderVisible
+            fullExtentEndTimeLabel.isHidden = !isSliderVisible
+            currentExtentStartTimeLabel.isHidden = !isSliderVisible
+            currentExtentEndTimeLabel.isHidden = !isSliderVisible
+            tickMarkLabels.forEach({ (tickMarkLabel) in
+                tickMarkLabel.isHidden = !isSliderVisible
             })
-            self.refresh()
+            invalidateIntrinsicContentSize()
+            setNeedsLayout()
         }
     }
     
@@ -571,7 +593,7 @@ public class TimeSlider: UIControl {
      */
     public var trackHeight : CGFloat = 6.0 {
         didSet {
-            refresh()
+            setNeedsLayout()
         }
     }
     
@@ -649,9 +671,9 @@ public class TimeSlider: UIControl {
     private var tickMarkLabels = [CATextLayer]()
     fileprivate var tickMarks = [TickMark]()
     
-    private var playPauseButton: UIButton?
-    private var forwardButton: UIButton?
-    private var backButton: UIButton?
+    private var playPauseButton = UIButton(type: .custom)
+    private var forwardButton = UIButton(type: .custom)
+    private var backButton = UIButton(type: .custom)
     
     private var playImage: UIImage?
     private var pauseImage: UIImage?
@@ -668,9 +690,7 @@ public class TimeSlider: UIControl {
         }
     }
     
-    private var heightConstraint: NSLayoutConstraint?
     private var timer: Timer?
-    
     private static var KVOContext = 0
     private var map: AGSMap?
     private var scene: AGSScene?
@@ -689,10 +709,10 @@ public class TimeSlider: UIControl {
             if frame.size.width < minimumFrameWidth {
                 frame.size.width = minimumFrameWidth
             }
-            if frame.size.height < heightConstraintConstant() {
-                frame.size.height = heightConstraintConstant()
+            if frame.size.height < intrinsicContentSize.height {
+                frame.size.height = intrinsicContentSize.height
             }
-            refresh()
+            setNeedsLayout()
         }
     }
     
@@ -774,7 +794,33 @@ public class TimeSlider: UIControl {
     
     // Refresh the slider when requried
     public override func layoutSubviews() {
-        refresh()
+        //
+        // Calculate time steps
+        if timeSteps == nil || timeSteps?.isEmpty == true {
+            calculateTimeSteps()
+        }
+        
+        // Update frames
+        updateLayerFrames()
+        
+        // Update labels
+        updateFullExtentLabelFrames()
+        updateCurrentExtentLabelFrames()
+    }
+    
+    // Set intrinsic content size
+    public override var intrinsicContentSize: CGSize {
+        let intrinsicHeight: CGFloat
+        if isSliderVisible {
+            if playbackButtonsVisible {
+                intrinsicHeight = 136
+            } else {
+                intrinsicHeight = 100
+            }
+        } else {
+            intrinsicHeight = 60
+        }
+        return CGSize(width: UIViewNoIntrinsicMetric, height: intrinsicHeight)
     }
     
     // Deinit
@@ -1183,10 +1229,6 @@ public class TimeSlider: UIControl {
     
     private func setupUI() {
         //
-        // Set height constraint
-        heightConstraint = heightAnchor.constraint(equalToConstant: heightConstraintConstant())
-        heightConstraint?.isActive = true
-        
         // Set background color
         backgroundColor = UIColor.lightGray.withAlphaComponent(0.7)
         
@@ -1222,6 +1264,7 @@ public class TimeSlider: UIControl {
         fullExtentStartTimeLabel.alignmentMode = kCAAlignmentCenter
         fullExtentStartTimeLabel.frame = CGRect.zero
         fullExtentStartTimeLabel.contentsScale = UIScreen.main.scale
+        fullExtentStartTimeLabel.font = fullExtentLabelFont as CFTypeRef
         fullExtentStartTimeLabel.fontSize = fullExtentLabelFont.pointSize
         layer.addSublayer(fullExtentStartTimeLabel)
         
@@ -1231,6 +1274,7 @@ public class TimeSlider: UIControl {
         fullExtentEndTimeLabel.alignmentMode = kCAAlignmentCenter
         fullExtentEndTimeLabel.frame = CGRect.zero
         fullExtentEndTimeLabel.contentsScale = UIScreen.main.scale
+        fullExtentEndTimeLabel.font = fullExtentLabelFont as CFTypeRef
         fullExtentEndTimeLabel.fontSize = fullExtentLabelFont.pointSize
         layer.addSublayer(fullExtentEndTimeLabel)
         
@@ -1240,6 +1284,7 @@ public class TimeSlider: UIControl {
         currentExtentStartTimeLabel.alignmentMode = kCAAlignmentCenter
         currentExtentStartTimeLabel.frame = CGRect.zero
         currentExtentStartTimeLabel.contentsScale = UIScreen.main.scale
+        currentExtentStartTimeLabel.font = currentExtentLabelFont as CFTypeRef
         currentExtentStartTimeLabel.fontSize = currentExtentLabelFont.pointSize
         layer.addSublayer(currentExtentStartTimeLabel)
         
@@ -1249,6 +1294,7 @@ public class TimeSlider: UIControl {
         currentExtentEndTimeLabel.alignmentMode = kCAAlignmentCenter
         currentExtentEndTimeLabel.frame = CGRect.zero
         currentExtentEndTimeLabel.contentsScale = UIScreen.main.scale
+        currentExtentEndTimeLabel.font = currentExtentLabelFont as CFTypeRef
         currentExtentEndTimeLabel.fontSize = currentExtentLabelFont.pointSize
         layer.addSublayer(currentExtentEndTimeLabel)
         
@@ -1259,47 +1305,30 @@ public class TimeSlider: UIControl {
         forwardImage = UIImage(named: "Forward", in: bundle, compatibleWith: nil)
         backImage = UIImage(named: "Back", in: bundle, compatibleWith: nil)
         
-        // Add Play/Pause button
-        let p = UIButton(type: .custom)
-        p.setBackgroundImage(playImage, for: .normal)
-        p.addTarget(self, action: #selector(TimeSlider.playPauseAction(_:)), for: .touchUpInside)
-        p.showsTouchWhenHighlighted = true
-        addSubview(p)
-        playPauseButton = p
+        // Setup Play/Pause button
+        playPauseButton.setImage(playImage, for: .normal)
+        playPauseButton.setImage(pauseImage, for: .selected)
+        playPauseButton.tintColor = playbackButtonsFillColor
+        playPauseButton.addTarget(self, action: #selector(TimeSlider.playPauseAction(_:)), for: .touchUpInside)
+        playPauseButton.showsTouchWhenHighlighted = true
+        addSubview(playPauseButton)
         
-        // Add forward button
-        let f = UIButton(type: .custom)
-        f.setBackgroundImage(forwardImage, for: .normal)
-        f.addTarget(self, action: #selector(TimeSlider.forwardAction(_:)), for: .touchUpInside)
-        f.showsTouchWhenHighlighted = true
-        addSubview(f)
-        forwardButton = f
+        // Setup forward button
+        forwardButton.setImage(forwardImage, for: .normal)
+        forwardButton.tintColor = playbackButtonsFillColor
+        forwardButton.addTarget(self, action: #selector(TimeSlider.forwardAction(_:)), for: .touchUpInside)
+        forwardButton.showsTouchWhenHighlighted = true
+        addSubview(forwardButton)
         
-        // Add back button
-        let b = UIButton(type: .custom)
-        b.setBackgroundImage(backImage, for: .normal)
-        b.addTarget(self, action: #selector(TimeSlider.backAction(_:)), for: .touchUpInside)
-        b.showsTouchWhenHighlighted = true
-        addSubview(b)
-        backButton = b
+        // Setup back button
+        backButton.setImage(backImage, for: .normal)
+        backButton.tintColor = playbackButtonsFillColor
+        backButton.addTarget(self, action: #selector(TimeSlider.backAction(_:)), for: .touchUpInside)
+        backButton.showsTouchWhenHighlighted = true
+        addSubview(backButton)
         
         // Refresh
-        refresh()
-    }
-    
-    private func refresh() {
-        //
-        // Calculate time steps
-        if timeSteps == nil || timeSteps?.isEmpty == true {
-            calculateTimeSteps()
-        }
-        
-        // Update frames
-        updateLayerFrames()
-        
-        // Update labels
-        updateFullExtentLabelFrames()
-        updateCurrentExtentLabelFrames()
+        setNeedsLayout()
     }
     
     private func updateLayerFrames() {
@@ -1337,7 +1366,7 @@ public class TimeSlider: UIControl {
                 let lowerThumbCenter = CGFloat(position(for: startTime.timeIntervalSince1970))
                 let lowerThumbOrigin = CGPoint(x: trackLayerSidePadding + lowerThumbCenter - thumbSize.width / 2.0, y: trackLayerFrame.midY - thumbSize.height / 2.0)
                 let lowerThumbFrame = CGRect(origin: lowerThumbOrigin, size: thumbSize)
-                lowerThumbLayer.isHidden = !self.isSliderVisible
+                lowerThumbLayer.isHidden = !isSliderVisible
                 lowerThumbLayer.frame = lowerThumbFrame
                 lowerThumbLayer.setNeedsDisplay()
             }
@@ -1350,7 +1379,7 @@ public class TimeSlider: UIControl {
                 let upperThumbCenter = CGFloat(position(for: endTime.timeIntervalSince1970))
                 let upperThumbOrigin = CGPoint(x: trackLayerSidePadding + upperThumbCenter - thumbSize.width / 2.0, y: trackLayerFrame.midY - thumbSize.height / 2.0)
                 let upperThumbFrame = CGRect(origin: upperThumbOrigin, size: thumbSize)
-                self.upperThumbLayer.isHidden = !self.isSliderVisible
+                upperThumbLayer.isHidden = !isSliderVisible
                 upperThumbLayer.frame = upperThumbFrame
                 upperThumbLayer.setNeedsDisplay()
             }
@@ -1372,15 +1401,15 @@ public class TimeSlider: UIControl {
             if !isSliderVisible {
                 playPauseButtonOrigin = CGPoint(x: bounds.midX - buttonSize.width / 2.0, y: bounds.midY - buttonSize.height / 2.0)
             }
-            playPauseButton?.frame = CGRect(origin: playPauseButtonOrigin, size: buttonSize)
+            playPauseButton.frame = CGRect(origin: playPauseButtonOrigin, size: buttonSize)
             
             // Set frame for forward button
             let forwardButtonOrigin = CGPoint(x: playPauseButtonOrigin.x + buttonSize.width + paddingBetweenButtons, y: playPauseButtonOrigin.y)
-            forwardButton?.frame = CGRect(origin: forwardButtonOrigin, size: buttonSize)
+            forwardButton.frame = CGRect(origin: forwardButtonOrigin, size: buttonSize)
             
             // Set frame for back button
             let backButtonOrigin = CGPoint(x: playPauseButtonOrigin.x - paddingBetweenButtons - buttonSize.width, y: playPauseButtonOrigin.y)
-            backButton?.frame = CGRect(origin: backButtonOrigin, size: buttonSize)
+            backButton.frame = CGRect(origin: backButtonOrigin, size: buttonSize)
         }
         
         // Commit the transaction
@@ -1404,7 +1433,7 @@ public class TimeSlider: UIControl {
         // Update full extent start time label
         if let fullExtentStartTime = fullExtent?.startTime {
             //
-            let startTimeString = fullExtentDateFormatter.string(from: fullExtentStartTime)
+            let startTimeString = string(for: fullExtentStartTime, style: fullExtentLabelDateStyle)
             fullExtentStartTimeLabel.string = startTimeString
             fullExtentStartTimeLabel.isHidden = !(fullExtentLabelsVisible && isSliderVisible)
             let startTimeLabelSize: CGSize = startTimeString.size(withAttributes: [kCTFontAttributeName as NSAttributedStringKey: fullExtentLabelFont])
@@ -1426,7 +1455,7 @@ public class TimeSlider: UIControl {
         // Update full extent end time label
         if let fullExtentEndTime = fullExtent?.endTime {
             //
-            let endTimeString = fullExtentDateFormatter.string(from: fullExtentEndTime)
+            let endTimeString = string(for: fullExtentEndTime, style: fullExtentLabelDateStyle)
             fullExtentEndTimeLabel.string = endTimeString
             fullExtentEndTimeLabel.isHidden = !(fullExtentLabelsVisible && isSliderVisible)
             let endTimeLabelSize: CGSize = endTimeString.size(withAttributes: [kCTFontAttributeName as NSAttributedStringKey: fullExtentLabelFont])
@@ -1468,7 +1497,7 @@ public class TimeSlider: UIControl {
         //
         // Update lower label
         if let startTime = currentExtentStartTime, fullExtent != nil  {
-            let startTimeString = currentExtentDateFormatter.string(from: startTime)
+            let startTimeString = string(for: startTime, style: currentExtentLabelDateStyle)
             currentExtentStartTimeLabel.string = startTimeString
             let startTimeLabelSize: CGSize = startTimeString.size(withAttributes: [kCTFontAttributeName as NSAttributedStringKey: currentExtentLabelFont])
             var startTimeLabelX = lowerThumbLayer.frame.midX - startTimeLabelSize.width / 2.0
@@ -1497,7 +1526,7 @@ public class TimeSlider: UIControl {
         
         // Update upper label
         if let endTime = currentExtentEndTime, isRangeEnabled, fullExtent != nil  {
-            let endTimeString = currentExtentDateFormatter.string(from: endTime)
+            let endTimeString = string(for: endTime, style: currentExtentLabelDateStyle)
             currentExtentEndTimeLabel.string = endTimeString
             let endTimeLabelSize: CGSize = endTimeString.size(withAttributes: [kCTFontAttributeName as NSAttributedStringKey: currentExtentLabelFont])
             var endTimeLabelX = upperThumbLayer.frame.midX - endTimeLabelSize.width / 2.0
@@ -1598,7 +1627,7 @@ public class TimeSlider: UIControl {
                         let currentTick = tms[j]
                         var currentTickLabelFrame: CGRect? = nil
                         if let currentTickDate = currentTick.value, let currentTickXPosition = currentTick.originX {
-                            let currentTickLabelString = timeStepIntervalDateFormatter.string(from: currentTickDate)
+                            let currentTickLabelString = string(for: currentTickDate, style: timeStepIntervalLabelDateStyle)
                             let currentTickLabel = tickMarkLabel(with: currentTickLabelString, originX: currentTickXPosition)
                             currentTickLabelFrame = currentTickLabel.frame
                         }
@@ -1607,7 +1636,7 @@ public class TimeSlider: UIControl {
                         let nextTick = tms[j + i]
                         var nextTickLabelFrame: CGRect? = nil
                         if let nextTickDate = nextTick.value, let nextTickXPosition = nextTick.originX {
-                            let nextTickLabelString = timeStepIntervalDateFormatter.string(from: nextTickDate)
+                            let nextTickLabelString = string(for: nextTickDate, style: timeStepIntervalLabelDateStyle)
                             let nextTickLabel = tickMarkLabel(with: nextTickLabelString, originX: nextTickXPosition)
                             nextTickLabelFrame = nextTickLabel.frame
                         }
@@ -1662,7 +1691,7 @@ public class TimeSlider: UIControl {
                 
                 // Get the label for tick mark and add it to the display.
                 if let tickMarkDate = tickMark.value, let tickMarkXPosition = tickMark.originX, tickMark.isMajorTick {
-                    let tickMarkLabelString = timeStepIntervalDateFormatter.string(from: tickMarkDate)
+                    let tickMarkLabelString = string(for: tickMarkDate, style: timeStepIntervalLabelDateStyle)
                     let label = tickMarkLabel(with: tickMarkLabelString, originX: tickMarkXPosition)
                     tickMarkLabels.append(label)
                     layer.addSublayer(label)
@@ -1832,13 +1861,19 @@ public class TimeSlider: UIControl {
         let tickMarkLabel = CATextLayer()
         tickMarkLabel.foregroundColor = timeStepIntervalLabelColor.cgColor
         tickMarkLabel.alignmentMode = kCAAlignmentCenter
+        tickMarkLabel.frame = CGRect.zero
         tickMarkLabel.contentsScale = UIScreen.main.scale
+        tickMarkLabel.font = timeStepIntervalLabelFont as CFTypeRef
         tickMarkLabel.fontSize = timeStepIntervalLabelFont.pointSize
         tickMarkLabel.string = string
         
         // Calculate the size of the label based on the string and font
         let tickMarkLabelSize: CGSize = string.size(withAttributes:[kCTFontAttributeName as NSAttributedStringKey: timeStepIntervalLabelFont])
         
+        // Calculate label's x position
+        let tickMarkLayerOriginDifference = tickMarkLayer.frame.minX - layer.frame.minX
+        let labelOriginX = (originX + tickMarkLayerOriginDifference + labelSidePadding) - (tickMarkLabelSize.width / 2.0)
+
         // The tick mark labels are displayed on the top side of the slider track.
         // So, it's y position needs to be minimum value of calculated either based on
         // tick mark layer or thumb size.
@@ -1847,7 +1882,7 @@ public class TimeSlider: UIControl {
         let originY = min(layerOriginY, thumbOriginY)
         
         // Set the label frame
-        tickMarkLabel.frame = CGRect(x: originX, y: originY, width: tickMarkLabelSize.width, height: tickMarkLabelSize.height)
+        tickMarkLabel.frame = CGRect(x: labelOriginX, y: originY, width: tickMarkLabelSize.width, height: tickMarkLabelSize.height)
         
         // Return label
         return tickMarkLabel
@@ -1892,22 +1927,6 @@ public class TimeSlider: UIControl {
             if let geoView = geoView {
                 geoView.timeExtent = currentExtent
             }
-        }
-    }
-    
-    // Returns value of height constraint constant
-    private func heightConstraintConstant() -> CGFloat {
-        //
-        // The constant value is based on whether
-        // slider and/or playback buttons are visible
-        if isSliderVisible && playbackButtonsVisible {
-            return 136.0
-        }
-        else if isSliderVisible && !playbackButtonsVisible {
-            return 100.0
-        }
-        else {
-            return 60.0
         }
     }
     
@@ -2080,6 +2099,45 @@ public class TimeSlider: UIControl {
         
         return false
     }
+    
+    // This function returns a string for the given date and date style
+    private func string(for date: Date, style: DateStyle) -> String {
+        //
+        // Create the date formatter to get the string for a date
+        let dateFormatter: DateFormatter = DateFormatter()
+        dateFormatter.timeZone = timeZone
+        
+        switch style {
+            
+        case .dayShortMonthYear:
+            dateFormatter.setLocalizedDateFormatFromTemplate("d MMM y")
+        case .longDate:
+            dateFormatter.setLocalizedDateFormatFromTemplate("EEEE, MMMM d, y")
+        case .longMonthDayYear:
+            dateFormatter.setLocalizedDateFormatFromTemplate("MMMM d y")
+        case .longMonthYear:
+            dateFormatter.setLocalizedDateFormatFromTemplate("MMMM y")
+        case .shortDate:
+            dateFormatter.setLocalizedDateFormatFromTemplate("M/d/y")
+        case .shortDateLongTime:
+            dateFormatter.setLocalizedDateFormatFromTemplate("M/d/y h:mm:ss a")
+        case .shortDateLongTime24:
+            dateFormatter.setLocalizedDateFormatFromTemplate("M/d/y H:mm:ss")
+        case .shortDateShortTime:
+            dateFormatter.setLocalizedDateFormatFromTemplate("M/d/y h:mm a")
+        case .shortDateShortTime24:
+            dateFormatter.setLocalizedDateFormatFromTemplate("M/d/y h:mm a")
+        case .shortMonthYear:
+            dateFormatter.setLocalizedDateFormatFromTemplate("MMM y")
+        case .year:
+            dateFormatter.setLocalizedDateFormatFromTemplate("y")
+        case .unknown:
+            dateFormatter.setLocalizedDateFormatFromTemplate("M/d/y h:mm a")
+        }
+        
+        return dateFormatter.string(from: date)
+    }
+    
 }
 
 // MARK: - Time Slider Thumb Layer
@@ -2279,41 +2337,6 @@ private class TickMark {
     init(originX: CGFloat, value: Date) {
         self.originX = originX
         self.value = value
-    }
-}
-
-// MARK: - Image Extension
-
-extension UIImage {
-    //
-    // Creates new image with given color
-    func imageWithColor(_ color: UIColor) -> UIImage {
-        //
-        // Begin graphic image context and color
-        UIGraphicsBeginImageContextWithOptions(size, false, scale)
-        color.setFill()
-        
-        // Get the current context and apply
-        // translate, scale and blend mode
-        let ctx = UIGraphicsGetCurrentContext()
-        ctx?.translateBy(x: 0, y: size.height)
-        ctx?.scaleBy(x: 1.0, y: -1.0)
-        ctx?.setBlendMode(.normal)
-        
-        // Clip image to the size
-        let rect = CGRect(x: 0, y: 0, width: size.width, height: size.height)
-        if let cgImage = cgImage {
-            ctx?.clip(to: rect, mask: cgImage)
-        }
-        
-        // Fill with the current fill color.
-        ctx?.fill(rect)
-        
-        // Create new image and end image context
-        guard let newImage = UIGraphicsGetImageFromCurrentImageContext() else { return self }
-        UIGraphicsEndImageContext()
-        
-        return newImage
     }
 }
 
