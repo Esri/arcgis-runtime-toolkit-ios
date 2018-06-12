@@ -1583,7 +1583,7 @@ public class TimeSlider: UIControl {
             
             // Calculate the largest number of ticks to allow between major ticks. This prevents scenarios where
             // there are two major ticks placed undesirably close to the end.
-            let maxMajorTickInterval = Int(ceil(Double(tickCount / 2)))
+            let maxMajorTickInterval = Int((Double(tickCount) / 2).rounded(.up))
             
             // If maxMajorTickInterval is not greater than majorTickInterval
             // then we can not do further calculation
@@ -1667,10 +1667,10 @@ public class TimeSlider: UIControl {
                     // Calculate the index of the middle tick. Note that, if there are an even number of ticks, there
                     // is not one perfectly centered. This logic takes the one before the true center of the slider.
                     if (tickCount % 2 == 0) {
-                        firstMajorTickIndex = Int(trunc(Double(tickCount / 2)) - 1)
+                        firstMajorTickIndex = Int(trunc(Double(tickCount) / 2) - 1)
                     }
                     else {
-                        firstMajorTickIndex = Int(trunc(Double(tickCount / 2)))
+                        firstMajorTickIndex = Int(trunc(Double(tickCount) / 2))
                     }
                 }
             }
@@ -2332,7 +2332,6 @@ private class TickMark {
     var originX: CGFloat?
     var value: Date?
     var isMajorTick: Bool = false
-    var label: CATextLayer?
     
     init(originX: CGFloat, value: Date) {
         self.originX = originX
