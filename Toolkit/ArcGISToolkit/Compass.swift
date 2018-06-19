@@ -54,8 +54,6 @@ public class Compass: UIImageView {
         
         super.init(frame: .zero)
         
-        //mapView.addObserver(self, forKeyPath: #keyPath(AGSMapView.rotation), options: [], context: &kvoContext)
-        
         // Set our image to the CompassIcon in the Assets
         let bundle = Bundle(for: type(of: self))
         image = UIImage(named: "CompassIcon", in: bundle, compatibleWith: nil)
