@@ -47,7 +47,7 @@ open class VCListViewController: TableViewController {
         return cell
     }
     
-    open func tableView(_ tableView: UITableView, didSelectRowAtIndexPath indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         let t = viewControllerInfos[(indexPath as NSIndexPath).row].viewControllerType
         let nibName = viewControllerInfos[(indexPath as NSIndexPath).row].nibName
@@ -74,5 +74,9 @@ open class VCListViewController: TableViewController {
             navigationController?.pushViewController(vc, animated: true)
         }
     }
+    
+//    open func tableView(_ tableView: UITableView, didSelectRowAtIndexPath indexPath: IndexPath) {
+//
+//    }
     
 }
