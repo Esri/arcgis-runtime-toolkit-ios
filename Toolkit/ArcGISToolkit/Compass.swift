@@ -42,19 +42,19 @@ public class Compass: UIImageView {
     }
     
     private var mapView: AGSMapView
-    private var kvoContext = 0
     
     // the width and height constraints
     private var widthConstraint:NSLayoutConstraint?
     private var heightConstraint:NSLayoutConstraint?
 
+    private var rotationObservation : NSKeyValueObservation?
+    
     public init(mapView: AGSMapView) {
         self.mapView = mapView
         
         super.init(frame: .zero)
         
-        // Add NorthArrowController as an observer of the mapView's rotation.
-        mapView.addObserver(self, forKeyPath: #keyPath(AGSMapView.rotation), options: [], context: &kvoContext)
+        //mapView.addObserver(self, forKeyPath: #keyPath(AGSMapView.rotation), options: [], context: &kvoContext)
         
         // Set our image to the CompassIcon in the Assets
         let bundle = Bundle(for: type(of: self))
@@ -67,20 +67,32 @@ public class Compass: UIImageView {
         
         // animate the compass visibility, if necessary
         animateCompass()
+        
+        // Add Compass as an observer of the mapView's rotation.
+        rotationObservation = mapView.observe(\.rotation, options: .new) { (mapView, change) in
+            
+            guard let rotation = change.newValue else{
+                return
+            }
+            
+            // make sure that UI changes are made on the main thread
+            DispatchQueue.main.async{
+                let mapRotation = self.degreesToRadians(degrees: (360 - rotation))
+                // Rotate north arrow to match the map view rotation.
+                self.transform = CGAffineTransform(rotationAngle: mapRotation)
+                // Animate the compass visibility (if necessary)
+                self.animateCompass()
+            }
+        }
+        
     }
     
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    deinit {
-        // Stop observing the map view's rotation.
-        mapView.removeObserver(self, forKeyPath: #keyPath(AGSMapView.rotation), context: &kvoContext)
-    }
-    
     @objc func compassTapped(){
         mapView.setViewpointRotation(0, completion: nil)
-        isHidden = autoHide
     }
     
     func animateCompass() {
@@ -89,21 +101,6 @@ public class Compass: UIImageView {
             UIView.animate(withDuration: 0.25) {
                 self.alpha = alpha
             }
-        }
-    }
-
-    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if (keyPath == #keyPath(AGSMapView.rotation)) && (context == &kvoContext) {
-            // Rotate north arrow to match the map view rotation.
-            let mapRotation = self.degreesToRadians(degrees: (360 - mapView.rotation))
-            let transform = CGAffineTransform(rotationAngle: mapRotation)
-            self.transform = transform
-            
-            // animate the compass visibility, if necessary
-            animateCompass()
-        }
-        else {
-            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
     }
     
