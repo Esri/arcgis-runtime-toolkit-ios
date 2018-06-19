@@ -162,18 +162,18 @@ class JobManagerExample: TableViewController {
         tableView.register(JobTableViewCell.self, forCellReuseIdentifier: "JobCell")
     }
     
-    func resumeAllPausedJobs(){
+    @objc func resumeAllPausedJobs(){
         JobManager.shared.resumeAllPausedJobs(statusHandler: self.jobStatusHandler, completion: self.jobCompletionHandler)
     }
     
-    func clearFinishedJobs(){
+    @objc func clearFinishedJobs(){
         JobManager.shared.clearFinishedJobs()
         tableView.reloadData()
     }
     
     var i = 0
     
-    func kickOffJob(){
+    @objc func kickOffJob(){
         
         if (i % 2) == 0{
             let url = URL(string: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Sync/WildfireSync/FeatureServer")!

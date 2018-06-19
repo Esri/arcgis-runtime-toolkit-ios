@@ -579,7 +579,7 @@ internal struct SegmentInfo{
 
 internal protocol ScalebarRenderer{
     
-    weak var scalebar: Scalebar? {get}
+    var scalebar: Scalebar? {get}
     var currentScaleDisplay : ScaleDisplay? { get set }
     var displayHeight: CGFloat {get}
     var currentMaxDisplayWidth : CGFloat { get }

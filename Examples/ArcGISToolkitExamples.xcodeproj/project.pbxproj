@@ -19,8 +19,8 @@
 		88B689CB1E96EDF400B67FAB /* MeasureExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689C11E96EDF400B67FAB /* MeasureExample.swift */; };
 		88B689CE1E96EDF400B67FAB /* ScalebarExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689C41E96EDF400B67FAB /* ScalebarExample.swift */; };
 		88B689D11E96EDF400B67FAB /* VCListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689C71E96EDF400B67FAB /* VCListViewController.swift */; };
-		E46893271FEDAE29008ADA79 /* CompassExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46893261FEDAE29008ADA79 /* CompassExample.swift */; };
 		88DBC2A11FE83D6000255921 /* JobManagerExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88DBC2A01FE83D6000255921 /* JobManagerExample.swift */; };
+		E46893271FEDAE29008ADA79 /* CompassExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46893261FEDAE29008ADA79 /* CompassExample.swift */; };
 		E48405751E9BE7E600927208 /* LegendExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48405741E9BE7E600927208 /* LegendExample.swift */; };
 /* End PBXBuildFile section */
 
@@ -76,8 +76,8 @@
 		88B689C11E96EDF400B67FAB /* MeasureExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeasureExample.swift; sourceTree = "<group>"; };
 		88B689C41E96EDF400B67FAB /* ScalebarExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScalebarExample.swift; sourceTree = "<group>"; };
 		88B689C71E96EDF400B67FAB /* VCListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VCListViewController.swift; sourceTree = "<group>"; };
-		E46893261FEDAE29008ADA79 /* CompassExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassExample.swift; sourceTree = "<group>"; };
 		88DBC2A01FE83D6000255921 /* JobManagerExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobManagerExample.swift; sourceTree = "<group>"; };
+		E46893261FEDAE29008ADA79 /* CompassExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassExample.swift; sourceTree = "<group>"; };
 		E48405741E9BE7E600927208 /* LegendExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegendExample.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -178,7 +178,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0800;
-				LastUpgradeCheck = 0820;
+				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = Esri;
 				TargetAttributes = {
 					8839043A1DF6022A001F3188 = {
@@ -317,15 +317,23 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
@@ -368,15 +376,23 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
@@ -420,7 +436,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.esri.${PRODUCT_NAME}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -440,7 +456,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.esri.${PRODUCT_NAME}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};

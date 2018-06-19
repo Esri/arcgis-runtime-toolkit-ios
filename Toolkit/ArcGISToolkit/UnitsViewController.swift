@@ -129,19 +129,19 @@ public class UnitsViewController: TableViewController, UINavigationBarDelegate, 
         
         let linearUnitIDs : [AGSLinearUnitID] = [.centimeters, .feet, .inches, .kilometers, .meters, .miles, .millimeters, .nauticalMiles, .yards]
         
-        linearUnits = linearUnitIDs.flatMap {
+        linearUnits = linearUnitIDs.compactMap {
             AGSLinearUnit(unitID: $0)
             }.sorted{ $0.pluralDisplayName < $1.pluralDisplayName }
         
         let areaUnitIDs : [AGSAreaUnitID] = [.acres, .hectares, .squareCentimeters, .squareDecimeters, .squareFeet, .squareKilometers, .squareMeters, .squareMillimeters, .squareMiles, .squareYards]
         
-        areaUnits = areaUnitIDs.flatMap {
+        areaUnits = areaUnitIDs.compactMap {
             AGSAreaUnit(unitID: $0)
             }.sorted{ $0.pluralDisplayName < $1.pluralDisplayName }
         
         let angularUnitIDs : [AGSAngularUnitID] = [.degrees, .grads, .minutes, .radians, .seconds]
         
-        angularUnits = angularUnitIDs.flatMap {
+        angularUnits = angularUnitIDs.compactMap {
             AGSAngularUnit(unitID: $0)
             }.sorted{ $0.pluralDisplayName < $1.pluralDisplayName }
         

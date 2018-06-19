@@ -37,7 +37,7 @@ class LegendExample: MapViewController {
         navigationItem.rightBarButtonItem = bbi
     }
     
-    func showLegendAction(){
+    @objc func showLegendAction(){
         if let legendVC = legendVC{
             navigationController?.pushViewController(legendVC, animated: true)
         }
