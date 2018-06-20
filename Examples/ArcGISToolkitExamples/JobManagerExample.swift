@@ -120,16 +120,23 @@ class JobManagerExample: TableViewController {
         return JobManager.shared.jobs
     }
     
+    var toolbar : UIToolbar?
+    
     override open func viewDidLoad() {
         super.viewDidLoad()
         
-        let toolbarFrame = CGRect(x: 0, y: view.bounds.size.height - 44.0, width: view.bounds.size.width, height: 44.0)
-        
         // create a Toolbar and add it to the view controller
-        let toolbar = UIToolbar()
-        toolbar.frame = toolbarFrame
-        toolbar.autoresizingMask = [.flexibleWidth, .flexibleTopMargin]
-        view.addSubview(toolbar)
+        let tb = UIToolbar()
+        toolbar = tb
+        tb.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(tb)
+        tb.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        tb.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        if #available(iOS 11.0, *) {
+            tb.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        } else {
+            tb.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        }
         
         // button to kick off a new job
         let kickOffJobItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(kickOffJob))
@@ -142,7 +149,7 @@ class JobManagerExample: TableViewController {
         let clearFinishedJobsItem = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(clearFinishedJobs))
         
         let flex = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        toolbar.items = [kickOffJobItem, flex, resumeAllPausedJobsItem, flex, clearFinishedJobsItem]
+        tb.items = [kickOffJobItem, flex, resumeAllPausedJobsItem, flex, clearFinishedJobsItem]
         
         //
         // register for user notifications, this way we can notify user in bg when job complete
@@ -180,6 +187,15 @@ class JobManagerExample: TableViewController {
         }
         
         i += 1
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        // update content inset for toolbar (so that tableView scrolls correctly behind the toolbar)
+        let tbHeight = toolbar?.frame.height ?? 0
+        tableView.contentInset = UIEdgeInsetsMake(tableView.contentInset.top, 0, tbHeight, 0)
+        tableView.scrollIndicatorInsets = tableView.contentInset
     }
     
     required public init?(coder aDecoder: NSCoder) {
