@@ -75,8 +75,4 @@ open class VCListViewController: TableViewController {
         }
     }
     
-//    open func tableView(_ tableView: UITableView, didSelectRowAtIndexPath indexPath: IndexPath) {
-//
-//    }
-    
 }
