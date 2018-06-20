@@ -155,7 +155,7 @@ private enum MeasureToolbarMode{
     case feature
 }
 
-public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
+public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
     
     
     // Exposed so that the user can customize the sketch editor styles.
@@ -200,7 +200,6 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
     
     private let unitsViewController = UnitsViewController()
     
-    private let toolbar : UIToolbar = UIToolbar()
     private let resultView : MeasureResultView = MeasureResultView()
     
     private var undoButton : UIBarButtonItem!
@@ -292,7 +291,6 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
         
         // auto layout
         
-        addSubview(toolbar)
         addSubview(resultView)
         
         // notification
@@ -359,15 +357,9 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
             return
         }
         
-        toolbar.translatesAutoresizingMaskIntoConstraints = false
         resultView.translatesAutoresizingMaskIntoConstraints = false
         
-        let views = ["view":self, "toolbar":toolbar, "resultView": resultView] as [String: UIView]
-        
-        addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|-0-[toolbar]-0-|", options: [], metrics: nil, views: views))
-        addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|-0-[toolbar(44)]-0-|", options: [], metrics: nil, views: views))
-        
-        resultView.centerYAnchor.constraint(equalTo: toolbar.centerYAnchor).isActive = true
+        resultView.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
         
         // The following constraints cause the results view to be centered,
         // however if the content is too big it is allowed to grow to the right.
@@ -383,10 +375,10 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
         let c2 = resultView.trailingAnchor.constraint(lessThanOrEqualTo: rightHiddenPlaceholderView.leadingAnchor, constant: -space)
         c2.priority = UILayoutPriority(rawValue: 999)
         
-        let c3 = NSLayoutConstraint(item: resultView, attribute: .centerX, relatedBy: .greaterThanOrEqual, toItem: toolbar, attribute: .centerX, multiplier: 1, constant: 0)
+        let c3 = NSLayoutConstraint(item: resultView, attribute: .centerX, relatedBy: .greaterThanOrEqual, toItem: self, attribute: .centerX, multiplier: 1, constant: 0)
         c3.priority = .required
         
-        let c4 = NSLayoutConstraint(item: resultView, attribute: .centerX, relatedBy: .lessThanOrEqual, toItem: toolbar, attribute: .centerX, multiplier: 1, constant: 0)
+        let c4 = NSLayoutConstraint(item: resultView, attribute: .centerX, relatedBy: .lessThanOrEqual, toItem: self, attribute: .centerX, multiplier: 1, constant: 0)
         c4.priority = .defaultLow
         
         NSLayoutConstraint.activate([c1, c2, c3, c4])
@@ -419,7 +411,7 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
         
         mode = .length
         selectionOverlay?.isVisible = false
-        toolbar.items = sketchModeButtons
+        self.items = sketchModeButtons
         mapView?.sketchEditor = lineSketchEditor
         
         if !lineSketchEditor.isStarted{
@@ -437,7 +429,7 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
         
         mode = .area
         selectionOverlay?.isVisible = false
-        toolbar.items = sketchModeButtons
+        self.items = sketchModeButtons
         mapView?.sketchEditor = areaSketchEditor
         
         if !areaSketchEditor.isStarted{
@@ -455,7 +447,7 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
         
         mode = .feature
         selectionOverlay?.isVisible = true
-        toolbar.items = selectModeButtons
+        self.items = selectModeButtons
         mapView?.sketchEditor = nil
         displayMeasurementForGeometry(geom: selectedGeometry)
     }
