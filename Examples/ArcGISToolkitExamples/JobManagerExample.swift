@@ -32,7 +32,7 @@ import ArcGISToolkit
 class JobTableViewCell: UITableViewCell{
     
     var job : AGSJob?
-    private var observerContext = 0
+    var statusObservation : NSKeyValueObservation?
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
@@ -44,15 +44,20 @@ class JobTableViewCell: UITableViewCell{
     
     func configureWithJob(job: AGSJob?){
         
-        // remove previous observer
-        self.job?.removeObserver(self, forKeyPath: #keyPath(AGSJob.status))
+        // invalidate previous observation
+        statusObservation?.invalidate()
+        statusObservation = nil
         
         self.job = job
         
         self.updateUI()
         
-        // add observer
-        self.job?.addObserver(self, forKeyPath: #keyPath(AGSJob.status), options: .new, context: &observerContext)
+        // observe job status
+        statusObservation = self.job?.observe(\.status, options: .new) { [weak self] (job, changes) in
+            DispatchQueue.main.async {
+                self?.updateUI()
+            }
+        }
     }
     
     func updateUI(){
@@ -102,20 +107,6 @@ class JobTableViewCell: UITableViewCell{
             return "Download Preplanned Offline Map"
         }
         return "Other"
-    }
-    
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?,
-                               change: [NSKeyValueChangeKey : Any]?,
-                               context: UnsafeMutableRawPointer?) {
-        
-        if context != &observerContext{
-            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
-            return
-        }
-        
-        if keyPath == #keyPath(AGSJob.status) {
-            self.updateUI()
-        }
     }
     
 }
