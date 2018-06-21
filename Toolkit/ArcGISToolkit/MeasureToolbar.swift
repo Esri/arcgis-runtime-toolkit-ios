@@ -223,6 +223,8 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
     private var undoButton : UIBarButtonItem!
     private var redoButton : UIBarButtonItem!
     private var clearButton : UIBarButtonItem!
+    private var rightHiddenPlaceholderView : UIView!
+    private var leftHiddenPlaceholderView : UIView!
     private var segControl : UISegmentedControl!
     private var segControlItem : UIBarButtonItem!
     private var mode : MeasureToolbarMode? = nil {
@@ -298,12 +300,17 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         segControl.addTarget(self, action: #selector(segmentControlValueChanged), for: .valueChanged)
         
         let flexButton = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        let fixed = UIBarButtonItem(customView: UIView(frame: CGRect(x: 0, y: 0, width: 8, height: 32)))
         
-        let resultButton = UIBarButtonItem(customView: resultView)
+        rightHiddenPlaceholderView = UIView(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
+        let rightHiddenPlaceholderButton = UIBarButtonItem(customView: rightHiddenPlaceholderView)
+        rightHiddenPlaceholderButton.isEnabled = false
         
-        sketchModeButtons = [segControlItem, fixed, flexButton, resultButton, flexButton, undoButton, redoButton, clearButton]
-        selectModeButtons = [segControlItem, fixed, flexButton, resultButton, flexButton]
+        leftHiddenPlaceholderView = UIView(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
+        let leftHiddenPlaceholderButton = UIBarButtonItem(customView: leftHiddenPlaceholderView)
+        leftHiddenPlaceholderButton.isEnabled = false
+        
+        sketchModeButtons = [segControlItem, leftHiddenPlaceholderButton, flexButton, rightHiddenPlaceholderButton, undoButton, redoButton, clearButton]
+        selectModeButtons = [segControlItem, leftHiddenPlaceholderButton, flexButton, rightHiddenPlaceholderButton]
         
         // notification
         
@@ -339,6 +346,49 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         if let mapView = mapView, let selectionOverlay = selectionOverlay{
             mapView.graphicsOverlays.remove(selectionOverlay)
         }
+    }
+    
+    private var didSetConstraints : Bool = false
+    
+    public override func updateConstraints() {
+        
+        super.updateConstraints()
+        
+        guard !didSetConstraints else{
+            return
+        }
+        
+        // NOTE: Cannot add resultView as a subview until updateConstraints
+        // or else the constraints wont be setup correctly.
+        addSubview(resultView)
+        
+        resultView.translatesAutoresizingMaskIntoConstraints = false
+        
+        resultView.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
+        
+        // The following constraints cause the results view to be centered,
+        // however if the content is too big it is allowed to grow to the right.
+        // The two centerX constraints are arranged with specific priorities to cause this.
+        
+        let space : CGFloat = 2
+        
+        let c1 = resultView.leadingAnchor.constraint(greaterThanOrEqualTo: leftHiddenPlaceholderView.trailingAnchor, constant: space)
+        c1.priority = .required
+        
+        // have to give this just below required, otherwise before the left and right views are setup in
+        // their proper locations we can get constraint errors
+        let c2 = resultView.trailingAnchor.constraint(lessThanOrEqualTo: rightHiddenPlaceholderView.leadingAnchor, constant: -space)
+        c2.priority = UILayoutPriority(rawValue: 999)
+        
+        let c3 = NSLayoutConstraint(item: resultView, attribute: .centerX, relatedBy: .greaterThanOrEqual, toItem: self, attribute: .centerX, multiplier: 1, constant: 0)
+        c3.priority = .required
+        
+        let c4 = NSLayoutConstraint(item: resultView, attribute: .centerX, relatedBy: .lessThanOrEqual, toItem: self, attribute: .centerX, multiplier: 1, constant: 0)
+        c4.priority = .defaultLow
+        
+        NSLayoutConstraint.activate([c1, c2, c3, c4])
+        
+        didSetConstraints = true
     }
     
     override public class var requiresConstraintBasedLayout : Bool {

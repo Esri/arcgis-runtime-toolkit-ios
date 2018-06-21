@@ -38,6 +38,7 @@ class MeasureExample: MapViewController{
         } else {
             measureToolbar.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         }
+        measureToolbar.heightAnchor.constraint(equalToConstant: 44).isActive = true
 
     }
     
