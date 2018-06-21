@@ -125,8 +125,6 @@ class JobManagerExample: TableViewController {
     override open func viewDidLoad() {
         super.viewDidLoad()
         
-        
-        
         // create a Toolbar and add it to the view controller
         let tb = UIToolbar()
         toolbar = tb
@@ -138,14 +136,6 @@ class JobManagerExample: TableViewController {
             tb.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         } else {
             tb.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        }
-        
-        if #available(iOS 11.0, *) {
-            //tableView.contentInsetAdjustmentBehavior = .always
-            tableView.layoutMargins = UIEdgeInsetsMake(0, 0, 44, 0)
-            //tableView.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 44.0).isActive = true
-        } else {
-            // Fallback on earlier versions
         }
         
         // button to kick off a new job
@@ -199,14 +189,14 @@ class JobManagerExample: TableViewController {
         i += 1
     }
     
-//    override func viewDidLayoutSubviews() {
-//        super.viewDidLayoutSubviews()
-//
-//        // update content inset for toolbar (so that tableView scrolls correctly behind the toolbar)
-//        let tbHeight = toolbar?.frame.height ?? 0
-//        tableView.contentInset = UIEdgeInsetsMake(tableView.contentInset.top, 0, tbHeight, 0)
-//        tableView.scrollIndicatorInsets = tableView.contentInset
-//    }
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+
+        // update content inset for toolbar (so that tableView scrolls correctly behind the toolbar)
+        let tbHeight = toolbar?.frame.height ?? 0
+        tableView.contentInset = UIEdgeInsetsMake(tableView.contentInset.top, 0, tbHeight, 0)
+        tableView.scrollIndicatorInsets = tableView.contentInset
+    }
     
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
