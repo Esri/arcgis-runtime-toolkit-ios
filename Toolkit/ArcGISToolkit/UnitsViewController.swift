@@ -147,6 +147,8 @@ public class UnitsViewController: TableViewController {
     // MARK: TableView delegate/datasource methods
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        // when the user taps on a unit
+        //
         tableView.deselectRow(at: indexPath, animated: true)
         let unit = unitForCell(at: indexPath)
         guard unit != selectedUnit else { return }
