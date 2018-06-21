@@ -155,7 +155,7 @@ private enum MeasureToolbarMode{
     case feature
 }
 
-public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
+public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
     
     
     // Exposed so that the user can customize the sketch editor styles.
@@ -175,7 +175,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
             bindToMapView(mapView: mapView)
         }
     }
-
+    
     public var linearUnits : [AGSLinearUnit]{
         get { return unitsViewController.linearUnits }
         set { unitsViewController.linearUnits = newValue }
@@ -200,6 +200,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
     
     private let unitsViewController = UnitsViewController()
     
+    private let toolbar : UIToolbar = UIToolbar()
     private let resultView : MeasureResultView = MeasureResultView()
     
     private var undoButton : UIBarButtonItem!
@@ -212,8 +213,8 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
     private var mode : MeasureToolbarMode? = nil
     
     private let geodeticCurveType : AGSGeodeticCurveType = .geodesic
-    // This is the threshold for which when the planar measurements are above, 
-    // it will switch to geodetic calculations. Set it to Double.infinity for 
+    // This is the threshold for which when the planar measurements are above,
+    // it will switch to geodetic calculations. Set it to Double.infinity for
     // always doing geodetic calculations (but be careful, they can get slow when they have to measure
     // too much length/area).
     // Set it to 0 to never do geodetic calculations (less accurate).
@@ -291,6 +292,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         
         // auto layout
         
+        addSubview(toolbar)
         addSubview(resultView)
         
         // notification
@@ -357,9 +359,15 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
             return
         }
         
+        toolbar.translatesAutoresizingMaskIntoConstraints = false
         resultView.translatesAutoresizingMaskIntoConstraints = false
         
-        resultView.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
+        let views = ["view":self, "toolbar":toolbar, "resultView": resultView] as [String: UIView]
+        
+        addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|-0-[toolbar]-0-|", options: [], metrics: nil, views: views))
+        addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|-0-[toolbar(44)]-0-|", options: [], metrics: nil, views: views))
+        
+        resultView.centerYAnchor.constraint(equalTo: toolbar.centerYAnchor).isActive = true
         
         // The following constraints cause the results view to be centered,
         // however if the content is too big it is allowed to grow to the right.
@@ -370,15 +378,15 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         let c1 = resultView.leadingAnchor.constraint(greaterThanOrEqualTo: leftHiddenPlaceholderView.trailingAnchor, constant: space)
         c1.priority = .required
         
-        // have to give this just below required, otherwise before the left and right views are setup in 
+        // have to give this just below required, otherwise before the left and right views are setup in
         // their proper locations we can get constraint errors
         let c2 = resultView.trailingAnchor.constraint(lessThanOrEqualTo: rightHiddenPlaceholderView.leadingAnchor, constant: -space)
         c2.priority = UILayoutPriority(rawValue: 999)
         
-        let c3 = NSLayoutConstraint(item: resultView, attribute: .centerX, relatedBy: .greaterThanOrEqual, toItem: self, attribute: .centerX, multiplier: 1, constant: 0)
+        let c3 = NSLayoutConstraint(item: resultView, attribute: .centerX, relatedBy: .greaterThanOrEqual, toItem: toolbar, attribute: .centerX, multiplier: 1, constant: 0)
         c3.priority = .required
         
-        let c4 = NSLayoutConstraint(item: resultView, attribute: .centerX, relatedBy: .lessThanOrEqual, toItem: self, attribute: .centerX, multiplier: 1, constant: 0)
+        let c4 = NSLayoutConstraint(item: resultView, attribute: .centerX, relatedBy: .lessThanOrEqual, toItem: toolbar, attribute: .centerX, multiplier: 1, constant: 0)
         c4.priority = .defaultLow
         
         NSLayoutConstraint.activate([c1, c2, c3, c4])
@@ -402,7 +410,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
             startFeatureMode()
         }
     }
- 
+    
     private func startLineMode(){
         
         guard mode != MeasureToolbarMode.length else{
@@ -411,7 +419,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         
         mode = .length
         selectionOverlay?.isVisible = false
-        self.items = sketchModeButtons
+        toolbar.items = sketchModeButtons
         mapView?.sketchEditor = lineSketchEditor
         
         if !lineSketchEditor.isStarted{
@@ -429,7 +437,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         
         mode = .area
         selectionOverlay?.isVisible = false
-        self.items = sketchModeButtons
+        toolbar.items = sketchModeButtons
         mapView?.sketchEditor = areaSketchEditor
         
         if !areaSketchEditor.isStarted{
@@ -447,7 +455,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         
         mode = .feature
         selectionOverlay?.isVisible = true
-        self.items = selectModeButtons
+        toolbar.items = selectModeButtons
         mapView?.sketchEditor = nil
         displayMeasurementForGeometry(geom: selectedGeometry)
     }
@@ -507,7 +515,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
     }
     
     private func calculateLength(of geom: AGSGeometry) -> Double{
-    
+        
         // if planar is very large then just return that, geodetic might take too long
         if let linearUnit = geom.spatialReference?.unit as? AGSLinearUnit{
             var planar = AGSGeometryEngine.length(of: geom)
@@ -610,7 +618,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
             guard let strongSelf = self else{
                 return
             }
-             
+            
             if let error = error{
                 guard (error as NSError).domain != NSCocoaErrorDomain && (error as NSError).code != NSUserCancelledError else{
                     return
@@ -672,7 +680,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         let graphic = AGSGraphic(geometry: geom, symbol: selectionSymbol(for: geom), attributes: nil)
         graphic.isSelected = true
         selectionOverlay?.graphics.add(graphic)
-
+        
         selectedGeometry = geom
     }
     
