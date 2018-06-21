@@ -46,7 +46,13 @@ class MeasureExample: MapViewController{
         
         // update content inset for mapview
         let tbHeight = measureToolbar.frame.height
-        mapView.contentInset = UIEdgeInsetsMake(0, 0, tbHeight, 0)
+        
+        if #available(iOS 11.0, *) {
+            mapView.contentInset = UIEdgeInsetsMake(0, 0, view.safeAreaInsets.bottom + tbHeight, 0)
+        }
+        else{
+            mapView.contentInset = UIEdgeInsetsMake(0, 0, tbHeight, 0)
+        }
     }
     
     override func didReceiveMemoryWarning() {
