@@ -361,16 +361,10 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
         toolbar.translatesAutoresizingMaskIntoConstraints = false
         resultView.translatesAutoresizingMaskIntoConstraints = false
         
-        if #available(iOS 11.0, *) {
-            toolbar.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor).isActive = true
-            toolbar.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor).isActive = true
-            toolbar.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor).isActive = true
-        } else {
-            // Fallback on earlier versions
-            toolbar.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
-            toolbar.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
-            toolbar.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
-        }
+        toolbar.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
+        toolbar.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
+        toolbar.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
+        toolbar.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
         
         resultView.centerYAnchor.constraint(equalTo: toolbar.centerYAnchor).isActive = true
         
