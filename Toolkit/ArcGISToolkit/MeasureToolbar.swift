@@ -27,6 +27,7 @@ class MeasureResultView : UIView{
                 valueLabel.text = valueString()
                 unitButton.setTitle(stringForUnit(measurement.unit), for: .normal)
                 unitButton.isHidden = false
+                invalidateIntrinsicContentSize()
             }
         }
     }
@@ -47,6 +48,10 @@ class MeasureResultView : UIView{
     
     let numberFormatter = NumberFormatter()
     var buttonTapHandler: (()->(Void))?
+    
+    override var intrinsicContentSize: CGSize{
+        return stackView.systemLayoutSizeFitting(CGSize(width: 0, height: 0), withHorizontalFittingPriority: .fittingSizeLevel, verticalFittingPriority: .fittingSizeLevel)
+    }
     
     override init(frame: CGRect) {
         
@@ -72,6 +77,8 @@ class MeasureResultView : UIView{
         stackView.spacing = 4.0
         stackView.distribution = .equalSpacing
         stackView.alignment = .center
+        stackView.layoutMargins = UIEdgeInsetsMake(0, 6, 0, 6)
+        stackView.isLayoutMarginsRelativeArrangement = true
         
         super.init(frame: frame)
         
@@ -87,8 +94,8 @@ class MeasureResultView : UIView{
         
         addSubview(stackView)
         
-        stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 6.0).isActive = true
-        stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -6.0).isActive = true
+        stackView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        stackView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         stackView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         stackView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         stackView.heightAnchor.constraint(equalToConstant: 32).isActive = true
@@ -155,7 +162,7 @@ private enum MeasureToolbarMode{
     case feature
 }
 
-public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
+public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
     
     
     // Exposed so that the user can customize the sketch editor styles.
@@ -171,8 +178,10 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
     
     public var mapView : AGSMapView? {
         didSet{
+            guard mapView != oldValue else { return }
             unbindFromMapView(mapView: oldValue)
             bindToMapView(mapView: mapView)
+            updateMeasurement()
         }
     }
     
@@ -209,7 +218,6 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
         }
     }
     
-    private let toolbar : UIToolbar = UIToolbar()
     private let resultView : MeasureResultView = MeasureResultView()
     
     private var undoButton : UIBarButtonItem!
@@ -227,8 +235,8 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
     }
     
     private let geodeticCurveType : AGSGeodeticCurveType = .geodesic
-    // This is the threshold for which when the planar measurements are above, 
-    // it will switch to geodetic calculations. Set it to Double.infinity for 
+    // This is the threshold for which when the planar measurements are above,
+    // it will switch to geodetic calculations. Set it to Double.infinity for
     // always doing geodetic calculations (but be careful, they can get slow when they have to measure
     // too much length/area).
     // Set it to 0 to never do geodetic calculations (less accurate).
@@ -293,21 +301,16 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
         
         let flexButton = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         
-        rightHiddenPlaceholderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 1))
+        rightHiddenPlaceholderView = UIView(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
         let rightHiddenPlaceholderButton = UIBarButtonItem(customView: rightHiddenPlaceholderView)
         rightHiddenPlaceholderButton.isEnabled = false
         
-        leftHiddenPlaceholderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 1))
+        leftHiddenPlaceholderView = UIView(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
         let leftHiddenPlaceholderButton = UIBarButtonItem(customView: leftHiddenPlaceholderView)
         leftHiddenPlaceholderButton.isEnabled = false
         
         sketchModeButtons = [segControlItem, leftHiddenPlaceholderButton, flexButton, rightHiddenPlaceholderButton, undoButton, redoButton, clearButton]
         selectModeButtons = [segControlItem, leftHiddenPlaceholderButton, flexButton, rightHiddenPlaceholderButton]
-        
-        // auto layout
-        
-        addSubview(toolbar)
-        addSubview(resultView)
         
         // notification
         
@@ -345,7 +348,6 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
         }
     }
     
-    
     private var didSetConstraints : Bool = false
     
     public override func updateConstraints() {
@@ -356,15 +358,13 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
             return
         }
         
-        toolbar.translatesAutoresizingMaskIntoConstraints = false
+        // NOTE: Cannot add resultView as a subview until updateConstraints
+        // or else the constraints wont be setup correctly.
+        addSubview(resultView)
+        
         resultView.translatesAutoresizingMaskIntoConstraints = false
         
-        let views = ["view":self, "toolbar":toolbar, "resultView": resultView] as [String: UIView]
-        
-        addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|-0-[toolbar]-0-|", options: [], metrics: nil, views: views))
-        addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|-0-[toolbar(44)]-0-|", options: [], metrics: nil, views: views))
-        
-        resultView.centerYAnchor.constraint(equalTo: toolbar.centerYAnchor).isActive = true
+        resultView.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
         
         // The following constraints cause the results view to be centered,
         // however if the content is too big it is allowed to grow to the right.
@@ -375,15 +375,15 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
         let c1 = resultView.leadingAnchor.constraint(greaterThanOrEqualTo: leftHiddenPlaceholderView.trailingAnchor, constant: space)
         c1.priority = .required
         
-        // have to give this just below required, otherwise before the left and right views are setup in 
+        // have to give this just below required, otherwise before the left and right views are setup in
         // their proper locations we can get constraint errors
         let c2 = resultView.trailingAnchor.constraint(lessThanOrEqualTo: rightHiddenPlaceholderView.leadingAnchor, constant: -space)
         c2.priority = UILayoutPriority(rawValue: 999)
         
-        let c3 = NSLayoutConstraint(item: resultView, attribute: .centerX, relatedBy: .greaterThanOrEqual, toItem: toolbar, attribute: .centerX, multiplier: 1, constant: 0)
+        let c3 = NSLayoutConstraint(item: resultView, attribute: .centerX, relatedBy: .greaterThanOrEqual, toItem: self, attribute: .centerX, multiplier: 1, constant: 0)
         c3.priority = .required
         
-        let c4 = NSLayoutConstraint(item: resultView, attribute: .centerX, relatedBy: .lessThanOrEqual, toItem: toolbar, attribute: .centerX, multiplier: 1, constant: 0)
+        let c4 = NSLayoutConstraint(item: resultView, attribute: .centerX, relatedBy: .lessThanOrEqual, toItem: self, attribute: .centerX, multiplier: 1, constant: 0)
         c4.priority = .defaultLow
         
         NSLayoutConstraint.activate([c1, c2, c3, c4])
@@ -407,7 +407,7 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
             startFeatureMode()
         }
     }
- 
+    
     private func startLineMode(){
         
         guard mode != MeasureToolbarMode.length else{
@@ -416,7 +416,7 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
         
         mode = .length
         selectionOverlay?.isVisible = false
-        toolbar.items = sketchModeButtons
+        self.items = sketchModeButtons
         mapView?.sketchEditor = lineSketchEditor
         
         if !lineSketchEditor.isStarted{
@@ -432,7 +432,7 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
         
         mode = .area
         selectionOverlay?.isVisible = false
-        toolbar.items = sketchModeButtons
+        self.items = sketchModeButtons
         mapView?.sketchEditor = areaSketchEditor
         
         if !areaSketchEditor.isStarted{
@@ -448,7 +448,7 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
         
         mode = .feature
         selectionOverlay?.isVisible = true
-        toolbar.items = selectModeButtons
+        self.items = selectModeButtons
         mapView?.sketchEditor = nil
     }
     
@@ -537,7 +537,7 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
     }
     
     private func calculateLength(of geom: AGSGeometry) -> Double{
-    
+        
         // if planar is very large then just return that, geodetic might take too long
         if let linearUnit = geom.spatialReference?.unit as? AGSLinearUnit{
             var planar = AGSGeometryEngine.length(of: geom)
@@ -628,7 +628,7 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
             guard let strongSelf = self else{
                 return
             }
-             
+            
             if let error = error{
                 guard (error as NSError).domain != NSCocoaErrorDomain && (error as NSError).code != NSUserCancelledError else{
                     return
@@ -678,7 +678,7 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
         let graphic = AGSGraphic(geometry: geom, symbol: selectionSymbol(for: geom), attributes: nil)
         graphic.isSelected = true
         selectionOverlay?.graphics.add(graphic)
-
+        
         selectedGeometry = geom
     }
     

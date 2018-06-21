@@ -32,7 +32,7 @@ import ArcGISToolkit
 class JobTableViewCell: UITableViewCell{
     
     var job : AGSJob?
-    private var observerContext = 0
+    var statusObservation : NSKeyValueObservation?
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
@@ -44,15 +44,20 @@ class JobTableViewCell: UITableViewCell{
     
     func configureWithJob(job: AGSJob?){
         
-        // remove previous observer
-        self.job?.removeObserver(self, forKeyPath: #keyPath(AGSJob.status))
+        // invalidate previous observation
+        statusObservation?.invalidate()
+        statusObservation = nil
         
         self.job = job
         
         self.updateUI()
         
-        // add observer
-        self.job?.addObserver(self, forKeyPath: #keyPath(AGSJob.status), options: .new, context: &observerContext)
+        // observe job status
+        statusObservation = self.job?.observe(\.status, options: .new) { [weak self] (job, changes) in
+            DispatchQueue.main.async {
+                self?.updateUI()
+            }
+        }
     }
     
     func updateUI(){
@@ -104,20 +109,6 @@ class JobTableViewCell: UITableViewCell{
         return "Other"
     }
     
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?,
-                               change: [NSKeyValueChangeKey : Any]?,
-                               context: UnsafeMutableRawPointer?) {
-        
-        if context != &observerContext{
-            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
-            return
-        }
-        
-        if keyPath == #keyPath(AGSJob.status) {
-            self.updateUI()
-        }
-    }
-    
 }
 
 class JobManagerExample: TableViewController {
@@ -129,16 +120,35 @@ class JobManagerExample: TableViewController {
         return JobManager.shared.jobs
     }
     
+    var toolbar : UIToolbar?
+    
     override open func viewDidLoad() {
         super.viewDidLoad()
         
-        let toolbarFrame = CGRect(x: 0, y: view.bounds.size.height - 44.0, width: view.bounds.size.width, height: 44.0)
-        
         // create a Toolbar and add it to the view controller
         let toolbar = UIToolbar()
-        toolbar.frame = toolbarFrame
-        toolbar.autoresizingMask = [.flexibleWidth, .flexibleTopMargin]
+        self.toolbar = toolbar
+        let toolbarHeight : CGFloat = 44.0
+        toolbar.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(toolbar)
+        toolbar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        toolbar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        toolbar.heightAnchor.constraint(equalToConstant: toolbarHeight).isActive = true
+        
+        if #available(iOS 11.0, *) {
+            // move safe area up above toolbar
+            // (this adjusts tableview contentInsets to correctly scroll behind toolbar)
+            additionalSafeAreaInsets = UIEdgeInsetsMake(0, 0, toolbarHeight, 0)
+            // now anchor toolbar below new safe area
+            toolbar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: toolbarHeight).isActive = true
+        }
+        else {
+            // pre-iOS 11, adjust content inset of tableview to go under toolbar
+            tableView.contentInset = UIEdgeInsetsMake(0, 0, toolbarHeight, 0)
+            tableView.scrollIndicatorInsets = tableView.contentInset
+            // anchor toolbar to bottom of view
+            toolbar.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        }
         
         // button to kick off a new job
         let kickOffJobItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(kickOffJob))
@@ -162,18 +172,18 @@ class JobManagerExample: TableViewController {
         tableView.register(JobTableViewCell.self, forCellReuseIdentifier: "JobCell")
     }
     
-    func resumeAllPausedJobs(){
+    @objc func resumeAllPausedJobs(){
         JobManager.shared.resumeAllPausedJobs(statusHandler: self.jobStatusHandler, completion: self.jobCompletionHandler)
     }
     
-    func clearFinishedJobs(){
+    @objc func clearFinishedJobs(){
         JobManager.shared.clearFinishedJobs()
         tableView.reloadData()
     }
     
     var i = 0
     
-    func kickOffJob(){
+    @objc func kickOffJob(){
         
         if (i % 2) == 0{
             let url = URL(string: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Sync/WildfireSync/FeatureServer")!
