@@ -175,30 +175,39 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
             bindToMapView(mapView: mapView)
         }
     }
-
-    public var linearUnits : [AGSLinearUnit]{
-        get { return unitsViewController.linearUnits }
-        set { unitsViewController.linearUnits = newValue }
+    
+    public var selectedLinearUnit: AGSLinearUnit = {
+        if NSLocale.current.usesMetricSystem {
+            return AGSLinearUnit.kilometers()
+        } else {
+            return AGSLinearUnit.miles()
+        }
+        }() {
+        didSet {
+            updateMeasurement()
+        }
     }
-    public var areaUnits : [AGSAreaUnit]{
-        get { return unitsViewController.areaUnits }
-        set { unitsViewController.areaUnits = newValue }
-    }
-    public var selectedLinearUnit : AGSLinearUnit {
-        get { return unitsViewController.selectedLinearUnit }
-        set { unitsViewController.selectedLinearUnit = newValue }
-    }
-    public var selectedAreaUnit : AGSAreaUnit {
-        get { return unitsViewController.selectedAreaUnit }
-        set { unitsViewController.selectedAreaUnit = newValue }
+    public var selectedAreaUnit: AGSAreaUnit = {
+        if NSLocale.current.usesMetricSystem {
+            return AGSAreaUnit(unitID: AGSAreaUnitID.hectares) ?? AGSAreaUnit.squareKilometers()
+        } else {
+            return AGSAreaUnit(unitID: AGSAreaUnitID.acres) ?? AGSAreaUnit.squareMiles()
+        }
+        }() {
+        didSet {
+            updateMeasurement()
+        }
     }
     
     private static let identifyTolerance = 16.0
     
     private var selectionOverlay : AGSGraphicsOverlay?
-    private var selectedGeometry : AGSGeometry?
-    
-    private let unitsViewController = UnitsViewController()
+    private var selectedGeometry: AGSGeometry? {
+        didSet {
+            guard selectedGeometry != oldValue else { return }
+            updateMeasurement()
+        }
+    }
     
     private let toolbar : UIToolbar = UIToolbar()
     private let resultView : MeasureResultView = MeasureResultView()
@@ -210,7 +219,12 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
     private var leftHiddenPlaceholderView : UIView!
     private var segControl : UISegmentedControl!
     private var segControlItem : UIBarButtonItem!
-    private var mode : MeasureToolbarMode? = nil
+    private var mode : MeasureToolbarMode? = nil {
+        didSet {
+            guard mode != oldValue else { return }
+            updateMeasurement()
+        }
+    }
     
     private let geodeticCurveType : AGSGeodeticCurveType = .geodesic
     // This is the threshold for which when the planar measurements are above, 
@@ -222,7 +236,6 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
     private let planarAreaSquareMilesThreshold : Double = 1_000_000
     
     deinit {
-        NotificationCenter.default.removeObserver(self)
         unbindFromMapView(mapView: mapView)
     }
     
@@ -237,8 +250,7 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
     }
     
     convenience public init(mapView: AGSMapView){
-        self.init(frame: CGRect.zero)
-        sharedInitialization()
+        self.init(frame: .zero)
         self.mapView = mapView
         // because didSet doesn't happen in constructors
         bindToMapView(mapView: mapView)
@@ -266,7 +278,9 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
         segControl.setImage(measureFeatureImage, forSegmentAt: 2)
         segControlItem = UIBarButtonItem(customView: segControl)
         
-        resultView.buttonTapHandler = unitsButtonTap
+        resultView.buttonTapHandler = { [weak self] in
+            self?.unitsButtonTap()
+        }
         
         undoButton.target = self
         undoButton.action = #selector(undoButtonTap)
@@ -297,8 +311,7 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
         
         // notification
         
-        NotificationCenter.default.addObserver(forName: NSNotification.Name.AGSSketchEditorGeometryDidChange, object: lineSketchEditor, queue: nil, using: sketchDidChange)
-        NotificationCenter.default.addObserver(forName: NSNotification.Name.AGSSketchEditorGeometryDidChange, object: areaSketchEditor, queue: nil, using: sketchDidChange)
+        NotificationCenter.default.addObserver(self, selector: #selector(sketchEditorGeometryDidChange(_:)), name: .AGSSketchEditorGeometryDidChange, object: nil)
         
         // defaults for symbology
         selectionLineSymbol = lineSketchEditor.style.lineSymbol
@@ -306,21 +319,6 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
         let fillColor = (selectionColor ?? UIColor.cyan).withAlphaComponent(0.25)
         let sfs = AGSSimpleFillSymbol(style: .solid, color: fillColor, outline: selectionLineSymbol as? AGSSimpleLineSymbol)
         selectionFillSymbol = sfs
-        
-        // setup unitsViewController callback for selected unit
-        unitsViewController.unitSelectedHandler = { [weak self] unit in
-            
-            guard let strongSelf = self else{
-                return
-            }
-            
-            if strongSelf.mapView?.sketchEditor?.isStarted == true{
-                strongSelf.sketchDidChange(notification: nil)
-            }
-            else{
-                strongSelf.displayMeasurementForGeometry(geom: strongSelf.selectedGeometry)
-            }
-        }
     }
     
     private func bindToMapView(mapView: AGSMapView?){
@@ -335,7 +333,6 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
             // set initial mode
             segControl.selectedSegmentIndex = 0
             segmentControlValueChanged()
-            sketchDidChange(notification: nil)
         }
     }
     
@@ -425,8 +422,6 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
         if !lineSketchEditor.isStarted{
             lineSketchEditor.start(with: AGSSketchCreationMode.polyline)
         }
-        
-        sketchDidChange(notification: nil)
     }
     
     private func startAreaMode(){
@@ -443,8 +438,6 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
         if !areaSketchEditor.isStarted{
             areaSketchEditor.start(with: AGSSketchCreationMode.polygon)
         }
-        
-        sketchDidChange(notification: nil)
     }
     
     private func startFeatureMode(){
@@ -457,7 +450,6 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
         selectionOverlay?.isVisible = true
         toolbar.items = selectModeButtons
         mapView?.sketchEditor = nil
-        displayMeasurementForGeometry(geom: selectedGeometry)
     }
     
     @objc private func undoButtonTap(){
@@ -473,35 +465,65 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
     }
     
     private func unitsButtonTap(){
-        
-        if mapView?.sketchEditor == lineSketchEditor{
-            unitsViewController.unitType = .linear
-        }
-        else if mapView?.sketchEditor == areaSketchEditor{
-            unitsViewController.unitType = .area
-        }
-        else if let geom = selectedGeometry{
-            unitsViewController.unitType = unitType(for: geom)
-        }
-        else{
+        let units: [AGSUnit]
+        let selectedUnit: AGSUnit
+        if mapView?.sketchEditor == lineSketchEditor ||
+            selectedGeometry?.geometryType == .polyline {
+            
+            let linearUnitIDs : [AGSLinearUnitID] = [.centimeters, .feet, .inches, .kilometers, .meters, .miles, .millimeters, .nauticalMiles, .yards]
+            units = linearUnitIDs.compactMap { AGSLinearUnit(unitID: $0) }
+            selectedUnit = selectedLinearUnit
+        } else if mapView?.sketchEditor == areaSketchEditor ||
+            selectedGeometry?.geometryType == .envelope ||
+            selectedGeometry?.geometryType == .polygon {
+            
+            let areaUnitIDs : [AGSAreaUnitID] = [.acres, .hectares, .squareCentimeters, .squareDecimeters, .squareFeet, .squareKilometers, .squareMeters, .squareMillimeters, .squareMiles, .squareYards]
+            units = areaUnitIDs.compactMap { AGSAreaUnit(unitID: $0) }
+            selectedUnit = selectedAreaUnit
+        } else {
             return
         }
         
-        UIApplication.shared.topViewController()?.present(unitsViewController, animated: true, completion: nil)
+        let unitsViewController = UnitsViewController()
+        unitsViewController.delegate = self
+        unitsViewController.units = units.sorted { $0.pluralDisplayName < $1.pluralDisplayName }
+        unitsViewController.selectedUnit = selectedUnit
+        
+        let navigationController = UINavigationController(rootViewController: unitsViewController)
+        navigationController.modalPresentationStyle = .formSheet
+        
+        UIApplication.shared.topViewController()?.present(navigationController, animated: true)
     }
     
-    private func sketchDidChange(notification: Notification?){
-        
-        if mapView?.sketchEditor == lineSketchEditor{
+    /// Called in response to
+    /// `Notification.Name.AGSSketchEditorGeometryDidChange` being posted.
+    ///
+    /// - Parameter notification: The posted notification.
+    @objc private func sketchEditorGeometryDidChange(_ notification: Notification) {
+        guard let sketchEditor = notification.object as? AGSSketchEditor,
+            sketchEditor == lineSketchEditor || sketchEditor == areaSketchEditor else {
+                return
+        }
+        updateMeasurement()
+    }
+    
+    /// Updates the measurement displayed to the user based on the current mode.
+    private func updateMeasurement() {
+        guard let mode = mode else { return }
+        switch mode {
+        case .length:
             let measurement = Measurement(value: calculateSketchLength(), unit: selectedLinearUnit)
             resultView.measurement = measurement
-        }
-        else if mapView?.sketchEditor == areaSketchEditor{
+        case .area:
             let measurement = Measurement(value: calculateSketchArea(), unit: selectedAreaUnit)
             resultView.measurement = measurement
-        }
-        else{
-            resultView.measurement = nil
+        case .feature:
+            if let geometry = selectedGeometry {
+                let measurement = Measurement(value: calculateMeasurement(of: geometry), unit: unit(for: geometry))
+                resultView.measurement = measurement
+            } else{
+                resultView.helpText = "Tap a feature"
+            }
         }
     }
     
@@ -583,18 +605,6 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
         return selectedGeometry?.geometryType == .polyline ? self.selectedLinearUnit : self.selectedAreaUnit
     }
     
-    private func unitType(for geom: AGSGeometry) -> UnitType{
-        
-        switch geom.geometryType {
-        case .polyline:
-            return .linear
-        case .polygon, .envelope:
-            return .area
-        default:
-            fatalError("unexpected geometry type")
-        }
-    }
-    
     private func selectionSymbol(for geom: AGSGeometry) -> AGSSymbol?{
         
         switch geom.geometryType {
@@ -628,7 +638,6 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
             if let geom = strongSelf.firstOverlayPolyResult(in: results){
                 // display graphic result
                 strongSelf.select(geom: geom)
-                strongSelf.displayMeasurementForGeometry(geom: geom)
             }
             else{
                 // otherwise identify layers to try to find a feature
@@ -646,20 +655,9 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
                     
                     let geom = strongSelf.firstLayerPolyResult(in: results)
                     strongSelf.select(geom: geom)
-                    strongSelf.displayMeasurementForGeometry(geom: geom)
                 }
             }
             
-        }
-    }
-    
-    private func displayMeasurementForGeometry(geom: AGSGeometry?){
-        if let geom = geom{
-            let measurement = Measurement(value: calculateMeasurement(of: geom), unit: unit(for: geom))
-            resultView.measurement = measurement
-        }
-        else{
-            resultView.helpText = "Tap a feature"
         }
     }
     
@@ -720,11 +718,20 @@ public class MeasureToolbar: UIView, AGSGeoViewTouchDelegate {
     }
 }
 
-
-
-
-
-
-
-
-
+extension MeasureToolbar: UnitsViewControllerDelegate {
+    public func unitsViewControllerDidCancel(_ unitsViewController: UnitsViewController) {
+        unitsViewController.dismiss(animated: true)
+    }
+    
+    public func unitsViewControllerDidSelectUnit(_ unitsViewController: UnitsViewController) {
+        unitsViewController.dismiss(animated: true)
+        switch unitsViewController.selectedUnit {
+        case let linearUnit as AGSLinearUnit:
+            selectedLinearUnit = linearUnit
+        case let areaUnit as AGSAreaUnit:
+            selectedAreaUnit = areaUnit
+        default:
+            fatalError("Unsupported unit type")
+        }
+    }
+}

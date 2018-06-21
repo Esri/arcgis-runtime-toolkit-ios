@@ -11,109 +11,94 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ArcGIS
+import UIKit
+import class ArcGIS.AGSUnit
 
-public enum UnitType {
-    case linear
-    case area
-    case angular
+/// The protocol you implement to respond as the user interacts with the units
+/// view controller.
+public protocol UnitsViewControllerDelegate: class {
+    /// Tells the delegate that the user has cancelled selecting a unit.
+    ///
+    /// - Parameter unitsViewController: The current units view controller.
+    func unitsViewControllerDidCancel(_ unitsViewController: UnitsViewController)
+    /// Tells the delegate that the user has selected a unit.
+    ///
+    /// - Parameters:
+    ///   - unitsViewController: The current units view controller.
+    func unitsViewControllerDidSelectUnit(_ unitsViewController: UnitsViewController)
 }
 
-public class UnitsViewController: TableViewController, UINavigationBarDelegate, UISearchBarDelegate {
+/// A view controller for selecting a unit from a list of units.
+public class UnitsViewController: TableViewController {
+    /// The delegate of the units view controller.
+    public weak var delegate: UnitsViewControllerDelegate?
     
-    public var linearUnits = [AGSLinearUnit](){
-        didSet{
-            // update our unfilteredUnits if we are currently looking at this unit type
-            if unitType == .linear{
-                unfilteredUnits = linearUnits
+    /// The units presented to the user.
+    public var units = [AGSUnit]() {
+        didSet {
+            guard isViewLoaded else { return }
+            tableView.reloadData()
+        }
+    }
+    
+    /// The currently selected unit.
+    public var selectedUnit: AGSUnit? {
+        didSet {
+            guard selectedUnit != oldValue else { return }
+            selectedUnitDidChange(oldValue)
+        }
+    }
+    
+    /// The units that match the search predicate or `nil` if the search field
+    /// is empty.
+    private var filteredUnits: [AGSUnit]? {
+        didSet {
+            guard filteredUnits != oldValue else { return }
+            tableView.reloadData()
+        }
+    }
+    
+    /// The search controller used by the units view controller. 
+    private var searchController: UISearchController? {
+        get {
+            if #available(iOS 11.0, *) {
+                return navigationItem.searchController
+            } else {
+                return _searchController
+            }
+        }
+        set {
+            if #available(iOS 11.0, *) {
+                navigationItem.searchController = newValue
+            } else {
+                _searchController = newValue
             }
         }
     }
+    /// This property is an implementation detail of `searchController`. Do not
+    /// use it directly.
+    private var _searchController: UISearchController?
     
-    public var areaUnits = [AGSAreaUnit](){
-        didSet{
-            // update our unfilteredUnits if we are currently looking at this unit type
-            if unitType == .area{
-                unfilteredUnits = areaUnits
-            }
-        }
+    /// Called in response to the Cancel button being tapped.
+    @objc private func cancel() {
+        delegate?.unitsViewControllerDidCancel(self)
     }
     
-    public var angularUnits = [AGSAngularUnit](){
-        didSet{
-            // update our unfilteredUnits if we are currently looking at this unit type
-            if unitType == .angular{
-                unfilteredUnits = angularUnits
-            }
+    /// Called in response to `selectedUnit` changing.
+    ///
+    /// - Parameter previousSelectedUnit: The previous value of `selectedUnit`.
+    private func selectedUnitDidChange(_ previousSelectedUnit: AGSUnit?) {
+        guard isViewLoaded else { return }
+        var indexPaths = [IndexPath]()
+        if let unit = previousSelectedUnit, let indexPath = indexPath(for: unit) {
+            indexPaths.append(indexPath)
         }
-    }
-    
-    public var unitSelectedHandler : ((AGSUnit) -> Void)?
-    
-    public var unitType : UnitType = .linear {
-        didSet{
-            switch unitType {
-            case .linear:
-                unfilteredUnits = linearUnits
-            case .area:
-                unfilteredUnits = areaUnits
-            case .angular:
-                unfilteredUnits = angularUnits
-            }
+        if let unit = selectedUnit, let indexPath = indexPath(for: unit) {
+            indexPaths.append(indexPath)
         }
+        guard !indexPaths.isEmpty else { return }
+        tableView.reloadRows(at: indexPaths, with: .automatic)
     }
-    
-    public var selectedUnit : AGSUnit? {
-        didSet{
-            
-            self.tableView.reloadData()
-            
-            if let selectedUnit = self.selectedUnit{
-                unitSelectedHandler?(selectedUnit)
-            }
-        }
-    }
-    
-    
-    public var selectedLinearUnit: AGSLinearUnit = AGSLinearUnit.meters(){
-        didSet{
-            if unitType == .linear{
-                // update our selectedUnit if we are currently looking at this unit type
-                selectedUnit = selectedLinearUnit
-            }
-        }
-    }
-    
-    public var selectedAreaUnit: AGSAreaUnit = AGSAreaUnit.squareKilometers(){
-        didSet{
-            if unitType == .area{
-                // update our selectedUnit if we are currently looking at this unit type
-                selectedUnit = selectedAreaUnit
-            }
-        }
-    }
-    
-    public var selectedAngularUnit: AGSAngularUnit = AGSAngularUnit.degrees(){
-        didSet{
-            if unitType == .angular{
-                // update our selectedUnit if we are currently looking at this unit type
-                selectedUnit = selectedAngularUnit
-            }
-        }
-    }
-    
-    
-    private var unfilteredUnits = [AGSUnit](){
-        didSet{
-            currentUnits = unfilteredUnits
-        }
-    }
-    private var currentUnits = [AGSUnit](){
-        didSet{
-            self.tableView.reloadData()
-        }
-    }
-    
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?)   {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
@@ -125,155 +110,104 @@ public class UnitsViewController: TableViewController, UINavigationBarDelegate, 
         sharedInitialization()
     }
     
-    private func sharedInitialization(){
-        
-        let linearUnitIDs : [AGSLinearUnitID] = [.centimeters, .feet, .inches, .kilometers, .meters, .miles, .millimeters, .nauticalMiles, .yards]
-        
-        linearUnits = linearUnitIDs.flatMap {
-            AGSLinearUnit(unitID: $0)
-            }.sorted{ $0.pluralDisplayName < $1.pluralDisplayName }
-        
-        let areaUnitIDs : [AGSAreaUnitID] = [.acres, .hectares, .squareCentimeters, .squareDecimeters, .squareFeet, .squareKilometers, .squareMeters, .squareMillimeters, .squareMiles, .squareYards]
-        
-        areaUnits = areaUnitIDs.flatMap {
-            AGSAreaUnit(unitID: $0)
-            }.sorted{ $0.pluralDisplayName < $1.pluralDisplayName }
-        
-        let angularUnitIDs : [AGSAngularUnitID] = [.degrees, .grads, .minutes, .radians, .seconds]
-        
-        angularUnits = angularUnitIDs.flatMap {
-            AGSAngularUnit(unitID: $0)
-            }.sorted{ $0.pluralDisplayName < $1.pluralDisplayName }
-        
-        if NSLocale.current.usesMetricSystem{
-            selectedLinearUnit = AGSLinearUnit.kilometers()
-            selectedAreaUnit = AGSAreaUnit(unitID: AGSAreaUnitID.hectares) ?? AGSAreaUnit.squareKilometers()
-        }
-        else{
-            selectedLinearUnit = AGSLinearUnit.miles()
-            selectedAreaUnit = AGSAreaUnit(unitID: AGSAreaUnitID.acres) ?? AGSAreaUnit.squareMiles()
-        }
-        
-        selectedAngularUnit = AGSAngularUnit.degrees()
+    private func sharedInitialization() {
+        title = "Units"
+        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(UnitsViewController.cancel))
+        definesPresentationContext = true
+        searchController = makeSearchController()
     }
     
+    /// Creates a search controller for searching the list of units.
+    ///
+    /// - Returns: A configured search controller.
+    private func makeSearchController() -> UISearchController {
+        let searchController = UISearchController(searchResultsController: nil)
+        searchController.dimsBackgroundDuringPresentation = false
+        searchController.hidesNavigationBarDuringPresentation = false
+        searchController.searchResultsUpdater = self
+        
+        let searchBar = searchController.searchBar
+        searchBar.spellCheckingType = .no
+        searchBar.autocapitalizationType = .none
+        searchBar.autocorrectionType = .no
+        
+        return searchController
+    }
     
     override public func viewDidLoad() {
         super.viewDidLoad()
         
-        // setup navbar
-        let navbar = UINavigationBar(frame: CGRect(x: 0, y: 0, width: self.view.bounds.size.width, height: 64))
-        navbar.autoresizingMask = .flexibleWidth
-        view.addSubview(navbar)
-        navbar.delegate = self
-        
-        let cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancelAction as ()->Void))
-        
-        let item = UINavigationItem(title: "Units")
-        item.leftBarButtonItem = cancelButton
-        navbar.pushItem(item, animated: false)
-        
-        //
-        let insets = UIEdgeInsets(top: navbar.bounds.size.height, left: 0, bottom: 0, right: 0)
-        tableView.contentInset = insets
-        tableView.scrollIndicatorInsets = insets
-        tableView.scrollRectToVisible(CGRect(x: 0, y: 0, width: 1, height: 1), animated: false)
-        
-        // search bar
-        let searchbar = UISearchBar(frame: CGRect(x: 0, y: 0, width: self.view.bounds.size.width, height: 44))
-        searchbar.delegate = self
-        searchbar.spellCheckingType = .no
-        searchbar.autocapitalizationType = .none
-        searchbar.autocorrectionType = .no
-        tableView.tableHeaderView = searchbar
-        
-    }
-    
-    // MARK: SearchBar / NavBar delegates
-    
-    public func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if searchText.isEmpty{
-            self.currentUnits = self.unfilteredUnits
+        if #available(iOS 11.0, *) {
+            // Nothing to do!
+        } else {
+            tableView.tableHeaderView = searchController?.searchBar
         }
-        else{
-            
-            DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async {
-                let filtered = self.unfilteredUnits.filter{
-                    $0.pluralDisplayName.range(of: searchText, options: .caseInsensitive) != nil
-                }
-                DispatchQueue.main.async {
-                    self.currentUnits = filtered
-                }
-            }
-            
-        }
-    }
-    
-    public func position(for bar: UIBarPositioning) -> UIBarPosition {
-        return .topAttached
     }
     
     // MARK: TableView delegate/datasource methods
     
-    func tableView(_ tableView: UITableView, didSelectRowAtIndexPath indexPath: IndexPath) {
-        // when the user taps on a unit
-        //
-
-        self.goBack{
-            let unit = self.unitForIndexPath(indexPath)
-            
-            // store the last selected value for current unit type
-            switch self.unitType {
-            case .linear:
-                if let sel = unit as? AGSLinearUnit{
-                    self.selectedLinearUnit = sel
-                }
-            case .area:
-                if let sel = unit as? AGSAreaUnit{
-                    self.selectedAreaUnit = sel
-                }
-            case .angular:
-                if let sel = unit as? AGSAngularUnit{
-                    self.selectedAngularUnit = sel
-                }
-            }
-        }
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let unit = unitForCell(at: indexPath)
+        guard unit != selectedUnit else { return }
+        selectedUnit = unit
+        // If the search controller is still active, the delegate will not be
+        // able to dismiss us, if desired.
+        searchController?.isActive = false
+        delegate?.unitsViewControllerDidSelectUnit(self)
     }
     
     override public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return currentUnits.count
+        return filteredUnits?.count ?? units.count
     }
     
     override public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let unit = unitForCell(at: indexPath)
         let cell = tableView.dequeueReusableCell(withIdentifier: cellReuseIdentifier, for: indexPath)
-        let unit = unitForIndexPath(indexPath)
-        if unit == selectedUnit{
-            cell.accessoryType = .checkmark
-        }
-        else{
-            cell.accessoryType = .none
-        }
         cell.textLabel?.text = unit.pluralDisplayName
+        cell.accessoryType = unit == selectedUnit ? .checkmark : .none
         return cell
-    }
-    
-    // MARK: go back, cancel methods
-    
-    @objc private func cancelAction(){
-        self.goBack(nil)
-    }
-    
-    @objc private func cancelAction(_ sender: AnyObject) {
-        self.goBack(nil)
     }
     
     // MARK: IndexPath -> Info
     
-    private func unitForIndexPath(_ indexPath: IndexPath) -> AGSUnit{
-        return currentUnits[indexPath.row]
+    /// Returns the index path of the cell corresponding to the given unit.
+    ///
+    /// - Parameter unit: A unit.
+    /// - Returns: An index path or `nil` if there is no cell corresponding to
+    /// the given unit.
+    private func indexPath(for unit: AGSUnit) -> IndexPath? {
+        if let filteredUnits = filteredUnits {
+            if let row = filteredUnits.index(of: unit) {
+                return IndexPath(row: row, section: 0)
+            } else {
+                return nil
+            }
+        } else if let row = units.index(of: unit) {
+            return IndexPath(row: row, section: 0)
+        } else {
+            return nil
+        }
     }
     
+    /// The unit for the cell at the given index path.
+    ///
+    /// - Parameter indexPath: An index path.
+    /// - Returns: The unit corresponding to the cell at the given index path.
+    private func unitForCell(at indexPath: IndexPath) -> AGSUnit {
+        return filteredUnits?[indexPath.row] ?? units[indexPath.row]
+    }
 }
 
-
-
+extension UnitsViewController: UISearchResultsUpdating {
+    public func updateSearchResults(for searchController: UISearchController) {
+        if let text = searchController.searchBar.text?.trimmingCharacters(in: .whitespaces),
+            !text.isEmpty {
+            filteredUnits = units.filter {
+                $0.pluralDisplayName.range(of: text, options: .caseInsensitive) != nil
+            }
+        } else {
+            filteredUnits = nil
+        }
+    }
+}
