@@ -67,7 +67,7 @@ public class Compass: UIImageView {
         animateCompass()
         
         // Add Compass as an observer of the mapView's rotation.
-        rotationObservation = mapView.observe(\.rotation, options: .new) { (mapView, change) in
+        rotationObservation = mapView.observe(\.rotation, options: .new) {[weak self] (mapView, change) in
             
             guard let rotation = change.newValue else{
                 return
@@ -75,11 +75,16 @@ public class Compass: UIImageView {
             
             // make sure that UI changes are made on the main thread
             DispatchQueue.main.async{
-                let mapRotation = self.degreesToRadians(degrees: (360 - rotation))
+                
+                guard let strongSelf = self else{
+                    return
+                }
+                
+                let mapRotation = strongSelf.degreesToRadians(degrees: (360 - rotation))
                 // Rotate north arrow to match the map view rotation.
-                self.transform = CGAffineTransform(rotationAngle: mapRotation)
+                strongSelf.transform = CGAffineTransform(rotationAngle: mapRotation)
                 // Animate the compass visibility (if necessary)
-                self.animateCompass()
+                strongSelf.animateCompass()
             }
         }
         
