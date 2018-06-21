@@ -549,7 +549,16 @@ public class TimeSlider: UIControl {
     /**
      A boolean value indicating whether changes (change in layers and time extent) in geo view are being observed by the time slider.
      */
-    public var observeGeoView = false
+    public var observeGeoView = false {
+        didSet {
+            if observeGeoView {
+                addObservers()
+            }
+            else {
+                removeObservers()
+            }
+        }
+    }
     
     /**
      Time zone of the slider.
