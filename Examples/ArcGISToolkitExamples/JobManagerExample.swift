@@ -126,16 +126,28 @@ class JobManagerExample: TableViewController {
         super.viewDidLoad()
         
         // create a Toolbar and add it to the view controller
-        let tb = UIToolbar()
-        toolbar = tb
-        tb.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(tb)
-        tb.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        tb.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        let toolbar = UIToolbar()
+        self.toolbar = toolbar
+        let toolbarHeight : CGFloat = 44.0
+        toolbar.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(toolbar)
+        toolbar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        toolbar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        toolbar.heightAnchor.constraint(equalToConstant: toolbarHeight).isActive = true
+        
         if #available(iOS 11.0, *) {
-            tb.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
-        } else {
-            tb.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+            // move safe area up above toolbar
+            // (this adjusts tableview contentInsets to correctly scroll behind toolbar)
+            additionalSafeAreaInsets = UIEdgeInsetsMake(0, 0, toolbarHeight, 0)
+            // now anchor toolbar below new safe area
+            toolbar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: toolbarHeight).isActive = true
+        }
+        else {
+            // pre-iOS 11, adjust content inset of tableview to go under toolbar
+            tableView.contentInset = UIEdgeInsetsMake(0, 0, toolbarHeight, 0)
+            tableView.scrollIndicatorInsets = tableView.contentInset
+            // anchor toolbar to bottom of view
+            toolbar.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         }
         
         // button to kick off a new job
@@ -149,7 +161,7 @@ class JobManagerExample: TableViewController {
         let clearFinishedJobsItem = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(clearFinishedJobs))
         
         let flex = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        tb.items = [kickOffJobItem, flex, resumeAllPausedJobsItem, flex, clearFinishedJobsItem]
+        toolbar.items = [kickOffJobItem, flex, resumeAllPausedJobsItem, flex, clearFinishedJobsItem]
         
         //
         // register for user notifications, this way we can notify user in bg when job complete
@@ -187,15 +199,6 @@ class JobManagerExample: TableViewController {
         }
         
         i += 1
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-
-        // update content inset for toolbar (so that tableView scrolls correctly behind the toolbar)
-        let tbHeight = toolbar?.frame.height ?? 0
-        tableView.contentInset = UIEdgeInsetsMake(tableView.contentInset.top, 0, tbHeight, 0)
-        tableView.scrollIndicatorInsets = tableView.contentInset
     }
     
     required public init?(coder aDecoder: NSCoder) {
