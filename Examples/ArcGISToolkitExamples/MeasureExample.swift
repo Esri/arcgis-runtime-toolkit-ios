@@ -33,11 +33,11 @@ class MeasureExample: MapViewController{
         view.addSubview(measureToolbar)
         measureToolbar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         measureToolbar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        if #available(iOS 11.0, *) {
-            measureToolbar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
-        } else {
-            measureToolbar.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        }
+        measureToolbar.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+//        if #available(iOS 11.0, *) {
+//            measureToolbar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+//        } else {
+//        }
 
     }
     
