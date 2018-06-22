@@ -859,7 +859,6 @@ public class TimeSlider: UIControl {
         // Set geoview and it's properties on the slider
         // it will initialize required properties.
         self.geoView = geoView
-        self.observeGeoView = observeGeoView
         
         // Set map/scene
         if let mapView = geoView as? AGSMapView {
@@ -868,6 +867,10 @@ public class TimeSlider: UIControl {
         else if let sceneView = geoView as? AGSSceneView {
             scene = sceneView.scene
         }
+        
+        // Set observeGeoView after setting map and scene
+        // setting map and scene
+        self.observeGeoView = observeGeoView
         
         //
         // Loop through all time aware layers which are visible and are participating in time based filtering
