@@ -845,7 +845,8 @@ public class TimeSlider: UIControl {
     
     /**
      This will look for all time aware layers which are visible and are participating in time based filtering
-     to initialize slider's fullExtent, currentExtent and timeStepInterval properties.
+     to initialize slider's fullExtent, currentExtent and timeStepInterval properties. Setting observeGeoView
+     to true will observe changes in operational layers and time extent of geo view.
      */
     public func initializeTimeProperties(geoView: AGSGeoView, observeGeoView: Bool, completion: @escaping (Error?)->Void) {
         //
@@ -1060,8 +1061,8 @@ public class TimeSlider: UIControl {
     }
     
     /**
-     This will re-calculate's timeStepInterval based on the provided step count.
-     The time slider must have full extent available to calcluate the timeStepInterval.
+     This will initialize slider's fullExtent, currentExtent and timeStepInterval properties
+     based on provided step count and full extent. The current extent will be set to a time instant.
      */
     public func initializeTimeSteps(timeStepCount: Int, fullExtent: AGSTimeExtent, completion: @escaping (Error?)->Void) {
         //
@@ -1086,6 +1087,9 @@ public class TimeSlider: UIControl {
         
         // Calculate time step interval
         timeStepInterval = calculateTimeStepInterval(for: fullExtent, timeStepCount: timeStepCount)
+        
+        // Slider is loaded successfully.
+        completion(nil)
     }
     
     /**
