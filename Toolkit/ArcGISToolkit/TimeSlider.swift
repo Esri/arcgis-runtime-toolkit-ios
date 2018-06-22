@@ -868,7 +868,7 @@ public class TimeSlider: UIControl {
             scene = sceneView.scene
         }
         
-        // Set observeGeoView after setting map and scene
+        // Set observeGeoView after
         // setting map and scene
         self.observeGeoView = observeGeoView
         
