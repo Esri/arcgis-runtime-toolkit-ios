@@ -869,11 +869,6 @@ public class TimeSlider: UIControl {
             scene = sceneView.scene
         }
         
-        // Start observing
-        if observeGeoView {
-            addObservers()
-        }
-        
         //
         // Loop through all time aware layers which are visible and are participating in time based filtering
         // and initialize slider's fullExtent, currentExtent and timeStepInterval properties
