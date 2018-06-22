@@ -185,7 +185,7 @@ public class TimeSlider: UIControl {
     }
     
     /**
-     A boolean value that indicates whether the start time of the currentExtent can be
+     A Boolean value that indicates whether the start time of the currentExtent can be
      manipulated through user interaction or moves when time is being animated.
      */
     public var isStartTimePinned = false {
@@ -195,7 +195,7 @@ public class TimeSlider: UIControl {
     }
     
     /**
-     A boolean value that indicates whether the end time of the currentExtent can be
+     A Boolean value that indicates whether the end time of the currentExtent can be
      manipulated through user interaction or moves when time is being animated.
      */
     public var isEndTimePinned = false {
@@ -292,7 +292,7 @@ public class TimeSlider: UIControl {
     }
     
     /**
-     A boolean value that indicates whether the minimum and full extent
+     A Boolean value that indicates whether the minimum and full extent
      labels are visible or not. Default if True.
      */
     public var fullExtentLabelsVisible = true {
@@ -474,7 +474,7 @@ public class TimeSlider: UIControl {
     // MARK: Playback Properties
     
     /**
-     A boolean value indicating whether playback buttons are visible or not. Default is true.
+     A Boolean value indicating whether playback buttons are visible or not. Default is true.
      */
     public var playbackButtonsVisible = true {
         didSet {
@@ -512,7 +512,7 @@ public class TimeSlider: UIControl {
     public var playbackInterval: TimeInterval = 1
     
     /**
-     A boolean value indicating whether playback is currently running.
+     A Boolean value indicating whether playback is currently running.
      */
     public var isPlaying = false {
         didSet {
@@ -547,7 +547,7 @@ public class TimeSlider: UIControl {
     public private(set) var geoView: AGSGeoView?
     
     /**
-     A boolean value indicating whether changes (change in layers and time extent) in geo view are being observed by the time slider.
+     A Boolean value indicating whether changes (change in layers and time extent) in geo view are being observed by the time slider.
      */
     public var observeGeoView = false {
         didSet {
@@ -572,7 +572,7 @@ public class TimeSlider: UIControl {
     }
     
     /**
-     A boolean value indicating whether slider is visible or not. Default is true.
+     A Boolean value indicating whether slider is visible or not. Default is true.
      */
     public var isSliderVisible = true {
         didSet {
@@ -648,7 +648,7 @@ public class TimeSlider: UIControl {
     }
     
     /**
-     A boolean value indicating whether changes in the slider’s value
+     A Boolean value indicating whether changes in the slider’s value
      generate continuous update events. Default is True.
      */
     public var isContinuous: Bool = true
@@ -2472,45 +2472,45 @@ private struct DateRange : Sequence, IteratorProtocol {
 
 // MARK: - Date Extension
 
-extension Date {
+fileprivate extension Date {
     //
     // Returns the amount of years from another date
-    private func years(from date: Date) -> Int {
+    func years(from date: Date) -> Int {
         return Calendar.current.dateComponents([.year], from: date, to: self).year ?? 0
     }
     
     // Returns the amount of months from another date
-    private func months(from date: Date) -> Int {
+    func months(from date: Date) -> Int {
         return Calendar.current.dateComponents([.month], from: date, to: self).month ?? 0
     }
     
     // Returns the amount of days from another date
-    private func days(from date: Date) -> Int {
+    func days(from date: Date) -> Int {
         return Calendar.current.dateComponents([.day], from: date, to: self).day ?? 0
     }
     
     // Returns the amount of hours from another date
-    private func hours(from date: Date) -> Int {
+    func hours(from date: Date) -> Int {
         return Calendar.current.dateComponents([.hour], from: date, to: self).hour ?? 0
     }
     
     // Returns the amount of minutes from another date
-    private func minutes(from date: Date) -> Int {
+    func minutes(from date: Date) -> Int {
         return Calendar.current.dateComponents([.minute], from: date, to: self).minute ?? 0
     }
     
     // Returns the amount of seconds from another date
-    private func seconds(from date: Date) -> Int {
+    func seconds(from date: Date) -> Int {
         return Calendar.current.dateComponents([.second], from: date, to: self).second ?? 0
     }
     
     // Returns the amount of nanoseconds from another date
-    private func nanoseconds(from date: Date) -> Int {
+    func nanoseconds(from date: Date) -> Int {
         return Calendar.current.dateComponents([.nanosecond], from: date, to: self).nanosecond ?? 0
     }
     
     // Returns the a custom time interval and calender component from another date
-    fileprivate func offset(from date: Date) -> (duration: Int, component: Calendar.Component)? {
+    func offset(from date: Date) -> (duration: Int, component: Calendar.Component)? {
         if years(from: date)   > 0 { return (years(from: date), .year) }
         if months(from: date)  > 0 { return (months(from: date), .month) }
         if seconds(from: date) > 0 { return (seconds(from: date), .second) }
