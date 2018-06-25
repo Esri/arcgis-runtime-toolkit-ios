@@ -156,12 +156,6 @@ class MeasureResultView : UIView{
     
 }
 
-private enum MeasureToolbarMode{
-    case length
-    case area
-    case feature
-}
-
 public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
     
     
@@ -227,7 +221,14 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
     private var leftHiddenPlaceholderView : UIView!
     private var segControl : UISegmentedControl!
     private var segControlItem : UIBarButtonItem!
-    private var mode : MeasureToolbarMode? = nil {
+    
+    private enum Mode {
+        case length
+        case area
+        case feature
+    }
+    
+    private var mode: Mode? = nil {
         didSet {
             guard mode != oldValue else { return }
             updateMeasurement()
@@ -410,7 +411,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
     
     private func startLineMode(){
         
-        guard mode != MeasureToolbarMode.length else{
+        guard mode != .length else {
             return
         }
         
@@ -426,7 +427,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
     
     private func startAreaMode(){
         
-        guard mode != MeasureToolbarMode.area else{
+        guard mode != .area else {
             return
         }
         
@@ -442,7 +443,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
     
     private func startFeatureMode(){
         
-        guard mode != MeasureToolbarMode.feature else{
+        guard mode != .feature else {
             return
         }
         
