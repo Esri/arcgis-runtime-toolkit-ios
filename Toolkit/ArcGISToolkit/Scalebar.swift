@@ -14,160 +14,34 @@
 import UIKit
 import ArcGIS
 
-public enum ScalebarUnits{
-    case imperial
-    case metric
-    
-    internal func baseUnits()->AGSLinearUnit{
-        return self == .imperial ? AGSLinearUnit.feet() : AGSLinearUnit.meters()
-    }
-    
-    private static func multiplierAndMagnitudeForDistance(distance: Double) -> (multiplier: Double, magnitude: Double){
-        // get multiplier
-        
-        let magnitude = pow(10, floor(log10(distance)))
-        let residual = distance / Double(magnitude)
-        let multiplier : Double = ScalebarUnits.roundNumberMultipliers.filter { $0 <= residual }.last ?? 0
-        return (multiplier, magnitude)
-    }
-    
-    internal func closestDistanceWithoutGoingOver(to distance: Double, units: AGSLinearUnit) -> Double{
-        
-        let mm = ScalebarUnits.multiplierAndMagnitudeForDistance(distance: distance)
-        let roundNumber = mm.multiplier * mm.magnitude
-        
-        // because feet and miles are not relationally multiples of 10 with each other,
-        // we have to convert to miles if we are dealing in miles
-        if units == AGSLinearUnit.feet() {
-            let displayUnits = linearUnitsForDistance(distance: roundNumber)
-            if units != displayUnits {
-                let displayDistance = closestDistanceWithoutGoingOver(to: units.convert(distance, to: displayUnits), units: displayUnits)
-                return displayUnits.convert(displayDistance, to: units)
-            }
-        }
-        
-        return roundNumber
-    }
-    
-    // this table must begin with 1 and end with 10
-    private static let roundNumberMultipliers : [Double] = [1, 1.2, 1.25, 1.5, 1.75, 2, 2.4, 2.5, 3, 3.75, 4, 5, 6, 7.5, 8, 9, 10]
-    private static func segmentOptionsForMultiplier(multiplier: Double) -> [Int]{
-        switch multiplier {
-        case 1:
-            return [1, 2, 4, 5]
-        case 1.2:
-            return [1, 2, 3, 4]
-        case 1.25:
-            return [1, 2]
-        case 1.5:
-            return [1, 2, 3, 5]
-        case 1.75:
-            return [1, 2]
-        case 2:
-            return [1, 2, 4, 5]
-        case 2.4:
-            return [1, 2, 3]
-        case 2.5:
-            return [1, 2, 5]
-        case 3:
-            return [1, 2, 3]
-        case 3.75:
-            return [1, 3]
-        case 4:
-            return [1, 2, 4]
-        case 5:
-            return [1, 2, 5]
-        case 6:
-            return [1, 2, 3]
-        case 7.5:
-            return [1, 2]
-        case 8:
-            return [1, 2, 4]
-        case 9:
-            return [1, 2, 3]
-        case 10:
-            return [1, 2, 5]
-        default:
-            return [1]
-        }
-    }
-    
-    internal static func numSegmentsForDistance(distance: Double, maxNumSegments: Int) -> Int{
-        
-        // this function returns the best number of segments so that we get relatively round
-        // numbers when the distance is divided up.
-        
-        let mm = multiplierAndMagnitudeForDistance(distance: distance)
-        let options = segmentOptionsForMultiplier(multiplier: mm.multiplier)
-        let num = options.filter { $0 <= maxNumSegments }.last ?? 1
-        return num
-    }
-    
-    internal func linearUnitsForDistance(distance: Double) -> AGSLinearUnit{
-        
-        switch self {
-        case .imperial:
-            
-            if distance >= 2640{
-                return AGSLinearUnit.miles()
-            }
-            return AGSLinearUnit.feet()
-            
-        case .metric:
-            
-            if distance >= 1000{
-                return AGSLinearUnit.kilometers()
-            }
-            return AGSLinearUnit.meters()
-        }
-        
-    }
-    
-}
-
-public enum ScalebarStyle{
-    case line
-    case bar
-    case graduatedLine
-    case alternatingBar
-    case dualUnitLine
-    
-    fileprivate func rendererForScalebar(scalebar: Scalebar) -> ScalebarRenderer{
-        switch self {
-        case .line:
-            return ScalebarLineStyleRenderer(scalebar: scalebar)
-        case .bar:
-            return ScalebarBarStyleRenderer(scalebar: scalebar)
-        case .graduatedLine:
-            return ScalebarGraduatedLineStyleRenderer(scalebar: scalebar)
-        case .alternatingBar:
-            return ScalebarAlternatingBarStyleRenderer(scalebar: scalebar)
-        case .dualUnitLine:
-            return ScalebarDualUnitLineStyleRenderer(scalebar: scalebar)
-        }
-    }
-}
-
-public enum ScalebarAlignment{
-    case left
-    case right
-    case center
-}
-
-
 public class Scalebar: UIView {
     
     //
     // public properties
     
-    public var units : ScalebarUnits = .imperial{
-        didSet{
+    public enum Units {
+        case imperial
+        case metric
+    }
+    
+    public var units: Units = .imperial {
+        didSet {
+            guard units != oldValue else { return }
             updateScaleDisplay(forceRedraw: true)
         }
     }
     
-    public var style : ScalebarStyle = .line{
-        didSet{
+    public enum Style {
+        case line
+        case bar
+        case graduatedLine
+        case alternatingBar
+        case dualUnitLine
+    }
+    
+    public var style: Style = .line {
+        didSet {
+            guard style != oldValue else { return }
             renderer = style.rendererForScalebar(scalebar: self)
             updateScaleDisplay(forceRedraw: true)
         }
@@ -225,8 +99,15 @@ public class Scalebar: UIView {
         }
     }
     
-    public var alignment : ScalebarAlignment = .left{
-        didSet{
+    public enum Alignment {
+        case left
+        case right
+        case center
+    }
+    
+    public var alignment: Alignment = .left {
+        didSet {
+            guard alignment != oldValue else { return }
             updateScaleDisplay(forceRedraw: true)
         }
     }
@@ -619,7 +500,7 @@ internal extension ScalebarRenderer{
         let minSegmentWidth = (minSegmentTestString.size(withAttributes: [NSAttributedStringKey.font: scalebar.font]).width * 1.5) + (Scalebar.labelXPad * 2)
         var maxNumSegments : Int = Int(lineDisplayLength / minSegmentWidth)
         maxNumSegments = min(maxNumSegments, 4) // cap it at 4
-        let numSegments: Int = ScalebarUnits.numSegmentsForDistance(distance: scaleDisplay.lineMapLength, maxNumSegments: maxNumSegments)
+        let numSegments: Int = Scalebar.Units.numSegmentsForDistance(distance: scaleDisplay.lineMapLength, maxNumSegments: maxNumSegments)
         
         let segmentScreenLength : CGFloat = (lineDisplayLength / CGFloat(numSegments))
         
@@ -1318,7 +1199,7 @@ internal class ScalebarDualUnitLineStyleRenderer : ScalebarRenderer{
         path.addLine(to: CGPoint(x: lineX + lineScreenLength, y: lineTop))
         
         // bottom unit line
-        let otherUnit = (scalebar.units == ScalebarUnits.imperial) ? ScalebarUnits.metric : ScalebarUnits.imperial
+        let otherUnit: Scalebar.Units = (scalebar.units == .imperial) ? .metric : .imperial
         let otherMapBaseLength = scaleDisplay.displayUnit.convert(scaleDisplay.lineMapLength, to: otherUnit.baseUnits())
         let otherClosestBaseLength = otherUnit.closestDistanceWithoutGoingOver(to: otherMapBaseLength, units: otherUnit.baseUnits())
         let otherDisplayUnits = otherUnit.linearUnitsForDistance(distance: otherClosestBaseLength)
@@ -1392,8 +1273,126 @@ internal class ScalebarDualUnitLineStyleRenderer : ScalebarRenderer{
     }
 }
 
+extension Scalebar.Units {
+    func baseUnits()->AGSLinearUnit{
+        return self == .imperial ? AGSLinearUnit.feet() : AGSLinearUnit.meters()
+    }
+    
+    private static func multiplierAndMagnitudeForDistance(distance: Double) -> (multiplier: Double, magnitude: Double){
+        // get multiplier
+        
+        let magnitude = pow(10, floor(log10(distance)))
+        let residual = distance / Double(magnitude)
+        let multiplier : Double = Scalebar.Units.roundNumberMultipliers.filter { $0 <= residual }.last ?? 0
+        return (multiplier, magnitude)
+    }
+    
+    func closestDistanceWithoutGoingOver(to distance: Double, units: AGSLinearUnit) -> Double{
+        
+        let mm = Scalebar.Units.multiplierAndMagnitudeForDistance(distance: distance)
+        let roundNumber = mm.multiplier * mm.magnitude
+        
+        // because feet and miles are not relationally multiples of 10 with each other,
+        // we have to convert to miles if we are dealing in miles
+        if units == AGSLinearUnit.feet() {
+            let displayUnits = linearUnitsForDistance(distance: roundNumber)
+            if units != displayUnits {
+                let displayDistance = closestDistanceWithoutGoingOver(to: units.convert(distance, to: displayUnits), units: displayUnits)
+                return displayUnits.convert(displayDistance, to: units)
+            }
+        }
+        
+        return roundNumber
+    }
+    
+    // this table must begin with 1 and end with 10
+    private static let roundNumberMultipliers : [Double] = [1, 1.2, 1.25, 1.5, 1.75, 2, 2.4, 2.5, 3, 3.75, 4, 5, 6, 7.5, 8, 9, 10]
+    private static func segmentOptionsForMultiplier(multiplier: Double) -> [Int]{
+        switch multiplier {
+        case 1:
+            return [1, 2, 4, 5]
+        case 1.2:
+            return [1, 2, 3, 4]
+        case 1.25:
+            return [1, 2]
+        case 1.5:
+            return [1, 2, 3, 5]
+        case 1.75:
+            return [1, 2]
+        case 2:
+            return [1, 2, 4, 5]
+        case 2.4:
+            return [1, 2, 3]
+        case 2.5:
+            return [1, 2, 5]
+        case 3:
+            return [1, 2, 3]
+        case 3.75:
+            return [1, 3]
+        case 4:
+            return [1, 2, 4]
+        case 5:
+            return [1, 2, 5]
+        case 6:
+            return [1, 2, 3]
+        case 7.5:
+            return [1, 2]
+        case 8:
+            return [1, 2, 4]
+        case 9:
+            return [1, 2, 3]
+        case 10:
+            return [1, 2, 5]
+        default:
+            return [1]
+        }
+    }
+    
+    static func numSegmentsForDistance(distance: Double, maxNumSegments: Int) -> Int{
+        
+        // this function returns the best number of segments so that we get relatively round
+        // numbers when the distance is divided up.
+        
+        let mm = multiplierAndMagnitudeForDistance(distance: distance)
+        let options = segmentOptionsForMultiplier(multiplier: mm.multiplier)
+        let num = options.filter { $0 <= maxNumSegments }.last ?? 1
+        return num
+    }
+    
+    func linearUnitsForDistance(distance: Double) -> AGSLinearUnit{
+        
+        switch self {
+        case .imperial:
+            
+            if distance >= 2640{
+                return AGSLinearUnit.miles()
+            }
+            return AGSLinearUnit.feet()
+            
+        case .metric:
+            
+            if distance >= 1000{
+                return AGSLinearUnit.kilometers()
+            }
+            return AGSLinearUnit.meters()
+        }
+        
+    }
+}
 
-
-
-
-
+extension Scalebar.Style {
+    fileprivate func rendererForScalebar(scalebar: Scalebar) -> ScalebarRenderer{
+        switch self {
+        case .line:
+            return ScalebarLineStyleRenderer(scalebar: scalebar)
+        case .bar:
+            return ScalebarBarStyleRenderer(scalebar: scalebar)
+        case .graduatedLine:
+            return ScalebarGraduatedLineStyleRenderer(scalebar: scalebar)
+        case .alternatingBar:
+            return ScalebarAlternatingBarStyleRenderer(scalebar: scalebar)
+        case .dualUnitLine:
+            return ScalebarDualUnitLineStyleRenderer(scalebar: scalebar)
+        }
+    }
+}
