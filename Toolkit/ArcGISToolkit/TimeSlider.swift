@@ -542,12 +542,12 @@ public class TimeSlider: UIControl {
     // MARK: Other Properties
     
     /**
-     The geo view used to initialize the time slider properties.
+     The geoView used to initialize the time slider properties.
      */
     public private(set) var geoView: AGSGeoView?
     
     /**
-     A Boolean value indicating whether changes (change in layers and time extent) in geo view are being observed by the time slider.
+     A Boolean value indicating whether changes (change in layers and time extent) in geoView should be observed by the time slider.
      */
     public var observeGeoView = false {
         didSet {
@@ -846,7 +846,7 @@ public class TimeSlider: UIControl {
     /**
      This will look for all time aware layers which are visible and are participating in time based filtering
      to initialize slider's fullExtent, currentExtent and timeStepInterval properties. Setting observeGeoView
-     to true will observe changes in operational layers and time extent of geo view.
+     to true will observe changes in operational layers and time extent of geoView.
      */
     public func initializeTimeProperties(geoView: AGSGeoView, observeGeoView: Bool, completion: @escaping (Error?)->Void) {
         //
