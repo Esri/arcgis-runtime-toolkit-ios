@@ -70,7 +70,7 @@ class TimeSliderExample: MapViewController {
                 strongSelf.mapView.setViewpoint(AGSViewpoint(targetExtent: fullExtent), completion: nil)
             }
             
-            strongSelf.timeSlider.initializeTimeProperties(geoView: strongSelf.mapView, completion: { [weak self] (error) in
+            strongSelf.timeSlider.initializeTimeProperties(geoView: strongSelf.mapView, observeGeoView: true, completion: { [weak self] (error) in
                 //
                 // Make sure self is around
                 guard let strongSelf = self else {

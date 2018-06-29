@@ -293,7 +293,7 @@ public class TimeSlider: UIControl {
     
     /**
      A Boolean value that indicates whether the minimum and full extent
-     lables are visible or not. Default if True.
+     labels are visible or not. Default if True.
      */
     public var fullExtentLabelsVisible = true {
         didSet {
@@ -542,10 +542,23 @@ public class TimeSlider: UIControl {
     // MARK: Other Properties
     
     /**
-     This will initialize the slider's fullExtent, currentExtent and timeStepInterval
-     properties based on time enabled layers in the geo view.
+     The geoView used to initialize the time slider properties.
      */
     public private(set) var geoView: AGSGeoView?
+    
+    /**
+     A Boolean value indicating whether changes (change in layers and time extent) in geoView should be observed by the time slider.
+     */
+    public var observeGeoView = false {
+        didSet {
+            if observeGeoView {
+                addObservers()
+            }
+            else {
+                removeObservers()
+            }
+        }
+    }
     
     /**
      Time zone of the slider.
@@ -832,19 +845,20 @@ public class TimeSlider: UIControl {
     
     /**
      This will look for all time aware layers which are visible and are participating in time based filtering
-     to initialize slider's fullExtent, currentExtent and timeStepInterval properties.
+     to initialize slider's fullExtent, currentExtent and timeStepInterval properties. Setting observeGeoView
+     to true will observe changes in operational layers and time extent of geoView.
      */
-    public func initializeTimeProperties(geoView: AGSGeoView, completion: @escaping (Error?)->Void) {
+    public func initializeTimeProperties(geoView: AGSGeoView, observeGeoView: Bool, completion: @escaping (Error?)->Void) {
         //
-        // Set geoview and it's properties on the slider
-        // it will initialize required properties.
-        self.geoView = geoView
-
         // Set operational layers
         guard let operationalLayers = geoView.operationalLayers, !operationalLayers.isEmpty else {
             completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonNoData.rawValue, userInfo: [NSLocalizedDescriptionKey : "There are no time aware layers to initialize time slider."]))
             return
         }
+        
+        // Set geoview and it's properties on the slider
+        // it will initialize required properties.
+        self.geoView = geoView
         
         // Set map/scene
         if let mapView = geoView as? AGSMapView {
@@ -854,8 +868,9 @@ public class TimeSlider: UIControl {
             scene = sceneView.scene
         }
         
-        // Start observing
-        addObservers()
+        // Set observeGeoView after
+        // setting map and scene
+        self.observeGeoView = observeGeoView
         
         //
         // Loop through all time aware layers which are visible and are participating in time based filtering
@@ -930,7 +945,7 @@ public class TimeSlider: UIControl {
                 //
                 // If full extent or time step interval is not available then
                 // we cannot initialize the slider. Finish with error.
-                guard let timeStepInterval = timeAwareLayersStepInterval, let layersFullExtent = timeAwareLayersFullExtent else {
+                guard let layersFullExtent = timeAwareLayersFullExtent else {
                     completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonNoData.rawValue, userInfo: [NSLocalizedDescriptionKey : "There are no time aware layers to initialize time slider."]))
                     return
                 }
@@ -938,10 +953,18 @@ public class TimeSlider: UIControl {
                 //
                 // Set calculated full extent and time step interval
                 strongSelf.fullExtent = layersFullExtent
-                strongSelf.timeStepInterval = timeStepInterval
                 
                 // Layer extent should be same as full extent.
                 strongSelf.layerExtent = strongSelf.fullExtent
+                
+                // Set the time step interval. If it is not available then
+                // calculate using default timeStepCount
+                if let timeStepInterval = timeAwareLayersStepInterval {
+                    strongSelf.timeStepInterval = timeStepInterval
+                }
+                else {
+                    strongSelf.timeStepInterval = strongSelf.calculateTimeStepInterval(for: layersFullExtent, timeStepCount: 0)
+                }
                 
                 // If the geoview has a time extent defined, use that. Otherwise, set the current extent to either the
                 // full extent's start (if range filtering is not supported), or to the entire full extent.
@@ -1004,7 +1027,7 @@ public class TimeSlider: UIControl {
                 // If either full extent or time step interval is not
                 // available then the layer does not have information
                 // required to initialize time slider. Finish with an error.
-                guard let timeInterval = timeInterval, let fullTimeExtent = timeAwareLayer.fullTimeExtent else {
+                guard let fullTimeExtent = timeAwareLayer.fullTimeExtent else {
                     completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonNoData.rawValue, userInfo: [NSLocalizedDescriptionKey : "The layer does not have time information to initialize time slider."]))
                     return
                 }
@@ -1015,8 +1038,14 @@ public class TimeSlider: UIControl {
                 // Layer extent should be same as full extent.
                 strongSelf.layerExtent = strongSelf.fullExtent
                 
-                // Set the time setp interval
-                strongSelf.timeStepInterval = timeInterval
+                // Set the time step interval. If it is not available then
+                // calculate using default timeStepCount
+                if let timeInterval = timeInterval {
+                    strongSelf.timeStepInterval = timeInterval
+                }
+                else {
+                    strongSelf.timeStepInterval = strongSelf.calculateTimeStepInterval(for: fullTimeExtent, timeStepCount: 0)
+                }
                 
                 // Set the current extent to either the full extent's start (if range filtering is not supported), or to the entire full extent.
                 if let fullExtentStartTime = strongSelf.fullExtent?.startTime, let fullExtentEndTime = strongSelf.fullExtent?.endTime {
@@ -1030,18 +1059,11 @@ public class TimeSlider: UIControl {
     }
     
     /**
-     This will re-calculate's timeStepInterval based on the provided step count.
-     The time slider must have full extent available to calcluate the timeStepInterval.
+     This will initialize slider's fullExtent, currentExtent and timeStepInterval properties
+     based on provided step count and full extent. The current extent will be set to a time instant.
      */
-    public func initializeTimeSteps(timeStepCount: Int, completion: @escaping (Error?)->Void) {
+    public func initializeTimeSteps(timeStepCount: Int, fullExtent: AGSTimeExtent, completion: @escaping (Error?)->Void) {
         //
-        // If full extent is not available
-        // then bail out
-        guard let fullExtent = fullExtent else {
-            completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonNoData.rawValue, userInfo: [NSLocalizedDescriptionKey : "fullExtent is not available to calculate time steps."]))
-            return
-        }
-        
         // There should be at least two time steps
         // for time slider to work correctly.
         guard timeStepCount >= 2 else {
@@ -1049,13 +1071,23 @@ public class TimeSlider: UIControl {
             return
         }
         
-        if let fullExtentStartTime = fullExtent.startTime, let fullExtentEndTime = fullExtent.endTime {
-            let timeIntervalInSeconds = ((fullExtentEndTime.timeIntervalSince1970 - fullExtentStartTime.timeIntervalSince1970) / Double(timeStepCount - 1)) + fullExtentStartTime.timeIntervalSince1970
-            let timeIntervalDate = Date(timeIntervalSince1970: timeIntervalInSeconds)
-            if let (duration, component) = timeIntervalDate.offset(from: fullExtentStartTime) {
-                timeStepInterval = AGSTimeValue.fromCalenderComponents(duration: Double(duration), component: component)
-            }
+        // Full extent's start and end time must be available for time slider to work correctly.
+        guard let fullExtentStartTime = fullExtent.startTime, let _ = fullExtent.endTime else {
+            completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonNoData.rawValue, userInfo: [NSLocalizedDescriptionKey : "fullExtent is not available to calculate time steps."]))
+            return
         }
+        
+        // Set current extent as time instant
+        currentExtent = AGSTimeExtent(timeInstant: fullExtentStartTime)
+        
+        // Set full extent
+        self.fullExtent = fullExtent
+        
+        // Calculate time step interval
+        timeStepInterval = calculateTimeStepInterval(for: fullExtent, timeStepCount: timeStepCount)
+        
+        // Slider is loaded successfully.
+        completion(nil)
     }
     
     /**
@@ -1495,7 +1527,7 @@ public class TimeSlider: UIControl {
         CATransaction.setDisableActions(true)
         
         //
-        // Update lower label
+        // Update current extent start time label
         if let startTime = currentExtentStartTime, fullExtent != nil  {
             let startTimeString = string(for: startTime, style: currentExtentLabelDateStyle)
             currentExtentStartTimeLabel.string = startTimeString
@@ -1504,11 +1536,15 @@ public class TimeSlider: UIControl {
             currentExtentStartTimeLabel.isHidden = !isSliderVisible
             if startTimeLabelX < bounds.origin.x + labelSidePadding {
                 startTimeLabelX = bounds.origin.x + labelSidePadding
-                currentExtentStartTimeLabel.isHidden = true
+                if let fullExtentStartTime = fullExtent?.startTime, fullExtentStartTime == startTime {
+                    currentExtentStartTimeLabel.isHidden = true
+                }
             }
-            else if startTimeLabelX + startTimeLabelSize.width > bounds.maxX - labelSidePadding && currentExtentStartTime == currentExtentEndTime {
+            else if startTimeLabelX + startTimeLabelSize.width > bounds.maxX - labelSidePadding {
                 startTimeLabelX = bounds.maxX - startTimeLabelSize.width - labelSidePadding
-                currentExtentStartTimeLabel.isHidden = true
+                if let fullExtentEndTime = fullExtent?.endTime, fullExtentEndTime == startTime {
+                    currentExtentStartTimeLabel.isHidden = true
+                }
             }
             else if !currentExtentEndTimeLabel.isHidden && currentExtentEndTimeLabel.frame.origin.x >= 0.0 && startTimeLabelX + startTimeLabelSize.width > currentExtentEndTimeLabel.frame.origin.x {
                 startTimeLabelX = currentExtentEndTimeLabel.frame.origin.x - startTimeLabelSize.width - paddingBetweenLabels
@@ -1524,22 +1560,26 @@ public class TimeSlider: UIControl {
             currentExtentStartTimeLabel.isHidden = true
         }
         
-        // Update upper label
+        // Update current extent end time label
         if let endTime = currentExtentEndTime, isRangeEnabled, fullExtent != nil  {
             let endTimeString = string(for: endTime, style: currentExtentLabelDateStyle)
             currentExtentEndTimeLabel.string = endTimeString
             let endTimeLabelSize: CGSize = endTimeString.size(withAttributes: [kCTFontAttributeName as NSAttributedStringKey: currentExtentLabelFont])
             var endTimeLabelX = upperThumbLayer.frame.midX - endTimeLabelSize.width / 2.0
             currentExtentEndTimeLabel.isHidden = !isSliderVisible
-            if endTimeLabelX < bounds.origin.x + labelSidePadding && currentExtentStartTime == currentExtentEndTime {
+            if endTimeLabelX < bounds.origin.x + labelSidePadding {
                 endTimeLabelX = bounds.origin.x + labelSidePadding
-                currentExtentEndTimeLabel.isHidden = true
+                if let fullExtentStartTime = fullExtent?.startTime, fullExtentStartTime == endTime {
+                    currentExtentEndTimeLabel.isHidden = true
+                }
             }
             else if endTimeLabelX + endTimeLabelSize.width > bounds.maxX - labelSidePadding {
                 endTimeLabelX = bounds.maxX - endTimeLabelSize.width - labelSidePadding
-                currentExtentEndTimeLabel.isHidden = true
+                if let fullExtentEndTime = fullExtent?.endTime, fullExtentEndTime == endTime {
+                    currentExtentEndTimeLabel.isHidden = true
+                }
             }
-            else if endTimeLabelX < currentExtentStartTimeLabel.frame.origin.x + currentExtentStartTimeLabel.frame.width {
+            else if !currentExtentStartTimeLabel.isHidden && endTimeLabelX < currentExtentStartTimeLabel.frame.origin.x + currentExtentStartTimeLabel.frame.width {
                 endTimeLabelX = currentExtentStartTimeLabel.frame.origin.x + currentExtentStartTimeLabel.frame.width + paddingBetweenLabels
             }
             
@@ -1730,7 +1770,7 @@ public class TimeSlider: UIControl {
                 //
                 // Re initialize time slider if the change contains time aware layer.
                 if let geoView = geoView, changeContainsTimeAwareLayer(change: change) {
-                    initializeTimeProperties(geoView: geoView, completion: { (error) in
+                    initializeTimeProperties(geoView: geoView, observeGeoView: observeGeoView, completion: { (error) in
                         if let error = error {
                             print("error: \(error)")
                         }
@@ -1923,8 +1963,9 @@ public class TimeSlider: UIControl {
             // Notify the change of dates
             sendActions(for: .valueChanged)
             
-            // If geoView is available update it's time extent
-            if let geoView = geoView {
+            // If geoView is available and is being observed
+            // then update it's time extent
+            if let geoView = geoView, observeGeoView {
                 geoView.timeExtent = currentExtent
             }
         }
@@ -1986,11 +2027,12 @@ public class TimeSlider: UIControl {
     // This function returns time step interval and whether given layer supports range time filtering or not.
     private func findTimeStepIntervalAndIsRangeTimeFilteringSupported(for timeAwareLayer: AGSTimeAware, completion: @escaping ((timeStepInterval: AGSTimeValue?, supportsRangeTimeFiltering: Bool))->Void) {
         //
-        // The default is true
-        var supportsRangeTimeFiltering = true
+        // The default is false
+        var supportsRangeTimeFiltering = false
         
         // Get the time interval of the layer
         var timeStepInterval = timeAwareLayer.timeInterval
+        
         
         // If the layer is map image layer then we need to find out details from the
         // sublayers. Let's load all sublayers and check whether sub layers supports
@@ -2136,6 +2178,34 @@ public class TimeSlider: UIControl {
         }
         
         return dateFormatter.string(from: date)
+    }
+    
+    // Calculates time step interval based on provided time extent and time step count
+    private func calculateTimeStepInterval(for timeExtent: AGSTimeExtent, timeStepCount: Int) -> AGSTimeValue? {
+        if let startTime = timeExtent.startTime, let endTime = timeExtent.endTime {
+            //
+            // Calculate time step interval based on time step count.
+            //
+            // Checking here for count to be greater than 1 to
+            // avoid device-by-zero situation.
+            if timeStepCount > 1 {
+                let timeIntervalInSeconds = ((endTime.timeIntervalSince1970 - startTime.timeIntervalSince1970) / Double(timeStepCount - 1)) + startTime.timeIntervalSince1970
+                let timeIntervalDate = Date(timeIntervalSince1970: timeIntervalInSeconds)
+                if let (duration, component) = timeIntervalDate.offset(from: startTime) {
+                    return AGSTimeValue.fromCalenderComponents(duration: Double(duration), component: component)
+                }
+            }
+            else {
+                if let startTime = timeExtent.startTime, let endTime = timeExtent.endTime {
+                    //
+                    // Since the time step count is 0 we'll use default duration 1
+                    if let (_, component) = endTime.offset(from: startTime) {
+                        return AGSTimeValue.fromCalenderComponents(duration: 1, component: component)
+                    }
+                }
+            }
+        }
+        return nil
     }
     
 }
@@ -2407,7 +2477,7 @@ private struct DateRange : Sequence, IteratorProtocol {
 
 // MARK: - Date Extension
 
-extension Date {
+fileprivate extension Date {
     //
     // Returns the amount of years from another date
     func years(from date: Date) -> Int {
@@ -2446,13 +2516,12 @@ extension Date {
     
     // Returns the a custom time interval and calender component from another date
     func offset(from date: Date) -> (duration: Int, component: Calendar.Component)? {
-        if years(from: date)   > 0 { return (years(from: date), .year)   }
-        if months(from: date)  > 0 { return (months(from: date), .month)  }
+        if years(from: date)   > 0 { return (years(from: date), .year) }
+        if months(from: date)  > 0 { return (months(from: date), .month) }
         if seconds(from: date) > 0 { return (seconds(from: date), .second) }
         if nanoseconds(from: date) > 0 { return (nanoseconds(from: date), .nanosecond) }
         return nil
     }
-    
 }
 
 // MARK: - Color Extension
