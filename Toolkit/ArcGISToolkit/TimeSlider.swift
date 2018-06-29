@@ -2184,9 +2184,11 @@ public class TimeSlider: UIControl {
     private func calculateTimeStepInterval(for timeExtent: AGSTimeExtent, timeStepCount: Int) -> AGSTimeValue? {
         if let startTime = timeExtent.startTime, let endTime = timeExtent.endTime {
             //
-            // Calculate time step interval
-            // based on time step count
-            if timeStepCount > 0 {
+            // Calculate time step interval based on time step count.
+            //
+            // Checking here for count to be greater than 1 to
+            // avoid device-by-zero situation.
+            if timeStepCount > 1 {
                 let timeIntervalInSeconds = ((endTime.timeIntervalSince1970 - startTime.timeIntervalSince1970) / Double(timeStepCount - 1)) + startTime.timeIntervalSince1970
                 let timeIntervalDate = Date(timeIntervalSince1970: timeIntervalInSeconds)
                 if let (duration, component) = timeIntervalDate.offset(from: startTime) {
