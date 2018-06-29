@@ -1,4 +1,8 @@
 ### Table of Contents
 
-- [Scalebar](Scalebar)
-- [Legend View Controller](LegendViewController)
+* [Compass](Compass)
+* [Job Manager](JobManager)
+* [Legend View Controller](LegendViewController)
+* [Measure Toolbar](MeasureToolbar)
+* [Scalebar](Scalebar)
+* [TimeSlider](TimeSlider)
