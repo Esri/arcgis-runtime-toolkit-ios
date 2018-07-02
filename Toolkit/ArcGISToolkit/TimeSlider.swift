@@ -709,9 +709,9 @@ public class TimeSlider: UIControl {
     private var isObserving: Bool = false
     private var reInitializeTimeProperties: Bool = false
     
-    private var mapLayersObservation : NSKeyValueObservation?
-    private var sceneLayersObservation : NSKeyValueObservation?
-    private var timeExtentObservation : NSKeyValueObservation?
+    private var mapLayersObservation: NSKeyValueObservation?
+    private var sceneLayersObservation: NSKeyValueObservation?
+    private var timeExtentObservation: NSKeyValueObservation?
 
     // MARK: - Override Functions
     
@@ -1757,28 +1757,18 @@ public class TimeSlider: UIControl {
         // Observe operationalLayers of map
         mapLayersObservation = map?.observe(\.operationalLayers, options: [.new, .old], changeHandler: { [weak self] (map, change) in
             //
-            // Make sure self is around
-            guard let strongSelf = self else {
-                return
-            }
-            
             // Handle the change in operationalLayers
-            strongSelf.handleOperationalLayers(change: change)
+            self?.handleOperationalLayers(change: change)
         })
         
         // Observe operationalLayers of map
         sceneLayersObservation = scene?.observe(\.operationalLayers, options: [.new, .old], changeHandler: { [weak self] (scene, change) in
             //
-            // Make sure self is around
-            guard let strongSelf = self else {
-                return
-            }
-            
             // Handle the change in operationalLayers
-            strongSelf.handleOperationalLayers(change: change)
+            self?.handleOperationalLayers(change: change)
         })
         
-        timeExtentObservation = geoView?.observe(\.timeExtent, options: .new, changeHandler: { [weak self] (scene, change) in
+        timeExtentObservation = geoView?.observe(\.timeExtent, options: .new, changeHandler: { [weak self] (_, _) in
             //
             // Make sure self is around
             guard let strongSelf = self else {
@@ -2155,47 +2145,31 @@ public class TimeSlider: UIControl {
             guard error == nil else {
                 return
             }
-
-            // Make sure self is around
-            guard let strongSelf = self else {
-                return
-            }
             
             // Set the flag
-            strongSelf.reInitializeTimeProperties = false
+            self?.reInitializeTimeProperties = false
         })
     }
     
     // This function checks whether the observed value of operationalLayers
     // contains any time aware layer.
     private func changeContainsTimeAwareLayer(change: NSKeyValueObservedChange<NSMutableArray>) -> Bool {
-        let newValue = change.newValue as? Array<AGSLayer>
-        let oldValue = change.oldValue as? Array<AGSLayer>
+        let newValue = change.newValue as? [AGSLayer]
+        let oldValue = change.oldValue as? [AGSLayer]
         let changedIndexes = change.indexes
         
-        if let newValue = newValue {
-            for layer in newValue {
-                if layer is AGSTimeAware {
-                    return true
-                }
-            }
+        if let newValue = newValue, newValue.contains(where: { $0 is AGSTimeAware }) {
+            return true
         }
         
-        if let oldValue = oldValue {
-            for layer in oldValue {
-                if layer is AGSTimeAware {
-                    return true
-                }
-            }
+        if let oldValue = oldValue, oldValue.contains(where: { $0 is AGSTimeAware }) {
+            return true
         }
         
-        if let changedIndexes = changedIndexes, let operationalLayers = geoView?.operationalLayers, !operationalLayers.isEmpty  {
-            for (_, element) in changedIndexes.enumerated() {
-                let layer = operationalLayers[element]
-                if layer is AGSTimeAware {
-                    return true
-                }
-            }
+        if let changedIndexes = changedIndexes,
+            let operationalLayers = geoView?.operationalLayers,
+            changedIndexes.contains(where: { operationalLayers[$0] is AGSTimeAware }) {
+            return true
         }
         
         return false
