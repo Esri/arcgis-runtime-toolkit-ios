@@ -292,7 +292,7 @@ public class TimeSlider: UIControl {
     }
     
     /**
-     A Boolean value that indicates whether the minimum and full extent
+     A Boolean value that indicates whether the full extent
      labels are visible or not. Default if True.
      */
     public var fullExtentLabelsVisible = true {
@@ -704,11 +704,15 @@ public class TimeSlider: UIControl {
     }
     
     private var timer: Timer?
-    private static var KVOContext = 0
     private var map: AGSMap?
     private var scene: AGSScene?
     private var isObserving: Bool = false
+    private var reInitializeTimeProperties: Bool = false
     
+    private var mapLayersObservation: NSKeyValueObservation?
+    private var sceneLayersObservation: NSKeyValueObservation?
+    private var timeExtentObservation: NSKeyValueObservation?
+
     // MARK: - Override Functions
     
     required public init?(coder: NSCoder) {
@@ -966,9 +970,9 @@ public class TimeSlider: UIControl {
                     strongSelf.timeStepInterval = strongSelf.calculateTimeStepInterval(for: layersFullExtent, timeStepCount: 0)
                 }
                 
-                // If the geoview has a time extent defined, use that. Otherwise, set the current extent to either the
-                // full extent's start (if range filtering is not supported), or to the entire full extent.
-                if let geoViewTimeExtent = strongSelf.geoView?.timeExtent {
+                // If the geoview has a time extent defined and we are not re-initializing, use that. Otherwise, set the
+                // current extent to either the full extent's start (if range filtering is not supported), or to the entire full extent.
+                if let geoViewTimeExtent = strongSelf.geoView?.timeExtent, !strongSelf.reInitializeTimeProperties {
                     strongSelf.currentExtent = geoViewTimeExtent
                 }
                 else {
@@ -1749,44 +1753,51 @@ public class TimeSlider: UIControl {
         if isObserving {
             removeObservers()
         }
-        map?.addObserver(self, forKeyPath: #keyPath(AGSMap.operationalLayers), options: [.new, .old], context: &TimeSlider.KVOContext)
-        scene?.addObserver(self, forKeyPath: #keyPath(AGSScene.operationalLayers), options: [.new, .old], context: &TimeSlider.KVOContext)
-        geoView?.addObserver(self, forKeyPath: #keyPath(AGSGeoView.timeExtent), options: .new, context: &TimeSlider.KVOContext)
+        
+        // Observe operationalLayers of map
+        mapLayersObservation = map?.observe(\.operationalLayers, options: [.new, .old], changeHandler: { [weak self] (map, change) in
+            //
+            // Handle the change in operationalLayers
+            self?.handleOperationalLayers(change: change)
+        })
+        
+        // Observe operationalLayers of map
+        sceneLayersObservation = scene?.observe(\.operationalLayers, options: [.new, .old], changeHandler: { [weak self] (scene, change) in
+            //
+            // Handle the change in operationalLayers
+            self?.handleOperationalLayers(change: change)
+        })
+        
+        timeExtentObservation = geoView?.observe(\.timeExtent, options: .new, changeHandler: { [weak self] (_, _) in
+            //
+            // Make sure self is around
+            guard let strongSelf = self else {
+                return
+            }
+            
+            // Update slider's currentExtent with geoView's timeExtent
+            if let geoViewTimeExtent = strongSelf.geoView?.timeExtent, let currentExtent = strongSelf.currentExtent {
+                if geoViewTimeExtent.startTime?.timeIntervalSince1970 != currentExtent.startTime?.timeIntervalSince1970 || geoViewTimeExtent.endTime?.timeIntervalSince1970 != currentExtent.endTime?.timeIntervalSince1970 {
+                    strongSelf.currentExtent = geoViewTimeExtent
+                }
+            }
+        })
+        
+        // Set the flag
         isObserving = true
     }
     
+    
+    
     private func removeObservers() {
         if isObserving {
-            map?.removeObserver(self, forKeyPath: #keyPath(AGSMap.operationalLayers))
-            scene?.removeObserver(self, forKeyPath: #keyPath(AGSScene.operationalLayers))
-            geoView?.removeObserver(self, forKeyPath: #keyPath(AGSGeoView.timeExtent))
+            mapLayersObservation?.invalidate()
+            mapLayersObservation = nil
+            sceneLayersObservation?.invalidate()
+            sceneLayersObservation = nil
+            timeExtentObservation?.invalidate()
+            timeExtentObservation = nil
             isObserving = false
-        }
-    }
-    
-    public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if context == &TimeSlider.KVOContext{
-            if keyPath == #keyPath(AGSMap.operationalLayers) {
-                //
-                // Re initialize time slider if the change contains time aware layer.
-                if let geoView = geoView, changeContainsTimeAwareLayer(change: change) {
-                    initializeTimeProperties(geoView: geoView, observeGeoView: observeGeoView, completion: { (error) in
-                        if let error = error {
-                            print("error: \(error)")
-                        }
-                    })
-                }
-            }
-            else if keyPath == #keyPath(AGSGeoView.timeExtent) {
-                if let geoViewTimeExtent = geoView?.timeExtent, let currentExtent = currentExtent {
-                    if geoViewTimeExtent.startTime?.timeIntervalSince1970 != currentExtent.startTime?.timeIntervalSince1970 || geoViewTimeExtent.endTime?.timeIntervalSince1970 != currentExtent.endTime?.timeIntervalSince1970 {
-                        self.currentExtent = geoViewTimeExtent
-                    }
-                }
-            }
-        }
-        else{
-            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
     }
     
@@ -2117,26 +2128,48 @@ public class TimeSlider: UIControl {
         return nil
     }
     
-    // This function checks whether the observed value of operationalLayers
-    // contains any time aware layer.
-    private func changeContainsTimeAwareLayer(change: [NSKeyValueChangeKey : Any]?) -> Bool {
-        let newValue = change?[NSKeyValueChangeKey.newKey] as? Array<AGSLayer>
-        let oldValue = change?[NSKeyValueChangeKey.oldKey] as? Array<AGSLayer>
-        
-        if let newValue = newValue {
-            for layer in newValue {
-                if layer is AGSTimeAware {
-                    return true
-                }
-            }
+    // This function handles change in operationalLayers
+    // and re-initialize time slider if required
+    private func handleOperationalLayers(change: NSKeyValueObservedChange<NSMutableArray>) {
+        //
+        // Make sure change contains time aware layer
+        guard let geoView = geoView, changeContainsTimeAwareLayer(change: change) else {
+            return
         }
         
-        if let oldValue = oldValue {
-            for layer in oldValue {
-                if layer is AGSTimeAware {
-                    return true
-                }
+        // Re initialize time slider
+        reInitializeTimeProperties = true
+        initializeTimeProperties(geoView: geoView, observeGeoView: observeGeoView, completion: { [weak self] (error) in
+            //
+            // Bail out if there is an error
+            guard error == nil else {
+                return
             }
+            
+            // Set the flag
+            self?.reInitializeTimeProperties = false
+        })
+    }
+    
+    // This function checks whether the observed value of operationalLayers
+    // contains any time aware layer.
+    private func changeContainsTimeAwareLayer(change: NSKeyValueObservedChange<NSMutableArray>) -> Bool {
+        let newValue = change.newValue as? [AGSLayer]
+        let oldValue = change.oldValue as? [AGSLayer]
+        let changedIndexes = change.indexes
+        
+        if let newValue = newValue, newValue.contains(where: { $0 is AGSTimeAware }) {
+            return true
+        }
+        
+        if let oldValue = oldValue, oldValue.contains(where: { $0 is AGSTimeAware }) {
+            return true
+        }
+        
+        if let changedIndexes = changedIndexes,
+            let operationalLayers = geoView?.operationalLayers,
+            changedIndexes.contains(where: { operationalLayers[$0] is AGSTimeAware }) {
+            return true
         }
         
         return false
