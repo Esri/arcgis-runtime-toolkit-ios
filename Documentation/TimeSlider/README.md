@@ -19,7 +19,7 @@ How the Time Slider's thumbs are presented will vary depending on whether the cu
 
   ![time-window](Images/time-window.png)
 
-* **Time Window - Start or End Time Pinned:** If the start or end time is pinned using the `isStartTimePinned` or `isEndTimePinned`, then the corresponding slider thumb is replaced with a bar to visually indicate that the start or end time cannot be manipulated. This allows user to see cumulatively view all data from the pinned thumb until the specified position of other thumb.
+* **Time Window - Start or End Time Pinned:** If the start or end time is pinned using the `isStartTimePinned` or `isEndTimePinned`, then the corresponding slider thumb is replaced with a bar to visually indicate that the start or end time cannot be manipulated. This allows user to cumulatively view all data from the pinned thumb until the specified position of other thumb.
 
   ![start-time-pinned](Images/start-time-pinned.png)
 
@@ -45,7 +45,7 @@ The labels are shown on slider to help user understand the time filtering option
 
 #### Display Components
 
-User can control either to show `Slider` and/or `Playback Buttons` using `isSliderVisible` and `playbackButtonsVisible`.
+User can control whether to show `Slider` and/or `Playback Buttons` using `isSliderVisible` and `playbackButtonsVisible`.
 
 ![only-slider-visible](Images/only-slider-visible.png)
 
