@@ -684,14 +684,9 @@ public class TimeSlider: UIControl {
     private var tickMarkLabels = [CATextLayer]()
     fileprivate var tickMarks = [TickMark]()
     
-    private var playPauseButton = UIButton(type: .custom)
-    private var forwardButton = UIButton(type: .custom)
-    private var backButton = UIButton(type: .custom)
-    
-    private var playImage: UIImage?
-    private var pauseImage: UIImage?
-    private var forwardImage: UIImage?
-    private var backImage: UIImage?
+    private let playPauseButton = UIButton(type: .custom)
+    private let forwardButton = UIButton(type: .custom)
+    private let backButton = UIButton(type: .custom)
     
     fileprivate var pinnedThumbFillColor: UIColor = UIColor.black
     
@@ -1336,10 +1331,10 @@ public class TimeSlider: UIControl {
         
         // Create the images
         let bundle = Bundle(for: type(of: self))
-        playImage = UIImage(named: "Play", in: bundle, compatibleWith: nil)
-        pauseImage = UIImage(named: "Pause", in: bundle, compatibleWith: nil)
-        forwardImage = UIImage(named: "Forward", in: bundle, compatibleWith: nil)
-        backImage = UIImage(named: "Back", in: bundle, compatibleWith: nil)
+        let playImage = UIImage(named: "Play", in: bundle, compatibleWith: nil)
+        let pauseImage = UIImage(named: "Pause", in: bundle, compatibleWith: nil)
+        let forwardImage = UIImage(named: "Forward", in: bundle, compatibleWith: nil)
+        let backImage = UIImage(named: "Back", in: bundle, compatibleWith: nil)
         
         // Setup Play/Pause button
         playPauseButton.setImage(playImage, for: .normal)
@@ -1362,9 +1357,6 @@ public class TimeSlider: UIControl {
         backButton.addTarget(self, action: #selector(TimeSlider.backAction(_:)), for: .touchUpInside)
         backButton.showsTouchWhenHighlighted = true
         addSubview(backButton)
-        
-        // Refresh
-        setNeedsLayout()
     }
     
     private func updateLayerFrames() {
