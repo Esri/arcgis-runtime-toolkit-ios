@@ -318,7 +318,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         
         // defaults for symbology
         selectionLineSymbol = lineSketchEditor.style.lineSymbol
-        selectionColor = lineSketchEditor.style.selectionColor
+        selectionColor = mapView?.selectionProperties.color
         let fillColor = (selectionColor ?? UIColor.cyan).withAlphaComponent(0.25)
         let sfs = AGSSimpleFillSymbol(style: .solid, color: fillColor, outline: selectionLineSymbol as? AGSSimpleLineSymbol)
         selectionFillSymbol = sfs
@@ -329,7 +329,9 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         
         if let mapView = mapView{
             let selectionOverlay = AGSGraphicsOverlay()
-            selectionOverlay.selectionColor = selectionColor
+            if let selectionColor = selectionColor {
+                mapView.selectionProperties.color = selectionColor
+            }
             self.selectionOverlay = selectionOverlay
             mapView.graphicsOverlays.add(selectionOverlay)
             
