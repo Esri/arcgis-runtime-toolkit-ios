@@ -313,25 +313,21 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         selectModeButtons = [segControlItem, leftHiddenPlaceholderButton, flexButton, rightHiddenPlaceholderButton]
         
         // notification
-        
         NotificationCenter.default.addObserver(self, selector: #selector(sketchEditorGeometryDidChange(_:)), name: .AGSSketchEditorGeometryDidChange, object: nil)
-        
-        // defaults for symbology
-        selectionLineSymbol = lineSketchEditor.style.lineSymbol
-        selectionColor = mapView?.selectionProperties.color
-        let fillColor = (selectionColor ?? UIColor.cyan).withAlphaComponent(0.25)
-        let sfs = AGSSimpleFillSymbol(style: .solid, color: fillColor, outline: selectionLineSymbol as? AGSSimpleLineSymbol)
-        selectionFillSymbol = sfs
     }
     
     private func bindToMapView(mapView: AGSMapView?){
         mapView?.touchDelegate = self
         
         if let mapView = mapView{
+            // defaults for symbology
+            selectionLineSymbol = lineSketchEditor.style.lineSymbol
+            selectionColor = mapView.selectionProperties.color
+            let fillColor = (selectionColor ?? UIColor.cyan).withAlphaComponent(0.25)
+            let sfs = AGSSimpleFillSymbol(style: .solid, color: fillColor, outline: selectionLineSymbol as? AGSSimpleLineSymbol)
+            selectionFillSymbol = sfs
+            
             let selectionOverlay = AGSGraphicsOverlay()
-            if let selectionColor = selectionColor {
-                mapView.selectionProperties.color = selectionColor
-            }
             self.selectionOverlay = selectionOverlay
             mapView.graphicsOverlays.add(selectionOverlay)
             
