@@ -174,8 +174,11 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
     // Exposed so that the symbology and selection colors can be customized.
     public private(set) var selectionLineSymbol : AGSSymbol?
     public private(set)var selectionFillSymbol : AGSSymbol?
-    public private(set) var selectionColor : UIColor?
-    
+    @available(iOS, deprecated, message: "Use `color` property exposed through `AGSGeoView.selectionProperties`")
+    public var selectionColor : UIColor? {
+        return mapView?.selectionProperties.color
+    }
+
     public var mapView : AGSMapView? {
         didSet{
             guard mapView != oldValue else { return }
@@ -313,23 +316,20 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         selectModeButtons = [segControlItem, leftHiddenPlaceholderButton, flexButton, rightHiddenPlaceholderButton]
         
         // notification
-        
         NotificationCenter.default.addObserver(self, selector: #selector(sketchEditorGeometryDidChange(_:)), name: .AGSSketchEditorGeometryDidChange, object: nil)
-        
-        // defaults for symbology
-        selectionLineSymbol = lineSketchEditor.style.lineSymbol
-        selectionColor = lineSketchEditor.style.selectionColor
-        let fillColor = (selectionColor ?? UIColor.cyan).withAlphaComponent(0.25)
-        let sfs = AGSSimpleFillSymbol(style: .solid, color: fillColor, outline: selectionLineSymbol as? AGSSimpleLineSymbol)
-        selectionFillSymbol = sfs
     }
     
     private func bindToMapView(mapView: AGSMapView?){
         mapView?.touchDelegate = self
         
         if let mapView = mapView{
+            // defaults for symbology
+            selectionLineSymbol = lineSketchEditor.style.lineSymbol
+            let fillColor = mapView.selectionProperties.color.withAlphaComponent(0.25)
+            let sfs = AGSSimpleFillSymbol(style: .solid, color: fillColor, outline: selectionLineSymbol as? AGSSimpleLineSymbol)
+            selectionFillSymbol = sfs
+            
             let selectionOverlay = AGSGraphicsOverlay()
-            selectionOverlay.selectionColor = selectionColor
             self.selectionOverlay = selectionOverlay
             mapView.graphicsOverlays.add(selectionOverlay)
             
