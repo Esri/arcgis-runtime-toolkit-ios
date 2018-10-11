@@ -174,7 +174,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
     // Exposed so that the symbology and selection colors can be customized.
     public private(set) var selectionLineSymbol : AGSSymbol?
     public private(set)var selectionFillSymbol : AGSSymbol?
-    @available(iOS, deprecated, message: "Use `color` property exposed through `AGSGeoView#selectionProperties`")
+    @available(iOS, deprecated, message: "Use `color` property exposed through `AGSGeoView.selectionProperties`")
     public var selectionColor : UIColor? {
         return mapView?.selectionProperties.color
     }
