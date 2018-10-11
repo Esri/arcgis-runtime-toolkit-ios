@@ -174,8 +174,11 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
     // Exposed so that the symbology and selection colors can be customized.
     public private(set) var selectionLineSymbol : AGSSymbol?
     public private(set)var selectionFillSymbol : AGSSymbol?
-    public private(set) var selectionColor : UIColor?
-    
+    @available(iOS, deprecated, message: "Use `color` property exposed through `AGSGeoView#selectionProperties`")
+    public var selectionColor : UIColor? {
+        return mapView?.selectionProperties.color
+    }
+
     public var mapView : AGSMapView? {
         didSet{
             guard mapView != oldValue else { return }
@@ -322,8 +325,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         if let mapView = mapView{
             // defaults for symbology
             selectionLineSymbol = lineSketchEditor.style.lineSymbol
-            selectionColor = mapView.selectionProperties.color
-            let fillColor = (selectionColor ?? UIColor.cyan).withAlphaComponent(0.25)
+            let fillColor = mapView.selectionProperties.color.withAlphaComponent(0.25)
             let sfs = AGSSimpleFillSymbol(style: .solid, color: fillColor, outline: selectionLineSymbol as? AGSSimpleLineSymbol)
             selectionFillSymbol = sfs
             
