@@ -46,7 +46,7 @@ class MeasureExample: MapViewController{
         super.viewDidLayoutSubviews()
         
         // update content inset for mapview
-        mapView.contentInset = UIEdgeInsetsMake(0, 0, measureToolbar.frame.height, 0)
+        mapView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: measureToolbar.frame.height, right: 0)
     }
     
     override func didReceiveMemoryWarning() {
