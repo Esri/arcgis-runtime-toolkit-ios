@@ -71,7 +71,7 @@
 		883904451DF6022A001F3188 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		883904481DF6022A001F3188 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8839044A1DF6022A001F3188 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		883904501DF60296001F3188 /* ArcGIS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ArcGIS.framework; path = "~/Library/SDKs/ArcGIS/iOS/Frameworks/Dynamic/ArcGIS.framework"; sourceTree = "<absolute>"; };
+		883904501DF60296001F3188 /* ArcGIS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ArcGIS.framework; path = "$HOME/Library/SDKs/ArcGIS/iOS/Frameworks/Dynamic/ArcGIS.framework"; sourceTree = "<absolute>"; };
 		88B6899F1E96E9AB00B67FAB /* ArcGISToolkit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ArcGISToolkit.xcodeproj; path = ../Toolkit/ArcGISToolkit.xcodeproj; sourceTree = "<group>"; };
 		88B689BE1E96EDF400B67FAB /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		88B689BF1E96EDF400B67FAB /* ExamplesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExamplesViewController.swift; sourceTree = "<group>"; };

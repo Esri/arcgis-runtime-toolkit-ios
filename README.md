@@ -12,7 +12,7 @@ Toolkit components that will simplify your iOS app development with ArcGIS Runti
 * [TimeSlider](Documentation/TimeSlider)
 
 ## Requirements
-* [ArcGIS Runtime SDK for iOS](https://developers.arcgis.com/en/ios/) 100.3.0 (or higher)
+* [ArcGIS Runtime SDK for iOS](https://developers.arcgis.com/en/ios/) 100.4.0 (or higher)
 * Xcode 9.3 (or higher)
 * Apple iOS SDK 10 (or higher)
 
