@@ -26,8 +26,22 @@ public class FeatureTypeInfo{
         self.swatch = swatch
     }
 }
+/// The protocol you implement to respond as the user interacts with the feature types
+/// view controller.
+public protocol FeatureTypesViewControllerDelegate: class {
+    /// Tells the delegate that the user has cancelled selecting a unit.
+    ///
+    /// - Parameter featureTypesViewController: The current feature types view controller.
+    func featureTypesViewControllerDidCancel(_ featureTypesViewController: FeatureTypesViewController)
+    /// Tells the delegate that the user has selected a feature type.
+    ///
+    /// - Parameters:
+    ///   - featureTypesViewController: The current feature types view controller.
+    ///   - featureTypeInfo: The selected feature type.
+    func featureTypesViewControllerDidSelectFeatureType(_ featureTypesViewController: FeatureTypesViewController, featureTypeInfo: FeatureTypeInfo)
+}
 
-public class FeatureTypesViewController: TableViewController, UINavigationBarDelegate, UISearchBarDelegate {
+public class FeatureTypesViewController: TableViewController, UINavigationBarDelegate {
     
     public private(set) var map : AGSMap?
     
@@ -57,36 +71,16 @@ public class FeatureTypesViewController: TableViewController, UINavigationBarDel
         fatalError("init(coder:) has not been implemented")
     }
     
-    public var featureTypeSelectedHandler : ((FeatureTypeInfo) -> Void)?
+    public weak var delegate : FeatureTypesViewControllerDelegate?
     
     override public func viewDidLoad() {
         super.viewDidLoad()
         
-        // setup navbar
-        let navbar = UINavigationBar(frame: CGRect.zero)
-        navbar.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(navbar)
-        navbar.delegate = self
-        navbar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        navbar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        navbar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+        // create a search controller
+        navigationItem.searchController = makeSearchController()
         
-        let cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancelAction as ()->Void))
-        
-        let item = UINavigationItem(title: "Feature Types")
-        item.leftBarButtonItem = cancelButton
-        navbar.pushItem(item, animated: false)
-        
-        
-        // search bar
-        searchbar = UISearchBar(frame: CGRect(x: 0, y: 0, width: self.view.bounds.size.width, height: 44))
-        searchbar?.delegate = self
-        searchbar?.spellCheckingType = .no
-        searchbar?.autocapitalizationType = .none
-        searchbar?.autocorrectionType = .no
-        tableView.tableHeaderView = searchbar
-        
-        tableView.contentInsetAdjustmentBehavior = .automatic
+        // add cancel button
+        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(FeatureTypesViewController.cancelAction))
         
         // load map, get initial data
         self.map?.load(){ [weak self] error in
@@ -99,6 +93,20 @@ public class FeatureTypesViewController: TableViewController, UINavigationBarDel
                 self?.getInitialData(map: map)
             }
         }
+    }
+    
+    private func makeSearchController() -> UISearchController {
+        let searchController = UISearchController(searchResultsController: nil)
+        searchController.dimsBackgroundDuringPresentation = false
+        searchController.hidesNavigationBarDuringPresentation = false
+        searchController.searchResultsUpdater = self
+        
+        let searchBar = searchController.searchBar
+        searchBar.spellCheckingType = .no
+        searchBar.autocapitalizationType = .none
+        searchBar.autocorrectionType = .no
+        
+        return searchController
     }
     
     private func getInitialData(map: AGSMap){
@@ -168,25 +176,7 @@ public class FeatureTypesViewController: TableViewController, UINavigationBarDel
         
     }
     
-    // MARK: SearchBar / NavBar delegates
-    
-    public func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if searchText.isEmpty{
-            self.currentInfos = self.unfilteredInfos
-        }
-        else{
-            
-            DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async {
-                let filtered = self.unfilteredInfos.filter{
-                    $0.featureType.name.range(of: searchText, options: .caseInsensitive) != nil
-                }
-                DispatchQueue.main.async {
-                    self.currentInfos = filtered
-                }
-            }
-            
-        }
-    }
+    // MARK: NavBar delegate
     
     public func position(for bar: UIBarPositioning) -> UIBarPosition {
         return .topAttached
@@ -202,15 +192,15 @@ public class FeatureTypesViewController: TableViewController, UINavigationBarDel
         return tables.count == 0 ? nil : tables[section].tableName
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAtIndexPath indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
         // when the user taps on a feature type
-        //
-
-        self.goBack{
-            if let closure = self.featureTypeSelectedHandler{
-                closure(self.infoForIndexPath(indexPath)!)
-            }
-        }
+        
+        // If the search controller is still active, the delegate will not be
+        // able to dismiss us, if desired.
+        navigationItem.searchController?.isActive = false
+        
+        delegate?.featureTypesViewControllerDidSelectFeatureType(self, featureTypeInfo: self.infoForIndexPath(indexPath)!)
     }
     
     override public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -235,11 +225,10 @@ public class FeatureTypesViewController: TableViewController, UINavigationBarDel
     // MARK: go back, cancel methods
     
     @objc private func cancelAction(){
-        self.goBack(nil)
-    }
-    
-    @IBAction func cancelAction(_ sender: AnyObject) {
-        self.goBack(nil)
+        // If the search controller is still active, the delegate will not be
+        // able to dismiss us, if desired.
+        navigationItem.searchController?.isActive = false
+        delegate?.featureTypesViewControllerDidCancel(self)
     }
     
     // MARK: IndexPath -> Info
@@ -266,3 +255,21 @@ public class FeatureTypesViewController: TableViewController, UINavigationBarDel
 
 
 
+extension FeatureTypesViewController: UISearchResultsUpdating {
+    public func updateSearchResults(for searchController: UISearchController) {
+        if let text = searchController.searchBar.text?.trimmingCharacters(in: .whitespaces),
+            !text.isEmpty {
+            DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async {
+                let filtered = self.unfilteredInfos.filter{
+                    $0.featureType.name.range(of: text, options: .caseInsensitive) != nil
+                }
+                DispatchQueue.main.async {
+                    self.currentInfos = filtered
+                }
+            }
+        }
+        else {
+            self.currentInfos = self.unfilteredInfos
+        }
+    }
+}

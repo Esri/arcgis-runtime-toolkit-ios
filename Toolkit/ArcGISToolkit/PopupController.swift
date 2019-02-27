@@ -70,18 +70,11 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         }
         
         let fvc = FeatureTypesViewController(map: map)
-        fvc.featureTypeSelectedHandler = { info in
-            if let feature = info.featureTable.createFeature(with: info.featureType){
-                self.addingNewFeature = true
-                let popup = AGSPopup(geoElement: feature, popupDefinition: info.featureLayer.popupDefinition)
-                self.showPopups([popup])
-                // TODO: This works around a bug where editing doesn't start until the view is loaded
-                _ = self.pvc?.view
-                self.pvc?.startEditingCurrentPopup()
-            }
-        }
+        fvc.delegate = self
         
-        geoViewController?.present(fvc, animated: true, completion: nil)
+        let navigationController = UINavigationController(rootViewController: fvc)
+        navigationController.modalPresentationStyle = .formSheet
+        UIApplication.shared.topViewController()?.present(navigationController, animated: true)
     }
     
     
@@ -316,6 +309,25 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
     
 }
 
+extension PopupController: FeatureTypesViewControllerDelegate {
+    
+    public func featureTypesViewControllerDidCancel(_ featureTypesViewController: FeatureTypesViewController) {
+        featureTypesViewController.dismiss(animated: true)
+    }
+    
+    public func featureTypesViewControllerDidSelectFeatureType(_ featureTypesViewController: FeatureTypesViewController, featureTypeInfo: FeatureTypeInfo) {
+        featureTypesViewController.dismiss(animated: true){
+            if let feature = featureTypeInfo.featureTable.createFeature(with: featureTypeInfo.featureType){
+                self.addingNewFeature = true
+                let popup = AGSPopup(geoElement: feature, popupDefinition: featureTypeInfo.featureLayer.popupDefinition)
+                self.showPopups([popup])
+                // NOTE: This works around a bug where editing doesn't start until the view is loaded
+                _ = self.pvc?.view
+                self.pvc?.startEditingCurrentPopup()
+            }
+        }
+    }
+}
 
 
 
