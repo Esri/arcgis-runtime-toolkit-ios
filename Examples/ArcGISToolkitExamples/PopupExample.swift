@@ -42,8 +42,8 @@ class PopupExample: MapViewController {
         }
         
         // Another way to create the map is with a portal item:
-        //portalItem = AGSPortalItem(portal: portal, itemID: "cebba45198704f89a9292af0bb1ec0fc")
-        //map = AGSMap(item: portalItem!)
+//        portalItem = AGSPortalItem(portal: portal, itemID: "9b92efeb82564269877c383d079a00e3")
+//        map = AGSMap(item: portalItem!)
         
         // set the map on the mapview
         mapView.map = map

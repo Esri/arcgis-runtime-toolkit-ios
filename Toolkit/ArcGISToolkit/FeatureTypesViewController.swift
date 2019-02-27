@@ -26,6 +26,7 @@ public class FeatureTypeInfo{
         self.swatch = swatch
     }
 }
+
 /// The protocol you implement to respond as the user interacts with the feature types
 /// view controller.
 public protocol FeatureTypesViewControllerDelegate: class {
@@ -252,8 +253,6 @@ public class FeatureTypesViewController: TableViewController, UINavigationBarDel
         return IndexPath(row: row, section: section)
     }
 }
-
-
 
 extension FeatureTypesViewController: UISearchResultsUpdating {
     public func updateSearchResults(for searchController: UISearchController) {
