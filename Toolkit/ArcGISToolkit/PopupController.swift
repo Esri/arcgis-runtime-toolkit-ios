@@ -69,7 +69,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
             return
         }
         
-        let fvc = FeatureTypesViewController(map: map)
+        let fvc = TemplatePickerViewController(map: map)
         fvc.delegate = self
         
         let navigationController = UINavigationController(rootViewController: fvc)
@@ -309,17 +309,17 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
     
 }
 
-extension PopupController: FeatureTypesViewControllerDelegate {
+extension PopupController: TemplatePickerViewControllerDelegate {
     
-    public func featureTypesViewControllerDidCancel(_ featureTypesViewController: FeatureTypesViewController) {
-        featureTypesViewController.dismiss(animated: true)
+    public func templatePickerViewControllerDidCancel(_ templatePickerViewController: TemplatePickerViewController) {
+        templatePickerViewController.dismiss(animated: true)
     }
     
-    public func featureTypesViewControllerDidSelectFeatureType(_ featureTypesViewController: FeatureTypesViewController, featureTypeInfo: FeatureTypeInfo) {
-        featureTypesViewController.dismiss(animated: true){
-            if let feature = featureTypeInfo.featureTable.createFeature(with: featureTypeInfo.featureType){
+    public func templatePickerViewControllerDidSelectTemplate(_ templatePickerViewController: TemplatePickerViewController, featureTemplateInfo: FeatureTemplateInfo) {
+        templatePickerViewController.dismiss(animated: true){
+            if let feature = featureTemplateInfo.featureTable.createFeature(with: featureTemplateInfo.featureTemplate){
                 self.addingNewFeature = true
-                let popup = AGSPopup(geoElement: feature, popupDefinition: featureTypeInfo.featureLayer.popupDefinition)
+                let popup = AGSPopup(geoElement: feature, popupDefinition: featureTemplateInfo.featureLayer.popupDefinition)
                 self.showPopups([popup])
                 // NOTE: This works around a bug where editing doesn't start until the view is loaded
                 _ = self.pvc?.view

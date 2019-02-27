@@ -13,49 +13,49 @@
 
 import ArcGIS
 
-public class FeatureTypeInfo{
+public class FeatureTemplateInfo{
     public let featureLayer : AGSFeatureLayer
     public let featureTable : AGSArcGISFeatureTable
-    public let featureType : AGSFeatureType
+    public let featureTemplate : AGSFeatureTemplate
     public var swatch : UIImage?
     
-    fileprivate init(featureLayer: AGSFeatureLayer, featureTable: AGSArcGISFeatureTable, featureType: AGSFeatureType, swatch: UIImage?){
+    fileprivate init(featureLayer: AGSFeatureLayer, featureTable: AGSArcGISFeatureTable, featureTemplate: AGSFeatureTemplate, swatch: UIImage?){
         self.featureLayer = featureLayer
         self.featureTable = featureTable
-        self.featureType =  featureType
+        self.featureTemplate = featureTemplate
         self.swatch = swatch
     }
 }
 
-/// The protocol you implement to respond as the user interacts with the feature types
+/// The protocol you implement to respond as the user interacts with the feature templates
 /// view controller.
-public protocol FeatureTypesViewControllerDelegate: class {
-    /// Tells the delegate that the user has cancelled selecting a unit.
+public protocol TemplatePickerViewControllerDelegate: class {
+    /// Tells the delegate that the user has cancelled selecting a template.
     ///
-    /// - Parameter featureTypesViewController: The current feature types view controller.
-    func featureTypesViewControllerDidCancel(_ featureTypesViewController: FeatureTypesViewController)
-    /// Tells the delegate that the user has selected a feature type.
+    /// - Parameter templatePickerViewController: The current template picker view controller.
+    func templatePickerViewControllerDidCancel(_ templatePickerViewController: TemplatePickerViewController)
+    /// Tells the delegate that the user has selected a feature template.
     ///
     /// - Parameters:
-    ///   - featureTypesViewController: The current feature types view controller.
-    ///   - featureTypeInfo: The selected feature type.
-    func featureTypesViewControllerDidSelectFeatureType(_ featureTypesViewController: FeatureTypesViewController, featureTypeInfo: FeatureTypeInfo)
+    ///   - templatePickerViewController: The current template picker view controller.
+    ///   - featureTemplateInfo: The selected feature template.
+    func templatePickerViewControllerDidSelectTemplate(_ templatePickerViewController: TemplatePickerViewController, featureTemplateInfo: FeatureTemplateInfo)
 }
 
-public class FeatureTypesViewController: TableViewController, UINavigationBarDelegate {
+public class TemplatePickerViewController: TableViewController, UINavigationBarDelegate {
     
     public private(set) var map : AGSMap?
     
-    private var searchbar : UISearchBar?
     private var tables = [AGSArcGISFeatureTable]()
-    private var currentDatasource = [String: [FeatureTypeInfo]]()
-    private var unfilteredInfos = [FeatureTypeInfo]()
-    private var currentInfos = [FeatureTypeInfo](){
+    private var currentDatasource = [String: [FeatureTemplateInfo]]()
+    private var isFiltering : Bool = false
+    private var unfilteredInfos = [FeatureTemplateInfo]()
+    private var currentInfos = [FeatureTemplateInfo](){
         didSet{
             tables = Set(self.currentInfos.map { $0.featureTable }).sorted(by: {$0.tableName < $1.tableName})
-            currentDatasource = [String: [FeatureTypeInfo]]()
+            currentDatasource = [String: [FeatureTemplateInfo]]()
             currentInfos.forEach{
-                var infosForTable = currentDatasource[$0.featureTable.tableName] ?? [FeatureTypeInfo]()
+                var infosForTable = currentDatasource[$0.featureTable.tableName] ?? [FeatureTemplateInfo]()
                 infosForTable.append($0)
                 currentDatasource[$0.featureTable.tableName] = infosForTable
             }
@@ -72,16 +72,18 @@ public class FeatureTypesViewController: TableViewController, UINavigationBarDel
         fatalError("init(coder:) has not been implemented")
     }
     
-    public weak var delegate : FeatureTypesViewControllerDelegate?
+    public weak var delegate : TemplatePickerViewControllerDelegate?
     
     override public func viewDidLoad() {
         super.viewDidLoad()
+        
+        definesPresentationContext = true
         
         // create a search controller
         navigationItem.searchController = makeSearchController()
         
         // add cancel button
-        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(FeatureTypesViewController.cancelAction))
+        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(TemplatePickerViewController.cancelAction))
         
         // load map, get initial data
         self.map?.load(){ [weak self] error in
@@ -136,24 +138,32 @@ public class FeatureTypesViewController: TableViewController, UINavigationBarDel
                     return
                 }
                 
-                guard let popupDef = fl.popupDefinition, popupDef.allowEdit, table.canAddFeature else{
+                guard let popupDef = fl.popupDefinition, popupDef.allowEdit || table.canAddFeature else{
                     return
                 }
                 
-                let infos = table.featureTypes.map{FeatureTypeInfo(featureLayer:fl, featureTable:table, featureType:$0, swatch:nil)}
+                let tableTemplates = table.featureTemplates.map({
+                    FeatureTemplateInfo(featureLayer:fl, featureTable:table, featureTemplate:$0, swatch:nil)
+                })
+                
+                let typeTemplates = table.featureTypes
+                    .flatMap({ $0.templates })
+                    .map({ FeatureTemplateInfo(featureLayer:fl, featureTable:table, featureTemplate:$0, swatch:nil) })
+                
+                let infos = tableTemplates + typeTemplates
                 
                 // add to list of unfiltered infos
                 strongSelf.unfilteredInfos.append(contentsOf: infos)
                 
                 // re-assign to the current infos so we can update the tableview
                 // only should do this if not currently filtering
-                if strongSelf.searchbar?.text?.isEmpty ?? true{
+                if !strongSelf.isFiltering{
                     strongSelf.currentInfos = strongSelf.unfilteredInfos
                 }
                 
                 // generate swatches for the layer infos
                 for (index, info) in infos.enumerated(){
-                    if let feature = info.featureTable.createFeature(with: info.featureType){
+                    if let feature = info.featureTable.createFeature(with: info.featureTemplate){
                         let sym = info.featureLayer.renderer?.symbol(for: feature)
                         sym?.createSwatch{ image, error in
                             
@@ -197,11 +207,16 @@ public class FeatureTypesViewController: TableViewController, UINavigationBarDel
         
         // when the user taps on a feature type
         
+        // first get the selected object
+        let selectedFeatureTemplateInfo = infoForIndexPath(indexPath)!
+        
         // If the search controller is still active, the delegate will not be
         // able to dismiss us, if desired.
+        // Note: we can't do this before the above, or else the object we pull
+        // out of the datasource will be incorrect
         navigationItem.searchController?.isActive = false
         
-        delegate?.featureTypesViewControllerDidSelectFeatureType(self, featureTypeInfo: self.infoForIndexPath(indexPath)!)
+        delegate?.templatePickerViewControllerDidSelectTemplate(self, featureTemplateInfo: selectedFeatureTemplateInfo)
     }
     
     override public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -218,7 +233,7 @@ public class FeatureTypesViewController: TableViewController, UINavigationBarDel
     override public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellReuseIdentifier, for: indexPath)
         let info = infoForIndexPath(indexPath)!
-        cell.textLabel?.text = info.featureType.name
+        cell.textLabel?.text = info.featureTemplate.name
         cell.imageView?.image = info.swatch
         return cell
     }
@@ -229,18 +244,18 @@ public class FeatureTypesViewController: TableViewController, UINavigationBarDel
         // If the search controller is still active, the delegate will not be
         // able to dismiss us, if desired.
         navigationItem.searchController?.isActive = false
-        delegate?.featureTypesViewControllerDidCancel(self)
+        delegate?.templatePickerViewControllerDidCancel(self)
     }
     
     // MARK: IndexPath -> Info
     
-    private func infoForIndexPath(_ indexPath: IndexPath) -> FeatureTypeInfo?{
+    private func infoForIndexPath(_ indexPath: IndexPath) -> FeatureTemplateInfo?{
         let tableName = tables[indexPath.section].tableName
         let infos = self.currentDatasource[tableName]
         return infos?[indexPath.row]
     }
     
-    private func indexPathForInfo(_ info: FeatureTypeInfo) -> IndexPath?{
+    private func indexPathForInfo(_ info: FeatureTemplateInfo) -> IndexPath?{
         
         let tableIndex = tables.index { $0.tableName == info.featureTable.tableName }
         let infos = self.currentDatasource[info.featureTable.tableName]
@@ -254,13 +269,14 @@ public class FeatureTypesViewController: TableViewController, UINavigationBarDel
     }
 }
 
-extension FeatureTypesViewController: UISearchResultsUpdating {
+extension TemplatePickerViewController: UISearchResultsUpdating {
     public func updateSearchResults(for searchController: UISearchController) {
         if let text = searchController.searchBar.text?.trimmingCharacters(in: .whitespaces),
             !text.isEmpty {
+            isFiltering = true
             DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async {
                 let filtered = self.unfilteredInfos.filter{
-                    $0.featureType.name.range(of: text, options: .caseInsensitive) != nil
+                    $0.featureTemplate.name.range(of: text, options: .caseInsensitive) != nil
                 }
                 DispatchQueue.main.async {
                     self.currentInfos = filtered
@@ -268,6 +284,7 @@ extension FeatureTypesViewController: UISearchResultsUpdating {
             }
         }
         else {
+            isFiltering = false
             self.currentInfos = self.unfilteredInfos
         }
     }
