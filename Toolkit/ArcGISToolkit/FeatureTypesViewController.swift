@@ -63,10 +63,13 @@ public class FeatureTypesViewController: TableViewController, UINavigationBarDel
         super.viewDidLoad()
         
         // setup navbar
-        let navbar = UINavigationBar(frame: CGRect(x: 0, y: 0, width: self.view.bounds.size.width, height: 64))
-        navbar.autoresizingMask = .flexibleWidth
+        let navbar = UINavigationBar(frame: CGRect.zero)
+        navbar.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(navbar)
         navbar.delegate = self
+        navbar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        navbar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        navbar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
         
         let cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancelAction as ()->Void))
         
@@ -74,11 +77,6 @@ public class FeatureTypesViewController: TableViewController, UINavigationBarDel
         item.leftBarButtonItem = cancelButton
         navbar.pushItem(item, animated: false)
         
-        //
-        let insets = UIEdgeInsets(top: navbar.bounds.size.height, left: 0, bottom: 0, right: 0)
-        tableView.contentInset = insets
-        tableView.scrollIndicatorInsets = insets
-        tableView.scrollRectToVisible(CGRect(x: 0, y: 0, width: 1, height: 1), animated: false)
         
         // search bar
         searchbar = UISearchBar(frame: CGRect(x: 0, y: 0, width: self.view.bounds.size.width, height: 44))
@@ -87,6 +85,8 @@ public class FeatureTypesViewController: TableViewController, UINavigationBarDel
         searchbar?.autocapitalizationType = .none
         searchbar?.autocorrectionType = .no
         tableView.tableHeaderView = searchbar
+        
+        tableView.contentInsetAdjustmentBehavior = .automatic
         
         // load map, get initial data
         self.map?.load(){ [weak self] error in

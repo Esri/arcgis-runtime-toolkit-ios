@@ -135,20 +135,11 @@ class JobManagerExample: TableViewController {
         toolbar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         toolbar.heightAnchor.constraint(equalToConstant: toolbarHeight).isActive = true
         
-        if #available(iOS 11.0, *) {
-            // move safe area up above toolbar
-            // (this adjusts tableview contentInsets to correctly scroll behind toolbar)
-            additionalSafeAreaInsets = UIEdgeInsetsMake(0, 0, toolbarHeight, 0)
-            // now anchor toolbar below new safe area
-            toolbar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
-        }
-        else {
-            // pre-iOS 11, adjust content inset of tableview to go under toolbar
-            tableView.contentInset = UIEdgeInsetsMake(0, 0, toolbarHeight, 0)
-            tableView.scrollIndicatorInsets = tableView.contentInset
-            // anchor toolbar to bottom of view
-            toolbar.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        }
+        // move safe area up above toolbar
+        // (this adjusts tableview contentInsets to correctly scroll behind toolbar)
+        additionalSafeAreaInsets = UIEdgeInsetsMake(0, 0, toolbarHeight, 0)
+        // now anchor toolbar below new safe area
+        toolbar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         
         // button to kick off a new job
         let kickOffJobItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(kickOffJob))

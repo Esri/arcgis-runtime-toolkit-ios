@@ -26,12 +26,14 @@ class PopupExample: MapViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Creat a map
+        
         // create a map
         map = AGSMap(basemap: .topographic())
         let featureTable = AGSServiceFeatureTable(url: URL(string: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/DamageAssessment/FeatureServer/0")!)
         let featureLayer = AGSFeatureLayer(featureTable: featureTable)
         map?.operationalLayers.add(featureLayer)
-        
+
         // Here we give the feature layer a default popup definition.
         // We have to load it first to create a default popup definition.
         // If you create the map from a portal item, you can define the popup definition
@@ -42,7 +44,30 @@ class PopupExample: MapViewController {
         
         // Another way to create the map is with a portal item:
         //portalItem = AGSPortalItem(portal: portal, itemID: "cebba45198704f89a9292af0bb1ec0fc")
-        //map = AGSMap(item: portalItem!)
+        //portalItem = AGSPortalItem(portal: portal, itemID: "655a67d60432459eb5a2b253caa87892")
+        
+//        portalItem = AGSPortalItem(portal: portal, itemID: "b31153c71c6c429a8b24c1751a50d3ad")
+//        map = AGSMap(item: portalItem!)
+//
+//        map?.load{ error in
+//            if let error = error{
+//                print("error loading map: \(error)")
+//            }
+//
+////            AGSLoadObjects(self.map?.operationalLayers as! [AGSLayer]){ success in
+////                for l in (self.map?.operationalLayers as! [AGSLayer]){
+////                    if let ps = l as? AGSPopupSource{
+////                        if ps.popupDefinition == nil{
+////                            ps.popupDefinition = AGSPopupDefinition(popupSource: ps)
+////                            print("working...")
+////                        }
+////                    }
+////                }
+////                print("done...")
+////            }
+//
+//
+//        }
         
         // set the map on the mapview
         mapView.map = map

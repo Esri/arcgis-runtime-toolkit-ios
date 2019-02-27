@@ -61,23 +61,12 @@ public class UnitsViewController: TableViewController {
     /// The search controller used by the units view controller. 
     private var searchController: UISearchController? {
         get {
-            if #available(iOS 11.0, *) {
-                return navigationItem.searchController
-            } else {
-                return _searchController
-            }
+            return navigationItem.searchController
         }
         set {
-            if #available(iOS 11.0, *) {
-                navigationItem.searchController = newValue
-            } else {
-                _searchController = newValue
-            }
+            navigationItem.searchController = newValue
         }
     }
-    /// This property is an implementation detail of `searchController`. Do not
-    /// use it directly.
-    private var _searchController: UISearchController?
     
     /// Called in response to the Cancel button being tapped.
     @objc private func cancel() {
@@ -136,12 +125,6 @@ public class UnitsViewController: TableViewController {
     
     override public func viewDidLoad() {
         super.viewDidLoad()
-        
-        if #available(iOS 11.0, *) {
-            // Nothing to do!
-        } else {
-            tableView.tableHeaderView = searchController?.searchBar
-        }
     }
     
     // MARK: TableView delegate/datasource methods
