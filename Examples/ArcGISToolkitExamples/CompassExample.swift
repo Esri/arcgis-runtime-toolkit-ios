@@ -36,7 +36,7 @@ class CompassExample: MapViewController {
 
         // Position the compass in the top right corner using auto layout constraints.
         // The Compass handles width/height constraints, so we don't need to do that here.
-        compass.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor, constant: 12.0).isActive = true
+        compass.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 12.0).isActive = true
         compass.trailingAnchor.constraint(equalTo: margins.trailingAnchor).isActive = true
     }
     

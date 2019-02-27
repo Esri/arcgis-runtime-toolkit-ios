@@ -832,7 +832,7 @@ public class TimeSlider: UIControl {
         } else {
             intrinsicHeight = 60
         }
-        return CGSize(width: UIViewNoIntrinsicMetric, height: intrinsicHeight)
+        return CGSize(width: UIView.noIntrinsicMetric, height: intrinsicHeight)
     }
     
     // Deinit
@@ -1292,7 +1292,7 @@ public class TimeSlider: UIControl {
         // Add the minimum value label
         fullExtentStartTimeLabel.isHidden = !(fullExtentLabelsVisible && isSliderVisible)
         fullExtentStartTimeLabel.foregroundColor = fullExtentLabelColor.cgColor
-        fullExtentStartTimeLabel.alignmentMode = kCAAlignmentCenter
+        fullExtentStartTimeLabel.alignmentMode = CATextLayerAlignmentMode.center
         fullExtentStartTimeLabel.frame = CGRect.zero
         fullExtentStartTimeLabel.contentsScale = UIScreen.main.scale
         fullExtentStartTimeLabel.font = fullExtentLabelFont as CFTypeRef
@@ -1302,7 +1302,7 @@ public class TimeSlider: UIControl {
         // Add the minimum value label
         fullExtentEndTimeLabel.isHidden = !(fullExtentLabelsVisible && isSliderVisible)
         fullExtentEndTimeLabel.foregroundColor = fullExtentLabelColor.cgColor
-        fullExtentEndTimeLabel.alignmentMode = kCAAlignmentCenter
+        fullExtentEndTimeLabel.alignmentMode = CATextLayerAlignmentMode.center
         fullExtentEndTimeLabel.frame = CGRect.zero
         fullExtentEndTimeLabel.contentsScale = UIScreen.main.scale
         fullExtentEndTimeLabel.font = fullExtentLabelFont as CFTypeRef
@@ -1312,7 +1312,7 @@ public class TimeSlider: UIControl {
         // Add the lower value label
         currentExtentStartTimeLabel.isHidden = !(labelMode == .thumbs && isSliderVisible)
         currentExtentStartTimeLabel.foregroundColor = currentExtentLabelColor.cgColor
-        currentExtentStartTimeLabel.alignmentMode = kCAAlignmentCenter
+        currentExtentStartTimeLabel.alignmentMode = CATextLayerAlignmentMode.center
         currentExtentStartTimeLabel.frame = CGRect.zero
         currentExtentStartTimeLabel.contentsScale = UIScreen.main.scale
         currentExtentStartTimeLabel.font = currentExtentLabelFont as CFTypeRef
@@ -1322,7 +1322,7 @@ public class TimeSlider: UIControl {
         // Add the upper value label
         currentExtentEndTimeLabel.isHidden = !(labelMode == .thumbs && isSliderVisible)
         currentExtentEndTimeLabel.foregroundColor = currentExtentLabelColor.cgColor
-        currentExtentEndTimeLabel.alignmentMode = kCAAlignmentCenter
+        currentExtentEndTimeLabel.alignmentMode = CATextLayerAlignmentMode.center
         currentExtentEndTimeLabel.frame = CGRect.zero
         currentExtentEndTimeLabel.contentsScale = UIScreen.main.scale
         currentExtentEndTimeLabel.font = currentExtentLabelFont as CFTypeRef
@@ -1464,7 +1464,7 @@ public class TimeSlider: UIControl {
             let startTimeString = string(for: fullExtentStartTime, style: fullExtentLabelDateStyle)
             fullExtentStartTimeLabel.string = startTimeString
             fullExtentStartTimeLabel.isHidden = !(fullExtentLabelsVisible && isSliderVisible)
-            let startTimeLabelSize: CGSize = startTimeString.size(withAttributes: [kCTFontAttributeName as NSAttributedStringKey: fullExtentLabelFont])
+            let startTimeLabelSize: CGSize = startTimeString.size(withAttributes: [kCTFontAttributeName as NSAttributedString.Key: fullExtentLabelFont])
             var startTimeLabelX = trackLayer.frame.minX - (startTimeLabelSize.width / 2.0)
             if startTimeLabelX < bounds.minX + labelSidePadding {
                 startTimeLabelX = bounds.minX + labelSidePadding
@@ -1486,7 +1486,7 @@ public class TimeSlider: UIControl {
             let endTimeString = string(for: fullExtentEndTime, style: fullExtentLabelDateStyle)
             fullExtentEndTimeLabel.string = endTimeString
             fullExtentEndTimeLabel.isHidden = !(fullExtentLabelsVisible && isSliderVisible)
-            let endTimeLabelSize: CGSize = endTimeString.size(withAttributes: [kCTFontAttributeName as NSAttributedStringKey: fullExtentLabelFont])
+            let endTimeLabelSize: CGSize = endTimeString.size(withAttributes: [kCTFontAttributeName as NSAttributedString.Key: fullExtentLabelFont])
             var endTimeLabelX = trackLayer.frame.maxX - (fullExtentEndTimeLabel.frame.width / 2.0)
             if endTimeLabelX + endTimeLabelSize.width > bounds.maxX - labelSidePadding {
                 endTimeLabelX = bounds.maxX - endTimeLabelSize.width - labelSidePadding
@@ -1527,7 +1527,7 @@ public class TimeSlider: UIControl {
         if let startTime = currentExtentStartTime, fullExtent != nil  {
             let startTimeString = string(for: startTime, style: currentExtentLabelDateStyle)
             currentExtentStartTimeLabel.string = startTimeString
-            let startTimeLabelSize: CGSize = startTimeString.size(withAttributes: [kCTFontAttributeName as NSAttributedStringKey: currentExtentLabelFont])
+            let startTimeLabelSize: CGSize = startTimeString.size(withAttributes: [kCTFontAttributeName as NSAttributedString.Key: currentExtentLabelFont])
             var startTimeLabelX = lowerThumbLayer.frame.midX - startTimeLabelSize.width / 2.0
             currentExtentStartTimeLabel.isHidden = !isSliderVisible
             if startTimeLabelX < bounds.origin.x + labelSidePadding {
@@ -1560,7 +1560,7 @@ public class TimeSlider: UIControl {
         if let endTime = currentExtentEndTime, isRangeEnabled, fullExtent != nil  {
             let endTimeString = string(for: endTime, style: currentExtentLabelDateStyle)
             currentExtentEndTimeLabel.string = endTimeString
-            let endTimeLabelSize: CGSize = endTimeString.size(withAttributes: [kCTFontAttributeName as NSAttributedStringKey: currentExtentLabelFont])
+            let endTimeLabelSize: CGSize = endTimeString.size(withAttributes: [kCTFontAttributeName as NSAttributedString.Key: currentExtentLabelFont])
             var endTimeLabelX = upperThumbLayer.frame.midX - endTimeLabelSize.width / 2.0
             currentExtentEndTimeLabel.isHidden = !isSliderVisible
             if endTimeLabelX < bounds.origin.x + labelSidePadding {
@@ -1903,7 +1903,7 @@ public class TimeSlider: UIControl {
         // Set label properties
         let tickMarkLabel = CATextLayer()
         tickMarkLabel.foregroundColor = timeStepIntervalLabelColor.cgColor
-        tickMarkLabel.alignmentMode = kCAAlignmentCenter
+        tickMarkLabel.alignmentMode = CATextLayerAlignmentMode.center
         tickMarkLabel.frame = CGRect.zero
         tickMarkLabel.contentsScale = UIScreen.main.scale
         tickMarkLabel.font = timeStepIntervalLabelFont as CFTypeRef
@@ -1911,7 +1911,7 @@ public class TimeSlider: UIControl {
         tickMarkLabel.string = string
         
         // Calculate the size of the label based on the string and font
-        let tickMarkLabelSize: CGSize = string.size(withAttributes:[kCTFontAttributeName as NSAttributedStringKey: timeStepIntervalLabelFont])
+        let tickMarkLabelSize: CGSize = string.size(withAttributes:[kCTFontAttributeName as NSAttributedString.Key: timeStepIntervalLabelFont])
         
         // Calculate label's x position
         let tickMarkLayerOriginDifference = tickMarkLayer.frame.minX - layer.frame.minX

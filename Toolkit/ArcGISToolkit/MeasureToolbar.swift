@@ -77,7 +77,7 @@ class MeasureResultView : UIView{
         stackView.spacing = 4.0
         stackView.distribution = .equalSpacing
         stackView.alignment = .center
-        stackView.layoutMargins = UIEdgeInsetsMake(0, 6, 0, 6)
+        stackView.layoutMargins = UIEdgeInsets.init(top: 0, left: 6, bottom: 0, right: 6)
         stackView.isLayoutMarginsRelativeArrangement = true
         
         super.init(frame: frame)

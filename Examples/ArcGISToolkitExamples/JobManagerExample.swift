@@ -34,7 +34,7 @@ class JobTableViewCell: UITableViewCell{
     var job : AGSJob?
     var statusObservation : NSKeyValueObservation?
     
-    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
     }
     
@@ -137,7 +137,7 @@ class JobManagerExample: TableViewController {
         
         // move safe area up above toolbar
         // (this adjusts tableview contentInsets to correctly scroll behind toolbar)
-        additionalSafeAreaInsets = UIEdgeInsetsMake(0, 0, toolbarHeight, 0)
+        additionalSafeAreaInsets = UIEdgeInsets.init(top: 0, left: 0, bottom: toolbarHeight, right: 0)
         // now anchor toolbar below new safe area
         toolbar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         
