@@ -69,10 +69,10 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
             return
         }
         
-        let fvc = TemplatePickerViewController(map: map)
-        fvc.delegate = self
+        let templatePicker = TemplatePickerViewController(map: map)
+        templatePicker.delegate = self
         
-        let navigationController = UINavigationController(rootViewController: fvc)
+        let navigationController = UINavigationController(rootViewController: templatePicker)
         navigationController.modalPresentationStyle = .formSheet
         UIApplication.shared.topViewController()?.present(navigationController, animated: true)
     }
@@ -328,12 +328,5 @@ extension PopupController: TemplatePickerViewControllerDelegate {
         }
     }
 }
-
-
-
-
-
-
-
 
 
