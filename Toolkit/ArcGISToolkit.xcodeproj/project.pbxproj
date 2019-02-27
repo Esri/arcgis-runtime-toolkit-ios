@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2140781C209B628200FBFDCC /* TimeSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2140781B209B628200FBFDCC /* TimeSlider.swift */; };
 		881233751DF601A700B2EA8E /* ArcGISToolkit.h in Headers */ = {isa = PBXBuildFile; fileRef = 881233731DF601A700B2EA8E /* ArcGISToolkit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		881233841DF601E900B2EA8E /* ArcGIS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 881233831DF601E900B2EA8E /* ArcGIS.framework */; };
 		883EA74920741A4C006D6F72 /* PopupController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 883EA74820741A4C006D6F72 /* PopupController.swift */; };
@@ -27,6 +28,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2140781B209B628200FBFDCC /* TimeSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeSlider.swift; sourceTree = "<group>"; };
 		881233701DF601A700B2EA8E /* ArcGISToolkit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ArcGISToolkit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		881233731DF601A700B2EA8E /* ArcGISToolkit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ArcGISToolkit.h; sourceTree = "<group>"; };
 		881233741DF601A700B2EA8E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -121,6 +123,7 @@
 				88B689FB1E96EFD700B67FAB /* UnitsViewController.swift */,
 				88DBC29E1FE83D4400255921 /* JobManager.swift */,
 				883EA74820741A4C006D6F72 /* PopupController.swift */,
+				2140781B209B628200FBFDCC /* TimeSlider.swift */,
 			);
 			name = Components;
 			sourceTree = "<group>";
@@ -163,7 +166,7 @@
 		881233671DF601A700B2EA8E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0920;
+				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = Esri;
 				TargetAttributes = {
 					8812336F1DF601A700B2EA8E = {
@@ -214,6 +217,7 @@
 				883EA74F20741B9C006D6F72 /* FeatureTypesViewController.swift in Sources */,
 				883EA74920741A4C006D6F72 /* PopupController.swift in Sources */,
 				88B68A011E96EFD700B67FAB /* MeasureToolbar.swift in Sources */,
+				2140781C209B628200FBFDCC /* TimeSlider.swift in Sources */,
 				88DBC2A31FE83DB800255921 /* CancelGroup.swift in Sources */,
 				88B68A071E96EFD700B67FAB /* TableViewController.swift in Sources */,
 				88B689FD1E96EFD700B67FAB /* Extensions.swift in Sources */,
@@ -239,6 +243,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -246,6 +251,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -299,6 +305,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -306,6 +313,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;

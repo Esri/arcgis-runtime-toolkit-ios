@@ -27,7 +27,8 @@ class ExamplesViewController: VCListViewController {
             ("Scalebar", ScalebarExample.self, nil),
             ("Legend", LegendExample.self, nil),
             ("Job Manager", JobManagerExample.self, nil),
-            ("Popup Controller", PopupExample.self, nil)
+            ("Popup Controller", PopupExample.self, nil),
+            ("Time Slider", TimeSliderExample.self, nil)
         ]
         
     }

@@ -252,7 +252,6 @@ public class Scalebar: UIView {
     //
     // private properties
     
-    private static var KVOContext = 0
     private static let geodeticCurveType : AGSGeodeticCurveType = .geodesic
     
     //
@@ -336,30 +335,26 @@ public class Scalebar: UIView {
         recalculateFontProperties()
     }
     
+    private var mapObservation : NSKeyValueObservation?
+    private var visibleAreaObservation : NSKeyValueObservation?
+    
     private func bindToMapView(mapView: AGSMapView?){
-        mapView?.addObserver(self, forKeyPath: #keyPath(AGSMapView.map), options: NSKeyValueObservingOptions.new, context: &Scalebar.KVOContext)
-        mapView?.addObserver(self, forKeyPath: #keyPath(AGSMapView.visibleArea), options: NSKeyValueObservingOptions.new, context: &Scalebar.KVOContext)
+        mapObservation = mapView?.observe(\.map, options: .new){[weak self] mapView, change in
+            self?.updateScaleDisplay(forceRedraw: false)
+        }
+        visibleAreaObservation = mapView?.observe(\.visibleArea, options: .new){ [weak self] mapView, change in
+            // since we get updates so often, we don't need to redraw that often
+            // so use the coalescer to filter the events on a time interval
+            self?.updateCoalescer?.ping()
+        }
     }
     
     private func unbindFromMapView(mapView: AGSMapView?){
-        mapView?.removeObserver(self, forKeyPath: #keyPath(AGSMapView.map))
-        mapView?.removeObserver(self, forKeyPath: #keyPath(AGSMapView.visibleArea))
-    }
-    
-    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if context == &Scalebar.KVOContext{
-            if keyPath == #keyPath(AGSMapView.map){
-                updateScaleDisplay(forceRedraw: false)
-            }
-            else if keyPath == #keyPath(AGSMapView.visibleArea){
-                // since we get updates so often, we don't need to redraw that often
-                // so use the coalescer to filter the events on a time interval
-                updateCoalescer?.ping()
-            }
-        }
-        else{
-            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
-        }
+        // invalidate observations and set to nil
+        mapObservation?.invalidate()
+        mapObservation = nil
+        visibleAreaObservation?.invalidate()
+        visibleAreaObservation = nil
     }
     
     private func updateScaleDisplayIfNecessary(){
@@ -579,7 +574,7 @@ internal struct SegmentInfo{
 
 internal protocol ScalebarRenderer{
     
-    weak var scalebar: Scalebar? {get}
+    var scalebar: Scalebar? {get}
     var currentScaleDisplay : ScaleDisplay? { get set }
     var displayHeight: CGFloat {get}
     var currentMaxDisplayWidth : CGFloat { get }
