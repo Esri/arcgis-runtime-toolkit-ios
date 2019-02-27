@@ -14,6 +14,7 @@
 import UIKit
 import ArcGIS
 import ArcGISToolkit
+import UserNotifications
 
 // NOTE:
 // 
@@ -154,10 +155,17 @@ class JobManagerExample: TableViewController {
         let flex = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         toolbar.items = [kickOffJobItem, flex, resumeAllPausedJobsItem, flex, clearFinishedJobsItem]
         
-        //
-        // register for user notifications, this way we can notify user in bg when job complete
-        let notificationSettings = UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
-        UIApplication.shared.registerUserNotificationSettings(notificationSettings)
+//        //
+//        // register for user notifications, this way we can notify user in bg when job complete
+//        let notificationSettings = UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
+//        UIApplication.shared.registerUserNotificationSettings(notificationSettings)
+        
+        let center = UNUserNotificationCenter.current()
+        center.requestAuthorization(options: [.alert, .badge, .sound]) { (granted, error) in
+            if !granted{
+                print("You must grant access for user notifications for all the features of this sample to work")
+            }
+        }
         
         // job cell registration
         tableView.register(JobTableViewCell.self, forCellReuseIdentifier: "JobCell")
@@ -329,6 +337,7 @@ class JobManagerExample: TableViewController {
     
     func jobCompletionHandler(result: Any?, error: Error?){
         print("job completed")
+        
         if let error = error{
             print("  - error: \(error)")
         }
@@ -336,17 +345,13 @@ class JobManagerExample: TableViewController {
             print("  - result: \(result)")
         }
         
-        // make sure we can post a local notification
-        guard let settings = UIApplication.shared.currentUserNotificationSettings, settings.types != .none else{
-            return
-        }
+        let content = UNMutableNotificationContent()
+        content.body = "Job Complete"
+        content.sound = UNNotificationSound.default
         
-        // post local notification letting user know that job is done
-        let notification = UILocalNotification()
-        notification.fireDate = Date()
-        notification.alertBody = "Job Complete"
-        notification.soundName = UILocalNotificationDefaultSoundName
-        UIApplication.shared.scheduleLocalNotification(notification)
+        let request = UNNotificationRequest(identifier: "job complete", content: content, trigger: nil)
+        
+        UNUserNotificationCenter.current().add(request)
     }
 }
 
