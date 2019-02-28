@@ -27,12 +27,34 @@ class PopupExample: MapViewController {
         super.viewDidLoad()
         
         // Creat a map
-        portalItem = AGSPortalItem(portal: portal, itemID: "<<Portal Item ID Goes Here>>")
-        map = AGSMap(item: portalItem!)
+        
+        map = AGSMap(basemap: .topographic())
+        let featureTable = AGSServiceFeatureTable(url: URL(string: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/DamageAssessment/FeatureServer/0")!)
+        let featureLayer = AGSFeatureLayer(featureTable: featureTable)
+        map?.operationalLayers.add(featureLayer)
+
+        // Here we give the feature layer a default popup definition.
+        // We have to load it first to create a default popup definition.
+        // If you create the map from a portal item, you can define the popup definition
+        // in the webmap and avoid this step.
+        featureLayer.load{ _ in
+            featureLayer.popupDefinition = AGSPopupDefinition(popupSource: featureLayer)
+        }
+        
+        // Another way to create the map is with a portal item:
+//        portalItem = AGSPortalItem(portal: portal, itemID: "9b92efeb82564269877c383d079a00e3")
+//        map = AGSMap(item: portalItem!)
         
         // set the map on the mapview
         mapView.map = map
-
+        
+        // Log if there is any error loading the map
+        map?.load{ error in
+            if let error = error{
+                print("error loading map: \(error)")
+            }
+        }
+        
         // instantiate the popup controller
         popupController = PopupController(geoViewController: self, geoView: mapView)
     }
