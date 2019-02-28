@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2140781E209B629000FBFDCC /* TimeSliderExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2140781D209B629000FBFDCC /* TimeSliderExample.swift */; };
+		8800656E2228577A00F76945 /* TemplatePickerExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8800656D2228577A00F76945 /* TemplatePickerExample.swift */; };
 		883904441DF6022A001F3188 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 883904421DF6022A001F3188 /* Main.storyboard */; };
 		883904461DF6022A001F3188 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 883904451DF6022A001F3188 /* Assets.xcassets */; };
 		883904491DF6022A001F3188 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 883904471DF6022A001F3188 /* LaunchScreen.storyboard */; };
@@ -67,6 +68,7 @@
 
 /* Begin PBXFileReference section */
 		2140781D209B629000FBFDCC /* TimeSliderExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeSliderExample.swift; sourceTree = "<group>"; };
+		8800656D2228577A00F76945 /* TemplatePickerExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemplatePickerExample.swift; sourceTree = "<group>"; };
 		8839043B1DF6022A001F3188 /* ArcGISToolkitExamples.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ArcGISToolkitExamples.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		883904431DF6022A001F3188 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		883904451DF6022A001F3188 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -147,8 +149,9 @@
 				88B689C11E96EDF400B67FAB /* MeasureExample.swift */,
 				88B689C41E96EDF400B67FAB /* ScalebarExample.swift */,
 				88DBC2A01FE83D6000255921 /* JobManagerExample.swift */,
-				883EA74A20741A56006D6F72 /* PopupExample.swift */,
 				2140781D209B629000FBFDCC /* TimeSliderExample.swift */,
+				883EA74A20741A56006D6F72 /* PopupExample.swift */,
+				8800656D2228577A00F76945 /* TemplatePickerExample.swift */,
 			);
 			name = Examples;
 			sourceTree = "<group>";
@@ -274,6 +277,7 @@
 				88B689CB1E96EDF400B67FAB /* MeasureExample.swift in Sources */,
 				88DBC2A11FE83D6000255921 /* JobManagerExample.swift in Sources */,
 				88B689D11E96EDF400B67FAB /* VCListViewController.swift in Sources */,
+				8800656E2228577A00F76945 /* TemplatePickerExample.swift in Sources */,
 				88B689CE1E96EDF400B67FAB /* ScalebarExample.swift in Sources */,
 				88B689C91E96EDF400B67FAB /* ExamplesViewController.swift in Sources */,
 				E48405751E9BE7E600927208 /* LegendExample.swift in Sources */,

@@ -17,8 +17,6 @@ import ArcGIS
 
 class PopupExample: MapViewController {
     
-    let portal = AGSPortal.arcGISOnline(withLoginRequired: false)
-    var portalItem : AGSPortalItem?
     var map : AGSMap?
     
     var popupController : PopupController?
@@ -27,7 +25,6 @@ class PopupExample: MapViewController {
         super.viewDidLoad()
         
         // Create a map
-        
         map = AGSMap(basemap: .topographic())
         let featureTable = AGSServiceFeatureTable(url: URL(string: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/DamageAssessment/FeatureServer/0")!)
         let featureLayer = AGSFeatureLayer(featureTable: featureTable)
@@ -42,8 +39,9 @@ class PopupExample: MapViewController {
         }
         
         // Another way to create the map is with a portal item:
-        //portalItem = AGSPortalItem(portal: portal, itemID: "9b92efeb82564269877c383d079a00e3")
-        //map = AGSMap(item: portalItem!)
+        // let portal = AGSPortal.arcGISOnline(withLoginRequired: false)
+        // let portalItem = AGSPortalItem(portal: portal, itemID: "<<YOUR PORTAL ITEM ID GOES HERE>>")!
+        // map = AGSMap(item: portalItem)
         
         // set the map on the mapview
         mapView.map = map

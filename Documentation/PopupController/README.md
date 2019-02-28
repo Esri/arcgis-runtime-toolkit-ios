@@ -10,9 +10,10 @@ var popupController : PopupController?
 override func viewDidLoad() {
     super.viewDidLoad()
 
-    // Creat a map
-    portalItem = AGSPortalItem(portal: portal, itemID: "<<Portal Item ID Goes Here>>")
-    map = AGSMap(item: portalItem!)
+    // Create a map        
+    let portal = AGSPortal.arcGISOnline(withLoginRequired: false)
+    let portalItem = AGSPortalItem(portal: portal, itemID: "<<YOUR PORTAL ITEM ID GOES HERE>>")!
+    map = AGSMap(item: portalItem)
 
     // set the map on the mapview
     mapView.map = map

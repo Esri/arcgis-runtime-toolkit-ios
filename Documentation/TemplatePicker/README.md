@@ -6,20 +6,14 @@ The `TemplatePickerViewController` is a `UIViewController` subclass that allows 
 
 ```swift
 
-// Instantiate the TemplatePickerViewController with a map
+// Instantiate the TemplatePickerViewController
 let templatePicker = TemplatePickerViewController(map: map)
 
-// assign the delegate
+// Assign the delegate
 templatePicker.delegate = self
 
-// Embed the TemplatePickerViewController in a UINavigationController, and present it
-let navigationController = UINavigationController(rootViewController: templatePicker)
-navigationController.modalPresentationStyle = .formSheet
-UIApplication.shared.topViewController()?.present(navigationController, animated: true)
+// Present the template picker
+navigationController?.pushViewController(templatePicker, animated: true)
 ```
 
-To see it in action, try out the [Examples](../../Examples) and refer to [PopupExample.swift](../../Examples/ArcGISToolkitExamples/PopupExample.swift) in the project.
-
-
-
-
+To see it in action, try out the [Examples](../../Examples) and refer to [TemplatePickerExample.swift](../../Examples/ArcGISToolkitExamples/TemplatePickerExample.swift) in the project.
