@@ -10,6 +10,7 @@ Toolkit components that will simplify your iOS app development with ArcGIS Runti
 * [Measure Toolbar](Documentation/MeasureToolbar)
 * [Scalebar](Documentation/Scalebar)
 * [TimeSlider](Documentation/TimeSlider)
+* [PopupController](Documentation/PopupController)
 
 ## Requirements
 * [ArcGIS Runtime SDK for iOS](https://developers.arcgis.com/en/ios/) 100.4.0 (or higher)

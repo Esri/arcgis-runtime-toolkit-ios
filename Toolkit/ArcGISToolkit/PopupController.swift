@@ -14,6 +14,9 @@
 import UIKit
 import ArcGIS
 
+/// The PopupController does the work of wiring up an AGSPopupsViewController for you.
+/// Through it's use of the AGSPopupsViewController, it provides a complete
+/// feature editing and collecting experience.
 public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoViewTouchDelegate {
     
     private var lastPopupQueries : [AGSCancelable]?
@@ -23,11 +26,23 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
     private var lastSelectedFeatureLayer : AGSFeatureLayer?
     private var addNewFeatureButton : UIBarButtonItem
     
+    /// The UIViewController that contains the AGSGeoView
     public weak var geoViewController: UIViewController?
+    
+    /// The AGSGeoView that the PopupController is interacting with
     public var geoView: AGSGeoView
+    
+    /// Whether or not to push the AGSPopupsViewController onto the UINavigationController
     public var useNavigationControllerIfAvailable : Bool = true
     
-    public init(geoViewController: UIViewController, geoView: AGSGeoView, takeOverGeoViewDelegate: Bool = true, showAddFeatureButton: Bool = true){
+    /// Instantiates a PopupController
+    /// - Parameters:
+    ///   - geoViewController: The UIViewController that contains the AGSGeoView that the PopupController will interact with
+    ///   - geoView: The AGSGeoView that the PopupController will interact with
+    ///   - takeOverTouchDelegate: Whether or not the PopupController will take over the AGSGeoView's touchDelegate.
+    ///     If false then you must forward calls from the AGSGeoViewTouchDelegate to the PopupController. Defaults to true.
+    ///   - showAddFeatureButton: If true then a UIBarButtonItem will be added to the navigationItem as a right-hand button.
+    public init(geoViewController: UIViewController, geoView: AGSGeoView, takeOverTouchDelegate: Bool = true, showAddFeatureButton: Bool = true){
         
         self.geoViewController = geoViewController
         self.geoView = geoView
@@ -48,7 +63,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
             }
         }
         
-        if takeOverGeoViewDelegate{
+        if takeOverTouchDelegate{
             self.geoView.touchDelegate = self
         }
         
