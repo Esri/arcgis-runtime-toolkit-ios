@@ -26,7 +26,7 @@ class PopupExample: MapViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Creat a map
+        // Create a map
         
         map = AGSMap(basemap: .topographic())
         let featureTable = AGSServiceFeatureTable(url: URL(string: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/DamageAssessment/FeatureServer/0")!)
