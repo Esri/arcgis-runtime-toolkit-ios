@@ -293,6 +293,9 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         // apply edits for service feature table
         if let f = popup.geoElement as? AGSArcGISFeature, let ft = f.featureTable as? AGSServiceFeatureTable{
             ft.applyEdits { (results, error) in
+                
+                //results?.contains(where: { $0.attachmentResults })
+                
                 //if let error = error{
                     //print("error applying edits: \(error)")
                 //}

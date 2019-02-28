@@ -213,7 +213,7 @@ public class TemplatePickerViewController: TableViewController {
         // when the user taps on a feature type
         
         // first get the selected object
-        let selectedFeatureTemplateInfo = infoForIndexPath(indexPath)!
+        let selectedFeatureTemplateInfo = infoForIndexPath(indexPath)
         
         // If the search controller is still active, the delegate will not be
         // able to dismiss us, if desired.
@@ -237,7 +237,7 @@ public class TemplatePickerViewController: TableViewController {
     
     override public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellReuseIdentifier, for: indexPath)
-        let info = infoForIndexPath(indexPath)!
+        let info = infoForIndexPath(indexPath)
         cell.textLabel?.text = info.featureTemplate.name
         cell.imageView?.image = info.swatch
         return cell
@@ -254,10 +254,10 @@ public class TemplatePickerViewController: TableViewController {
     
     // MARK: IndexPath -> Info
     
-    private func infoForIndexPath(_ indexPath: IndexPath) -> FeatureTemplateInfo?{
+    private func infoForIndexPath(_ indexPath: IndexPath) -> FeatureTemplateInfo{
         let tableName = tables[indexPath.section].tableName
-        let infos = self.currentDatasource[tableName]
-        return infos?[indexPath.row]
+        let infos = self.currentDatasource[tableName]!
+        return infos[indexPath.row]
     }
     
     private func indexPathForInfo(_ info: FeatureTemplateInfo) -> IndexPath?{
