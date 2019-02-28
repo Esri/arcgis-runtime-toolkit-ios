@@ -294,19 +294,38 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         if let f = popup.geoElement as? AGSArcGISFeature, let ft = f.featureTable as? AGSServiceFeatureTable{
             ft.applyEdits { (results, error) in
                 
-                //results?.contains(where: { $0.attachmentResults })
+                if let error = error{
+                    // In this case it is a service level error
+                    print("error applying edits: \(error)")
+                }
                 
-                //if let error = error{
-                    //print("error applying edits: \(error)")
-                //}
-                //else{
-                    //print("possible success applying edits...");
-                //}
+                if let results = results{
+                    
+                    let editErrors = results.flatMap({ self.checkFeatureEditResult($0) })
+                    if editErrors.isEmpty{
+                        print("applied all edits successfully")
+                    }
+                    else{
+                        // These would be feature level edit errors
+                        print("apply edits failed: \(editErrors)")
+                    }
+                    
+                }
             }
         }
         
         // reset flag
         addingNewFeature = false
+    }
+    
+    /// This pulls out any nested errors from a feature edit result
+    private func checkFeatureEditResult(_ featureEditResult: AGSFeatureEditResult) -> [Error]{
+        var errors = [Error]()
+        if let error = featureEditResult.error{
+            errors.append(error)
+        }
+        errors.append(contentsOf: featureEditResult.attachmentResults.compactMap({ $0.error }))
+        return errors
     }
     
     public func popupsViewController(_ popupsViewController: AGSPopupsViewController, didCancelEditingFor popup: AGSPopup) {
