@@ -13,10 +13,15 @@
 
 import ArcGIS
 
+/// An object that encapsulates information related to a feature template
 public class FeatureTemplateInfo{
+    /// The feature layer that the template is from
     public let featureLayer : AGSFeatureLayer
+    /// The feature table that the template is from
     public let featureTable : AGSArcGISFeatureTable
+    /// The feature template
     public let featureTemplate : AGSFeatureTemplate
+    /// The swatch for the feature template
     public var swatch : UIImage?
     
     fileprivate init(featureLayer: AGSFeatureLayer, featureTable: AGSArcGISFeatureTable, featureTemplate: AGSFeatureTemplate, swatch: UIImage?){
@@ -42,8 +47,12 @@ public protocol TemplatePickerViewControllerDelegate: class {
     func templatePickerViewControllerDidSelectTemplate(_ templatePickerViewController: TemplatePickerViewController, featureTemplateInfo: FeatureTemplateInfo)
 }
 
-public class TemplatePickerViewController: TableViewController, UINavigationBarDelegate {
+/// A view controller that is useful for showing the user a list of feature templates
+/// and allowing them to choose one.
+/// This view controller is meant to be embedded in a navigation controller.
+public class TemplatePickerViewController: TableViewController {
     
+    /// The map which this view controller will display the feature templates from
     public private(set) var map : AGSMap?
     
     private var tables = [AGSArcGISFeatureTable]()
@@ -63,6 +72,7 @@ public class TemplatePickerViewController: TableViewController, UINavigationBarD
         }
     }
     
+    /// Initializes a TemplatePickerViewController with a map
     public init(map: AGSMap){
         super.init(nibName: nil, bundle: nil)
         self.map = map
@@ -72,6 +82,7 @@ public class TemplatePickerViewController: TableViewController, UINavigationBarD
         fatalError("init(coder:) has not been implemented")
     }
     
+    /// The delegate that will handle the selection and cancelation of the TemplatePickerViewController.
     public weak var delegate : TemplatePickerViewControllerDelegate?
     
     override public func viewDidLoad() {
@@ -185,12 +196,6 @@ public class TemplatePickerViewController: TableViewController, UINavigationBarD
             
         }
         
-    }
-    
-    // MARK: NavBar delegate
-    
-    public func position(for bar: UIBarPositioning) -> UIBarPosition {
-        return .topAttached
     }
     
     // MARK: TableView delegate/datasource methods
