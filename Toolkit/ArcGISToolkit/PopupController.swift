@@ -16,12 +16,12 @@ import ArcGIS
 
 public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoViewTouchDelegate {
     
-    fileprivate var lastPopupQueries : [AGSCancelable]?
-    fileprivate var pvc : AGSPopupsViewController?
-    fileprivate var sketchEditor = AGSSketchEditor()
-    fileprivate var lastSelectedFeature : AGSFeature?
-    fileprivate var lastSelectedFeatureLayer : AGSFeatureLayer?
-    fileprivate var addNewFeatureButton : UIBarButtonItem
+    private var lastPopupQueries : [AGSCancelable]?
+    private var pvc : AGSPopupsViewController?
+    private var sketchEditor = AGSSketchEditor()
+    private var lastSelectedFeature : AGSFeature?
+    private var lastSelectedFeatureLayer : AGSFeatureLayer?
+    private var addNewFeatureButton : UIBarButtonItem
     
     public weak var geoViewController: UIViewController?
     public var geoView: AGSGeoView
@@ -58,9 +58,9 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         }
     }
     
-    fileprivate var addingNewFeature : Bool = false
+    private var addingNewFeature : Bool = false
     
-    @objc fileprivate func addNewFeatureTap(){
+    @objc private func addNewFeatureTap(){
         
         // if old pvc is being shown still for some reason, dismiss it
         self.cleanupLastPopupsViewController()
@@ -78,7 +78,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
     }
     
     
-    fileprivate func cleanupLastPopupsViewController(){
+    private func cleanupLastPopupsViewController(){
         unselectLastSelectedFeature()
         
         // if old pvc is being shown still for some reason, dismiss it
@@ -127,7 +127,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         lastPopupQueries?.append(c)
     }
     
-    fileprivate func showPopups(_ popups: [AGSPopup]?){
+    private func showPopups(_ popups: [AGSPopup]?){
         
         guard let popups = popups else{
             return
@@ -163,14 +163,14 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         }
     }
     
-    @objc fileprivate func doneViewingInNavController(){
+    @objc private func doneViewingInNavController(){
         guard let pvc = self.pvc else {
             return
         }
         popupsViewControllerDidFinishViewingPopups(pvc)
     }
     
-    fileprivate func unselectLastSelectedFeature(){
+    private func unselectLastSelectedFeature(){
         if let lastSelectedFeature = self.lastSelectedFeature,
             let lastSelectedFeatureLayer = self.lastSelectedFeatureLayer{
             lastSelectedFeatureLayer.unselectFeature(lastSelectedFeature)
@@ -179,10 +179,10 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         }
     }
     
-    fileprivate var geoViewControllerOriginalRightBarButtonItems : [UIBarButtonItem]?
-    fileprivate var editingGeometry : Bool = false
+    private var geoViewControllerOriginalRightBarButtonItems : [UIBarButtonItem]?
+    private var editingGeometry : Bool = false
     
-    fileprivate func navigateToMapActionForGeometryEditing() {
+    private func navigateToMapActionForGeometryEditing() {
         
         editingGeometry = true
         
@@ -206,7 +206,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         
     }
     
-    @objc fileprivate func navigateBackToPopupsFromGeometryEditing(){
+    @objc private func navigateBackToPopupsFromGeometryEditing(){
         
         guard let pvc = self.pvc else{
             return

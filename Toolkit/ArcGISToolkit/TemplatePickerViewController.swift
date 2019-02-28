@@ -195,11 +195,11 @@ public class TemplatePickerViewController: TableViewController, UINavigationBarD
     
     // MARK: TableView delegate/datasource methods
     
-    func numberOfSectionsInTableView(_ tableView: UITableView) -> Int{
+    public func numberOfSectionsInTableView(_ tableView: UITableView) -> Int{
         return tables.count
     }
     
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    public func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         return tables.count == 0 ? nil : tables[section].tableName
     }
     
