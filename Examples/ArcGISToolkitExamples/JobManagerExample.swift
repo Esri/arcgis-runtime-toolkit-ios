@@ -155,11 +155,7 @@ class JobManagerExample: TableViewController {
         let flex = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         toolbar.items = [kickOffJobItem, flex, resumeAllPausedJobsItem, flex, clearFinishedJobsItem]
         
-//        //
-//        // register for user notifications, this way we can notify user in bg when job complete
-//        let notificationSettings = UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
-//        UIApplication.shared.registerUserNotificationSettings(notificationSettings)
-        
+        // request authorization for user notifications, this way we can notify user in bg when job complete
         let center = UNUserNotificationCenter.current()
         center.requestAuthorization(options: [.alert, .badge, .sound]) { (granted, error) in
             if !granted{
