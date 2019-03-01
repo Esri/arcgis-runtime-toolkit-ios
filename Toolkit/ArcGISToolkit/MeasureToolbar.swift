@@ -625,7 +625,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         
         lastIdentify = geoView.identifyGraphicsOverlays(atScreenPoint: screenPoint, tolerance: MeasureToolbar.identifyTolerance, returnPopupsOnly: false){ [weak self] results, error in
             
-            guard let strongSelf = self else{
+            guard let self = self else{
                 return
             }
             
@@ -635,15 +635,15 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
                 }
             }
             
-            if let geom = strongSelf.firstOverlayPolyResult(in: results){
+            if let geom = self.firstOverlayPolyResult(in: results){
                 // display graphic result
-                strongSelf.select(geom: geom)
+                self.select(geom: geom)
             }
             else{
                 // otherwise identify layers to try to find a feature
-                strongSelf.lastIdentify = geoView.identifyLayers(atScreenPoint: screenPoint, tolerance: MeasureToolbar.identifyTolerance, returnPopupsOnly: false){ [weak self] results, error in
+                self.lastIdentify = geoView.identifyLayers(atScreenPoint: screenPoint, tolerance: MeasureToolbar.identifyTolerance, returnPopupsOnly: false){ [weak self] results, error in
                     
-                    guard let strongSelf = self else{
+                    guard let self = self else{
                         return
                     }
                     
@@ -653,8 +653,8 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
                         }
                     }
                     
-                    let geom = strongSelf.firstLayerPolyResult(in: results)
-                    strongSelf.select(geom: geom)
+                    let geom = self.firstLayerPolyResult(in: results)
+                    self.select(geom: geom)
                 }
             }
             

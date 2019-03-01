@@ -894,7 +894,7 @@ public class TimeSlider: UIControl {
             }
             
             // Make sure self is around
-            guard let strongSelf = self else {
+            guard let self = self else {
                 return
             }
             
@@ -916,7 +916,7 @@ public class TimeSlider: UIControl {
                 // This is an async operation to find out time step interval and
                 // whether range time filtering is supported by the layer.
                 dispatchGroup.enter()
-                strongSelf.findTimeStepIntervalAndIsRangeTimeFilteringSupported(for: timeAwareLayer, completion: { (timeInterval, supportsRangeFiltering) in
+                self.findTimeStepIntervalAndIsRangeTimeFilteringSupported(for: timeAwareLayer, completion: { (timeInterval, supportsRangeFiltering) in
                     //
                     // Set the range filtering value
                     supportsRangeTimeFiltering = supportsRangeFiltering
@@ -951,28 +951,28 @@ public class TimeSlider: UIControl {
                 
                 //
                 // Set calculated full extent and time step interval
-                strongSelf.fullExtent = layersFullExtent
+                self.fullExtent = layersFullExtent
                 
                 // Layer extent should be same as full extent.
-                strongSelf.layerExtent = strongSelf.fullExtent
+                self.layerExtent = self.fullExtent
                 
                 // Set the time step interval. If it is not available then
                 // calculate using default timeStepCount
                 if let timeStepInterval = timeAwareLayersStepInterval {
-                    strongSelf.timeStepInterval = timeStepInterval
+                    self.timeStepInterval = timeStepInterval
                 }
                 else {
-                    strongSelf.timeStepInterval = strongSelf.calculateTimeStepInterval(for: layersFullExtent, timeStepCount: 0)
+                    self.timeStepInterval = self.calculateTimeStepInterval(for: layersFullExtent, timeStepCount: 0)
                 }
                 
                 // If the geoview has a time extent defined and we are not re-initializing, use that. Otherwise, set the
                 // current extent to either the full extent's start (if range filtering is not supported), or to the entire full extent.
-                if let geoViewTimeExtent = strongSelf.geoView?.timeExtent, !strongSelf.reInitializeTimeProperties {
-                    strongSelf.currentExtent = geoViewTimeExtent
+                if let geoViewTimeExtent = self.geoView?.timeExtent, !self.reInitializeTimeProperties {
+                    self.currentExtent = geoViewTimeExtent
                 }
                 else {
-                    if let fullExtentStartTime = strongSelf.fullExtent?.startTime, let fullExtentEndTime = strongSelf.fullExtent?.endTime {
-                        strongSelf.currentExtent = supportsRangeTimeFiltering ? AGSTimeExtent(startTime: fullExtentStartTime, endTime: fullExtentEndTime) : AGSTimeExtent(timeInstant: fullExtentStartTime)
+                    if let fullExtentStartTime = self.fullExtent?.startTime, let fullExtentEndTime = self.fullExtent?.endTime {
+                        self.currentExtent = supportsRangeTimeFiltering ? AGSTimeExtent(startTime: fullExtentStartTime, endTime: fullExtentEndTime) : AGSTimeExtent(timeInstant: fullExtentStartTime)
                     }
                 }
                 completion(nil)
@@ -1009,17 +1009,17 @@ public class TimeSlider: UIControl {
             }
             
             // Make sure self is around
-            guard let strongSelf = self else {
+            guard let self = self else {
                 return
             }
             
             //
             // This is an async operation to find out time step interval and
             // whether range time filtering is supported by the layer.
-            strongSelf.findTimeStepIntervalAndIsRangeTimeFilteringSupported(for: timeAwareLayer, completion: { [weak self] (timeInterval, supportsRangeTimeFiltering) in
+            self.findTimeStepIntervalAndIsRangeTimeFilteringSupported(for: timeAwareLayer, completion: { [weak self] (timeInterval, supportsRangeTimeFiltering) in
                 //
                 // Make sure self is around
-                guard let strongSelf = self else {
+                guard let self = self else {
                     return
                 }
                 
@@ -1032,23 +1032,23 @@ public class TimeSlider: UIControl {
                 }
                 
                 // Set full extent of the layer
-                strongSelf.fullExtent = fullTimeExtent
+                self.fullExtent = fullTimeExtent
                 
                 // Layer extent should be same as full extent.
-                strongSelf.layerExtent = strongSelf.fullExtent
+                self.layerExtent = self.fullExtent
                 
                 // Set the time step interval. If it is not available then
                 // calculate using default timeStepCount
                 if let timeInterval = timeInterval {
-                    strongSelf.timeStepInterval = timeInterval
+                    self.timeStepInterval = timeInterval
                 }
                 else {
-                    strongSelf.timeStepInterval = strongSelf.calculateTimeStepInterval(for: fullTimeExtent, timeStepCount: 0)
+                    self.timeStepInterval = self.calculateTimeStepInterval(for: fullTimeExtent, timeStepCount: 0)
                 }
                 
                 // Set the current extent to either the full extent's start (if range filtering is not supported), or to the entire full extent.
-                if let fullExtentStartTime = strongSelf.fullExtent?.startTime, let fullExtentEndTime = strongSelf.fullExtent?.endTime {
-                    strongSelf.currentExtent = supportsRangeTimeFiltering ? AGSTimeExtent(startTime: fullExtentStartTime, endTime: fullExtentEndTime) : AGSTimeExtent(timeInstant: fullExtentStartTime)
+                if let fullExtentStartTime = self.fullExtent?.startTime, let fullExtentEndTime = self.fullExtent?.endTime {
+                    self.currentExtent = supportsRangeTimeFiltering ? AGSTimeExtent(startTime: fullExtentStartTime, endTime: fullExtentEndTime) : AGSTimeExtent(timeInstant: fullExtentStartTime)
                 }
                 
                 // Slider is loaded successfully.
@@ -1763,14 +1763,14 @@ public class TimeSlider: UIControl {
         timeExtentObservation = geoView?.observe(\.timeExtent, options: .new, changeHandler: { [weak self] (_, _) in
             //
             // Make sure self is around
-            guard let strongSelf = self else {
+            guard let self = self else {
                 return
             }
             
             // Update slider's currentExtent with geoView's timeExtent
-            if let geoViewTimeExtent = strongSelf.geoView?.timeExtent, let currentExtent = strongSelf.currentExtent {
+            if let geoViewTimeExtent = self.geoView?.timeExtent, let currentExtent = self.currentExtent {
                 if geoViewTimeExtent.startTime?.timeIntervalSince1970 != currentExtent.startTime?.timeIntervalSince1970 || geoViewTimeExtent.endTime?.timeIntervalSince1970 != currentExtent.endTime?.timeIntervalSince1970 {
-                    strongSelf.currentExtent = geoViewTimeExtent
+                    self.currentExtent = geoViewTimeExtent
                 }
             }
         })
@@ -2042,16 +2042,16 @@ public class TimeSlider: UIControl {
         // range time filtering and largets time step interval.
         if let mapImageLayer = timeAwareLayer as? AGSArcGISMapImageLayer {
             AGSLoadObjects(mapImageLayer.mapImageSublayers as! [AGSLoadable], { [weak self] (loaded) in
-                //
+                
                 // Make sure self is around
-                guard let strongSelf = self else {
+                guard let self = self else {
                     return
                 }
                 
                 if loaded {
                     var timeInterval: AGSTimeValue?
                     for i in 0..<mapImageLayer.mapImageSublayers.count {
-                        if let sublayer = mapImageLayer.mapImageSublayers[i] as? AGSArcGISSublayer, sublayer.isVisible, let timeInfo = strongSelf.timeInfo(for: sublayer) {
+                        if let sublayer = mapImageLayer.mapImageSublayers[i] as? AGSArcGISSublayer, sublayer.isVisible, let timeInfo = self.timeInfo(for: sublayer) {
                             //
                             // If either start or end time field name is not available then
                             // set supportsRangeTimeFiltering to false

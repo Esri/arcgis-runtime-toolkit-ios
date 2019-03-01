@@ -233,7 +233,7 @@ class JobManagerExample: TableViewController {
         task.load{ [weak self, weak task] error in
 
             // make sure we are still around...
-            guard let strongSelf = self else {
+            guard let self = self else {
                 return
             }
             
@@ -242,8 +242,8 @@ class JobManagerExample: TableViewController {
             }
             
             // remove task from array now that it's loaded
-            if let index = strongSelf.tasks.index(where: {return $0 === strongTask}){
-                strongSelf.tasks.remove(at: index)
+            if let index = self.tasks.index(where: {return $0 === strongTask}){
+                self.tasks.remove(at: index)
             }
             
             // return if error or no featureServiceInfo
@@ -278,7 +278,7 @@ class JobManagerExample: TableViewController {
             }
             
             let uuid = NSUUID()
-            let downloadURL = NSURL(fileURLWithPath: "\(strongSelf.documentsPath)/\(uuid.uuidString).geodatabase") as URL
+            let downloadURL = NSURL(fileURLWithPath: "\(self.documentsPath)/\(uuid.uuidString).geodatabase") as URL
             
             // create a job
             let job = strongTask.generateJob(with: params, downloadFileURL: downloadURL)
@@ -287,10 +287,10 @@ class JobManagerExample: TableViewController {
             JobManager.shared.register(job: job)
             
             // start the job
-            job.start(statusHandler: strongSelf.jobStatusHandler, completion: strongSelf.jobCompletionHandler)
+            job.start(statusHandler: self.jobStatusHandler, completion: self.jobCompletionHandler)
             
             // refresh the tableview
-            strongSelf.tableView.reloadData()
+            self.tableView.reloadData()
         }
     }
     
@@ -304,7 +304,7 @@ class JobManagerExample: TableViewController {
         task.defaultGenerateOfflineMapParameters(withAreaOfInterest: extent){ [weak self] params, error in
             
             // make sure we are still around...
-            guard let strongSelf = self else {
+            guard let self = self else {
                 return
             }
             
@@ -315,14 +315,14 @@ class JobManagerExample: TableViewController {
                 JobManager.shared.register(job: job)
                 
                 // start the job
-                job.start(statusHandler: strongSelf.jobStatusHandler, completion: strongSelf.jobCompletionHandler)
+                job.start(statusHandler: self.jobStatusHandler, completion: self.jobCompletionHandler)
                 
                 // refresh the tableview
-                strongSelf.tableView.reloadData()
+                self.tableView.reloadData()
             }
             else{
                 // if could not get default parameters, then fire completion with the error
-                strongSelf.jobCompletionHandler(result: nil, error: error)
+                self.jobCompletionHandler(result: nil, error: error)
             }
         }
         

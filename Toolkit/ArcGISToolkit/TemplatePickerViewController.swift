@@ -99,16 +99,16 @@ public class TemplatePickerViewController: TableViewController {
         // load map, get initial data
         self.map?.load(){ [weak self] error in
 
-            guard let strongSelf = self else{
+            guard let self = self else{
                 return
             }
             
-            guard let map = strongSelf.map else{
+            guard let map = self.map else{
                 return
             }
             
             if error == nil{
-                strongSelf.getTemplates(map: map)
+                self.getTemplates(map: map)
             }
         }
     }
