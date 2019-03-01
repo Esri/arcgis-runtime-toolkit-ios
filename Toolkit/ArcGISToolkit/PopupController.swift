@@ -19,47 +19,46 @@ import ArcGIS
 /// feature editing and collecting experience.
 public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoViewTouchDelegate {
     
-    private var lastPopupQueries: [AGSCancelable]?
+    private var lastPopupQueries = [AGSCancelable]()
     private var popupsViewController: AGSPopupsViewController?
-    private var sketchEditor = AGSSketchEditor()
+    private let sketchEditor = AGSSketchEditor()
     private var lastSelectedFeature: AGSFeature?
     private var lastSelectedFeatureLayer: AGSFeatureLayer?
-    private var addNewFeatureButton: UIBarButtonItem
+    private let addNewFeatureButtonItem: UIBarButtonItem
     
     /// The UIViewController that contains the AGSGeoView
-    public weak var geoViewController: UIViewController?
+    public private(set) weak var geoViewController: UIViewController?
     
     /// The AGSGeoView that the PopupController is interacting with
-    public var geoView: AGSGeoView
+    public let geoView: AGSGeoView
     
     /// Whether or not to push the AGSPopupsViewController onto the UINavigationController
     public var useNavigationControllerIfAvailable: Bool = true
     
-    /// Instantiates a PopupController
+    /// Instantiates a `PopupController`
     /// - Parameters:
-    ///   - geoViewController: The UIViewController that contains the AGSGeoView that the PopupController will interact with
-    ///   - geoView: The AGSGeoView that the PopupController will interact with
-    ///   - takeOverTouchDelegate: Whether or not the PopupController will take over the AGSGeoView's touchDelegate.
-    ///     If false then you must forward calls from the AGSGeoViewTouchDelegate to the PopupController. Defaults to true.
-    ///   - showAddFeatureButton: If true then a UIBarButtonItem will be added to the navigationItem as a right-hand button.
+    ///   - geoViewController: The `UIViewController` that contains the `AGSGeoView` that the `PopupController` will interact with
+    ///   - geoView: The `AGSGeoView` that the `PopupController` will interact with
+    ///   - takeOverTouchDelegate: Whether or not the `PopupController` will take over the `AGSGeoView's` `touchDelegate`.
+    ///     If `false` then you must forward calls from the `AGSGeoViewTouchDelegate` to the `PopupController`. Defaults to `true`.
+    ///   - showAddFeatureButton: If `true` then a `UIBarButtonItem` will be added to the `navigationItem` as a right-hand button.
     public init(geoViewController: UIViewController, geoView: AGSGeoView, takeOverTouchDelegate: Bool = true, showAddFeatureButton: Bool = true){
         
         self.geoViewController = geoViewController
         self.geoView = geoView
-        //self.addNewFeatureButton = UIBarButtonItem(title: "Add Feature", style: .plain, target: nil, action: nil)
-        self.addNewFeatureButton = UIBarButtonItem(barButtonSystemItem: .add, target: nil, action: nil)
+        self.addNewFeatureButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: nil, action: nil)
         
         super.init()
         
-        self.addNewFeatureButton.target = self
-        self.addNewFeatureButton.action = #selector(addNewFeatureTap)
+        self.addNewFeatureButtonItem.target = self
+        self.addNewFeatureButtonItem.action = #selector(addNewFeatureTap)
         
         if showAddFeatureButton{
             if let items = geoViewController.navigationItem.rightBarButtonItems{
-                geoViewController.navigationItem.rightBarButtonItems = [self.addNewFeatureButton] + items
+                geoViewController.navigationItem.rightBarButtonItems = [self.addNewFeatureButtonItem] + items
             }
             else{
-                geoViewController.navigationItem.rightBarButtonItem = self.addNewFeatureButton
+                geoViewController.navigationItem.rightBarButtonItem = self.addNewFeatureButtonItem
             }
         }
         
@@ -107,7 +106,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         }
         
         // cleanup last time
-        lastPopupQueries?.forEach{ $0.cancel() }
+        lastPopupQueries.forEach{ $0.cancel() }
         popupsViewController = nil;
         lastPopupQueries = [AGSCancelable]()
     }
@@ -139,7 +138,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
                 print("error identifying popups \(error)")
             }
         }
-        lastPopupQueries?.append(c)
+        lastPopupQueries.append(c)
     }
     
     private func showPopups(_ popups: [AGSPopup]?){
