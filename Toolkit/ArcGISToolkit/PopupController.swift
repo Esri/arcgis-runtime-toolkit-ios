@@ -26,7 +26,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
     private var lastSelectedFeatureLayer : AGSFeatureLayer?
     private var addNewFeatureButton : UIBarButtonItem
     
-    /// The UIViewController that contains the AGSGeoView
+    /// The `UIViewController` that contains the `AGSGeoView`.
     public weak var geoViewController: UIViewController?
     
     /// The AGSGeoView that the PopupController is interacting with
