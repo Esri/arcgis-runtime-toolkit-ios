@@ -98,7 +98,7 @@ extension TemplatePickerExample: TemplatePickerViewControllerDelegate {
         navigationController?.popViewController(animated: true)
         
         let alert = UIAlertController(title: "TemplatePickerExample", message: "User selected \(featureTemplateInfo.featureTemplate.name)", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+        alert.addAction(UIAlertAction(title: "Ok", style: .default))
         
         present(alert, animated: true, completion: nil)
         
