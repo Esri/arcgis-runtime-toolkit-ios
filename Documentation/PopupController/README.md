@@ -5,7 +5,7 @@ The PopupController makes it easy to wire up an `AGSPopupsViewController` for a 
 ### Usage
 
 ```swift
-var popupController : PopupController?
+var popupController: PopupController?
 
 override func viewDidLoad() {
     super.viewDidLoad()
