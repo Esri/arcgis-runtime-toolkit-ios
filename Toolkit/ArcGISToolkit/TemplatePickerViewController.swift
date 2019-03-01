@@ -283,12 +283,17 @@ extension TemplatePickerViewController: UISearchResultsUpdating {
         if let text = searchController.searchBar.text?.trimmingCharacters(in: .whitespaces),
             !text.isEmpty {
             isFiltering = true
-            DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async {
+            DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async { [weak self] in
+                guard let self = self else { return }
                 let filtered = self.unfilteredInfos.filter{
                     $0.featureTemplate.name.range(of: text, options: .caseInsensitive) != nil
                 }
-                DispatchQueue.main.async {
-                    self.currentInfos = filtered
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    // Make sure we are still filtering
+                    if self.isFiltering{
+                        self.currentInfos = filtered
+                    }
                 }
             }
         }
