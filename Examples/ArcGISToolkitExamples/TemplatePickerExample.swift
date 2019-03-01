@@ -78,13 +78,15 @@ extension TemplatePickerExample: TemplatePickerViewControllerDelegate {
         navigationController?.popToViewController(self, animated: true)
         
         let alert = UIAlertController(title: "TemplatePickerExample", message: "User cancelled", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+        let action = UIAlertAction(title: "OK", style: .default, handler: nil)
+        alert.addAction(action)
+        alert.preferredAction = action
         
         present(alert, animated: true, completion: nil)
         
     }
     
-    public func templatePickerViewControllerDidSelectTemplate(_ templatePickerViewController: TemplatePickerViewController, featureTemplateInfo: FeatureTemplateInfo) {
+    public func templatePickerViewController(_ templatePickerViewController: TemplatePickerViewController, didSelect featureTemplateInfo: FeatureTemplateInfo) {
         
         // This is where you handle the user making a selection with the template picker
         
@@ -92,7 +94,9 @@ extension TemplatePickerExample: TemplatePickerViewControllerDelegate {
         navigationController?.popToViewController(self, animated: true)
         
         let alert = UIAlertController(title: "TemplatePickerExample", message: "User selected \(featureTemplateInfo.featureTemplate.name)", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Ok", style: .default))
+        let action = UIAlertAction(title: "OK", style: .default, handler: nil)
+        alert.addAction(action)
+        alert.preferredAction = action
         
         present(alert, animated: true, completion: nil)
         

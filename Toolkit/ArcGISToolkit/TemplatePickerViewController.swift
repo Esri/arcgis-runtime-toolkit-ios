@@ -24,7 +24,7 @@ public class FeatureTemplateInfo{
     /// The swatch for the feature template
     public var swatch: UIImage?
     
-    fileprivate init(featureLayer: AGSFeatureLayer, featureTable: AGSArcGISFeatureTable, featureTemplate: AGSFeatureTemplate, swatch: UIImage?){
+    fileprivate init(featureLayer: AGSFeatureLayer, featureTable: AGSArcGISFeatureTable, featureTemplate: AGSFeatureTemplate, swatch: UIImage? = nil){
         self.featureLayer = featureLayer
         self.featureTable = featureTable
         self.featureTemplate = featureTemplate
@@ -44,7 +44,7 @@ public protocol TemplatePickerViewControllerDelegate: class {
     /// - Parameters:
     ///   - templatePickerViewController: The current template picker view controller.
     ///   - featureTemplateInfo: The selected feature template.
-    func templatePickerViewControllerDidSelectTemplate(_ templatePickerViewController: TemplatePickerViewController, featureTemplateInfo: FeatureTemplateInfo)
+    func templatePickerViewController(_ templatePickerViewController: TemplatePickerViewController, didSelect featureTemplateInfo: FeatureTemplateInfo)
 }
 
 /// A view controller that is useful for showing the user a list of feature templates
@@ -98,13 +98,17 @@ public class TemplatePickerViewController: TableViewController {
         
         // load map, get initial data
         self.map?.load(){ [weak self] error in
+
+            guard let strongSelf = self else{
+                return
+            }
             
-            guard let map = self?.map else{
+            guard let map = strongSelf.map else{
                 return
             }
             
             if error == nil{
-                self?.getInitialData(map: map)
+                strongSelf.getTemplates(map: map)
             }
         }
     }
@@ -123,79 +127,83 @@ public class TemplatePickerViewController: TableViewController {
         return searchController
     }
     
-    private func getInitialData(map: AGSMap){
+    /// Gets the templates out of a map.
+    /// This should only be called once the map is loaded.
+    private func getTemplates(map: AGSMap){
         
-        // get the initial data for the map, this function should be called once the map is loaded
-        
-        guard let map = self.map else{
-            return
-        }
+        // get the templates for the map, this function should be called once the map is loaded
         
         // go through each layer and if it has a popup definition, editable and can create features
         // then add it's info to the list
-        for layer in map.operationalLayers as NSArray as! [AGSLayer]{
+        for layer in map.operationalLayers as! [AGSLayer]{
             
-            guard let fl = layer as? AGSFeatureLayer, let table = fl.featureTable as? AGSArcGISFeatureTable else {
+            guard let fl = layer as? AGSFeatureLayer, fl.featureTable is AGSArcGISFeatureTable else {
                 continue
             }
             
             fl.load{ [weak self] error in
-                
-                if error != nil{
+                guard error == nil else{
                     return
                 }
                 
-                guard let strongSelf = self else{
-                    return
-                }
-                
-                guard let popupDef = fl.popupDefinition, popupDef.allowEdit || table.canAddFeature else{
-                    return
-                }
-                
-                let tableTemplates = table.featureTemplates.map({
-                    FeatureTemplateInfo(featureLayer:fl, featureTable:table, featureTemplate:$0, swatch:nil)
-                })
-                
-                let typeTemplates = table.featureTypes
-                    .flatMap({ $0.templates })
-                    .map({ FeatureTemplateInfo(featureLayer:fl, featureTable:table, featureTemplate:$0, swatch:nil) })
-                
-                let infos = tableTemplates + typeTemplates
-                
-                // add to list of unfiltered infos
-                strongSelf.unfilteredInfos.append(contentsOf: infos)
-                
-                // re-assign to the current infos so we can update the tableview
-                // only should do this if not currently filtering
-                if !strongSelf.isFiltering{
-                    strongSelf.currentInfos = strongSelf.unfilteredInfos
-                }
-                
-                // generate swatches for the layer infos
-                for (index, info) in infos.enumerated(){
-                    if let feature = info.featureTable.createFeature(with: info.featureTemplate){
-                        let sym = info.featureLayer.renderer?.symbol(for: feature)
-                        sym?.createSwatch{ image, error in
-                            
-                            if error != nil{
-                                return
-                            }
-                            
-                            // update info with swatch
-                            infos[index].swatch = image
-                            
-                            // reload index where that info currently is
-                            if let index = strongSelf.indexPathForInfo(info){
-                                strongSelf.tableView.reloadRows(at: [index], with: .automatic)
-                            }
-                        }
-                    }
-                }
+                self?.getTemplates(featureLayer: fl)
             }
             
         }
         
+    }
+    
+    /// Gets the templates out of a feature layer and associated table.
+    /// This should only be called once the feature layer is loaded.
+    private func getTemplates(featureLayer: AGSFeatureLayer){
+        
+        guard let table = featureLayer.featureTable as? AGSArcGISFeatureTable else{
+            return
+        }
+        
+        guard let popupDef = featureLayer.popupDefinition, popupDef.allowEdit || table.canAddFeature else{
+            return
+        }
+        
+        let tableTemplates = table.featureTemplates.map({
+            FeatureTemplateInfo(featureLayer:featureLayer, featureTable:table, featureTemplate:$0)
+        })
+        
+        let typeTemplates = table.featureTypes
+            .flatMap({ $0.templates })
+            .map({ FeatureTemplateInfo(featureLayer:featureLayer, featureTable:table, featureTemplate:$0) })
+        
+        let infos = tableTemplates + typeTemplates
+        
+        // add to list of unfiltered infos
+        unfilteredInfos.append(contentsOf: infos)
+        
+        // re-assign to the current infos so we can update the tableview
+        // only should do this if not currently filtering
+        if !isFiltering{
+            currentInfos = unfilteredInfos
+        }
+        
+        // generate swatches for the layer infos
+        for (index, info) in infos.enumerated(){
+            if let feature = info.featureTable.createFeature(with: info.featureTemplate){
+                let sym = info.featureLayer.renderer?.symbol(for: feature)
+                sym?.createSwatch{ [weak self] image, error in
+                    
+                    guard error == nil else{
+                        return
+                    }
+                    
+                    // update info with swatch
+                    infos[index].swatch = image
+                    
+                    // reload index where that info currently is
+                    if let index = self?.indexPathForInfo(info){
+                        self?.tableView.reloadRows(at: [index], with: .automatic)
+                    }
+                }
+            }
+        }
     }
     
     // MARK: TableView delegate/datasource methods
@@ -221,7 +229,7 @@ public class TemplatePickerViewController: TableViewController {
         // out of the datasource will be incorrect
         navigationItem.searchController?.isActive = false
         
-        delegate?.templatePickerViewControllerDidSelectTemplate(self, featureTemplateInfo: selectedFeatureTemplateInfo)
+        delegate?.templatePickerViewController(self, didSelect: selectedFeatureTemplateInfo)
     }
     
     override public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

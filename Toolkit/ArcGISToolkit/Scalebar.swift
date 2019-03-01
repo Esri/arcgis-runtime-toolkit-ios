@@ -281,14 +281,16 @@ public class Scalebar: UIView {
     
     private func recalculateFontProperties(){
         
+        let attributes: [NSAttributedString.Key: Any] = [.font: font]
+        
         let zeroText = "0"
-        zeroStringWidth = zeroText.size(withAttributes: [NSAttributedString.Key.font: font]).width
+        zeroStringWidth = zeroText.size(withAttributes: attributes).width
         
         let fontHeightText = "Ay"
-        fontHeight = fontHeightText.size(withAttributes: [NSAttributedString.Key.font: font]).height
+        fontHeight = fontHeightText.size(withAttributes: attributes).height
         
         let unitsMaxText = " km"
-        maxRightUnitsPad = unitsMaxText.size(withAttributes: [NSAttributedString.Key.font: font]).width
+        maxRightUnitsPad = unitsMaxText.size(withAttributes: attributes).width
     }
     
     // set a minScale if you only want the scalebar to appear when you reach a large enough scale
@@ -654,9 +656,11 @@ internal extension ScalebarRenderer{
         // draw text shadow
         if let shadowColor = scalebar.textShadowColor{
             
-            let shadowAttrs = [NSAttributedString.Key.font: scalebar.font,
-                               NSAttributedString.Key.paragraphStyle: paragraphStyle,
-                               NSAttributedString.Key.foregroundColor: shadowColor]
+            let shadowAttrs: [NSAttributedString.Key: Any] = [
+                .font: scalebar.font,
+                .paragraphStyle: paragraphStyle,
+                .foregroundColor: shadowColor
+            ]
             
             let shadowFrame = frame.offsetBy(dx: shadowOffset.x, dy: shadowOffset.y)
             
@@ -664,9 +668,11 @@ internal extension ScalebarRenderer{
         }
         
         // draw text
-        let attrs = [NSAttributedString.Key.font: scalebar.font,
-                     NSAttributedString.Key.paragraphStyle: paragraphStyle,
-                     NSAttributedString.Key.foregroundColor: textColor]
+        let attrs : [NSAttributedString.Key: Any] = [
+            .font: scalebar.font,
+            .paragraphStyle: paragraphStyle,
+            .foregroundColor: textColor
+        ]
         
         text.draw(with: frame, options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
     }
