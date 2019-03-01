@@ -210,6 +210,7 @@ public class TemplatePickerViewController: TableViewController {
     }
     
     public func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        guard !tables.isEmpty else { return nil }
         return tables[section].tableName
     }
     
@@ -218,7 +219,7 @@ public class TemplatePickerViewController: TableViewController {
         // when the user taps on a feature type
         
         // first get the selected object
-        let selectedFeatureTemplateInfo = infoForIndexPath(indexPath)
+        let selectedFeatureTemplateInfo = info(for: indexPath)
         
         // If the search controller is still active, the delegate will not be
         // able to dismiss us, if desired.
@@ -230,6 +231,7 @@ public class TemplatePickerViewController: TableViewController {
     }
     
     override public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        guard !tables.isEmpty else { return 0 }
         let tableName = tables[section].tableName
         let infos = self.currentDatasource[tableName]
         return infos?.count ?? 0
@@ -237,9 +239,9 @@ public class TemplatePickerViewController: TableViewController {
     
     override public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellReuseIdentifier, for: indexPath)
-        let info = infoForIndexPath(indexPath)
-        cell.textLabel?.text = info.featureTemplate.name
-        cell.imageView?.image = info.swatch
+        let infoObject = info(for: indexPath)
+        cell.textLabel?.text = infoObject.featureTemplate.name
+        cell.imageView?.image = infoObject.swatch
         return cell
     }
     
@@ -254,7 +256,7 @@ public class TemplatePickerViewController: TableViewController {
     
     // MARK: IndexPath -> Info
     
-    private func infoForIndexPath(_ indexPath: IndexPath) -> FeatureTemplateInfo{
+    private func info(for indexPath: IndexPath) -> FeatureTemplateInfo{
         let tableName = tables[indexPath.section].tableName
         let infos = self.currentDatasource[tableName]!
         return infos[indexPath.row]

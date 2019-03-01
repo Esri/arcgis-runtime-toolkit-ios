@@ -81,9 +81,7 @@ extension TemplatePickerExample: TemplatePickerViewControllerDelegate {
         let action = UIAlertAction(title: "OK", style: .default, handler: nil)
         alert.addAction(action)
         alert.preferredAction = action
-        
         present(alert, animated: true)
-        
     }
     
     public func templatePickerViewController(_ templatePickerViewController: TemplatePickerViewController, didSelect featureTemplateInfo: FeatureTemplateInfo) {
@@ -97,9 +95,7 @@ extension TemplatePickerExample: TemplatePickerViewControllerDelegate {
         let action = UIAlertAction(title: "OK", style: .default, handler: nil)
         alert.addAction(action)
         alert.preferredAction = action
-        
         present(alert, animated: true)
-        
     }
 }
 
