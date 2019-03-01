@@ -122,16 +122,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         let c = mapView.identifyLayers(atScreenPoint: screenPoint, tolerance: 10, returnPopupsOnly: true, maximumResultsPerLayer: 12) { [weak self] (identifyResults, error) -> Void in
             
             if let identifyResults = identifyResults {
-                var popups = [AGSPopup]()
-                
-                func processIdentifyResults(identifyResults: [AGSIdentifyLayerResult]){
-                    for identifyResult in identifyResults {
-                        popups.append(contentsOf: identifyResult.popups)
-                        processIdentifyResults(identifyResults: identifyResult.sublayerResults)
-                    }
-                }
-                processIdentifyResults(identifyResults: identifyResults)
-                
+                let popups = identifyResults.flatMap({ $0.allPopups })
                 self?.showPopups(popups)
             }
             else if let error = error {
@@ -141,41 +132,41 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         lastPopupQueries.append(c)
     }
     
-    private func showPopups(_ popups: [AGSPopup]?){
+    private func showPopups(_ popups: [AGSPopup]){
         
-        guard let popups = popups else{
+        guard !popups.isEmpty else{
             return
         }
         
-        if !popups.isEmpty {
-            if popupsViewController == nil{
-                
-                let containerStyle: AGSPopupsViewControllerContainerStyle = useNavigationControllerIfAvailable && geoViewController?.navigationController != nil ? .navigationController : .navigationBar
-                
-                let popupsViewController = AGSPopupsViewController(popups: popups, containerStyle: containerStyle)
-                self.popupsViewController = popupsViewController
-                popupsViewController.geometryEditingStyle = .toolbar
-                popupsViewController.customDoneButton = nil
-                popupsViewController.delegate = self
-                
-                if containerStyle == .navigationController{
-                    // set a back button for the pvc in the nav controller, showing modally, this is handled for us
-                    // need to do this so we can clean up (unselect feature, etc) when `back` is tapped
-                    let doneViewingBbi = UIBarButtonItem(title: "Back", style: .plain, target: self, action: #selector(doneViewingInNavController))
-                    popupsViewController.customDoneButton = doneViewingBbi
-                    popupsViewController.navigationItem.leftBarButtonItem = doneViewingBbi
-                    
-                    geoViewController?.navigationController?.pushViewController(popupsViewController, animated: true)
-                }
-                else{
-                    geoViewController?.present(popupsViewController, animated: true)
-                }
-                
-            }
-            else{
-                popupsViewController?.showAdditionalPopups(popups)
-            }
+        if let popupsViewController = self.popupsViewController{
+            // If we already have a popupsViewController, then show additional
+            popupsViewController.showAdditionalPopups(popups)
+            return
         }
+        
+        // Otherwise we need to create the popupsViewController
+        
+        let containerStyle: AGSPopupsViewControllerContainerStyle = useNavigationControllerIfAvailable && geoViewController?.navigationController != nil ? .navigationController : .navigationBar
+        
+        let popupsViewController = AGSPopupsViewController(popups: popups, containerStyle: containerStyle)
+        self.popupsViewController = popupsViewController
+        popupsViewController.geometryEditingStyle = .toolbar
+        popupsViewController.customDoneButton = nil
+        popupsViewController.delegate = self
+        
+        if containerStyle == .navigationController{
+            // set a back button for the pvc in the nav controller, showing modally, this is handled for us
+            // need to do this so we can clean up (unselect feature, etc) when `back` is tapped
+            let doneViewingBbi = UIBarButtonItem(title: "Back", style: .plain, target: self, action: #selector(doneViewingInNavController))
+            popupsViewController.customDoneButton = doneViewingBbi
+            popupsViewController.navigationItem.leftBarButtonItem = doneViewingBbi
+            
+            geoViewController?.navigationController?.pushViewController(popupsViewController, animated: true)
+        }
+        else{
+            geoViewController?.present(popupsViewController, animated: true)
+        }
+        
     }
     
     @objc private func doneViewingInNavController(){
@@ -369,4 +360,8 @@ extension PopupController: TemplatePickerViewControllerDelegate {
     }
 }
 
-
+fileprivate extension AGSIdentifyLayerResult {
+    var allPopups: [AGSPopup] {
+        return popups + sublayerResults.flatMap { $0.allPopups }
+    }
+}
