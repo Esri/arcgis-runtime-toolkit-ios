@@ -91,7 +91,7 @@ public class TemplatePickerViewController: TableViewController {
         // add cancel button
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(TemplatePickerViewController.cancelAction))
         
-        // get the templates from the map
+        // get the templates from the map and load them as the datasource
         if let map = map{
             getTemplateInfos(map: map, completion: loadInfosAndCreateSwatches)
         }
@@ -162,14 +162,16 @@ public class TemplatePickerViewController: TableViewController {
     /// and creates swatches for them
     private func loadInfosAndCreateSwatches(infos: [FeatureTemplateInfo]){
         
+        // if filtering, need to disable it
+        if isFiltering{
+            navigationItem.searchController?.isActive = false
+        }
+        
         // add to list of unfiltered infos
         unfilteredInfos = infos
         
         // re-assign to the current infos so we can update the tableview
-        // only should do this if not currently filtering
-        if !isFiltering{
-            currentInfos = unfilteredInfos
-        }
+        currentInfos = unfilteredInfos
         
         // generate swatches for the layer infos
         for index in infos.indices{
