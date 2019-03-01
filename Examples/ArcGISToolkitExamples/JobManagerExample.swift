@@ -138,7 +138,7 @@ class JobManagerExample: TableViewController {
         
         // move safe area up above toolbar
         // (this adjusts tableview contentInsets to correctly scroll behind toolbar)
-        additionalSafeAreaInsets = UIEdgeInsets.init(top: 0, left: 0, bottom: toolbarHeight, right: 0)
+        additionalSafeAreaInsets = UIEdgeInsets(top: 0, left: 0, bottom: toolbarHeight, right: 0)
         // now anchor toolbar below new safe area
         toolbar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         
@@ -157,7 +157,7 @@ class JobManagerExample: TableViewController {
         
         // request authorization for user notifications, this way we can notify user in bg when job complete
         let center = UNUserNotificationCenter.current()
-        center.requestAuthorization(options: [.alert, .badge, .sound]) { (granted, error) in
+        center.requestAuthorization(options: [.alert, .badge, .sound]) { (granted, _) in
             if !granted{
                 print("You must grant access for user notifications for all the features of this sample to work")
             }
@@ -343,7 +343,7 @@ class JobManagerExample: TableViewController {
         
         let content = UNMutableNotificationContent()
         content.body = "Job Complete"
-        content.sound = UNNotificationSound.default
+        content.sound = .default
         
         let request = UNNotificationRequest(identifier: "job complete", content: content, trigger: nil)
         
