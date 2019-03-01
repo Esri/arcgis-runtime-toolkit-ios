@@ -138,7 +138,7 @@ class JobManagerExample: TableViewController {
         
         // move safe area up above toolbar
         // (this adjusts tableview contentInsets to correctly scroll behind toolbar)
-        additionalSafeAreaInsets = UIEdgeInsets.init(top: 0, left: 0, bottom: toolbarHeight, right: 0)
+        additionalSafeAreaInsets = UIEdgeInsets(top: 0, left: 0, bottom: toolbarHeight, right: 0)
         // now anchor toolbar below new safe area
         toolbar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         
