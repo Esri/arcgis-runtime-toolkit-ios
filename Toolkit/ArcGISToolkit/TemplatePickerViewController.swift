@@ -16,13 +16,13 @@ import ArcGIS
 /// An object that encapsulates information related to a feature template
 public class FeatureTemplateInfo{
     /// The feature layer that the template is from
-    public let featureLayer : AGSFeatureLayer
+    public let featureLayer: AGSFeatureLayer
     /// The feature table that the template is from
-    public let featureTable : AGSArcGISFeatureTable
+    public let featureTable: AGSArcGISFeatureTable
     /// The feature template
-    public let featureTemplate : AGSFeatureTemplate
+    public let featureTemplate: AGSFeatureTemplate
     /// The swatch for the feature template
-    public var swatch : UIImage?
+    public var swatch: UIImage?
     
     fileprivate init(featureLayer: AGSFeatureLayer, featureTable: AGSArcGISFeatureTable, featureTemplate: AGSFeatureTemplate, swatch: UIImage?){
         self.featureLayer = featureLayer
@@ -53,11 +53,11 @@ public protocol TemplatePickerViewControllerDelegate: class {
 public class TemplatePickerViewController: TableViewController {
     
     /// The map which this view controller will display the feature templates from
-    public private(set) var map : AGSMap?
+    public private(set) var map: AGSMap?
     
     private var tables = [AGSArcGISFeatureTable]()
     private var currentDatasource = [String: [FeatureTemplateInfo]]()
-    private var isFiltering : Bool = false
+    private var isFiltering: Bool = false
     private var unfilteredInfos = [FeatureTemplateInfo]()
     private var currentInfos = [FeatureTemplateInfo](){
         didSet{
@@ -83,7 +83,7 @@ public class TemplatePickerViewController: TableViewController {
     }
     
     /// The delegate that will handle the selection and cancelation of the TemplatePickerViewController.
-    public weak var delegate : TemplatePickerViewControllerDelegate?
+    public weak var delegate: TemplatePickerViewControllerDelegate?
     
     override public func viewDidLoad() {
         super.viewDidLoad()

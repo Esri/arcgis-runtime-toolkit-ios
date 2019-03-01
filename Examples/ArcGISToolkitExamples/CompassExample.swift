@@ -17,7 +17,7 @@ import ArcGIS
 
 class CompassExample: MapViewController {
     
-    var map : AGSMap?
+    var map: AGSMap?
 
     override func viewDidLoad() {
         super.viewDidLoad()

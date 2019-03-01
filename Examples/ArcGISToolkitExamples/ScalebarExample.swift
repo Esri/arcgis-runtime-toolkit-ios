@@ -17,8 +17,8 @@ import ArcGIS
 
 class ScalebarExample: MapViewController, AGSGeoViewTouchDelegate {
     
-    var map : AGSMap?
-    var scalebar : Scalebar?
+    var map: AGSMap?
+    var scalebar: Scalebar?
     
     override func viewDidLoad() {
         super.viewDidLoad()

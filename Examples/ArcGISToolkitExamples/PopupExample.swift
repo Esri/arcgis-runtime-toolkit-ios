@@ -17,9 +17,9 @@ import ArcGIS
 
 class PopupExample: MapViewController {
     
-    var map : AGSMap?
+    var map: AGSMap?
     
-    var popupController : PopupController?
+    var popupController: PopupController?
     
     override func viewDidLoad() {
         super.viewDidLoad()

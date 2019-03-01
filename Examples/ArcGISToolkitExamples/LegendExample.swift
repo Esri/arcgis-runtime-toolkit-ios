@@ -18,8 +18,8 @@ import ArcGIS
 class LegendExample: MapViewController {
 
     let portal = AGSPortal.arcGISOnline(withLoginRequired: false)
-    var portalItem : AGSPortalItem?
-    var map : AGSMap?
+    var portalItem: AGSPortalItem?
+    var map: AGSMap?
     var legendVC: LegendViewController?
     
     override func viewDidLoad() {

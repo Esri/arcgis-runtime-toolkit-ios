@@ -604,7 +604,7 @@ public class TimeSlider: UIControl {
     /**
      The height of the slider track.
      */
-    public var trackHeight : CGFloat = 6.0 {
+    public var trackHeight: CGFloat = 6.0 {
         didSet {
             setNeedsLayout()
         }
@@ -851,7 +851,7 @@ public class TimeSlider: UIControl {
         //
         // Set operational layers
         guard let operationalLayers = geoView.operationalLayers, !operationalLayers.isEmpty else {
-            completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonNoData.rawValue, userInfo: [NSLocalizedDescriptionKey : "There are no time aware layers to initialize time slider."]))
+            completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonNoData.rawValue, userInfo: [NSLocalizedDescriptionKey: "There are no time aware layers to initialize time slider."]))
             return
         }
         
@@ -945,7 +945,7 @@ public class TimeSlider: UIControl {
                 // If full extent or time step interval is not available then
                 // we cannot initialize the slider. Finish with error.
                 guard let layersFullExtent = timeAwareLayersFullExtent else {
-                    completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonNoData.rawValue, userInfo: [NSLocalizedDescriptionKey : "There are no time aware layers to initialize time slider."]))
+                    completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonNoData.rawValue, userInfo: [NSLocalizedDescriptionKey: "There are no time aware layers to initialize time slider."]))
                     return
                 }
                 
@@ -988,7 +988,7 @@ public class TimeSlider: UIControl {
         //
         // The layer must be loadable.
         guard let layer = timeAwareLayer as? AGSLoadable else {
-            completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonNoData.rawValue, userInfo: [NSLocalizedDescriptionKey : "The layer is not loadable to initialize time slider."]))
+            completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonNoData.rawValue, userInfo: [NSLocalizedDescriptionKey: "The layer is not loadable to initialize time slider."]))
             return
         }
         
@@ -1004,7 +1004,7 @@ public class TimeSlider: UIControl {
             // The layer must support time filtering and it should enabled
             // then only we can initialize the time slider.
             guard timeAwareLayer.supportsTimeFiltering, timeAwareLayer.isTimeFilteringEnabled else {
-                completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonNoData.rawValue, userInfo: [NSLocalizedDescriptionKey : "The layer either does not support time filtering or is not enabled."]))
+                completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonNoData.rawValue, userInfo: [NSLocalizedDescriptionKey: "The layer either does not support time filtering or is not enabled."]))
                 return
             }
             
@@ -1027,7 +1027,7 @@ public class TimeSlider: UIControl {
                 // available then the layer does not have information
                 // required to initialize time slider. Finish with an error.
                 guard let fullTimeExtent = timeAwareLayer.fullTimeExtent else {
-                    completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonNoData.rawValue, userInfo: [NSLocalizedDescriptionKey : "The layer does not have time information to initialize time slider."]))
+                    completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonNoData.rawValue, userInfo: [NSLocalizedDescriptionKey: "The layer does not have time information to initialize time slider."]))
                     return
                 }
                 
@@ -1066,13 +1066,13 @@ public class TimeSlider: UIControl {
         // There should be at least two time steps
         // for time slider to work correctly.
         guard timeStepCount >= 2 else {
-            completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonNoData.rawValue, userInfo: [NSLocalizedDescriptionKey : "fullExtent is not available to calculate time steps."]))
+            completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonNoData.rawValue, userInfo: [NSLocalizedDescriptionKey: "fullExtent is not available to calculate time steps."]))
             return
         }
         
         // Full extent's start and end time must be available for time slider to work correctly.
         guard let fullExtentStartTime = fullExtent.startTime, let _ = fullExtent.endTime else {
-            completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonNoData.rawValue, userInfo: [NSLocalizedDescriptionKey : "fullExtent is not available to calculate time steps."]))
+            completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonNoData.rawValue, userInfo: [NSLocalizedDescriptionKey: "fullExtent is not available to calculate time steps."]))
             return
         }
         
@@ -1798,7 +1798,7 @@ public class TimeSlider: UIControl {
     private func value(for position: Double) -> Double {
         //
         // Bail out if full extent start and end times are not available
-        var resultValue : Double = 0.0
+        var resultValue: Double = 0.0
         guard let  fullExtentStartTime = fullExtent?.startTime, let fullExtentEndTime = fullExtent?.endTime else {
             return resultValue
         }
@@ -2447,7 +2447,7 @@ private extension Calendar {
 
 // MARK: - Date Range
 
-private struct DateRange : Sequence, IteratorProtocol {
+private struct DateRange: Sequence, IteratorProtocol {
     var calendar: Calendar
     var startDate: Date
     var endDate: Date
@@ -2590,7 +2590,7 @@ extension AGSTimeExtent {
 
 // MARK: - Time Value Extension
 
-extension AGSTimeValue : Comparable {
+extension AGSTimeValue: Comparable {
     //
     // Converts time value to seconds
     public var toSeconds: TimeInterval {

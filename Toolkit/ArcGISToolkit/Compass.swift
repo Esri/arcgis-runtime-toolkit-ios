@@ -44,10 +44,10 @@ public class Compass: UIImageView {
     private var mapView: AGSMapView
     
     // the width and height constraints
-    private var widthConstraint:NSLayoutConstraint?
-    private var heightConstraint:NSLayoutConstraint?
+    private var widthConstraint: NSLayoutConstraint?
+    private var heightConstraint: NSLayoutConstraint?
 
-    private var rotationObservation : NSKeyValueObservation?
+    private var rotationObservation: NSKeyValueObservation?
     
     public init(mapView: AGSMapView) {
         self.mapView = mapView
@@ -107,7 +107,7 @@ public class Compass: UIImageView {
         }
     }
     
-    func degreesToRadians(degrees : Double) -> CGFloat {
+    func degreesToRadians(degrees: Double) -> CGFloat {
         return CGFloat(degrees * Double.pi / 180)
     }
 }

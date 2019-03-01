@@ -17,7 +17,7 @@ import ArcGIS
 
 class MeasureExample: MapViewController{
     
-    var measureToolbar : MeasureToolbar!
+    var measureToolbar: MeasureToolbar!
     
     override func viewDidLoad() {
         super.viewDidLoad()

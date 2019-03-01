@@ -32,8 +32,8 @@ import UserNotifications
 
 class JobTableViewCell: UITableViewCell{
     
-    var job : AGSJob?
-    var statusObservation : NSKeyValueObservation?
+    var job: AGSJob?
+    var statusObservation: NSKeyValueObservation?
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
@@ -117,11 +117,11 @@ class JobManagerExample: TableViewController {
     // array to hold onto tasks while they are loading
     var tasks = [AGSGeodatabaseSyncTask]()
     
-    var jobs : [AGSJob] {
+    var jobs: [AGSJob] {
         return JobManager.shared.jobs
     }
     
-    var toolbar : UIToolbar?
+    var toolbar: UIToolbar?
     
     override open func viewDidLoad() {
         super.viewDidLoad()
@@ -129,7 +129,7 @@ class JobManagerExample: TableViewController {
         // create a Toolbar and add it to the view controller
         let toolbar = UIToolbar()
         self.toolbar = toolbar
-        let toolbarHeight : CGFloat = 44.0
+        let toolbarHeight: CGFloat = 44.0
         toolbar.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(toolbar)
         toolbar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true

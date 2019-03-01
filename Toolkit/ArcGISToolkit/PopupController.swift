@@ -19,12 +19,12 @@ import ArcGIS
 /// feature editing and collecting experience.
 public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoViewTouchDelegate {
     
-    private var lastPopupQueries : [AGSCancelable]?
-    private var popupsViewController : AGSPopupsViewController?
+    private var lastPopupQueries: [AGSCancelable]?
+    private var popupsViewController: AGSPopupsViewController?
     private var sketchEditor = AGSSketchEditor()
-    private var lastSelectedFeature : AGSFeature?
-    private var lastSelectedFeatureLayer : AGSFeatureLayer?
-    private var addNewFeatureButton : UIBarButtonItem
+    private var lastSelectedFeature: AGSFeature?
+    private var lastSelectedFeatureLayer: AGSFeatureLayer?
+    private var addNewFeatureButton: UIBarButtonItem
     
     /// The UIViewController that contains the AGSGeoView
     public weak var geoViewController: UIViewController?
@@ -33,7 +33,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
     public var geoView: AGSGeoView
     
     /// Whether or not to push the AGSPopupsViewController onto the UINavigationController
-    public var useNavigationControllerIfAvailable : Bool = true
+    public var useNavigationControllerIfAvailable: Bool = true
     
     /// Instantiates a PopupController
     /// - Parameters:
@@ -73,7 +73,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         }
     }
     
-    private var addingNewFeature : Bool = false
+    private var addingNewFeature: Bool = false
     
     @objc private func addNewFeatureTap(){
         
@@ -151,7 +151,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         if popups.count > 0{
             if popupsViewController == nil{
                 
-                let containerStyle : AGSPopupsViewControllerContainerStyle = useNavigationControllerIfAvailable && geoViewController?.navigationController != nil ? .navigationController : .navigationBar
+                let containerStyle: AGSPopupsViewControllerContainerStyle = useNavigationControllerIfAvailable && geoViewController?.navigationController != nil ? .navigationController : .navigationBar
                 
                 let popupsViewController = AGSPopupsViewController(popups: popups, containerStyle: containerStyle)
                 self.popupsViewController = popupsViewController
@@ -195,8 +195,8 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         }
     }
     
-    private var geoViewControllerOriginalRightBarButtonItems : [UIBarButtonItem]?
-    private var editingGeometry : Bool = false
+    private var geoViewControllerOriginalRightBarButtonItems: [UIBarButtonItem]?
+    private var editingGeometry: Bool = false
     
     private func navigateToMapActionForGeometryEditing() {
         

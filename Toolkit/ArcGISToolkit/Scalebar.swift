@@ -27,7 +27,7 @@ public enum ScalebarUnits{
         
         let magnitude = pow(10, floor(log10(distance)))
         let residual = distance / Double(magnitude)
-        let multiplier : Double = ScalebarUnits.roundNumberMultipliers.filter { $0 <= residual }.last ?? 0
+        let multiplier: Double = ScalebarUnits.roundNumberMultipliers.filter { $0 <= residual }.last ?? 0
         return (multiplier, magnitude)
     }
     
@@ -50,7 +50,7 @@ public enum ScalebarUnits{
     }
     
     // this table must begin with 1 and end with 10
-    private static let roundNumberMultipliers : [Double] = [1, 1.2, 1.25, 1.5, 1.75, 2, 2.4, 2.5, 3, 3.75, 4, 5, 6, 7.5, 8, 9, 10]
+    private static let roundNumberMultipliers: [Double] = [1, 1.2, 1.25, 1.5, 1.75, 2, 2.4, 2.5, 3, 3.75, 4, 5, 6, 7.5, 8, 9, 10]
     private static func segmentOptionsForMultiplier(multiplier: Double) -> [Int]{
         switch multiplier {
         case 1:
@@ -160,13 +160,13 @@ public class Scalebar: UIView {
     //
     // public properties
     
-    public var units : ScalebarUnits = .imperial{
+    public var units: ScalebarUnits = .imperial{
         didSet{
             updateScaleDisplay(forceRedraw: true)
         }
     }
     
-    public var style : ScalebarStyle = .line{
+    public var style: ScalebarStyle = .line{
         didSet{
             renderer = style.rendererForScalebar(scalebar: self)
             updateScaleDisplay(forceRedraw: true)
@@ -174,42 +174,42 @@ public class Scalebar: UIView {
     }
     
     @IBInspectable
-    public var fillColor : UIColor? = UIColor.lightGray.withAlphaComponent(0.5){
+    public var fillColor: UIColor? = UIColor.lightGray.withAlphaComponent(0.5){
         didSet{
             setNeedsDisplay()
         }
     }
     
     @IBInspectable
-    public var alternateFillColor : UIColor? = UIColor.black{
+    public var alternateFillColor: UIColor? = UIColor.black{
         didSet{
             setNeedsDisplay()
         }
     }
     
     @IBInspectable
-    public var lineColor : UIColor = UIColor.white{
+    public var lineColor: UIColor = UIColor.white{
         didSet{
             setNeedsDisplay()
         }
     }
     
     @IBInspectable
-    public var shadowColor : UIColor? = UIColor.black.withAlphaComponent(0.65){
+    public var shadowColor: UIColor? = UIColor.black.withAlphaComponent(0.65){
         didSet{
             setNeedsDisplay()
         }
     }
     
     @IBInspectable
-    public var textColor : UIColor? = UIColor.black{
+    public var textColor: UIColor? = UIColor.black{
         didSet{
             setNeedsDisplay()
         }
     }
     
     @IBInspectable
-    public var textShadowColor : UIColor? = UIColor.white{
+    public var textShadowColor: UIColor? = UIColor.white{
         didSet{
             setNeedsDisplay()
         }
@@ -218,14 +218,14 @@ public class Scalebar: UIView {
     // Set this to a value greater than 0 if you don't specify constraints for width and want to rely
     // on intrinsic content size for the width when using autolayout. Only applicable for autolayout.
     @IBInspectable
-    public var maximumIntrinsicWidth : CGFloat = 0 {
+    public var maximumIntrinsicWidth: CGFloat = 0 {
         didSet{
             // this will invalidate the intrinsicContentSize and also redraw
             updateScaleDisplay(forceRedraw: true)
         }
     }
     
-    public var alignment : ScalebarAlignment = .left{
+    public var alignment: ScalebarAlignment = .left{
         didSet{
             updateScaleDisplay(forceRedraw: true)
         }
@@ -234,7 +234,7 @@ public class Scalebar: UIView {
     // allow user to turn off/on geodetic calculations
     public var useGeodeticCalculations = true
     
-    public var mapView : AGSMapView? {
+    public var mapView: AGSMapView? {
         didSet{
             unbindFromMapView(mapView: oldValue)
             bindToMapView(mapView: mapView)
@@ -242,7 +242,7 @@ public class Scalebar: UIView {
         }
     }
     
-    public var font : UIFont = UIFont.systemFont(ofSize: 9.0, weight: UIFont.Weight.semibold){
+    public var font: UIFont = UIFont.systemFont(ofSize: 9.0, weight: UIFont.Weight.semibold){
         didSet{
             recalculateFontProperties()
             updateScaleDisplay(forceRedraw: true)
@@ -252,17 +252,17 @@ public class Scalebar: UIView {
     //
     // private properties
     
-    private static let geodeticCurveType : AGSGeodeticCurveType = .geodesic
+    private static let geodeticCurveType: AGSGeodeticCurveType = .geodesic
     
     //
     // internal statics
     
-    internal static let labelYPad : CGFloat = 2.0
-    internal static let labelXPad : CGFloat = 4.0
-    internal static let tickHeight : CGFloat  = 6.0
-    internal static let tick2Height : CGFloat  = 4.5
-    internal static let notchHeight : CGFloat  = 6.0
-    internal static var numberFormatter : NumberFormatter = {
+    internal static let labelYPad: CGFloat = 2.0
+    internal static let labelXPad: CGFloat = 4.0
+    internal static let tickHeight: CGFloat  = 6.0
+    internal static let tick2Height: CGFloat  = 4.5
+    internal static let notchHeight: CGFloat  = 6.0
+    internal static var numberFormatter: NumberFormatter = {
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .decimal
         numberFormatter.formatterBehavior = .behavior10_4
@@ -273,11 +273,11 @@ public class Scalebar: UIView {
     
     
     internal static let showFrameDebugColors = false
-    internal static let lineCap : CGLineCap = CGLineCap.round
+    internal static let lineCap: CGLineCap = CGLineCap.round
     
-    internal var fontHeight : CGFloat = 0
-    internal var zeroStringWidth : CGFloat = 0
-    internal var maxRightUnitsPad : CGFloat = 0
+    internal var fontHeight: CGFloat = 0
+    internal var zeroStringWidth: CGFloat = 0
+    internal var maxRightUnitsPad: CGFloat = 0
     
     private func recalculateFontProperties(){
         
@@ -295,10 +295,10 @@ public class Scalebar: UIView {
     // maybe something like 10_000_000. This could be useful because the scalebar is really only
     // accurate for the center of the map on smaller scales (when zoomed way out).
     // A minScale of 0 means it will always be visible
-    private let minScale : Double = 0
-    private var updateCoalescer : Coalescer? = nil
+    private let minScale: Double = 0
+    private var updateCoalescer: Coalescer? = nil
 
-    private var renderer : ScalebarRenderer?
+    private var renderer: ScalebarRenderer?
     
     deinit {
         unbindFromMapView(mapView: mapView)
@@ -335,8 +335,8 @@ public class Scalebar: UIView {
         recalculateFontProperties()
     }
     
-    private var mapObservation : NSKeyValueObservation?
-    private var visibleAreaObservation : NSKeyValueObservation?
+    private var mapObservation: NSKeyValueObservation?
+    private var visibleAreaObservation: NSKeyValueObservation?
     
     private func bindToMapView(mapView: AGSMapView?){
         mapObservation = mapView?.observe(\.map, options: .new){[weak self] mapView, change in
@@ -408,10 +408,10 @@ public class Scalebar: UIView {
         // ScaleDisplay properties
         let mapScale = mapView.mapScale
         let unitsPerPoint = mapView.unitsPerPoint
-        let lineMapLength : Double
-        let displayUnit : AGSLinearUnit
+        let lineMapLength: Double
+        let displayUnit: AGSLinearUnit
         let mapCenter = visibleArea.extent.center
-        let lineDisplayLength : CGFloat
+        let lineDisplayLength: CGFloat
         
         // bail early if we can because the last time we drew was good
         if let csd = renderer.currentScaleDisplay, forceRedraw == false{
@@ -554,30 +554,30 @@ public class Scalebar: UIView {
 
 
 internal struct ScaleDisplay{
-    var mapScale : Double = 0
-    var unitsPerPoint : Double = 0
-    var lineMapLength : Double = 0
-    var displayUnit : AGSLinearUnit
-    var lineDisplayLength : CGFloat = 0
-    var mapCenter : AGSPoint
-    var mapLengthString : String
+    var mapScale: Double = 0
+    var unitsPerPoint: Double = 0
+    var lineMapLength: Double = 0
+    var displayUnit: AGSLinearUnit
+    var lineDisplayLength: CGFloat = 0
+    var mapCenter: AGSPoint
+    var mapLengthString: String
 }
 
 internal struct SegmentInfo{
-    var index : Int
-    var segmentScreenLength : CGFloat
-    var xOffset : CGFloat
-    var segmentMapLength : Double
-    var text : String
-    var textWidth : CGFloat
+    var index: Int
+    var segmentScreenLength: CGFloat
+    var xOffset: CGFloat
+    var segmentMapLength: Double
+    var text: String
+    var textWidth: CGFloat
 }
 
 internal protocol ScalebarRenderer{
     
     var scalebar: Scalebar? {get}
-    var currentScaleDisplay : ScaleDisplay? { get set }
+    var currentScaleDisplay: ScaleDisplay? { get set }
     var displayHeight: CGFloat {get}
-    var currentMaxDisplayWidth : CGFloat { get }
+    var currentMaxDisplayWidth: CGFloat { get }
     
     init(scalebar: Scalebar)
     
@@ -587,17 +587,17 @@ internal protocol ScalebarRenderer{
 
 internal extension ScalebarRenderer{
     
-    var shadowOffset : CGPoint{
+    var shadowOffset: CGPoint{
         return CGPoint(x: 0.5, y: 0.5)
     }
     
-    var lineWidth : CGFloat {
+    var lineWidth: CGFloat {
         get {
             return 2
         }
     }
     
-    var halfLineWidth : CGFloat {
+    var halfLineWidth: CGFloat {
         get{
             return 1
         }
@@ -617,13 +617,13 @@ internal extension ScalebarRenderer{
         let minSegmentTestString = (scaleDisplay.mapLengthString.count > 3) ? scaleDisplay.mapLengthString : "9.9"
         // use 1.5 because the last segment, the text is right justified insted of center, which makes it harder to squeeze text in
         let minSegmentWidth = (minSegmentTestString.size(withAttributes: [NSAttributedString.Key.font: scalebar.font]).width * 1.5) + (Scalebar.labelXPad * 2)
-        var maxNumSegments : Int = Int(lineDisplayLength / minSegmentWidth)
+        var maxNumSegments: Int = Int(lineDisplayLength / minSegmentWidth)
         maxNumSegments = min(maxNumSegments, 4) // cap it at 4
         let numSegments: Int = ScalebarUnits.numSegmentsForDistance(distance: scaleDisplay.lineMapLength, maxNumSegments: maxNumSegments)
         
-        let segmentScreenLength : CGFloat = (lineDisplayLength / CGFloat(numSegments))
+        let segmentScreenLength: CGFloat = (lineDisplayLength / CGFloat(numSegments))
         
-        var currSegmentX : CGFloat = 0
+        var currSegmentX: CGFloat = 0
         
         var segmentInfos = [SegmentInfo]()
         
@@ -731,7 +731,7 @@ internal extension ScalebarRenderer{
     }
 }
 
-internal class ScalebarLineStyleRenderer : ScalebarRenderer{
+internal class ScalebarLineStyleRenderer: ScalebarRenderer{
     
     weak var scalebar: Scalebar?
     
@@ -739,7 +739,7 @@ internal class ScalebarLineStyleRenderer : ScalebarRenderer{
         self.scalebar = scalebar
     }
     
-    var currentScaleDisplay : ScaleDisplay?
+    var currentScaleDisplay: ScaleDisplay?
     
     var displayHeight: CGFloat {
         get{
@@ -839,7 +839,7 @@ internal class ScalebarLineStyleRenderer : ScalebarRenderer{
     }
 }
 
-internal class ScalebarGraduatedLineStyleRenderer : ScalebarRenderer{
+internal class ScalebarGraduatedLineStyleRenderer: ScalebarRenderer{
     
     weak var scalebar: Scalebar?
     
@@ -847,7 +847,7 @@ internal class ScalebarGraduatedLineStyleRenderer : ScalebarRenderer{
         self.scalebar = scalebar
     }
     
-    var currentScaleDisplay : ScaleDisplay?
+    var currentScaleDisplay: ScaleDisplay?
     
     var displayHeight: CGFloat {
         get{
@@ -960,7 +960,7 @@ internal class ScalebarGraduatedLineStyleRenderer : ScalebarRenderer{
     }
 }
 
-internal class ScalebarBarStyleRenderer : ScalebarRenderer{
+internal class ScalebarBarStyleRenderer: ScalebarRenderer{
     
     weak var scalebar: Scalebar?
     
@@ -968,7 +968,7 @@ internal class ScalebarBarStyleRenderer : ScalebarRenderer{
         self.scalebar = scalebar
     }
     
-    var currentScaleDisplay : ScaleDisplay?
+    var currentScaleDisplay: ScaleDisplay?
     
     var displayHeight: CGFloat {
         get{
@@ -1074,7 +1074,7 @@ internal class ScalebarBarStyleRenderer : ScalebarRenderer{
     }
 }
 
-internal class ScalebarAlternatingBarStyleRenderer : ScalebarRenderer{
+internal class ScalebarAlternatingBarStyleRenderer: ScalebarRenderer{
     
     weak var scalebar: Scalebar?
     
@@ -1082,7 +1082,7 @@ internal class ScalebarAlternatingBarStyleRenderer : ScalebarRenderer{
         self.scalebar = scalebar
     }
     
-    var currentScaleDisplay : ScaleDisplay?
+    var currentScaleDisplay: ScaleDisplay?
     
     var displayHeight: CGFloat {
         get{
@@ -1241,7 +1241,7 @@ internal class ScalebarAlternatingBarStyleRenderer : ScalebarRenderer{
 }
 
 
-internal class ScalebarDualUnitLineStyleRenderer : ScalebarRenderer{
+internal class ScalebarDualUnitLineStyleRenderer: ScalebarRenderer{
     
     weak var scalebar: Scalebar?
     
@@ -1249,7 +1249,7 @@ internal class ScalebarDualUnitLineStyleRenderer : ScalebarRenderer{
         self.scalebar = scalebar
     }
     
-    var currentScaleDisplay : ScaleDisplay?
+    var currentScaleDisplay: ScaleDisplay?
     
     var displayHeight: CGFloat {
         get{
