@@ -66,7 +66,7 @@ public class UnitsViewController: TableViewController {
         // Only do this if not being presented from a nav controller
         // as in that case, it causes problems when the delegate that pushed this VC
         // tries to pop it off the stack.
-        if navigationController == nil || navigationController?.viewControllers.first == self{
+        if presentingViewController != nil{
             navigationItem.searchController?.isActive = false
         }
         delegate?.unitsViewControllerDidCancel(self)
@@ -141,7 +141,7 @@ public class UnitsViewController: TableViewController {
         // Only do this if not being presented from a nav controller
         // as in that case, it causes problems when the delegate that pushed this VC
         // tries to pop it off the stack.
-        if navigationController == nil || navigationController?.viewControllers.first == self{
+        if presentingViewController != nil{
             navigationItem.searchController?.isActive = false
         }
         delegate?.unitsViewControllerDidSelectUnit(self)
