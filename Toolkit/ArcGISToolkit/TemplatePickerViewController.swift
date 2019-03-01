@@ -22,7 +22,7 @@ public class FeatureTemplateInfo{
     /// The feature template
     public let featureTemplate: AGSFeatureTemplate
     /// The swatch for the feature template
-    public let swatch: UIImage?
+    public var swatch: UIImage?
     
     fileprivate init(featureLayer: AGSFeatureLayer, featureTable: AGSArcGISFeatureTable, featureTemplate: AGSFeatureTemplate, swatch: UIImage? = nil){
         self.featureLayer = featureLayer
