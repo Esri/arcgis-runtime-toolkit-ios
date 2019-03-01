@@ -57,11 +57,5 @@ class PopupExample: MapViewController {
         popupController = PopupController(geoViewController: self, geoView: mapView)
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
-    
 }
 

@@ -40,9 +40,4 @@ class CompassExample: MapViewController {
         compass.trailingAnchor.constraint(equalTo: margins.trailingAnchor).isActive = true
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
 }
