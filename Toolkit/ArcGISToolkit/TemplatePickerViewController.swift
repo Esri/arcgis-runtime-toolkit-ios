@@ -34,7 +34,7 @@ public class FeatureTemplateInfo{
 
 /// The protocol you implement to respond as the user interacts with the feature templates
 /// view controller.
-public protocol TemplatePickerViewControllerDelegate: class {
+public protocol TemplatePickerViewControllerDelegate: AnyObject {
     /// Tells the delegate that the user has cancelled selecting a template.
     ///
     /// - Parameter templatePickerViewController: The current template picker view controller.
@@ -72,7 +72,7 @@ public class TemplatePickerViewController: TableViewController {
         }
     }
     
-    /// Initializes a TemplatePickerViewController with a map
+    /// Initializes a `TemplatePickerViewController` with a map.
     public init(map: AGSMap){
         super.init(nibName: nil, bundle: nil)
         self.map = map
@@ -82,7 +82,7 @@ public class TemplatePickerViewController: TableViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    /// The delegate that will handle the selection and cancelation of the TemplatePickerViewController.
+    /// The delegate that will handle the selection and cancelation of the `TemplatePickerViewController`.
     public weak var delegate: TemplatePickerViewControllerDelegate?
     
     override public func viewDidLoad() {

@@ -29,10 +29,10 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
     /// The `UIViewController` that contains the `AGSGeoView`.
     public private(set) weak var geoViewController: UIViewController?
     
-    /// The AGSGeoView that the PopupController is interacting with
+    /// The `AGSGeoView` that the `PopupController` is interacting with.
     public let geoView: AGSGeoView
     
-    /// Whether or not to push the AGSPopupsViewController onto the UINavigationController
+    /// Indicates whether or not to push the `AGSPopupsViewController` onto the `UINavigationController`. The default is `true`.
     public var useNavigationControllerIfAvailable: Bool = true
     
     /// Instantiates a `PopupController`
@@ -147,7 +147,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
             return
         }
         
-        if popups.count > 0{
+        if !popups.isEmpty {
             if popupsViewController == nil{
                 
                 let containerStyle: AGSPopupsViewControllerContainerStyle = useNavigationControllerIfAvailable && geoViewController?.navigationController != nil ? .navigationController : .navigationBar
@@ -207,7 +207,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         if let geoViewController = geoViewController, let nc = geoViewController.navigationController{
             // if there is a navigationController available add button to go back to popups when done editing geometry
             geoViewControllerOriginalRightBarButtonItems = geoViewController.navigationItem.rightBarButtonItems
-            let backToPvcButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(navigateBackToPopupsFromGeometryEditing))
+            let backToPvcButton = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(navigateBackToPopupsFromGeometryEditing))
             geoViewController.navigationItem.rightBarButtonItem = backToPvcButton
             
             if useNavigationControllerIfAvailable{
