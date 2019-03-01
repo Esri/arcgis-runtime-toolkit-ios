@@ -221,11 +221,18 @@ public class TemplatePickerViewController: TableViewController {
         // first get the selected object
         let selectedFeatureTemplateInfo = info(for: indexPath)
         
-        // If the search controller is still active, the delegate will not be
-        // able to dismiss us, if desired.
         // Note: we can't do this before the above, or else the object we pull
         // out of the datasource will be incorrect
-        navigationItem.searchController?.isActive = false
+        //
+        // If the search controller is still active, the delegate will not be
+        // able to dismiss this if they showed this modally
+        // (or wrapped it in a navigation controller and showed that modally)
+        // Only do this if not being presented from a nav controller
+        // as in that case, it causes problems when the delegate that pushed this VC
+        // tries to pop it off the stack.
+        if navigationController == nil || navigationController?.viewControllers.first == self{
+            navigationItem.searchController?.isActive = false
+        }
         
         delegate?.templatePickerViewController(self, didSelect: selectedFeatureTemplateInfo)
     }
@@ -249,8 +256,14 @@ public class TemplatePickerViewController: TableViewController {
     
     @objc private func cancelAction(){
         // If the search controller is still active, the delegate will not be
-        // able to dismiss us, if desired.
-        navigationItem.searchController?.isActive = false
+        // able to dismiss this if they showed this modally.
+        // (or wrapped it in a navigation controller and showed that modally)
+        // Only do this if not being presented from a nav controller
+        // as in that case, it causes problems when the delegate that pushed this VC
+        // tries to pop it off the stack.
+        if navigationController == nil || navigationController?.viewControllers.first == self{
+            navigationItem.searchController?.isActive = false
+        }
         delegate?.templatePickerViewControllerDidCancel(self)
     }
     

@@ -60,6 +60,15 @@ public class UnitsViewController: TableViewController {
     
     /// Called in response to the Cancel button being tapped.
     @objc private func cancel() {
+        // If the search controller is still active, the delegate will not be
+        // able to dismiss this if they showed this modally.
+        // (or wrapped it in a navigation controller and showed that modally)
+        // Only do this if not being presented from a nav controller
+        // as in that case, it causes problems when the delegate that pushed this VC
+        // tries to pop it off the stack.
+        if navigationController == nil || navigationController?.viewControllers.first == self{
+            navigationItem.searchController?.isActive = false
+        }
         delegate?.unitsViewControllerDidCancel(self)
     }
     
@@ -127,8 +136,14 @@ public class UnitsViewController: TableViewController {
         guard unit != selectedUnit else { return }
         selectedUnit = unit
         // If the search controller is still active, the delegate will not be
-        // able to dismiss us, if desired.
-        navigationItem.searchController?.isActive = false
+        // able to dismiss this if they showed this modally.
+        // (or wrapped it in a navigation controller and showed that modally)
+        // Only do this if not being presented from a nav controller
+        // as in that case, it causes problems when the delegate that pushed this VC
+        // tries to pop it off the stack.
+        if navigationController == nil || navigationController?.viewControllers.first == self{
+            navigationItem.searchController?.isActive = false
+        }
         delegate?.unitsViewControllerDidSelectUnit(self)
     }
     
