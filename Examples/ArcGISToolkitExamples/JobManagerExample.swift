@@ -343,7 +343,7 @@ class JobManagerExample: TableViewController {
         
         let content = UNMutableNotificationContent()
         content.body = "Job Complete"
-        content.sound = UNNotificationSound.default
+        content.sound = .default
         
         let request = UNNotificationRequest(identifier: "job complete", content: content, trigger: nil)
         
