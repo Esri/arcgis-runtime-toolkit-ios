@@ -157,7 +157,7 @@ class JobManagerExample: TableViewController {
         
         // request authorization for user notifications, this way we can notify user in bg when job complete
         let center = UNUserNotificationCenter.current()
-        center.requestAuthorization(options: [.alert, .badge, .sound]) { (granted, error) in
+        center.requestAuthorization(options: [.alert, .badge, .sound]) { (granted, _) in
             if !granted{
                 print("You must grant access for user notifications for all the features of this sample to work")
             }
