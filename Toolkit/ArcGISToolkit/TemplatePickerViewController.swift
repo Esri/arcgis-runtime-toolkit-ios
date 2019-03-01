@@ -22,13 +22,17 @@ public class FeatureTemplateInfo{
     /// The feature template
     public let featureTemplate: AGSFeatureTemplate
     /// The swatch for the feature template
-    public var swatch: UIImage?
+    public let swatch: UIImage?
     
     fileprivate init(featureLayer: AGSFeatureLayer, featureTable: AGSArcGISFeatureTable, featureTemplate: AGSFeatureTemplate, swatch: UIImage? = nil){
         self.featureLayer = featureLayer
         self.featureTable = featureTable
         self.featureTemplate = featureTemplate
         self.swatch = swatch
+    }
+    
+    fileprivate func updatingSwatch(swatch: UIImage?) -> FeatureTemplateInfo{
+        return FeatureTemplateInfo(featureLayer: featureLayer, featureTable: featureTable, featureTemplate: featureTemplate, swatch: swatch)
     }
 }
 
@@ -62,12 +66,7 @@ public class TemplatePickerViewController: TableViewController {
     private var currentInfos = [FeatureTemplateInfo](){
         didSet{
             tables = Set(self.currentInfos.map { $0.featureTable }).sorted(by: {$0.tableName < $1.tableName})
-            currentDatasource = [String: [FeatureTemplateInfo]]()
-            currentInfos.forEach{
-                var infosForTable = currentDatasource[$0.featureTable.tableName] ?? [FeatureTemplateInfo]()
-                infosForTable.append($0)
-                currentDatasource[$0.featureTable.tableName] = infosForTable
-            }
+            currentDatasource = Dictionary(grouping: currentInfos, by: { $0.featureTable.tableName })
             self.tableView.reloadData()
         }
     }
@@ -200,7 +199,7 @@ public class TemplatePickerViewController: TableViewController {
                     infos[index].swatch = image
                     
                     // reload index where that info currently is
-                    if let indexPath = self?.indexPathForInfo(info){
+                    if let indexPath = self?.indexPath(for: info){
                         self?.tableView.reloadRows(at: [indexPath], with: .automatic)
                     }
                 }
@@ -265,17 +264,13 @@ public class TemplatePickerViewController: TableViewController {
         return infos[indexPath.row]
     }
     
-    private func indexPathForInfo(_ info: FeatureTemplateInfo) -> IndexPath?{
+    private func indexPath(for info: FeatureTemplateInfo) -> IndexPath{
         
-        let tableIndex = tables.index { $0.tableName == info.featureTable.tableName }
-        let infos = self.currentDatasource[info.featureTable.tableName]
-        let infoIndex = infos?.index { $0 === info }
+        let tableIndex = tables.index { $0.tableName == info.featureTable.tableName }!
+        let infos = self.currentDatasource[info.featureTable.tableName]!
+        let infoIndex = infos.index { $0 === info }!
         
-        guard let section = tableIndex, let row = infoIndex else{
-            return nil
-        }
-        
-        return IndexPath(row: row, section: section)
+        return IndexPath(row: infoIndex, section: tableIndex)
     }
 }
 
