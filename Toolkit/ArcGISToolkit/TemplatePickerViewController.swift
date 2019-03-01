@@ -170,6 +170,7 @@ public class TemplatePickerViewController: TableViewController {
         })
         
         let typeTemplates = table.featureTypes
+            .lazy
             .flatMap({ $0.templates })
             .map({ FeatureTemplateInfo(featureLayer:featureLayer, featureTable:table, featureTemplate:$0) })
         

@@ -82,7 +82,7 @@ extension TemplatePickerExample: TemplatePickerViewControllerDelegate {
         alert.addAction(action)
         alert.preferredAction = action
         
-        present(alert, animated: true, completion: nil)
+        present(alert, animated: true)
         
     }
     
@@ -98,7 +98,7 @@ extension TemplatePickerExample: TemplatePickerViewControllerDelegate {
         alert.addAction(action)
         alert.preferredAction = action
         
-        present(alert, animated: true, completion: nil)
+        present(alert, animated: true)
         
     }
 }

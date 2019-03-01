@@ -101,7 +101,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
                 geoViewController?.navigationController?.popToViewController(geoViewController!, animated: true)
             }
             else if popupsViewController == geoViewController?.presentedViewController{
-                popupsViewController?.dismiss(animated: true, completion: nil)
+                popupsViewController?.dismiss(animated: true)
             }
         }
         
@@ -168,7 +168,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
                     geoViewController?.navigationController?.pushViewController(popupsViewController, animated: true)
                 }
                 else{
-                    geoViewController?.present(popupsViewController, animated: true, completion: nil)
+                    geoViewController?.present(popupsViewController, animated: true)
                 }
                 
             }
@@ -214,12 +214,12 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
                 nc.popToViewController(geoViewController, animated: true)
             }
             else{
-                popupsViewController?.dismiss(animated: true, completion: nil)
+                popupsViewController?.dismiss(animated: true)
             }
         }
         else{
             // in this case developer needs to have a button that calls `navigateBackToPopupsFromGeometryEditing`
-            popupsViewController?.dismiss(animated: true, completion: nil)
+            popupsViewController?.dismiss(animated: true)
         }
         
     }
@@ -241,11 +241,11 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
                 nc.pushViewController(popupsViewController, animated: true)
             }
             else{
-                geoViewController.present(popupsViewController, animated: true, completion: nil)
+                geoViewController.present(popupsViewController, animated: true)
             }
         }
         else{
-            geoViewController?.present(popupsViewController, animated: true, completion: nil)
+            geoViewController?.present(popupsViewController, animated: true)
         }
     }
     

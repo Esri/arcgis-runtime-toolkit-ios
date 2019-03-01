@@ -94,7 +94,7 @@ class TimeSliderExample: MapViewController {
     private func showError(_ error: Error) {
         let alertController = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-        present(alertController, animated: true, completion: nil)
+        present(alertController, animated: true)
     }
 }
 
