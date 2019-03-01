@@ -1292,7 +1292,7 @@ public class TimeSlider: UIControl {
         // Add the minimum value label
         fullExtentStartTimeLabel.isHidden = !(fullExtentLabelsVisible && isSliderVisible)
         fullExtentStartTimeLabel.foregroundColor = fullExtentLabelColor.cgColor
-        fullExtentStartTimeLabel.alignmentMode = CATextLayerAlignmentMode.center
+        fullExtentStartTimeLabel.alignmentMode = .center
         fullExtentStartTimeLabel.frame = CGRect.zero
         fullExtentStartTimeLabel.contentsScale = UIScreen.main.scale
         fullExtentStartTimeLabel.font = fullExtentLabelFont as CFTypeRef

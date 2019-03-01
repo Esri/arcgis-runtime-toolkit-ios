@@ -14,8 +14,8 @@
 import UIKit
 import ArcGIS
 
-/// The PopupController does the work of wiring up an AGSPopupsViewController for you.
-/// Through it's use of the AGSPopupsViewController, it provides a complete
+/// The `PopupController` does the work of wiring up an `AGSPopupsViewController` for you.
+/// Through its use of the `AGSPopupsViewController`, it provides a complete
 /// feature editing and collecting experience.
 public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoViewTouchDelegate {
     
