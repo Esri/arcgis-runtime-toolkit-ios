@@ -99,7 +99,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         // if old pvc is being shown still for some reason, dismiss it
         if popupsViewController?.view?.window != nil {
             if popupsViewController == geoViewController?.navigationController?.topViewController{
-                _ = geoViewController?.navigationController?.popViewController(animated: true)
+                geoViewController?.navigationController?.popToViewController(geoViewController!, animated: true)
             }
             else if popupsViewController == geoViewController?.presentedViewController{
                 popupsViewController?.dismiss(animated: true, completion: nil)

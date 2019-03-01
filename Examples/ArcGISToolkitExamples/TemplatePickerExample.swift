@@ -75,7 +75,7 @@ extension TemplatePickerExample: TemplatePickerViewControllerDelegate {
         // This is where you handle the user canceling the template picker
         
         // dismiss the template picker
-        navigationController?.popViewController(animated: true)
+        navigationController?.popToViewController(self, animated: true)
         
         let alert = UIAlertController(title: "TemplatePickerExample", message: "User cancelled", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
@@ -89,7 +89,7 @@ extension TemplatePickerExample: TemplatePickerViewControllerDelegate {
         // This is where you handle the user making a selection with the template picker
         
         // dismiss the template picker
-        navigationController?.popViewController(animated: true)
+        navigationController?.popToViewController(self, animated: true)
         
         let alert = UIAlertController(title: "TemplatePickerExample", message: "User selected \(featureTemplateInfo.featureTemplate.name)", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
