@@ -1464,7 +1464,7 @@ public class TimeSlider: UIControl {
             let startTimeString = string(for: fullExtentStartTime, style: fullExtentLabelDateStyle)
             fullExtentStartTimeLabel.string = startTimeString
             fullExtentStartTimeLabel.isHidden = !(fullExtentLabelsVisible && isSliderVisible)
-            let startTimeLabelSize: CGSize = startTimeString.size(withAttributes: [kCTFontAttributeName as NSAttributedString.Key: fullExtentLabelFont])
+            let startTimeLabelSize = startTimeString.size(withAttributes: [.font: fullExtentLabelFont])
             var startTimeLabelX = trackLayer.frame.minX - (startTimeLabelSize.width / 2.0)
             if startTimeLabelX < bounds.minX + labelSidePadding {
                 startTimeLabelX = bounds.minX + labelSidePadding

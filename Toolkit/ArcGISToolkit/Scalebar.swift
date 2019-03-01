@@ -618,7 +618,7 @@ internal extension ScalebarRenderer{
         // very basic hueristics...
         let minSegmentTestString = (scaleDisplay.mapLengthString.count > 3) ? scaleDisplay.mapLengthString : "9.9"
         // use 1.5 because the last segment, the text is right justified insted of center, which makes it harder to squeeze text in
-        let minSegmentWidth = (minSegmentTestString.size(withAttributes: [NSAttributedString.Key.font: scalebar.font]).width * 1.5) + (Scalebar.labelXPad * 2)
+        let minSegmentWidth = (minSegmentTestString.size(withAttributes: [.font: scalebar.font]).width * 1.5) + (Scalebar.labelXPad * 2)
         var maxNumSegments: Int = Int(lineDisplayLength / minSegmentWidth)
         maxNumSegments = min(maxNumSegments, 4) // cap it at 4
         let numSegments: Int = ScalebarUnits.numSegmentsForDistance(distance: scaleDisplay.lineMapLength, maxNumSegments: maxNumSegments)
@@ -634,7 +634,7 @@ internal extension ScalebarRenderer{
             currSegmentX += segmentScreenLength
             let segmentMapLength = Double((segmentScreenLength * CGFloat(index + 1)) / lineDisplayLength) * scaleDisplay.lineMapLength
             let segmentText = Scalebar.numberFormatter.string(from: NSNumber(value: segmentMapLength)) ?? ""
-            let segmentTextWidth = segmentText.size(withAttributes: [NSAttributedString.Key.font: scalebar.font]).width
+            let segmentTextWidth = segmentText.size(withAttributes: [.font: scalebar.font]).width
             
             let segmentInfo = SegmentInfo(index: index, segmentScreenLength: segmentScreenLength, xOffset: currSegmentX, segmentMapLength: segmentMapLength, text: segmentText, textWidth: segmentTextWidth)
             
@@ -712,7 +712,7 @@ internal extension ScalebarRenderer{
                 // draw units off the end
                 
                 let unitsText = " \(scaleDisplay.displayUnit.abbreviation)"
-                let unitsTextWidth = unitsText.size(withAttributes: [NSAttributedString.Key.font: scalebar.font]).width
+                let unitsTextWidth = unitsText.size(withAttributes: [.font: scalebar.font]).width
                 
                 let unitsTextFrame = CGRect(x: segmentTextFrame.maxX,
                                               y: textY,
@@ -1362,10 +1362,10 @@ internal class ScalebarDualUnitLineStyleRenderer: ScalebarRenderer{
         // draw top text
         
         let topUnitsText = " \(scaleDisplay.displayUnit.abbreviation)"
-        let topUnitsTextWidth = topUnitsText.size(withAttributes: [NSAttributedString.Key.font: scalebar.font]).width
+        let topUnitsTextWidth = topUnitsText.size(withAttributes: [.font: scalebar.font]).width
         
         let topText = "\(scaleDisplay.mapLengthString)\(topUnitsText)"
-        let topTextWidth = topText.size(withAttributes: [NSAttributedString.Key.font: scalebar.font]).width
+        let topTextWidth = topText.size(withAttributes: [.font: scalebar.font]).width
         let topTextMapLengthStringWidth = topTextWidth - topUnitsTextWidth
         
         let topTextFrame = CGRect(x: lineX + lineScreenLength + halfLineWidth - topTextMapLengthStringWidth,
@@ -1379,10 +1379,10 @@ internal class ScalebarDualUnitLineStyleRenderer: ScalebarRenderer{
         if let numberString = Scalebar.numberFormatter.string(from: NSNumber(value: otherLineMapLength)){
             
             let bottomUnitsText = " \(otherDisplayUnits.abbreviation)"
-            let bottomUnitsTextWidth = bottomUnitsText.size(withAttributes: [NSAttributedString.Key.font: scalebar.font]).width
+            let bottomUnitsTextWidth = bottomUnitsText.size(withAttributes: [.font: scalebar.font]).width
             
             let bottomText = "\(numberString)\(bottomUnitsText)"
-            let bottomTextWidth = bottomText.size(withAttributes: [NSAttributedString.Key.font: scalebar.font]).width
+            let bottomTextWidth = bottomText.size(withAttributes: [.font: scalebar.font]).width
             let bottomTextNumberStringWidth = bottomTextWidth - bottomUnitsTextWidth
             
             let bottomTextFrame = CGRect(x: lineX + otherLineScreenLength + halfLineWidth - bottomTextNumberStringWidth,
