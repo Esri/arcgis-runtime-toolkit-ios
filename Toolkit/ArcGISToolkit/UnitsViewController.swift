@@ -58,16 +58,6 @@ public class UnitsViewController: TableViewController {
         }
     }
     
-    /// The search controller used by the units view controller. 
-    private var searchController: UISearchController? {
-        get {
-            return navigationItem.searchController
-        }
-        set {
-            navigationItem.searchController = newValue
-        }
-    }
-    
     /// Called in response to the Cancel button being tapped.
     @objc private func cancel() {
         delegate?.unitsViewControllerDidCancel(self)
@@ -103,7 +93,7 @@ public class UnitsViewController: TableViewController {
         title = "Units"
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(UnitsViewController.cancel))
         definesPresentationContext = true
-        searchController = makeSearchController()
+        navigationItem.searchController = makeSearchController()
     }
     
     /// Creates a search controller for searching the list of units.
@@ -138,7 +128,7 @@ public class UnitsViewController: TableViewController {
         selectedUnit = unit
         // If the search controller is still active, the delegate will not be
         // able to dismiss us, if desired.
-        searchController?.isActive = false
+        navigationItem.searchController?.isActive = false
         delegate?.unitsViewControllerDidSelectUnit(self)
     }
     

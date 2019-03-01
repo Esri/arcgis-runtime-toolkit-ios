@@ -185,7 +185,8 @@ public class TemplatePickerViewController: TableViewController {
         }
         
         // generate swatches for the layer infos
-        for (index, info) in infos.enumerated(){
+        for index in infos.indices{
+            let info = infos[index]
             if let feature = info.featureTable.createFeature(with: info.featureTemplate){
                 let sym = info.featureLayer.renderer?.symbol(for: feature)
                 sym?.createSwatch{ [weak self] image, error in
@@ -198,8 +199,8 @@ public class TemplatePickerViewController: TableViewController {
                     infos[index].swatch = image
                     
                     // reload index where that info currently is
-                    if let index = self?.indexPathForInfo(info){
-                        self?.tableView.reloadRows(at: [index], with: .automatic)
+                    if let indexPath = self?.indexPathForInfo(info){
+                        self?.tableView.reloadRows(at: [indexPath], with: .automatic)
                     }
                 }
             }
@@ -213,7 +214,7 @@ public class TemplatePickerViewController: TableViewController {
     }
     
     public func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return tables.count == 0 ? nil : tables[section].tableName
+        return tables[section].tableName
     }
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -233,11 +234,6 @@ public class TemplatePickerViewController: TableViewController {
     }
     
     override public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
-        guard tables.count > 0 else {
-            return 0
-        }
-        
         let tableName = tables[section].tableName
         let infos = self.currentDatasource[tableName]
         return infos?.count ?? 0
