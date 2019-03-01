@@ -30,10 +30,6 @@ public class FeatureTemplateInfo{
         self.featureTemplate = featureTemplate
         self.swatch = swatch
     }
-    
-    fileprivate func updatingSwatch(swatch: UIImage?) -> FeatureTemplateInfo{
-        return FeatureTemplateInfo(featureLayer: featureLayer, featureTable: featureTable, featureTemplate: featureTemplate, swatch: swatch)
-    }
 }
 
 /// The protocol you implement to respond as the user interacts with the feature templates
