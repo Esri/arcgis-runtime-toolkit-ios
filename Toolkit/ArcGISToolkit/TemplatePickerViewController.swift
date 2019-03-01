@@ -91,20 +91,9 @@ public class TemplatePickerViewController: TableViewController {
         // add cancel button
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(TemplatePickerViewController.cancelAction))
         
-        // load map, get initial data
-        self.map?.load(){ [weak self] error in
-
-            guard let self = self else{
-                return
-            }
-            
-            guard let map = self.map else{
-                return
-            }
-            
-            if error == nil{
-                self.getTemplates(map: map)
-            }
+        // get the templates from the map
+        if let map = map{
+            getTemplateInfos(map: map, completion: loadInfosAndCreateSwatches)
         }
     }
     
@@ -123,41 +112,38 @@ public class TemplatePickerViewController: TableViewController {
     }
     
     /// Gets the templates out of a map.
-    /// This should only be called once the map is loaded.
-    private func getTemplates(map: AGSMap){
+    private func getTemplateInfos(map: AGSMap, completion: @escaping (([FeatureTemplateInfo])->Void) ){
         
-        // get the templates for the map, this function should be called once the map is loaded
-        
-        // go through each layer and if it has a popup definition, editable and can create features
-        // then add it's info to the list
-        for layer in map.operationalLayers as! [AGSLayer]{
+        map.load{ [weak self] error in
             
-            guard let fl = layer as? AGSFeatureLayer, fl.featureTable is AGSArcGISFeatureTable else {
-                continue
+            guard let self = self else { return }
+            guard error == nil else{ return }
+            
+            let allLayers : [AGSLayer] = (map.operationalLayers as Array + map.basemap.baseLayers as Array + map.basemap.referenceLayers as Array) as! [AGSLayer]
+            
+            let featureLayers = allLayers
+                .compactMap({ $0 as? AGSFeatureLayer })
+                .filter({ $0.featureTable is AGSArcGISFeatureTable })
+            
+            AGSLoadObjects(featureLayers){ [weak self] _ in
+                guard let self = self else { return }
+                let templates = featureLayers.flatMap({ return self.getTemplateInfos(featureLayer: $0) })
+                completion(templates)
             }
-            
-            fl.load{ [weak self] error in
-                guard error == nil else{
-                    return
-                }
-                
-                self?.getTemplates(featureLayer: fl)
-            }
-            
         }
         
     }
     
     /// Gets the templates out of a feature layer and associated table.
     /// This should only be called once the feature layer is loaded.
-    private func getTemplates(featureLayer: AGSFeatureLayer){
+    private func getTemplateInfos(featureLayer: AGSFeatureLayer) -> [FeatureTemplateInfo]{
         
         guard let table = featureLayer.featureTable as? AGSArcGISFeatureTable else{
-            return
+            return []
         }
         
         guard let popupDef = featureLayer.popupDefinition, popupDef.allowEdit || table.canAddFeature else{
-            return
+            return []
         }
         
         let tableTemplates = table.featureTemplates.map({
@@ -169,10 +155,15 @@ public class TemplatePickerViewController: TableViewController {
             .flatMap({ $0.templates })
             .map({ FeatureTemplateInfo(featureLayer:featureLayer, featureTable:table, featureTemplate:$0) })
         
-        let infos = tableTemplates + typeTemplates
+        return tableTemplates + typeTemplates
+    }
+    
+    /// Loads the template infos as the current datasource
+    /// and creates swatches for them
+    private func loadInfosAndCreateSwatches(infos: [FeatureTemplateInfo]){
         
         // add to list of unfiltered infos
-        unfilteredInfos.append(contentsOf: infos)
+        unfilteredInfos = infos
         
         // re-assign to the current infos so we can update the tableview
         // only should do this if not currently filtering
@@ -187,17 +178,15 @@ public class TemplatePickerViewController: TableViewController {
                 let sym = info.featureLayer.renderer?.symbol(for: feature)
                 sym?.createSwatch{ [weak self] image, error in
                     
-                    guard error == nil else{
-                        return
-                    }
+                    guard let self = self else { return }
+                    guard error == nil else{ return }
                     
                     // update info with swatch
                     infos[index].swatch = image
                     
                     // reload index where that info currently is
-                    if let indexPath = self?.indexPath(for: info){
-                        self?.tableView.reloadRows(at: [indexPath], with: .automatic)
-                    }
+                    let indexPath = self.indexPath(for: info)
+                    self.tableView.reloadRows(at: [indexPath], with: .automatic)
                 }
             }
         }
@@ -230,7 +219,7 @@ public class TemplatePickerViewController: TableViewController {
         // Only do this if not being presented from a nav controller
         // as in that case, it causes problems when the delegate that pushed this VC
         // tries to pop it off the stack.
-        if navigationController == nil || navigationController?.viewControllers.first == self{
+        if presentingViewController != nil || navigationController?.presentingViewController != nil {
             navigationItem.searchController?.isActive = false
         }
         
