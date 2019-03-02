@@ -53,7 +53,7 @@ public protocol TemplatePickerViewControllerDelegate: AnyObject {
 public class TemplatePickerViewController: TableViewController {
     
     /// The map which this view controller will display the feature templates from
-    public private(set) var map: AGSMap?
+    public let map: AGSMap?
     
     private var tables = [AGSArcGISFeatureTable]()
     private var currentDatasource = [String: [FeatureTemplateInfo]]()
@@ -69,8 +69,8 @@ public class TemplatePickerViewController: TableViewController {
     
     /// Initializes a `TemplatePickerViewController` with a map.
     public init(map: AGSMap){
-        super.init(nibName: nil, bundle: nil)
         self.map = map
+        super.init(nibName: nil, bundle: nil)
     }
     
     required public init?(coder aDecoder: NSCoder) {
@@ -231,8 +231,7 @@ public class TemplatePickerViewController: TableViewController {
     override public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         guard !tables.isEmpty else { return 0 }
         let tableName = tables[section].tableName
-        let infos = self.currentDatasource[tableName]
-        return infos?.count ?? 0
+        return currentDatasource[tableName, default: []].count
     }
     
     override public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
