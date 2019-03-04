@@ -18,7 +18,7 @@ open class VCListViewController: TableViewController {
     
     public var storyboardName: String?
     
-    public var viewControllerInfos : [(vcName: String, viewControllerType: UIViewController.Type, nibName: String?)] = [
+    public var viewControllerInfos: [(vcName: String, viewControllerType: UIViewController.Type, nibName: String?)] = [
         ]{
         didSet{
             self.tableView.reloadData()
@@ -51,7 +51,7 @@ open class VCListViewController: TableViewController {
         
         let t = viewControllerInfos[indexPath.row].viewControllerType
         let nibName = viewControllerInfos[indexPath.row].nibName
-        var vcOpt : UIViewController? = nil
+        var vcOpt: UIViewController? = nil
         
         // first check storyboard
         if let storyboardName = self.storyboardName{

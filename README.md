@@ -5,11 +5,13 @@ Toolkit components that will simplify your iOS app development with ArcGIS Runti
 ## Toolkit Components
 
 * [Compass](Documentation/Compass)
-* [Job Manager](Documentation/JobManager)
-* [Legend View Controller](Documentation/LegendViewController)
-* [Measure Toolbar](Documentation/MeasureToolbar)
+* [JobManager](Documentation/JobManager)
+* [LegendViewController](Documentation/LegendViewController)
+* [MeasureToolbar](Documentation/MeasureToolbar)
 * [Scalebar](Documentation/Scalebar)
 * [TimeSlider](Documentation/TimeSlider)
+* [PopupController](Documentation/PopupController)
+* [TemplatePickerViewController](Documentation/TemplatePicker)
 
 ## Requirements
 * [ArcGIS Runtime SDK for iOS](https://developers.arcgis.com/en/ios/) 100.4.0 (or higher)

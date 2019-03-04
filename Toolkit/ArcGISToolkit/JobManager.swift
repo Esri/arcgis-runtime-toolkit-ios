@@ -39,14 +39,14 @@ private let _jobManagerSharedInstance = JobManager(jobManagerID: "shared")
  
  method.
  */
-public class JobManager : NSObject {
+public class JobManager: NSObject {
     
     /// Default shared instance of the JobManager.
     public class var shared: JobManager {
         return _jobManagerSharedInstance
     }
     
-    public private(set) var jobManagerID : String
+    public private(set) var jobManagerID: String
     
     // Flag to signify that we shouldn't write to defaults
     // Maybe we are currently reading from the defaults so it's pointless to write to them.
@@ -59,7 +59,7 @@ public class JobManager : NSObject {
         jobs.forEach { unObserveJobStatus(job: $0) }
     }
     
-    public private(set) var keyedJobs = [String : AGSJob](){
+    public private(set) var keyedJobs = [String: AGSJob](){
         didSet{
             self.updateJobsArray()
             saveJobsToUserDefaults()
@@ -83,7 +83,7 @@ public class JobManager : NSObject {
     }
     
     private func toJSON() -> JSONDictionary{
-        var d = [String : Any]()
+        var d = [String: Any]()
         for (jobID, job) in self.keyedJobs{
             if let json = try? job.toJSON(){
                 d[jobID] = json
@@ -113,7 +113,7 @@ public class JobManager : NSObject {
         }
     }
     
-    private var jobsDefaultsKey : String {
+    private var jobsDefaultsKey: String {
         return "com.esri.arcgis.runtime.toolkit.jobManager.\(jobManagerID).jobs"
     }
     
@@ -126,7 +126,7 @@ public class JobManager : NSObject {
         job.removeObserver(self, forKeyPath: #keyPath(AGSJob.status))
     }
     
-    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
         if context == &kvoContext{
             if keyPath == #keyPath(AGSJob.status){
                 // when a job's status changes we need to save to user defaults again

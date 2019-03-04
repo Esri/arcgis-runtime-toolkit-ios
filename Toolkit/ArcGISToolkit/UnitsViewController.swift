@@ -58,29 +58,17 @@ public class UnitsViewController: TableViewController {
         }
     }
     
-    /// The search controller used by the units view controller. 
-    private var searchController: UISearchController? {
-        get {
-            if #available(iOS 11.0, *) {
-                return navigationItem.searchController
-            } else {
-                return _searchController
-            }
-        }
-        set {
-            if #available(iOS 11.0, *) {
-                navigationItem.searchController = newValue
-            } else {
-                _searchController = newValue
-            }
-        }
-    }
-    /// This property is an implementation detail of `searchController`. Do not
-    /// use it directly.
-    private var _searchController: UISearchController?
-    
     /// Called in response to the Cancel button being tapped.
     @objc private func cancel() {
+        // If the search controller is still active, the delegate will not be
+        // able to dismiss this if they showed this modally.
+        // (or wrapped it in a navigation controller and showed that modally)
+        // Only do this if not being presented from a nav controller
+        // as in that case, it causes problems when the delegate that pushed this VC
+        // tries to pop it off the stack.
+        if presentingViewController != nil{
+            navigationItem.searchController?.isActive = false
+        }
         delegate?.unitsViewControllerDidCancel(self)
     }
     
@@ -114,7 +102,7 @@ public class UnitsViewController: TableViewController {
         title = "Units"
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(UnitsViewController.cancel))
         definesPresentationContext = true
-        searchController = makeSearchController()
+        navigationItem.searchController = makeSearchController()
     }
     
     /// Creates a search controller for searching the list of units.
@@ -136,12 +124,6 @@ public class UnitsViewController: TableViewController {
     
     override public func viewDidLoad() {
         super.viewDidLoad()
-        
-        if #available(iOS 11.0, *) {
-            // Nothing to do!
-        } else {
-            tableView.tableHeaderView = searchController?.searchBar
-        }
     }
     
     // MARK: TableView delegate/datasource methods
@@ -154,8 +136,14 @@ public class UnitsViewController: TableViewController {
         guard unit != selectedUnit else { return }
         selectedUnit = unit
         // If the search controller is still active, the delegate will not be
-        // able to dismiss us, if desired.
-        searchController?.isActive = false
+        // able to dismiss this if they showed this modally.
+        // (or wrapped it in a navigation controller and showed that modally)
+        // Only do this if not being presented from a nav controller
+        // as in that case, it causes problems when the delegate that pushed this VC
+        // tries to pop it off the stack.
+        if presentingViewController != nil{
+            navigationItem.searchController?.isActive = false
+        }
         delegate?.unitsViewControllerDidSelectUnit(self)
     }
     

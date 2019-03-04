@@ -38,54 +38,47 @@ class TimeSliderExample: MapViewController {
         let margin: CGFloat = 10.0
         timeSlider.translatesAutoresizingMaskIntoConstraints = false
         timeSlider.bottomAnchor.constraint(equalTo: mapView.attributionTopAnchor, constant: -margin).isActive = true
-        
-        if #available(iOS 11.0, *) {
-            timeSlider.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: margin).isActive = true
-            timeSlider.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -margin).isActive = true
-        }
-        else {
-            timeSlider.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: margin).isActive = true
-            timeSlider.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -margin).isActive = true
-        }
+        timeSlider.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: margin).isActive = true
+        timeSlider.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -margin).isActive = true
         
         // Add layer
         let mapImageLayer = AGSArcGISMapImageLayer(url: URL(string: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/911CallsHotspot/MapServer")!)
         mapView.map?.operationalLayers.add(mapImageLayer)
         mapImageLayer.load(completion: { [weak self] (error) in
-            //
+            
             // Make sure self is around
-            guard let strongSelf = self else {
+            guard let self = self else {
                 return
             }
             
             // If layer fails to load then
             // return with an error.
             guard error == nil else {
-                strongSelf.showError(error!)
+                self.showError(error!)
                 return
             }
             
             // Zoom to full extent of layer
             if let fullExtent = mapImageLayer.fullExtent {
-                strongSelf.mapView.setViewpoint(AGSViewpoint(targetExtent: fullExtent), completion: nil)
+                self.mapView.setViewpoint(AGSViewpoint(targetExtent: fullExtent), completion: nil)
             }
             
-            strongSelf.timeSlider.initializeTimeProperties(geoView: strongSelf.mapView, observeGeoView: true, completion: { [weak self] (error) in
-                //
+            self.timeSlider.initializeTimeProperties(geoView: self.mapView, observeGeoView: true, completion: { [weak self] (error) in
+                
                 // Make sure self is around
-                guard let strongSelf = self else {
+                guard let self = self else {
                     return
                 }
                 
                 // If time slider fails to init then
                 // return with an error.
                 guard error == nil else {
-                    strongSelf.showError(error!)
+                    self.showError(error!)
                     return
                 }
                 
                 // Show the time slider
-                strongSelf.timeSlider.isHidden = false
+                self.timeSlider.isHidden = false
             })
         })
     }
@@ -101,7 +94,7 @@ class TimeSliderExample: MapViewController {
     private func showError(_ error: Error) {
         let alertController = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-        present(alertController, animated: true, completion: nil)
+        present(alertController, animated: true)
     }
 }
 
