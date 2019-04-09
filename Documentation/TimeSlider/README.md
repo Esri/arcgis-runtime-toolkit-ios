@@ -1,8 +1,8 @@
-#TimeSlider
+# TimeSlider
 
 The Time Slider provides controls that allow you to visualize temporal data for time enabled layers in a map or scene.
 
-###Features of the Time Slider
+### Features of the Time Slider
 
 ![timeslider](Images/timeslider.png)
 
