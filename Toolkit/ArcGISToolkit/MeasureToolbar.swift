@@ -601,8 +601,6 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         default:
             fatalError("unexpected geometry type")
         }
-        
-        return selectedGeometry?.geometryType == .polyline ? self.selectedLinearUnit : self.selectedAreaUnit
     }
     
     private func selectionSymbol(for geom: AGSGeometry) -> AGSSymbol?{

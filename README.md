@@ -14,9 +14,9 @@ Toolkit components that will simplify your iOS app development with ArcGIS Runti
 * [TemplatePickerViewController](Documentation/TemplatePicker)
 
 ## Requirements
-* [ArcGIS Runtime SDK for iOS](https://developers.arcgis.com/en/ios/) 100.4.0 (or higher)
-* Xcode 9.3 (or higher)
-* Apple iOS SDK 10 (or higher)
+* [ArcGIS Runtime SDK for iOS](https://developers.arcgis.com/en/ios/) 100.5.0 (or higher)
+* Xcode 10.1 (or higher)
+* Apple iOS SDK 12.1 (or higher)
 
 ## Instructions
 
