@@ -16,7 +16,7 @@ import ArcGIS
 
 public class LegendViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
-    public var geoView : AGSGeoView?{
+    public var geoView: AGSGeoView?{
         didSet
         {
             if geoView != nil {

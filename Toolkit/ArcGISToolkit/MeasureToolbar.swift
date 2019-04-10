@@ -15,13 +15,13 @@ import UIKit
 import ArcGIS
 
 struct Measurement {
-    let value : Double
-    let unit : AGSUnit
+    let value: Double
+    let unit: AGSUnit
 }
 
-class MeasureResultView : UIView{
+class MeasureResultView: UIView{
     
-    var measurement : Measurement? {
+    var measurement: Measurement? {
         didSet{
             if let measurement = measurement{
                 valueLabel.text = valueString()
@@ -32,7 +32,7 @@ class MeasureResultView : UIView{
         }
     }
     
-    var helpText : String?{
+    var helpText: String?{
         didSet{
             if let helpText = helpText{
                 valueLabel.text = helpText
@@ -42,9 +42,9 @@ class MeasureResultView : UIView{
         }
     }
     
-    var valueLabel : UILabel
-    var unitButton : UIButton
-    var stackView : UIStackView
+    var valueLabel: UILabel
+    var unitButton: UIButton
+    var stackView: UIStackView
     
     let numberFormatter = NumberFormatter()
     var buttonTapHandler: (()->(Void))?
@@ -77,7 +77,7 @@ class MeasureResultView : UIView{
         stackView.spacing = 4.0
         stackView.distribution = .equalSpacing
         stackView.alignment = .center
-        stackView.layoutMargins = UIEdgeInsetsMake(0, 6, 0, 6)
+        stackView.layoutMargins = UIEdgeInsets(top: 0, left: 6, bottom: 0, right: 6)
         stackView.isLayoutMarginsRelativeArrangement = true
         
         super.init(frame: frame)
@@ -114,7 +114,7 @@ class MeasureResultView : UIView{
         fatalError("init(coder:) has not been implemented")
     }
     
-    override public class var requiresConstraintBasedLayout : Bool {
+    override public class var requiresConstraintBasedLayout: Bool {
         return true
     }
     
@@ -172,14 +172,14 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
     public let areaSketchEditor = AGSSketchEditor()
     
     // Exposed so that the symbology and selection colors can be customized.
-    public private(set) var selectionLineSymbol : AGSSymbol?
-    public private(set)var selectionFillSymbol : AGSSymbol?
+    public private(set) var selectionLineSymbol: AGSSymbol?
+    public private(set)var selectionFillSymbol: AGSSymbol?
     @available(iOS, deprecated, message: "Use `color` property exposed through `AGSGeoView.selectionProperties`")
-    public var selectionColor : UIColor? {
+    public var selectionColor: UIColor? {
         return mapView?.selectionProperties.color
     }
 
-    public var mapView : AGSMapView? {
+    public var mapView: AGSMapView? {
         didSet{
             guard mapView != oldValue else { return }
             unbindFromMapView(mapView: oldValue)
@@ -213,7 +213,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
     
     private static let identifyTolerance = 16.0
     
-    private var selectionOverlay : AGSGraphicsOverlay?
+    private var selectionOverlay: AGSGraphicsOverlay?
     private var selectedGeometry: AGSGeometry? {
         didSet {
             guard selectedGeometry != oldValue else { return }
@@ -221,30 +221,30 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         }
     }
     
-    private let resultView : MeasureResultView = MeasureResultView()
+    private let resultView: MeasureResultView = MeasureResultView()
     
-    private var undoButton : UIBarButtonItem!
-    private var redoButton : UIBarButtonItem!
-    private var clearButton : UIBarButtonItem!
-    private var rightHiddenPlaceholderView : UIView!
-    private var leftHiddenPlaceholderView : UIView!
-    private var segControl : UISegmentedControl!
-    private var segControlItem : UIBarButtonItem!
-    private var mode : MeasureToolbarMode? = nil {
+    private var undoButton: UIBarButtonItem!
+    private var redoButton: UIBarButtonItem!
+    private var clearButton: UIBarButtonItem!
+    private var rightHiddenPlaceholderView: UIView!
+    private var leftHiddenPlaceholderView: UIView!
+    private var segControl: UISegmentedControl!
+    private var segControlItem: UIBarButtonItem!
+    private var mode: MeasureToolbarMode? = nil {
         didSet {
             guard mode != oldValue else { return }
             updateMeasurement()
         }
     }
     
-    private let geodeticCurveType : AGSGeodeticCurveType = .geodesic
+    private let geodeticCurveType: AGSGeodeticCurveType = .geodesic
     // This is the threshold for which when the planar measurements are above,
     // it will switch to geodetic calculations. Set it to Double.infinity for
     // always doing geodetic calculations (but be careful, they can get slow when they have to measure
     // too much length/area).
     // Set it to 0 to never do geodetic calculations (less accurate).
-    private let planarLengthMetersThreshold : Double = 10_000_000
-    private let planarAreaSquareMilesThreshold : Double = 1_000_000
+    private let planarLengthMetersThreshold: Double = 10_000_000
+    private let planarAreaSquareMilesThreshold: Double = 1_000_000
     
     deinit {
         unbindFromMapView(mapView: mapView)
@@ -267,8 +267,8 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         bindToMapView(mapView: mapView)
     }
     
-    private var sketchModeButtons : [UIBarButtonItem] = []
-    private var selectModeButtons : [UIBarButtonItem] = []
+    private var sketchModeButtons: [UIBarButtonItem] = []
+    private var selectModeButtons: [UIBarButtonItem] = []
     
     private func sharedInitialization(){
         
@@ -348,7 +348,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         }
     }
     
-    private var didSetConstraints : Bool = false
+    private var didSetConstraints: Bool = false
     
     public override func updateConstraints() {
         
@@ -370,7 +370,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         // however if the content is too big it is allowed to grow to the right.
         // The two centerX constraints are arranged with specific priorities to cause this.
         
-        let space : CGFloat = 2
+        let space: CGFloat = 2
         
         let c1 = resultView.leadingAnchor.constraint(greaterThanOrEqualTo: leftHiddenPlaceholderView.trailingAnchor, constant: space)
         c1.priority = .required
@@ -391,7 +391,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         didSetConstraints = true
     }
     
-    override public class var requiresConstraintBasedLayout : Bool {
+    override public class var requiresConstraintBasedLayout: Bool {
         return true
     }
     
@@ -470,14 +470,14 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         if mapView?.sketchEditor == lineSketchEditor ||
             selectedGeometry?.geometryType == .polyline {
             
-            let linearUnitIDs : [AGSLinearUnitID] = [.centimeters, .feet, .inches, .kilometers, .meters, .miles, .millimeters, .nauticalMiles, .yards]
+            let linearUnitIDs: [AGSLinearUnitID] = [.centimeters, .feet, .inches, .kilometers, .meters, .miles, .millimeters, .nauticalMiles, .yards]
             units = linearUnitIDs.compactMap { AGSLinearUnit(unitID: $0) }
             selectedUnit = selectedLinearUnit
         } else if mapView?.sketchEditor == areaSketchEditor ||
             selectedGeometry?.geometryType == .envelope ||
             selectedGeometry?.geometryType == .polygon {
             
-            let areaUnitIDs : [AGSAreaUnitID] = [.acres, .hectares, .squareCentimeters, .squareDecimeters, .squareFeet, .squareKilometers, .squareMeters, .squareMillimeters, .squareMiles, .squareYards]
+            let areaUnitIDs: [AGSAreaUnitID] = [.acres, .hectares, .squareCentimeters, .squareDecimeters, .squareFeet, .squareKilometers, .squareMeters, .squareMillimeters, .squareMiles, .squareYards]
             units = areaUnitIDs.compactMap { AGSAreaUnit(unitID: $0) }
             selectedUnit = selectedAreaUnit
         } else {
@@ -601,8 +601,6 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         default:
             fatalError("unexpected geometry type")
         }
-        
-        return selectedGeometry?.geometryType == .polyline ? self.selectedLinearUnit : self.selectedAreaUnit
     }
     
     private func selectionSymbol(for geom: AGSGeometry) -> AGSSymbol?{
@@ -617,7 +615,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         }
     }
     
-    private var lastIdentify : AGSCancelable?
+    private var lastIdentify: AGSCancelable?
     
     public func geoView(_ geoView: AGSGeoView, didTapAtScreenPoint screenPoint: CGPoint, mapPoint: AGSPoint){
         
@@ -625,7 +623,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         
         lastIdentify = geoView.identifyGraphicsOverlays(atScreenPoint: screenPoint, tolerance: MeasureToolbar.identifyTolerance, returnPopupsOnly: false){ [weak self] results, error in
             
-            guard let strongSelf = self else{
+            guard let self = self else{
                 return
             }
             
@@ -635,15 +633,15 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
                 }
             }
             
-            if let geom = strongSelf.firstOverlayPolyResult(in: results){
+            if let geom = self.firstOverlayPolyResult(in: results){
                 // display graphic result
-                strongSelf.select(geom: geom)
+                self.select(geom: geom)
             }
             else{
                 // otherwise identify layers to try to find a feature
-                strongSelf.lastIdentify = geoView.identifyLayers(atScreenPoint: screenPoint, tolerance: MeasureToolbar.identifyTolerance, returnPopupsOnly: false){ [weak self] results, error in
+                self.lastIdentify = geoView.identifyLayers(atScreenPoint: screenPoint, tolerance: MeasureToolbar.identifyTolerance, returnPopupsOnly: false){ [weak self] results, error in
                     
-                    guard let strongSelf = self else{
+                    guard let self = self else{
                         return
                     }
                     
@@ -653,8 +651,8 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
                         }
                     }
                     
-                    let geom = strongSelf.firstLayerPolyResult(in: results)
-                    strongSelf.select(geom: geom)
+                    let geom = self.firstLayerPolyResult(in: results)
+                    self.select(geom: geom)
                 }
             }
             

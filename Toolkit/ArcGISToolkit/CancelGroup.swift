@@ -18,7 +18,7 @@ import Foundation
  Wraps multiple AGSCancelables into a single cancelable object.
  */
 @objc
-public class CancelGroup : NSObject, AGSCancelable{
+public class CancelGroup: NSObject, AGSCancelable{
     
     /// Cancels all the AGSCancelables in the group.
     public func cancel(){
@@ -26,7 +26,7 @@ public class CancelGroup : NSObject, AGSCancelable{
         _canceled = true
     }
     
-    private var _canceled : Bool = false
+    private var _canceled: Bool = false
     
     /// Whether or not the group is canceled.
     public func isCanceled() -> Bool{

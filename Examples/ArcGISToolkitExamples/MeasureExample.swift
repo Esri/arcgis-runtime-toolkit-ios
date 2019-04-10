@@ -17,7 +17,7 @@ import ArcGIS
 
 class MeasureExample: MapViewController{
     
-    var measureToolbar : MeasureToolbar!
+    var measureToolbar: MeasureToolbar!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,11 +33,7 @@ class MeasureExample: MapViewController{
         view.addSubview(measureToolbar)
         measureToolbar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         measureToolbar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        if #available(iOS 11.0, *) {
-            measureToolbar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
-        } else {
-            measureToolbar.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        }
+        measureToolbar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         measureToolbar.heightAnchor.constraint(equalToConstant: 44).isActive = true
 
     }
@@ -48,11 +44,5 @@ class MeasureExample: MapViewController{
         // update content inset for mapview
         mapView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: measureToolbar.frame.height, right: 0)
     }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
     
 }
