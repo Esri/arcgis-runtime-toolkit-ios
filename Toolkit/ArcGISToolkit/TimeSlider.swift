@@ -1200,6 +1200,12 @@ public class TimeSlider: UIControl {
                 currentExtentEndTime = ts[newEndTimeStepIndex]
                 endTimeStepIndex = newEndTimeStepIndex
                 
+                // If range is not enabled
+                // then both values are same
+                if !isRangeEnabled {
+                    currentExtentEndTime = currentExtentStartTime
+                }
+                
                 // Set current extent
                 updateCurrentExtent(AGSTimeExtent(startTime: currentExtentStartTime, endTime: currentExtentEndTime))
                 
@@ -1988,20 +1994,16 @@ public class TimeSlider: UIControl {
         // Make sure the time is within full extent
         let startTime = Date(timeIntervalSince1970: boundCurrentExtentStartTime(value: startTime.timeIntervalSince1970))
         
-        // Update start time only if it is different than current
-        if startTime != currentExtentStartTime {
-            //
-            // If time steps are available then snap it to the closest time step and set the index.
-            if let ts = timeSteps, ts.count > 0 {
-                if let (index, date) = closestTimeStep(for: startTime) {
-                    currentExtentStartTime = date
-                    startTimeStepIndex = index
-                }
+        // If time steps are available then snap it to the closest time step and set the index.
+        if let ts = timeSteps, ts.count > 0 {
+            if let (index, date) = closestTimeStep(for: startTime) {
+                currentExtentStartTime = date
+                startTimeStepIndex = index
             }
-            else {
-                currentExtentStartTime = startTime
-                startTimeStepIndex = -1
-            }
+        }
+        else {
+            currentExtentStartTime = startTime
+            startTimeStepIndex = -1
         }
     }
     
@@ -2010,20 +2012,16 @@ public class TimeSlider: UIControl {
         // Make sure the time is within full extent
         let endTime = Date(timeIntervalSince1970: boundCurrentExtentEndTime(value: endTime.timeIntervalSince1970))
         
-        // Update end time only if it is different than current
-        if endTime != currentExtentEndTime {
-            //
-            // If time steps are available then snap it to the closest time step and set the index.
-            if let ts = timeSteps, ts.count > 0 {
-                if let (index, date) = closestTimeStep(for: endTime) {
-                    currentExtentEndTime = date
-                    endTimeStepIndex = index
-                }
+        // If time steps are available then snap it to the closest time step and set the index.
+        if let ts = timeSteps, ts.count > 0 {
+            if let (index, date) = closestTimeStep(for: endTime) {
+                currentExtentEndTime = date
+                endTimeStepIndex = index
             }
-            else {
-                currentExtentEndTime = endTime
-                endTimeStepIndex = -1
-            }
+        }
+        else {
+            currentExtentEndTime = endTime
+            endTimeStepIndex = -1
         }
     }
     
