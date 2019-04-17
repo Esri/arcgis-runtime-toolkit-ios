@@ -28,7 +28,14 @@ The *ArcGIS Runtime Toolkit for iOS* has a *Target SDK* version of *11.0*, meani
 
  New to cocoapods? Visit [cocoapods.org](https://cocoapods.org/)
 
-### Carthage
+### [Carthage](https://github.com/Carthage/Carthage)
+
+- Add the following to your Cartfile: `github "Esri/arcgis-runtime-toolkit-ios"`
+- Then run `carthage update`
+- Follow the current instructions in [Carthage's README][carthage-installation]
+for up to date installation instructions.
+
+[carthage-installation]: https://github.com/Carthage/Carthage#adding-frameworks-to-an-application
 
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
