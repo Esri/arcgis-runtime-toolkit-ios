@@ -28,6 +28,10 @@ The *ArcGIS Runtime Toolkit for iOS* has a *Target SDK* version of *11.0*, meani
 
  New to cocoapods? Visit [cocoapods.org](https://cocoapods.org/)
 
+### Carthage
+
+[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
+
 ### Manual
  1. Ensure you have downloaded and installed __ArcGIS Runtime SDK for iOS__ as described [here](https://developers.arcgis.com/ios/latest/swift/guide/install.htm#ESRI_SECTION1_D57435A2BEBC4D29AFA3A4CAA722506A)
  2. Clone or download this repo. 
