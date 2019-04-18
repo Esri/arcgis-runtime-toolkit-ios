@@ -30,10 +30,10 @@ The *ArcGIS Runtime Toolkit for iOS* has a *Target SDK* version of *11.0*, meani
 
 ### [Carthage](https://github.com/Carthage/Carthage)
 
+Carthage is a decentralized dependency manager that builds your dependencies and provides you with binary frameworks.
+
 - Add the following to your Cartfile: `github "Esri/arcgis-runtime-toolkit-ios"`
 - Then run `carthage update`
-- Follow the current instructions in [Carthage's README][carthage-installation]
-for up to date installation instructions.
 
 [carthage-installation]: https://github.com/Carthage/Carthage#adding-frameworks-to-an-application
 
