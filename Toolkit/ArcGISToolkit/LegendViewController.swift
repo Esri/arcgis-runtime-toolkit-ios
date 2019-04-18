@@ -14,7 +14,7 @@
 import UIKit
 import ArcGIS
 
-public class LegendViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+public class LegendViewController: UITableViewController {
     
     public var geoView: AGSGeoView?{
         didSet
@@ -63,9 +63,6 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
             updateLayerData()
         }
     }
-
-    // the tableView used to display the legend
-    @IBOutlet private var tableView: UITableView?
     
     // dictionary of legend infos; keys are AGSLayerContent objectIdentifier values
     private var legendInfos = [UInt:[AGSLegendInfo]]()
@@ -116,31 +113,29 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
 
     // MARK: - Table view data source
 
-    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return legendArray.count
     }
     
-    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        var cell: UITableViewCell!
+    public override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell: UITableViewCell
         
         // configure the cell...
-        let rowItem:AnyObject = legendArray[indexPath.row]
-        if let layer = rowItem as? AGSLayer {
+        switch legendArray[indexPath.row] {
+        case let layer as AGSLayer:
             // item is a layer
-            cell = tableView.dequeueReusableCell(withIdentifier: LegendViewController.layerTitleCellID)!
+            cell = tableView.dequeueReusableCell(withIdentifier: LegendViewController.layerTitleCellID, for: indexPath)
             let textLabel = cell.viewWithTag(LegendViewController.labelTag) as? UILabel
             textLabel?.text = layer.name
-        }
-        else if let layerContent = rowItem as? AGSLayerContent {
+        case let layerContent as AGSLayerContent:
             // item is not a layer, but still implements AGSLayerContent
             // so it's a sublayer
-            cell = tableView.dequeueReusableCell(withIdentifier: LegendViewController.sublayerTitleCellID)!
+            cell = tableView.dequeueReusableCell(withIdentifier: LegendViewController.sublayerTitleCellID, for: indexPath)
             let textLabel = cell.viewWithTag(LegendViewController.labelTag) as? UILabel
             textLabel?.text = layerContent.name
-        }
-        else if let legendInfo = rowItem as? AGSLegendInfo {
+        case let legendInfo as AGSLegendInfo:
             // item is a legendInfo
-            cell = tableView.dequeueReusableCell(withIdentifier: LegendViewController.legendInfoCellID)!
+            cell = tableView.dequeueReusableCell(withIdentifier: LegendViewController.legendInfoCellID, for: indexPath)
             let textLabel = cell.viewWithTag(LegendViewController.labelTag) as? UILabel
             textLabel?.text = legendInfo.name
             
@@ -173,6 +168,8 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
                     })
                 }
             }
+        default:
+            fatalError()
         }
 
         return cell
