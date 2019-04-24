@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import UIKit
-import ArcGIS
+//import ArcGIS
 
 public enum LocationType {
     case anglesOnly
@@ -21,7 +21,7 @@ public enum LocationType {
     case anglesAndPosition
 }
 
-class ArcGISARSensorView: UIView {
+public class ArcGISARSensorView: UIView {
 
     public var locationType: LocationType = .anglesAndPosition
     
