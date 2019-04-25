@@ -16,7 +16,7 @@ import ArcGIS
 
 public class LegendViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
-    public var geoView : AGSGeoView?{
+    public var geoView: AGSGeoView?{
         didSet
         {
             if geoView != nil {
@@ -42,7 +42,9 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
                 //set layerViewStateChangedHandler
                 if let geoView = geoView {
                     geoView.layerViewStateChangedHandler = { [weak self] (layer: AGSLayer, layerViewState: AGSLayerViewState) in
-                        self?.updateLegendArray()
+                        DispatchQueue.main.async{
+                            self?.updateLegendArray()
+                        }
                     }
                 }
             }
@@ -269,7 +271,9 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
         // the AGSLayer is loaded for this layer/sublayer, so
         // set the contents changed handler.
         layerContent.subLayerContentsChangedHandler = { [weak self] () in
-            self?.updateLegendArray()
+            DispatchQueue.main.async{
+                self?.updateLegendArray()
+            }
         }
 
         // if we have sublayer contents, load those as well

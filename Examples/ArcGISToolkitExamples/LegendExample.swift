@@ -18,8 +18,8 @@ import ArcGIS
 class LegendExample: MapViewController {
 
     let portal = AGSPortal.arcGISOnline(withLoginRequired: false)
-    var portalItem : AGSPortalItem?
-    var map : AGSMap?
+    var portalItem: AGSPortalItem?
+    var map: AGSMap?
     var legendVC: LegendViewController?
     
     override func viewDidLoad() {
@@ -37,15 +37,11 @@ class LegendExample: MapViewController {
         navigationItem.rightBarButtonItem = bbi
     }
     
-    func showLegendAction(){
+    @objc func showLegendAction(){
         if let legendVC = legendVC{
             navigationController?.pushViewController(legendVC, animated: true)
         }
     }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
+
 }
 

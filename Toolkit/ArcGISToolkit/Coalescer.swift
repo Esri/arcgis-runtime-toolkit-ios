@@ -17,9 +17,9 @@ internal class Coalescer {
     // This is helpful for the Scalebar because we get updates to the visibleArea up to 60hz and we
     // don't need to redraw the Scalebar that often
     
-    var dispatchQueue : DispatchQueue
-    var interval : DispatchTimeInterval
-    var action : (() -> Void)
+    var dispatchQueue: DispatchQueue
+    var interval: DispatchTimeInterval
+    var action: (() -> Void)
     
     init (dispatchQueue: DispatchQueue, interval: DispatchTimeInterval, action: @escaping (()->Void)){
         self.dispatchQueue = dispatchQueue

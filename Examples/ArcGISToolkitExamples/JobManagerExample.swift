@@ -14,6 +14,7 @@
 import UIKit
 import ArcGIS
 import ArcGISToolkit
+import UserNotifications
 
 // NOTE:
 // 
@@ -31,10 +32,10 @@ import ArcGISToolkit
 
 class JobTableViewCell: UITableViewCell{
     
-    var job : AGSJob?
-    private var observerContext = 0
+    var job: AGSJob?
+    var statusObservation: NSKeyValueObservation?
     
-    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
     }
     
@@ -44,15 +45,20 @@ class JobTableViewCell: UITableViewCell{
     
     func configureWithJob(job: AGSJob?){
         
-        // remove previous observer
-        self.job?.removeObserver(self, forKeyPath: #keyPath(AGSJob.status))
+        // invalidate previous observation
+        statusObservation?.invalidate()
+        statusObservation = nil
         
         self.job = job
         
         self.updateUI()
         
-        // add observer
-        self.job?.addObserver(self, forKeyPath: #keyPath(AGSJob.status), options: .new, context: &observerContext)
+        // observe job status
+        statusObservation = self.job?.observe(\.status, options: .new) { [weak self] (job, changes) in
+            DispatchQueue.main.async {
+                self?.updateUI()
+            }
+        }
     }
     
     func updateUI(){
@@ -104,20 +110,6 @@ class JobTableViewCell: UITableViewCell{
         return "Other"
     }
     
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?,
-                               change: [NSKeyValueChangeKey : Any]?,
-                               context: UnsafeMutableRawPointer?) {
-        
-        if context != &observerContext{
-            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
-            return
-        }
-        
-        if keyPath == #keyPath(AGSJob.status) {
-            self.updateUI()
-        }
-    }
-    
 }
 
 class JobManagerExample: TableViewController {
@@ -125,20 +117,30 @@ class JobManagerExample: TableViewController {
     // array to hold onto tasks while they are loading
     var tasks = [AGSGeodatabaseSyncTask]()
     
-    var jobs : [AGSJob] {
+    var jobs: [AGSJob] {
         return JobManager.shared.jobs
     }
+    
+    var toolbar: UIToolbar?
     
     override open func viewDidLoad() {
         super.viewDidLoad()
         
-        let toolbarFrame = CGRect(x: 0, y: view.bounds.size.height - 44.0, width: view.bounds.size.width, height: 44.0)
-        
         // create a Toolbar and add it to the view controller
         let toolbar = UIToolbar()
-        toolbar.frame = toolbarFrame
-        toolbar.autoresizingMask = [.flexibleWidth, .flexibleTopMargin]
+        self.toolbar = toolbar
+        let toolbarHeight: CGFloat = 44.0
+        toolbar.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(toolbar)
+        toolbar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        toolbar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        toolbar.heightAnchor.constraint(equalToConstant: toolbarHeight).isActive = true
+        
+        // move safe area up above toolbar
+        // (this adjusts tableview contentInsets to correctly scroll behind toolbar)
+        additionalSafeAreaInsets = UIEdgeInsets(top: 0, left: 0, bottom: toolbarHeight, right: 0)
+        // now anchor toolbar below new safe area
+        toolbar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         
         // button to kick off a new job
         let kickOffJobItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(kickOffJob))
@@ -153,27 +155,30 @@ class JobManagerExample: TableViewController {
         let flex = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         toolbar.items = [kickOffJobItem, flex, resumeAllPausedJobsItem, flex, clearFinishedJobsItem]
         
-        //
-        // register for user notifications, this way we can notify user in bg when job complete
-        let notificationSettings = UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
-        UIApplication.shared.registerUserNotificationSettings(notificationSettings)
+        // request authorization for user notifications, this way we can notify user in bg when job complete
+        let center = UNUserNotificationCenter.current()
+        center.requestAuthorization(options: [.alert, .badge, .sound]) { (granted, _) in
+            if !granted{
+                print("You must grant access for user notifications for all the features of this sample to work")
+            }
+        }
         
         // job cell registration
         tableView.register(JobTableViewCell.self, forCellReuseIdentifier: "JobCell")
     }
     
-    func resumeAllPausedJobs(){
+    @objc func resumeAllPausedJobs(){
         JobManager.shared.resumeAllPausedJobs(statusHandler: self.jobStatusHandler, completion: self.jobCompletionHandler)
     }
     
-    func clearFinishedJobs(){
+    @objc func clearFinishedJobs(){
         JobManager.shared.clearFinishedJobs()
         tableView.reloadData()
     }
     
     var i = 0
     
-    func kickOffJob(){
+    @objc func kickOffJob(){
         
         if (i % 2) == 0{
             let url = URL(string: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Sync/WildfireSync/FeatureServer")!
@@ -210,7 +215,7 @@ class JobManagerExample: TableViewController {
         return cell
     }
     
-    open func tableView(_ tableView: UITableView, didSelectRowAtIndexPath indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
@@ -228,7 +233,7 @@ class JobManagerExample: TableViewController {
         task.load{ [weak self, weak task] error in
 
             // make sure we are still around...
-            guard let strongSelf = self else {
+            guard let self = self else {
                 return
             }
             
@@ -237,8 +242,8 @@ class JobManagerExample: TableViewController {
             }
             
             // remove task from array now that it's loaded
-            if let index = strongSelf.tasks.index(where: {return $0 === strongTask}){
-                strongSelf.tasks.remove(at: index)
+            if let index = self.tasks.index(where: {return $0 === strongTask}){
+                self.tasks.remove(at: index)
             }
             
             // return if error or no featureServiceInfo
@@ -273,7 +278,7 @@ class JobManagerExample: TableViewController {
             }
             
             let uuid = NSUUID()
-            let downloadURL = NSURL(fileURLWithPath: "\(strongSelf.documentsPath)/\(uuid.uuidString).geodatabase") as URL
+            let downloadURL = NSURL(fileURLWithPath: "\(self.documentsPath)/\(uuid.uuidString).geodatabase") as URL
             
             // create a job
             let job = strongTask.generateJob(with: params, downloadFileURL: downloadURL)
@@ -282,10 +287,10 @@ class JobManagerExample: TableViewController {
             JobManager.shared.register(job: job)
             
             // start the job
-            job.start(statusHandler: strongSelf.jobStatusHandler, completion: strongSelf.jobCompletionHandler)
+            job.start(statusHandler: self.jobStatusHandler, completion: self.jobCompletionHandler)
             
             // refresh the tableview
-            strongSelf.tableView.reloadData()
+            self.tableView.reloadData()
         }
     }
     
@@ -299,7 +304,7 @@ class JobManagerExample: TableViewController {
         task.defaultGenerateOfflineMapParameters(withAreaOfInterest: extent){ [weak self] params, error in
             
             // make sure we are still around...
-            guard let strongSelf = self else {
+            guard let self = self else {
                 return
             }
             
@@ -310,14 +315,14 @@ class JobManagerExample: TableViewController {
                 JobManager.shared.register(job: job)
                 
                 // start the job
-                job.start(statusHandler: strongSelf.jobStatusHandler, completion: strongSelf.jobCompletionHandler)
+                job.start(statusHandler: self.jobStatusHandler, completion: self.jobCompletionHandler)
                 
                 // refresh the tableview
-                strongSelf.tableView.reloadData()
+                self.tableView.reloadData()
             }
             else{
                 // if could not get default parameters, then fire completion with the error
-                strongSelf.jobCompletionHandler(result: nil, error: error)
+                self.jobCompletionHandler(result: nil, error: error)
             }
         }
         
@@ -328,6 +333,7 @@ class JobManagerExample: TableViewController {
     
     func jobCompletionHandler(result: Any?, error: Error?){
         print("job completed")
+        
         if let error = error{
             print("  - error: \(error)")
         }
@@ -335,17 +341,13 @@ class JobManagerExample: TableViewController {
             print("  - result: \(result)")
         }
         
-        // make sure we can post a local notification
-        guard let settings = UIApplication.shared.currentUserNotificationSettings, settings.types != .none else{
-            return
-        }
+        let content = UNMutableNotificationContent()
+        content.body = "Job Complete"
+        content.sound = .default
         
-        // post local notification letting user know that job is done
-        let notification = UILocalNotification()
-        notification.fireDate = Date()
-        notification.alertBody = "Job Complete"
-        notification.soundName = UILocalNotificationDefaultSoundName
-        UIApplication.shared.scheduleLocalNotification(notification)
+        let request = UNNotificationRequest(identifier: "job complete", content: content, trigger: nil)
+        
+        UNUserNotificationCenter.current().add(request)
     }
 }
 

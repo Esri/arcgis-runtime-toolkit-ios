@@ -16,17 +16,24 @@ import UIKit
 open class TableViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     public var cellReuseIdentifier = "cell"
-    public var tableView = UITableView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+    public var tableView = UITableView(frame: .zero)
     
     override open func viewDidLoad() {
         super.viewDidLoad()
         
-        tableView.frame = view.bounds
-        tableView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(tableView)
+        
+        NSLayoutConstraint.activate([
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            ])
+        
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellReuseIdentifier)
-        view.addSubview(tableView)
     }
     
     open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

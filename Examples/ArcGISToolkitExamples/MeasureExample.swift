@@ -15,9 +15,9 @@ import UIKit
 import ArcGISToolkit
 import ArcGIS
 
-class MeasureExample: MapViewController {
+class MeasureExample: MapViewController{
     
-    var measureToolbar : MeasureToolbar!
+    var measureToolbar: MeasureToolbar!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,20 +27,22 @@ class MeasureExample: MapViewController {
         let map = AGSMap(item: portalItem)
         mapView.map = map
         
-        let toolbarFrame = CGRect(x: 0, y: view.bounds.size.height - 44.0, width: view.bounds.size.width, height: 44.0)
-        
         // create a MeasureToolbar and add it to the view controller
         measureToolbar = MeasureToolbar(mapView: mapView)
-        measureToolbar.frame = toolbarFrame
-        measureToolbar.autoresizingMask = [.flexibleWidth, .flexibleTopMargin]
+        measureToolbar.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(measureToolbar)
+        measureToolbar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        measureToolbar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        measureToolbar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        measureToolbar.heightAnchor.constraint(equalToConstant: 44).isActive = true
 
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        // update content inset for mapview
+        mapView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: measureToolbar.frame.height, right: 0)
     }
-    
     
 }

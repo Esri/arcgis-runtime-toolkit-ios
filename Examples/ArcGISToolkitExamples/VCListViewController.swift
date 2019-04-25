@@ -18,7 +18,7 @@ open class VCListViewController: TableViewController {
     
     public var storyboardName: String?
     
-    public var viewControllerInfos : [(vcName: String, viewControllerType: UIViewController.Type, nibName: String?)] = [
+    public var viewControllerInfos: [(vcName: String, viewControllerType: UIViewController.Type, nibName: String?)] = [
         ]{
         didSet{
             self.tableView.reloadData()
@@ -43,15 +43,15 @@ open class VCListViewController: TableViewController {
     
     override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellReuseIdentifier)!
-        cell.textLabel?.text = viewControllerInfos[(indexPath as NSIndexPath).row].vcName
+        cell.textLabel?.text = viewControllerInfos[indexPath.row].vcName
         return cell
     }
     
-    open func tableView(_ tableView: UITableView, didSelectRowAtIndexPath indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        let t = viewControllerInfos[(indexPath as NSIndexPath).row].viewControllerType
-        let nibName = viewControllerInfos[(indexPath as NSIndexPath).row].nibName
-        var vcOpt : UIViewController? = nil
+        let t = viewControllerInfos[indexPath.row].viewControllerType
+        let nibName = viewControllerInfos[indexPath.row].nibName
+        var vcOpt: UIViewController? = nil
         
         // first check storyboard
         if let storyboardName = self.storyboardName{

@@ -27,15 +27,12 @@ class ExamplesViewController: VCListViewController {
             ("Scalebar", ScalebarExample.self, nil),
             ("Legend", LegendExample.self, nil),
             ("Job Manager", JobManagerExample.self, nil),
+            ("Time Slider", TimeSliderExample.self, nil),
+            ("Popup Controller", PopupExample.self, nil),
+            ("Template Picker", TemplatePickerExample.self, nil),
             ("Sketch", SketchExample.self, nil)
         ]
         
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
 
 }
