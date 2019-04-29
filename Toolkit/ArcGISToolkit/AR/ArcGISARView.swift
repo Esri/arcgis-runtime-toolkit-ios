@@ -14,7 +14,7 @@
 
 import UIKit
 import ARKit
-//import ArcGIS
+import ArcGIS
 
 public class ArcGISARView: UIView {
     
@@ -45,6 +45,10 @@ public class ArcGISARView: UIView {
         lm.delegate = self
         return lm
     }()
+    
+    // initial location from locationManager
+    private var initialLocation: CLLocation?
+    private var horizontalAccuracy: CLLocationAccuracy = .greatestFiniteMagnitude;
 
     // is ARKit supported on this device?
     private var isSupported = false
@@ -73,20 +77,19 @@ public class ArcGISARView: UIView {
         //
         // ARKit initialization
         isSupported = ARWorldTrackingConfiguration.isSupported
-
+        
         addSubviewWithConstraints(arSCNView)
         arSCNView.session.delegate = self
         
         //
         // add sceneView to view and setup constraints
         addSubviewWithConstraints(sceneView)
-        
-        locationManager.delegate = self
 
         //
         // make our sceneView's background transparent
         sceneView.isBackgroundTransparent = true
         sceneView.atmosphereEffect = .none
+
     }
 
     // MARK: Public
@@ -125,11 +128,11 @@ public class ArcGISARView: UIView {
             let authStatus = CLLocationManager.authorizationStatus()
             switch authStatus {
             case .notDetermined:
-                self.startWithAccessNotDetermined()
+                startWithAccessNotDetermined()
             case .restricted, .denied:
-                self.startWithAccessDenied()
+                startWithAccessDenied()
             case .authorizedAlways, .authorizedWhenInUse:
-                self.startWithAccessAuthorized()
+                startWithAccessAuthorized()
             }
         }
     }
@@ -144,14 +147,14 @@ public class ArcGISARView: UIView {
     
     // MARK: Private
     fileprivate func finalizeStart() {
-
+        arSCNView.isHidden = !renderVideoFeed
         arSCNView.session.run(arConfiguration, options:.resetTracking)
         didStartOrFailWithError(nil)
     }
 
     fileprivate func addSubviewWithConstraints(_ subview: UIView) {
-        // add arSCNView to view and setup constraints
-        self.addSubview(subview)
+        // add subview to view and setup constraints
+        addSubview(subview)
         subview.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             subview.leadingAnchor.constraint(equalTo: self.leadingAnchor),
@@ -244,7 +247,7 @@ extension ArcGISARView: ARSessionDelegate {
      */
     public func session(_ session: ARSession, didUpdate frame: ARFrame) {
         // TODO: updateCamera().....
-        
+        print("didUpdateFrame...")
         delegate?.session?(session, didUpdate: frame)
     }
     
@@ -402,14 +405,26 @@ extension ArcGISARView: CLLocationManagerDelegate {
      */
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last, location.horizontalAccuracy >= 0.0 else { return }
-        let locationPoint = AGSPoint(x: location.coordinate.longitude,
-                                     y: location.coordinate.latitude,
-                                     z: location.altitude,
-                                     spatialReference: .wgs84())
-        let camera = AGSCamera(location: locationPoint, heading: 0.0, pitch: 0.0, roll: 0.0)
-        sceneView.setViewpointCamera(camera)
         
-        // TODO: original code tested new location for a better horizontal accuracy...
+        if initialLocation == nil {
+            initialLocation = location
+            horizontalAccuracy = location.horizontalAccuracy
+            
+            let locationPoint = AGSPoint(x: location.coordinate.longitude,
+                                         y: location.coordinate.latitude,
+                                         z: location.altitude,
+                                         spatialReference: .wgs84())
+            let camera = AGSCamera(location: locationPoint, heading: 0.0, pitch: 0.0, roll: 0.0)
+            sceneView.setViewpointCamera(camera)
+            
+            finalizeStart()
+        }
+        else if location.horizontalAccuracy < horizontalAccuracy {
+            horizontalAccuracy = location.horizontalAccuracy
+            // TODO: update current location???
+        }
+        
+        print("didUpdateLocations...")
     }
     
     /*
@@ -445,9 +460,9 @@ extension ArcGISARView: CLLocationManagerDelegate {
         case .notDetermined:
             break
         case .restricted, .denied:
-            self.handleAuthStatusChangedAccessDenied()
+            handleAuthStatusChangedAccessDenied()
         case .authorizedAlways, .authorizedWhenInUse:
-            self.handleAuthStatusChangedAccessAuthorized()
+            handleAuthStatusChangedAccessAuthorized()
         }
     }
 
