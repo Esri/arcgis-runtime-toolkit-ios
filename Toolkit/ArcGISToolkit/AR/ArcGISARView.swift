@@ -90,6 +90,7 @@ public class ArcGISARView: UIView {
         sceneView.isBackgroundTransparent = true
         sceneView.atmosphereEffect = .none
 
+        notifiedStartOrFailure = false
     }
 
     // MARK: Public
@@ -99,7 +100,9 @@ public class ArcGISARView: UIView {
     }
     
     public func resetTracking() {
-        
+        // reset initial location, so we're sure to set it from the LocationManager (provided originCamera == nil)
+        initialLocation = nil
+        startTracking()
     }
 
     public func resetUsingLocationServices() -> Bool {
@@ -111,7 +114,6 @@ public class ArcGISARView: UIView {
     }
     
     public func startTracking() {
-        notifiedStartOrFailure = false
         
         if !isSupported {
             didStartOrFailWithError(ArcGISARView.notSupportedError())
@@ -139,10 +141,7 @@ public class ArcGISARView: UIView {
 
     public func stopTracking() {
         arSCNView.session.pause()
-        locationManager.stopUpdatingLocation()
-        if CLLocationManager.headingAvailable() {
-            locationManager.stopUpdatingHeading()
-        }
+        stopUpdatingLocationAndHeading()
     }
     
     // MARK: Private
@@ -182,6 +181,13 @@ public class ArcGISARView: UIView {
             locationManager.startUpdatingHeading()
         }
     }
+    
+    fileprivate func stopUpdatingLocationAndHeading() {
+        locationManager.stopUpdatingLocation()
+        if CLLocationManager.headingAvailable() {
+            locationManager.stopUpdatingHeading()
+        }
+    }
 
     fileprivate func startWithAccessDenied() {
         didStartOrFailWithError(ArcGISARView.accessDeniedError())
@@ -192,30 +198,30 @@ public class ArcGISARView: UIView {
     }
     
     fileprivate func didStartOrFailWithError(_ error: Error?) {
-        // TODO: present error to user...
+        if !notifiedStartOrFailure, let error = error {
+            // TODO: present error to user...
+            print("didStartOrFailWithError: \(String(reflecting:error))")
+        }
         
         notifiedStartOrFailure = true;
     }
     
     fileprivate func handleAuthStatusChangedAccessDenied() {
         // auth status changed to denied
-        if !notifiedStartOrFailure {
-            stopTracking()
-            // we were waiting for user prompt to come back, so notify
-            didStartOrFailWithError(ArcGISARView.accessDeniedError())
-        }
+        stopUpdatingLocationAndHeading()
+        
+        // we were waiting for user prompt to come back, so notify
+        didStartOrFailWithError(ArcGISARView.accessDeniedError())
     }
     
     fileprivate func handleAuthStatusChangedAccessAuthorized() {
         // auth status changed to authorized
-        if !notifiedStartOrFailure {
-            // we were waiting for status to come in to start the datasource
-            // now that we have authorization - start it
-            didStartOrFailWithError(nil)
-            
-            // need to start location manager updates
-            startUpdatingLocationAndHeading()
-        }
+        // we were waiting for status to come in to start the datasource
+        // now that we have authorization - start it
+        didStartOrFailWithError(nil)
+        
+        // need to start location manager updates
+        startUpdatingLocationAndHeading()
     }
 
     // MARK: Errors
