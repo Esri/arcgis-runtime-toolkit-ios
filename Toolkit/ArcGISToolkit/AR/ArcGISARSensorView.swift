@@ -100,13 +100,6 @@ public class ArcGISARSensorView: UIView {
     required public convenience init(renderVideoFeed: Bool){
         self.init(frame: CGRect.zero)
         self.renderVideoFeed = renderVideoFeed
-        if renderVideoFeed {
-            // Set up the video preview view.
-            addSubviewWithConstraints(cameraView, index: 0)
-            cameraView.session = session
-            
-            prepVideoFeed()
-        }
     }
     
     private func sharedInitialization(){
@@ -118,6 +111,14 @@ public class ArcGISARSensorView: UIView {
 
         // add sceneView to our view
         addSubviewWithConstraints(sceneView)
+        
+        if renderVideoFeed {
+            // Set up the video preview view.
+            addSubviewWithConstraints(cameraView, index: 0)
+            cameraView.session = session
+            
+            prepVideoFeed()
+        }
     }
 
     public func startTracking() {
