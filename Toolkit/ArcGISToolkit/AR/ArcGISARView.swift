@@ -143,8 +143,10 @@ public class ArcGISARView: UIView {
             }
         }
         
+        // reset frameCount and start timer to capture frame rate
+        frameCount = 0
         frameCountTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true, block: { [weak self] (timer) in
-            print("Frame rate = \(self?.frameCount)")
+            print("Frame rate = \(String(reflecting: self?.frameCount))")
             self?.frameCount = 0
         })
     }
@@ -267,8 +269,8 @@ extension ArcGISARView: ARSessionDelegate {
         // TODO: updateCamera().....
 //        print("didUpdateFrame...")
         delegate?.session?(session, didUpdate: frame)
-        frameCount = frameCount + 1
         self.sceneView.renderFrame()
+        frameCount = frameCount + 1
     }
     
     /**

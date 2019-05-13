@@ -262,7 +262,7 @@ public class ArcGISARSensorView: UIView {
             let currentQuat = simd_quaternion(Float(quat.x), Float(quat.y), Float(quat.z), Float(quat.w))
             let finalQuat = simd_mul(currentQuat, orientationQuat)
             
-            print("updating device motion: \(finalQuat)")
+//            print("updating device motion: \(finalQuat)")
             //use `finalQuat` to update position/orientation of camera
         }
     }
@@ -474,7 +474,7 @@ extension ArcGISARSensorView: CLLocationManagerDelegate {
         
 //        finalizeStart()  // is this needed?
         
-        print("updating location: \(locationPoint)")
+//        print("updating location: \(locationPoint)")
     }
     
     /*
