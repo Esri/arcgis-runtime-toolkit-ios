@@ -14,7 +14,7 @@
 
 import UIKit
 import ARKit
-//import ArcGIS
+import ArcGIS
 
 public class ArcGISARView: UIView {
     
@@ -259,38 +259,6 @@ public class ArcGISARView: UIView {
         startUpdatingLocationAndHeading()
     }
     
-    /*
-    //set initial orientation
-    [self didChangeOrientation:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-    selector:@selector(didChangeOrientation:)
-    name:UIApplicationDidChangeStatusBarOrientationNotification
-    object:nil];
-
-    - (void)didChangeOrientation:(NSNotification *)note{
-    switch ([[UIApplication sharedApplication]statusBarOrientation]) {
-    case UIInterfaceOrientationPortraitUpsideDown:
-    _orientationQuat = simd_quaternion(0, 0, -(float)sqrt(0.5), (float)sqrt(0.5));
-    break;
-    case UIInterfaceOrientationPortrait:
-    _orientationQuat = simd_quaternion(0, 0, (float)sqrt(0.5), (float)sqrt(0.5));
-    break;
-    case UIInterfaceOrientationLandscapeLeft:
-    #warning - this is different than the Xamarin version
-    _orientationQuat = simd_quaternion(0, 0, (float)1, 0);
-    break;
-    case UIInterfaceOrientationLandscapeRight:
-    #warning - this is different than the Xamarin version
-    _orientationQuat = simd_quaternion(0, 0, 0, (float)1);
-    break;
-    default:
-    break;
-    }
-    _needResetFOV = YES;
-    }
-*/
-    
     // Called when device orientation changes
     @objc func orientationChanged(notification: Notification?) {
         // handle rotation here
@@ -339,45 +307,35 @@ extension ArcGISARView: ARSessionDelegate {
      @param frame The frame that has been updated.
      */
     public func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        // TODO: updateCamera().....
-        //        print("didUpdateFrame...")
+
         delegate?.session?(session, didUpdate: frame)
         
-        /*
-         if (currentFrame != nil) {
-         matrix_float4x4 transform = currentFrame.camera.transform;
-         simd_quatf finalQuat = simd_mul(simd_mul(_compensationQuat, simd_quaternion(transform)), _orientationQuat);
-         
-         [self didUpdateRelativePositionWithDeltaX:transform.columns[3].x
-         deltaY:-transform.columns[3].z
-         deltaZ:transform.columns[3].y
-         deltaRotationX:finalQuat.vector.x
-         deltaRotationY:finalQuat.vector.y
-         deltaRotationZ:finalQuat.vector.z
-         deltaRotationW:finalQuat.vector.w
-         ignoreInitialHeading:NO];
-         }
-         */
-        
-        guard let currentFrame = session.currentFrame else { return }
-        
-        let timeDiff = currentFrame.timestamp - frame.timestamp
-        print("timeDiff between currentFrame and didUpdate frame: \(timeDiff)")
+        //
+        // Debug - here's the switch between currentFrame and frame...
+        //
         
         // create transformation matrix
+        guard let currentFrame = session.currentFrame else { return }
         let cameraTransform = currentFrame.camera.transform
 //        let cameraTransform = frame.camera.transform
         
+        //
+        // Debug - calculate and display time difference between frame and currentFrame
+        //
+//        let timeDiff = currentFrame.timestamp - frame.timestamp
+//        print("timeDiff between currentFrame and didUpdate frame: \(timeDiff)")
+        
+        //
+        // Future...
+        //
         // set FOV from ARKit camera.projectionMatrix
-        let projectionMatrix = currentFrame.camera.projectionMatrix
-        let verticalElement = projectionMatrix.columns.0.x
-        let horizontalElement = projectionMatrix.columns.1.y
-        sceneView.setFieldOfViewFromProjection(Double(verticalElement), horizontalElement: Double(horizontalElement))
+        //
+//        let projectionMatrix = currentFrame.camera.projectionMatrix
+//        let verticalElement = projectionMatrix.columns.0.x
+//        let horizontalElement = projectionMatrix.columns.1.y
+//        sceneView.setFieldOfViewFromProjection(Double(verticalElement), horizontalElement: Double(horizontalElement))
         
         let finalQuat:simd_quatf = simd_mul(simd_mul(compensationQuat, simd_quaternion(cameraTransform)), orientationQuat)
-        
-        
-        
         var transformationMatrix = AGSTransformationMatrix(quaternionX: Double(finalQuat.vector.x),
                                                            quaternionY: Double(finalQuat.vector.y),
                                                            quaternionZ: Double(finalQuat.vector.z),
@@ -403,96 +361,8 @@ extension ArcGISARView: ARSessionDelegate {
         sceneView.renderFrame()
         frameCount = frameCount + 1
 //        Thread.sleep(forTimeInterval: 0.25)
+    }
 
-//        sleep(5)
-    }
-    /*
-    public func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        // TODO: updateCamera().....
-        //        print("didUpdateFrame...")
-        delegate?.session?(session, didUpdate: frame)
-        
-        /*
-         if (currentFrame != nil) {
-         matrix_float4x4 transform = currentFrame.camera.transform;
-         simd_quatf finalQuat = simd_mul(simd_mul(_compensationQuat, simd_quaternion(transform)), _orientationQuat);
-         
-         [self didUpdateRelativePositionWithDeltaX:transform.columns[3].x
-         deltaY:-transform.columns[3].z
-         deltaZ:transform.columns[3].y
-         deltaRotationX:finalQuat.vector.x
-         deltaRotationY:finalQuat.vector.y
-         deltaRotationZ:finalQuat.vector.z
-         deltaRotationW:finalQuat.vector.w
-         ignoreInitialHeading:NO];
-         }
-         */
-        
-        // create transformation matrix
-        let cameraTransform = frame.camera.transform
-        //                let finalQuat:simd_quatf = simd_mul(simd_mul(compensationQuat, simd_quaternion(cameraTransform)), orientationQuat)
-        let finalQuat:simd_quatf = simd_quaternion(cameraTransform)
-        
-        var transformationMatrix = AGSTransformationMatrix(translationX: Double(cameraTransform.columns.3.x),
-                                                           translationY: Double(-cameraTransform.columns.3.z),
-                                                           translationZ: Double(cameraTransform.columns.3.y),
-                                                           quaternionX: Double(finalQuat.vector.x),
-                                                           quaternionY: Double(finalQuat.vector.y),
-                                                           quaternionZ: Double(finalQuat.vector.z),
-                                                           quaternionW: Double(finalQuat.vector.w))
-        print("transformation values: tX = \(Double(cameraTransform.columns.3.x)); tY = \(Double(-cameraTransform.columns.3.z)); tZ = \(Double(cameraTransform.columns.3.y)); qX = \(Double(finalQuat.vector.x)); qY = \(Double(finalQuat.vector.y)); qZ = \(Double(finalQuat.vector.z)); qW =  = \(Double(finalQuat.vector.w))")
-        
-        //        //this gives the same location, no matter what...
-        //        var transformationMatrix = AGSTransformationMatrix(translationX: 0.0,
-        //                                                           translationY: 0.0,
-        //                                                           translationZ: 0.0,
-        //                                                           quaternionX: 0.0,
-        //                                                           quaternionY: 0.0,
-        //                                                           quaternionZ: 0.0,
-        //                                                           quaternionW: 1.0)
-        
-        
-        if !compensationApplied {
-            compensationApplied = true
-            let adjustmentQuat:simd_quatf = simd_mul(compensationQuat, orientationQuat);
-            
-            var compensationMatrix = AGSTransformationMatrix(translationX: 0.0,
-                                                             translationY: 0.0,
-                                                             translationZ: 0.0,
-                                                             quaternionX: Double(adjustmentQuat.vector.x),
-                                                             quaternionY: Double(adjustmentQuat.vector.y),
-                                                             quaternionZ: Double(adjustmentQuat.vector.z),
-                                                             quaternionW: Double(adjustmentQuat.vector.w))
-            
-            let currentTransformationMatrix = sceneView.currentViewpointCamera().transformationMatrix
-            compensationMatrix = currentTransformationMatrix.addTransformation(compensationMatrix)
-            let camera = AGSCamera(transformationMatrix: compensationMatrix)
-            //            print("camera heading: \(camera.heading), pitch = \(camera.pitch), roll = \(camera.roll), location = \(camera.location)")
-            sceneView.setViewpointCamera(camera)
-        }
-        
-        //        var transformationMatrix = AGSTransformationMatrix(translationX: Double(cameraTransform.columns.3.x),
-        //                                                           translationY: Double(-cameraTransform.columns.3.z),
-        //                                                           translationZ: Double(cameraTransform.columns.3.y),
-        //                                                           quaternionX: Double(finalQuat.vector.x),
-        //                                                           quaternionY: Double(finalQuat.vector.y),
-        //                                                           quaternionZ: Double(finalQuat.vector.z),
-        //                                                           quaternionW: Double(finalQuat.vector.w))
-        
-        let currentTransformationMatrix = sceneView.currentViewpointCamera().transformationMatrix
-        transformationMatrix = currentTransformationMatrix.addTransformation(transformationMatrix)
-        let camera = AGSCamera(transformationMatrix: transformationMatrix)
-        print("camera heading: \(camera.heading), pitch = \(camera.pitch), roll = \(camera.roll), location = \(camera.location)")
-        
-        sceneView.setViewpointCamera(camera)
-        
-        //        let svCamera = sceneView.currentViewpointCamera()
-        //        print("sceneView.Camera heading: \(svCamera.heading), pitch = \(svCamera.pitch), roll = \(svCamera.roll), location = \(svCamera.location)")
-        
-        sceneView.renderFrame()
-        frameCount = frameCount + 1
-    }
-*/
     /**
      This is called when new anchors are added to the session.
      
@@ -633,6 +503,9 @@ extension ArcGISARView: ARSessionObserver {
     }
 }
 
+//
+// Debug
+//
 var pointTimer: Timer?
 
 // MARK: - CLLocationManagerDelegate
@@ -662,6 +535,9 @@ extension ArcGISARView: CLLocationManagerDelegate {
             initialTransformationMatrix = camera.transformationMatrix
             sceneView.setViewpointCamera(camera)
             
+            //
+            // Debug - schedule timer to add point to the scene after 5 seconds (so we're sure the camera is set up)...
+            //
             pointTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false, block: { [weak self] (timer) in
                 self?.addPointToScene(camera: (self?.sceneView.currentViewpointCamera())!)
             })
@@ -675,27 +551,21 @@ extension ArcGISARView: CLLocationManagerDelegate {
         
         print("didUpdateLocations...")
     }
-    
+
+    //
+    // Debug - show point in front of camera...
+    //
     private func addPointToScene(camera: AGSCamera) {
         
-        
-//        let location = AGSPoint(x: camera.location.x, y: camera.location.y, z: camera.location.z + 10, spatialReference: camera.location.spatialReference)
-//        //  get camera forward 5 meters
-        let newerCamera = camera.moveForward(withDistance: 1.0)
-        let location = newerCamera.location
-        
-//        var builder = AGSPointBuilder(point: camera.location)
-//        builder.offsetBy(x: -0.0001, y: 0.0).z = camera.location.z + 150
-//        let location = builder.toGeometry()
-//
-//        let distance = AGSLocationDistanceMeasurement(startLocation: camera.location, endLocation: location).directDistance
-//        print("distance = \(String(reflecting: distance))")
         let go = AGSGraphicsOverlay()
         go.sceneProperties = AGSLayerSceneProperties(surfacePlacement: .absolute)
         sceneView.graphicsOverlays.add(go)
         
         let markerSymbol = AGSSimpleMarkerSceneSymbol(style: .diamond, color: .blue, height: 0.1, width: 0.1, depth: 0.1, anchorPosition: .bottom)
         
+        //  move camera forward 1 meters and get location
+        let location = camera.moveForward(withDistance: 1.0).location
+
         let graphic = AGSGraphic(geometry: location, symbol: markerSymbol, attributes: nil)
         go.graphics.add(graphic)
     }
