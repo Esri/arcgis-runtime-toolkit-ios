@@ -15,7 +15,7 @@
 import UIKit
 import AVFoundation
 import CoreMotion
-import ArcGIS
+//import ArcGIS
 
 public enum LocationType {
     case anglesOnly
@@ -66,6 +66,11 @@ public class ArcGISARSensorView: UIView {
         mm.showsDeviceMovementDisplay = true
         return mm
     }()
+
+    private var initialLocation: AGSPoint?
+    private var currentCamera: AGSCamera = AGSCamera(latitude: 0, longitude: 0, altitude: 0, heading: 0, pitch: 0, roll: 0)
+
+    var updateTimer: Timer?
 
     // MARK: Capture session
     
@@ -135,8 +140,8 @@ public class ArcGISARSensorView: UIView {
             startWithAccessAuthorized()
         }
         
-        // start motion manager
-        startUpdatingLocationAndHeading()
+//        // start motion manager
+//        startUpdatingLocationAndHeading()
         
         if renderVideoFeed {
             setupSession()
@@ -249,6 +254,12 @@ public class ArcGISARSensorView: UIView {
     
     private func finalizeStart() {
         // TODO:  is there anything to do here?
+//        updateTimer = Timer.scheduledTimer(withTimeInterval: 1 / 10, repeats: true, block: { [weak self] (timer) in
+//            guard let strongSelf = self else { return }
+//            print("currentCamera = \(strongSelf.currentCamera)")
+//            strongSelf.sceneView.setViewpointCamera(strongSelf.currentCamera)
+//        })
+
     }
     
     private func startUpdatingAngles() {
@@ -257,13 +268,60 @@ public class ArcGISARSensorView: UIView {
         motionQueue.maxConcurrentOperationCount = 1
         
         motionManager.startDeviceMotionUpdates(to: motionQueue) { [weak self] (motion, error) in
-            guard let quat = self?.motionManager.deviceMotion?.attitude.quaternion,
-                let orientationQuat = self?.orientationQuat else { return }
-            let currentQuat = simd_quaternion(Float(quat.x), Float(quat.y), Float(quat.z), Float(quat.w))
-            let finalQuat = simd_mul(currentQuat, orientationQuat)
+            guard let strongSelf = self else { return }
             
+//            guard let quat = self?.motionManager.deviceMotion?.attitude.quaternion,
+//                let orientationQuat = self?.orientationQuat else { return }
+//            let currentQuat = simd_quaternion(Float(quat.x), Float(quat.y), Float(quat.z), Float(quat.w))
+//            let finalQuat = simd_mul(currentQuat, orientationQuat)
+            
+            
+            guard let attitude = strongSelf.motionManager.deviceMotion?.attitude else { return }
+            
+            // Landscape
+            let heading = 360 - attitude.yaw * 180 / .pi
+            var pitch = -attitude.roll * 180.0 / .pi
+            pitch = pitch < 0 ? pitch + 180.0 : pitch
+            let roll = 360 - attitude.pitch * 180.0 / .pi
+
+            // portrait - this doesn't work
+//            let heading = (atan2(motion!.gravity.x, motion!.gravity.y) - .pi) * 180.0 / .pi //0.0 //360 - attitude.yaw * 180 / .pi
+//            var pitch = 90.0//360 - attitude.pitch * 180.0 / .pi
+////            pitch = pitch < 0 ? pitch + 180.0 : pitch
+//            let roll = 0.0 //-attitude.roll * 180.0 / .pi//-attitude.yaw * 180 / .pi//360 - attitude.pitch * 180.0 / .pi
+
+            let camera = strongSelf.sceneView.currentViewpointCamera()
+            //landscape
+            strongSelf.currentCamera = camera.rotate(toHeading: heading, pitch: pitch, roll: roll)
+            
+            strongSelf.sceneView.setViewpointCamera(strongSelf.currentCamera)
+            print("attitude = \(attitude)")
+            print("currentCamera = \(strongSelf.currentCamera)")
+//            let newCamera = camera.rotate(toHeading: attitude.yaw, pitch: attitude.roll + 90, roll: attitude.pitch)
+//            sceneView.setViewpointCamera(newCamera)
+
 //            print("updating device motion: \(finalQuat)")
             //use `finalQuat` to update position/orientation of camera
+            
+            
+            /*
+ [self.motionManager startDeviceMotionUpdatesToQueue: motionQueue withHandler: ^(CMDeviceMotion *motion, NSError *error) {
+ 
+ CMQuaternion quat = weakSelf.motionManager.deviceMotion.attitude.quaternion;
+ simd_quatf curentQuat = simd_quaternion((float)quat.x, (float)quat.y, (float)quat.z, (float)quat.w);
+ 
+ simd_quatf finalQuat = simd_mul(curentQuat, _orientationQuat);
+ 
+ [weakSelf didUpdateRelativePositionWithDeltaX:0
+ deltaY:0
+ deltaZ:0
+ deltaRotationX:finalQuat.vector.x
+ deltaRotationY:finalQuat.vector.y
+ deltaRotationZ:finalQuat.vector.z
+ deltaRotationW:finalQuat.vector.w
+ ignoreInitialHeading:NO];
+ }];
+*/
         }
     }
     
@@ -467,14 +525,45 @@ extension ArcGISARSensorView: CLLocationManagerDelegate {
         
         let locationPoint = AGSPoint(x: location.coordinate.longitude,
                                      y: location.coordinate.latitude,
-                                     z: location.altitude,
+                                     z: location.altitude + 100,
                                      spatialReference: .wgs84())
+        
+        if initialLocation == nil {
+            initialLocation = locationPoint
+            currentCamera = AGSCamera(location: locationPoint, heading: 0, pitch: 0, roll: 0)
+            sceneView.setViewpointCamera(currentCamera)
+            finalizeStart()
+        } else {
+            let camera = sceneView.currentViewpointCamera()
+            currentCamera = camera.move(toLocation: locationPoint)
+//            sceneView.setViewpointCamera(currentCamera)
+        }
 //        let camera = AGSCamera(location: locationPoint, heading: 0.0, pitch: 0.0, roll: 0.0)
 //        sceneView.setViewpointCamera(camera)
         
 //        finalizeStart()  // is this needed?
         
 //        print("updating location: \(locationPoint)")
+
+        /*
+ -(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations {
+ CLLocation *newLocation = [locations lastObject];
+ 
+ // invalid location if hAcc negative
+ if (newLocation.horizontalAccuracy < 0 || !newLocation) {
+ return;
+ }
+ if (newLocation.verticalAccuracy >= 0)
+ [self moveInitialPositionToLatitude:newLocation.coordinate.latitude longitude:newLocation.coordinate.longitude altitude:newLocation.altitude];
+ else
+ [self moveInitialPositionToLatitude:newLocation.coordinate.latitude longitude:newLocation.coordinate.longitude];
+ 
+ if (!_initialLocation) {
+ _initialLocation = YES;
+ [self finalizeStart];
+ }
+ }
+*/
     }
     
     /*
