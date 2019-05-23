@@ -12,8 +12,8 @@
 // limitations under the License.
 
 import UIKit
-//import ArcGISToolkit
-//import ArcGIS
+import ArcGISToolkit
+import ArcGIS
 
 open class ARExample: UIViewController {
     
