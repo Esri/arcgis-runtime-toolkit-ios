@@ -657,10 +657,11 @@ extension ArcGISARView: SCNSceneRendererDelegate {
         //
         // set FOV from ARKit camera.projectionMatrix
         //
-        //        let projectionMatrix = currentFrame.camera.projectionMatrix
-        //        let verticalElement = projectionMatrix.columns.0.x
-        //        let horizontalElement = projectionMatrix.columns.1.y
-        //        sceneView.setFieldOfViewFromProjection(Double(verticalElement), horizontalElement: Double(horizontalElement))
+//        guard let currentFrame = arSCNView.session.currentFrame else { return }
+//        let projectionMatrix = currentFrame.camera.projectionMatrix
+//        let verticalElement = projectionMatrix.columns.0.x
+//        let horizontalElement = projectionMatrix.columns.1.y
+//        sceneView.setFieldOfViewFromProjection(Double(verticalElement), horizontalElement: Double(horizontalElement))
         
         let finalQuat:simd_quatf = simd_mul(simd_mul(compensationQuat, simd_quaternion(cameraTransform)), orientationQuat)
         var transformationMatrix = AGSTransformationMatrix(quaternionX: Double(finalQuat.vector.x),
@@ -678,12 +679,6 @@ extension ArcGISARView: SCNSceneRendererDelegate {
         //        print("transformation values: tX = \(transformationMatrix.translationX); tY = \(transformationMatrix.translationY); tZ = \(transformationMatrix.translationZ); qX = \(transformationMatrix.quaternionX); qY = \(transformationMatrix.quaternionY); qZ = \(transformationMatrix.quaternionZ); qW =  = \(transformationMatrix.quaternionW)")
         let camera = AGSCamera(transformationMatrix: transformationMatrix)
 //        print("camera heading: \(camera.heading), pitch = \(camera.pitch), roll = \(camera.roll), location = \(camera.location)")
-        
-        print("go props = \((sceneView.graphicsOverlays.firstObject as? AGSGraphicsOverlay)?.sceneProperties?.surfacePlacement.rawValue)")
-        
-        guard let graphic = (sceneView.graphicsOverlays.firstObject as? AGSGraphicsOverlay)?.graphics.firstObject as? AGSGraphic else { return }
-        
-        print("graphic location = \(graphic.geometry)")
         
         sceneView.setViewpointCamera(camera)
         
