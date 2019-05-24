@@ -310,14 +310,27 @@ extension ArcGISARView: ARSessionDelegate {
 
         delegate?.session?(session, didUpdate: frame)
         
+        
         //
         // Debug - here's the switch between currentFrame and frame...
         //
         
         // create transformation matrix
         guard let currentFrame = session.currentFrame else { return }
-        let cameraTransform = currentFrame.camera.transform
+//        let cameraTransform = currentFrame.camera.transform
 //        let cameraTransform = frame.camera.transform
+        
+        //
+        // SCNRenderer point of View stuff
+        //
+        guard let pointOfView = arSCNView.pointOfView else { return }
+        let transform = pointOfView.transform
+        //        let orientation = SCNVector3(-transform.m31, -transform.m32, transform.m33)
+        //        let location = SCNVector3(transform.m41, transform.m42, transform.m43)
+        //        let currentPositionOfCamera = orientation + location
+        //        print(currentPositionOfCamera)
+        let cameraTransform = float4x4.init(transform)
+
         
         //
         // Debug - calculate and display time difference between frame and currentFrame
@@ -357,10 +370,10 @@ extension ArcGISARView: ARSessionDelegate {
         //        let svCamera = sceneView.currentViewpointCamera()
         //        print("sceneView.Camera heading: \(svCamera.heading), pitch = \(svCamera.pitch), roll = \(svCamera.roll), location = \(svCamera.location)")
         
-//        Thread.sleep(forTimeInterval: 0.25)
+//        Thread.sleep(forTimeInterval: 0.1)
         sceneView.renderFrame()
         frameCount = frameCount + 1
-//        Thread.sleep(forTimeInterval: 0.25)
+//        Thread.sleep(forTimeInterval: 0.1)
     }
 
     /**
