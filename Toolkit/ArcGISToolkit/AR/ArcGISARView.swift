@@ -89,6 +89,7 @@ public class ArcGISARView: UIView {
         
         addSubviewWithConstraints(arSCNView)
         arSCNView.session.delegate = self
+        (arSCNView as SCNSceneRenderer).delegate = self
         
         //
         // add sceneView to view and setup constraints
@@ -138,6 +139,7 @@ public class ArcGISARView: UIView {
         // TODO: look at original beta code and grab locationmanager started stuff
         if let origin = originCamera {
             //set origin on sceneView???
+            initialTransformationMatrix = origin.transformationMatrix
             sceneView.setViewpointCamera(origin)
             finalizeStart()
         }
@@ -310,70 +312,70 @@ extension ArcGISARView: ARSessionDelegate {
 
         delegate?.session?(session, didUpdate: frame)
         
-        
-        //
-        // Debug - here's the switch between currentFrame and frame...
-        //
-        
-        // create transformation matrix
-        guard let currentFrame = session.currentFrame else { return }
-//        let cameraTransform = currentFrame.camera.transform
-//        let cameraTransform = frame.camera.transform
-        
-        //
-        // SCNRenderer point of View stuff
-        //
-        guard let pointOfView = arSCNView.pointOfView else { return }
-        let transform = pointOfView.transform
-        //        let orientation = SCNVector3(-transform.m31, -transform.m32, transform.m33)
-        //        let location = SCNVector3(transform.m41, transform.m42, transform.m43)
-        //        let currentPositionOfCamera = orientation + location
-        //        print(currentPositionOfCamera)
-        let cameraTransform = float4x4.init(transform)
-
-        
-        //
-        // Debug - calculate and display time difference between frame and currentFrame
-        //
-//        let timeDiff = currentFrame.timestamp - frame.timestamp
-//        print("timeDiff between currentFrame and didUpdate frame: \(timeDiff)")
-        
-        //
-        // Future...
-        //
-        // set FOV from ARKit camera.projectionMatrix
-        //
-//        let projectionMatrix = currentFrame.camera.projectionMatrix
-//        let verticalElement = projectionMatrix.columns.0.x
-//        let horizontalElement = projectionMatrix.columns.1.y
-//        sceneView.setFieldOfViewFromProjection(Double(verticalElement), horizontalElement: Double(horizontalElement))
-        
-        let finalQuat:simd_quatf = simd_mul(simd_mul(compensationQuat, simd_quaternion(cameraTransform)), orientationQuat)
-        var transformationMatrix = AGSTransformationMatrix(quaternionX: Double(finalQuat.vector.x),
-                                                           quaternionY: Double(finalQuat.vector.y),
-                                                           quaternionZ: Double(finalQuat.vector.z),
-                                                           quaternionW: Double(finalQuat.vector.w),
-                                                           translationX: Double(cameraTransform.columns.3.x),
-                                                           translationY: Double(-cameraTransform.columns.3.z),
-                                                           translationZ: Double(cameraTransform.columns.3.y))
-        
-        transformationMatrix = initialTransformationMatrix.addTransformation(transformationMatrix)
-
-        //        let currentTransformationMatrix = sceneView.currentViewpointCamera().transformationMatrix
-        //        transformationMatrix = currentTransformationMatrix.addTransformation(transformationMatrix)
-//        print("transformation values: tX = \(transformationMatrix.translationX); tY = \(transformationMatrix.translationY); tZ = \(transformationMatrix.translationZ); qX = \(transformationMatrix.quaternionX); qY = \(transformationMatrix.quaternionY); qZ = \(transformationMatrix.quaternionZ); qW =  = \(transformationMatrix.quaternionW)")
-        let camera = AGSCamera(transformationMatrix: transformationMatrix)
-        print("camera heading: \(camera.heading), pitch = \(camera.pitch), roll = \(camera.roll), location = \(camera.location)")
-        
-        sceneView.setViewpointCamera(camera)
-        
-        //        let svCamera = sceneView.currentViewpointCamera()
-        //        print("sceneView.Camera heading: \(svCamera.heading), pitch = \(svCamera.pitch), roll = \(svCamera.roll), location = \(svCamera.location)")
-        
-//        Thread.sleep(forTimeInterval: 0.1)
-        sceneView.renderFrame()
-        frameCount = frameCount + 1
-//        Thread.sleep(forTimeInterval: 0.1)
+//
+//        //
+//        // Debug - here's the switch between currentFrame and frame...
+//        //
+//
+//        // create transformation matrix
+//        guard let currentFrame = session.currentFrame else { return }
+////        let cameraTransform = currentFrame.camera.transform
+////        let cameraTransform = frame.camera.transform
+//
+//        //
+//        // SCNRenderer point of View stuff
+//        //
+//        guard let pointOfView = arSCNView.pointOfView else { return }
+//        let transform = pointOfView.transform
+//        //        let orientation = SCNVector3(-transform.m31, -transform.m32, transform.m33)
+//        //        let location = SCNVector3(transform.m41, transform.m42, transform.m43)
+//        //        let currentPositionOfCamera = orientation + location
+//        //        print(currentPositionOfCamera)
+//        let cameraTransform = float4x4.init(transform)
+//
+//
+//        //
+//        // Debug - calculate and display time difference between frame and currentFrame
+//        //
+////        let timeDiff = currentFrame.timestamp - frame.timestamp
+////        print("timeDiff between currentFrame and didUpdate frame: \(timeDiff)")
+//
+//        //
+//        // Future...
+//        //
+//        // set FOV from ARKit camera.projectionMatrix
+//        //
+////        let projectionMatrix = currentFrame.camera.projectionMatrix
+////        let verticalElement = projectionMatrix.columns.0.x
+////        let horizontalElement = projectionMatrix.columns.1.y
+////        sceneView.setFieldOfViewFromProjection(Double(verticalElement), horizontalElement: Double(horizontalElement))
+//
+//        let finalQuat:simd_quatf = simd_mul(simd_mul(compensationQuat, simd_quaternion(cameraTransform)), orientationQuat)
+//        var transformationMatrix = AGSTransformationMatrix(quaternionX: Double(finalQuat.vector.x),
+//                                                           quaternionY: Double(finalQuat.vector.y),
+//                                                           quaternionZ: Double(finalQuat.vector.z),
+//                                                           quaternionW: Double(finalQuat.vector.w),
+//                                                           translationX: Double(cameraTransform.columns.3.x),
+//                                                           translationY: Double(-cameraTransform.columns.3.z),
+//                                                           translationZ: Double(cameraTransform.columns.3.y))
+//
+//        transformationMatrix = initialTransformationMatrix.addTransformation(transformationMatrix)
+//
+//        //        let currentTransformationMatrix = sceneView.currentViewpointCamera().transformationMatrix
+//        //        transformationMatrix = currentTransformationMatrix.addTransformation(transformationMatrix)
+////        print("transformation values: tX = \(transformationMatrix.translationX); tY = \(transformationMatrix.translationY); tZ = \(transformationMatrix.translationZ); qX = \(transformationMatrix.quaternionX); qY = \(transformationMatrix.quaternionY); qZ = \(transformationMatrix.quaternionZ); qW =  = \(transformationMatrix.quaternionW)")
+//        let camera = AGSCamera(transformationMatrix: transformationMatrix)
+//        print("camera heading: \(camera.heading), pitch = \(camera.pitch), roll = \(camera.roll), location = \(camera.location)")
+//
+//        sceneView.setViewpointCamera(camera)
+//
+//        //        let svCamera = sceneView.currentViewpointCamera()
+//        //        print("sceneView.Camera heading: \(svCamera.heading), pitch = \(svCamera.pitch), roll = \(svCamera.roll), location = \(svCamera.location)")
+//
+////        Thread.sleep(forTimeInterval: 0.1)
+//        sceneView.renderFrame()
+//        frameCount = frameCount + 1
+////        Thread.sleep(forTimeInterval: 0.1)
     }
 
     /**
@@ -548,13 +550,6 @@ extension ArcGISARView: CLLocationManagerDelegate {
             initialTransformationMatrix = camera.transformationMatrix
             sceneView.setViewpointCamera(camera)
             
-            //
-            // Debug - schedule timer to add point to the scene after 5 seconds (so we're sure the camera is set up)...
-            //
-            pointTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false, block: { [weak self] (timer) in
-                self?.addPointToScene(camera: (self?.sceneView.currentViewpointCamera())!)
-            })
-            
             finalizeStart()
         }
         else if location.horizontalAccuracy < horizontalAccuracy {
@@ -563,24 +558,6 @@ extension ArcGISARView: CLLocationManagerDelegate {
         }
         
         print("didUpdateLocations...")
-    }
-
-    //
-    // Debug - show point in front of camera...
-    //
-    private func addPointToScene(camera: AGSCamera) {
-        
-        let go = AGSGraphicsOverlay()
-        go.sceneProperties = AGSLayerSceneProperties(surfacePlacement: .absolute)
-        sceneView.graphicsOverlays.add(go)
-        
-        let markerSymbol = AGSSimpleMarkerSceneSymbol(style: .diamond, color: .blue, height: 0.1, width: 0.1, depth: 0.1, anchorPosition: .bottom)
-        
-        //  move camera forward 1 meters and get location
-        let location = camera.moveForward(withDistance: 1.0).location
-
-        let graphic = AGSGraphic(geometry: location, symbol: markerSymbol, attributes: nil)
-        go.graphics.add(graphic)
     }
     
     /*
@@ -640,5 +617,86 @@ extension ArcGISARView: CLLocationManagerDelegate {
     @available(iOS 6.0, *)
     public func locationManagerDidResumeLocationUpdates(_ manager: CLLocationManager) {
         
+    }
+}
+
+// MARK: - SCNSceneRendererDelegate
+extension ArcGISARView: SCNSceneRendererDelegate {
+
+    public func renderer(_ renderer: SCNSceneRenderer, willRenderScene scene: SCNScene, atTime time: TimeInterval) {
+        
+        //
+        // Debug - here's the switch between currentFrame and frame...
+        //
+        
+        // create transformation matrix
+//        guard let currentFrame = session.currentFrame else { return }
+        //        let cameraTransform = currentFrame.camera.transform
+        //        let cameraTransform = frame.camera.transform
+        
+        //
+        // SCNRenderer point of View stuff
+        //
+        guard let pointOfView = arSCNView.pointOfView else { return }
+        let transform = pointOfView.transform
+        //        let orientation = SCNVector3(-transform.m31, -transform.m32, transform.m33)
+        //        let location = SCNVector3(transform.m41, transform.m42, transform.m43)
+        //        let currentPositionOfCamera = orientation + location
+        //        print(currentPositionOfCamera)
+        let cameraTransform = float4x4.init(transform)
+        
+        
+        //
+        // Debug - calculate and display time difference between frame and currentFrame
+        //
+        //        let timeDiff = currentFrame.timestamp - frame.timestamp
+        //        print("timeDiff between currentFrame and didUpdate frame: \(timeDiff)")
+        
+        //
+        // Future...
+        //
+        // set FOV from ARKit camera.projectionMatrix
+        //
+        //        let projectionMatrix = currentFrame.camera.projectionMatrix
+        //        let verticalElement = projectionMatrix.columns.0.x
+        //        let horizontalElement = projectionMatrix.columns.1.y
+        //        sceneView.setFieldOfViewFromProjection(Double(verticalElement), horizontalElement: Double(horizontalElement))
+        
+        let finalQuat:simd_quatf = simd_mul(simd_mul(compensationQuat, simd_quaternion(cameraTransform)), orientationQuat)
+        var transformationMatrix = AGSTransformationMatrix(quaternionX: Double(finalQuat.vector.x),
+                                                           quaternionY: Double(finalQuat.vector.y),
+                                                           quaternionZ: Double(finalQuat.vector.z),
+                                                           quaternionW: Double(finalQuat.vector.w),
+                                                           translationX: Double(cameraTransform.columns.3.x),
+                                                           translationY: Double(-cameraTransform.columns.3.z),
+                                                           translationZ: Double(cameraTransform.columns.3.y))
+        
+        transformationMatrix = initialTransformationMatrix.addTransformation(transformationMatrix)
+        
+        //        let currentTransformationMatrix = sceneView.currentViewpointCamera().transformationMatrix
+        //        transformationMatrix = currentTransformationMatrix.addTransformation(transformationMatrix)
+        //        print("transformation values: tX = \(transformationMatrix.translationX); tY = \(transformationMatrix.translationY); tZ = \(transformationMatrix.translationZ); qX = \(transformationMatrix.quaternionX); qY = \(transformationMatrix.quaternionY); qZ = \(transformationMatrix.quaternionZ); qW =  = \(transformationMatrix.quaternionW)")
+        let camera = AGSCamera(transformationMatrix: transformationMatrix)
+//        print("camera heading: \(camera.heading), pitch = \(camera.pitch), roll = \(camera.roll), location = \(camera.location)")
+        
+        print("go props = \((sceneView.graphicsOverlays.firstObject as? AGSGraphicsOverlay)?.sceneProperties?.surfacePlacement.rawValue)")
+        
+        guard let graphic = (sceneView.graphicsOverlays.firstObject as? AGSGraphicsOverlay)?.graphics.firstObject as? AGSGraphic else { return }
+        
+        print("graphic location = \(graphic.geometry)")
+        
+        sceneView.setViewpointCamera(camera)
+        
+        //        let svCamera = sceneView.currentViewpointCamera()
+        //        print("sceneView.Camera heading: \(svCamera.heading), pitch = \(svCamera.pitch), roll = \(svCamera.roll), location = \(svCamera.location)")
+        
+        //        Thread.sleep(forTimeInterval: 0.1)
+        sceneView.renderFrame()
+        frameCount = frameCount + 1
+        //        Thread.sleep(forTimeInterval: 0.1)
+    }
+
+    public func renderer(_ renderer: SCNSceneRenderer, didRenderScene scene: SCNScene, atTime time: TimeInterval) {
+
     }
 }

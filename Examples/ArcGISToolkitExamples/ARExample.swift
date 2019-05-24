@@ -31,6 +31,13 @@ open class ARExample: UIViewController {
         arView.sceneView.scene = scene()
 //        arView.sceneView.alpha = 0.5
         
+//        camera heading: 318.9702215288517, pitch = 52.69900468516913, roll = 0.6234908971981902, location = AGSPoint: (-93.298481, 44.940544, 274.055704, nan), sr: 4326
+
+        let originCamera = AGSCamera(latitude: 44.940544, longitude: -93.298481, altitude: 274.055704, heading: 270.0, pitch: 0.0, roll: 0.0)
+        arView.originCamera = originCamera
+        
+        let camera = AGSCamera(latitude: 44.940544, longitude: -93.298481, altitude: 274.055704, heading: 270.0, pitch: 90.0, roll: 0.0)
+        addPointToScene(camera: camera)
     }
     
     override open func viewDidAppear(_ animated: Bool) {
@@ -57,6 +64,24 @@ open class ARExample: UIViewController {
         scene.baseSurface = surface
         
         return scene
+    }
+
+    //
+    // Debug - show point in front of camera...
+    //
+    private func addPointToScene(camera: AGSCamera) {
+        
+        let go = AGSGraphicsOverlay()
+        go.sceneProperties = AGSLayerSceneProperties(surfacePlacement: .absolute)
+        arView.sceneView.graphicsOverlays.add(go)
+        
+        let markerSymbol = AGSSimpleMarkerSceneSymbol(style: .diamond, color: .blue, height: 0.1, width: 0.1, depth: 0.1, anchorPosition: .bottom)
+        
+        //  move camera forward 1 meters and get location
+        let location = camera.moveForward(withDistance: 5.0).location
+        
+        let graphic = AGSGraphic(geometry: location, symbol: markerSymbol, attributes: nil)
+        go.graphics.add(graphic)
     }
 }
 
