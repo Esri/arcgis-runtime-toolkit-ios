@@ -14,7 +14,7 @@
 
 import UIKit
 import ARKit
-//import ArcGIS
+import ArcGIS
 
 public class ArcGISARView: UIView {
     
@@ -32,8 +32,11 @@ public class ArcGISARView: UIView {
     public var originCamera: AGSCamera?
     public var translationTransformationFactor: Double = 1.0
     
-    // we intercept these methods first, but will use `delegate` to forward them to clients
-    weak open var delegate: ARSessionDelegate?
+    // we intercept these ARSessionDelegate methods first, but will use `sessionDelegate` to forward them to clients
+    weak open var sessionDelegate: ARSessionDelegate?
+    
+    // we intercept these SCNSceneRendererDelegate methods first, but will use `scnSceneRendererDelegate` to forward them to clients
+    weak open var scnSceneRendererDelegate: SCNSceneRendererDelegate?
 
     // MARK: private properties
     
@@ -99,7 +102,7 @@ public class ArcGISARView: UIView {
         // make our sceneView's background transparent
         sceneView.isBackgroundTransparent = true
         sceneView.atmosphereEffect = .none
-        sceneView.isManualRendering = false
+        sceneView.isManualRendering = true
         
         notifiedStartOrFailure = false
         
@@ -309,73 +312,7 @@ extension ArcGISARView: ARSessionDelegate {
      @param frame The frame that has been updated.
      */
     public func session(_ session: ARSession, didUpdate frame: ARFrame) {
-
-        delegate?.session?(session, didUpdate: frame)
-        
-//
-//        //
-//        // Debug - here's the switch between currentFrame and frame...
-//        //
-//
-//        // create transformation matrix
-//        guard let currentFrame = session.currentFrame else { return }
-////        let cameraTransform = currentFrame.camera.transform
-////        let cameraTransform = frame.camera.transform
-//
-//        //
-//        // SCNRenderer point of View stuff
-//        //
-//        guard let pointOfView = arSCNView.pointOfView else { return }
-//        let transform = pointOfView.transform
-//        //        let orientation = SCNVector3(-transform.m31, -transform.m32, transform.m33)
-//        //        let location = SCNVector3(transform.m41, transform.m42, transform.m43)
-//        //        let currentPositionOfCamera = orientation + location
-//        //        print(currentPositionOfCamera)
-//        let cameraTransform = float4x4.init(transform)
-//
-//
-//        //
-//        // Debug - calculate and display time difference between frame and currentFrame
-//        //
-////        let timeDiff = currentFrame.timestamp - frame.timestamp
-////        print("timeDiff between currentFrame and didUpdate frame: \(timeDiff)")
-//
-//        //
-//        // Future...
-//        //
-//        // set FOV from ARKit camera.projectionMatrix
-//        //
-////        let projectionMatrix = currentFrame.camera.projectionMatrix
-////        let verticalElement = projectionMatrix.columns.0.x
-////        let horizontalElement = projectionMatrix.columns.1.y
-////        sceneView.setFieldOfViewFromProjection(Double(verticalElement), horizontalElement: Double(horizontalElement))
-//
-//        let finalQuat:simd_quatf = simd_mul(simd_mul(compensationQuat, simd_quaternion(cameraTransform)), orientationQuat)
-//        var transformationMatrix = AGSTransformationMatrix(quaternionX: Double(finalQuat.vector.x),
-//                                                           quaternionY: Double(finalQuat.vector.y),
-//                                                           quaternionZ: Double(finalQuat.vector.z),
-//                                                           quaternionW: Double(finalQuat.vector.w),
-//                                                           translationX: Double(cameraTransform.columns.3.x),
-//                                                           translationY: Double(-cameraTransform.columns.3.z),
-//                                                           translationZ: Double(cameraTransform.columns.3.y))
-//
-//        transformationMatrix = initialTransformationMatrix.addTransformation(transformationMatrix)
-//
-//        //        let currentTransformationMatrix = sceneView.currentViewpointCamera().transformationMatrix
-//        //        transformationMatrix = currentTransformationMatrix.addTransformation(transformationMatrix)
-////        print("transformation values: tX = \(transformationMatrix.translationX); tY = \(transformationMatrix.translationY); tZ = \(transformationMatrix.translationZ); qX = \(transformationMatrix.quaternionX); qY = \(transformationMatrix.quaternionY); qZ = \(transformationMatrix.quaternionZ); qW =  = \(transformationMatrix.quaternionW)")
-//        let camera = AGSCamera(transformationMatrix: transformationMatrix)
-//        print("camera heading: \(camera.heading), pitch = \(camera.pitch), roll = \(camera.roll), location = \(camera.location)")
-//
-//        sceneView.setViewpointCamera(camera)
-//
-//        //        let svCamera = sceneView.currentViewpointCamera()
-//        //        print("sceneView.Camera heading: \(svCamera.heading), pitch = \(svCamera.pitch), roll = \(svCamera.roll), location = \(svCamera.location)")
-//
-////        Thread.sleep(forTimeInterval: 0.1)
-//        sceneView.renderFrame()
-//        frameCount = frameCount + 1
-////        Thread.sleep(forTimeInterval: 0.1)
+        sessionDelegate?.session?(session, didUpdate: frame)
     }
 
     /**
@@ -385,7 +322,7 @@ extension ArcGISARView: ARSessionDelegate {
      @param anchors An array of added anchors.
      */
     public func session(_ session: ARSession, didAdd anchors: [ARAnchor]) {
-        delegate?.session?(session, didAdd: anchors)
+        sessionDelegate?.session?(session, didAdd: anchors)
     }
     
     /**
@@ -395,7 +332,7 @@ extension ArcGISARView: ARSessionDelegate {
      @param anchors An array of updated anchors.
      */
     public func session(_ session: ARSession, didUpdate anchors: [ARAnchor]) {
-        delegate?.session?(session, didUpdate: anchors)
+        sessionDelegate?.session?(session, didUpdate: anchors)
     }
     
     /**
@@ -405,7 +342,7 @@ extension ArcGISARView: ARSessionDelegate {
      @param anchors An array of removed anchors.
      */
     public func session(_ session: ARSession, didRemove anchors: [ARAnchor]) {
-        delegate?.session?(session, didRemove: anchors)
+        sessionDelegate?.session?(session, didRemove: anchors)
     }
 }
 
@@ -446,7 +383,7 @@ extension ArcGISARView: ARSessionObserver {
             rootController.present(alertController, animated: true, completion: nil)
         }
         
-        delegate?.session?(session, didFailWithError: error)
+        sessionDelegate?.session?(session, didFailWithError: error)
     }
     
     /**
@@ -456,7 +393,7 @@ extension ArcGISARView: ARSessionObserver {
      @param camera The camera that changed tracking states.
      */
     public func session(_ session: ARSession, cameraDidChangeTrackingState camera: ARCamera) {
-        delegate?.session?(session, cameraDidChangeTrackingState: camera)
+        sessionDelegate?.session?(session, cameraDidChangeTrackingState: camera)
     }
     
     /**
@@ -470,7 +407,7 @@ extension ArcGISARView: ARSessionObserver {
      @param session The session that was interrupted.
      */
     public func sessionWasInterrupted(_ session: ARSession) {
-        delegate?.sessionWasInterrupted?(session)
+        sessionDelegate?.sessionWasInterrupted?(session)
     }
     
     /**
@@ -483,7 +420,7 @@ extension ArcGISARView: ARSessionObserver {
      @param session The session that was interrupted.
      */
     public func sessionInterruptionEnded(_ session: ARSession) {
-        delegate?.sessionWasInterrupted?(session)
+        sessionDelegate?.sessionWasInterrupted?(session)
     }
     
     /**
@@ -501,7 +438,7 @@ extension ArcGISARView: ARSessionObserver {
      */
     @available(iOS 11.3, *)
     public func sessionShouldAttemptRelocalization(_ session: ARSession) -> Bool {
-        if let result = delegate?.sessionShouldAttemptRelocalization?(session) {
+        if let result = sessionDelegate?.sessionShouldAttemptRelocalization?(session) {
             return result
         }
         return false
@@ -514,14 +451,9 @@ extension ArcGISARView: ARSessionObserver {
      @param audioSampleBuffer The captured audio sample buffer.
      */
     public func session(_ session: ARSession, didOutputAudioSampleBuffer audioSampleBuffer: CMSampleBuffer) {
-        delegate?.session?(session, didOutputAudioSampleBuffer: audioSampleBuffer)
+        sessionDelegate?.session?(session, didOutputAudioSampleBuffer: audioSampleBuffer)
     }
 }
-
-//
-// Debug
-//
-var pointTimer: Timer?
 
 // MARK: - CLLocationManagerDelegate
 extension ArcGISARView: CLLocationManagerDelegate {
@@ -551,13 +483,13 @@ extension ArcGISARView: CLLocationManagerDelegate {
             sceneView.setViewpointCamera(camera)
             
             finalizeStart()
+            print("didUpdateLocations - initialLocation...")
         }
         else if location.horizontalAccuracy < horizontalAccuracy {
             horizontalAccuracy = location.horizontalAccuracy
-            // TODO: update current location???
+            print("didUpdateLocations - accuracy improved...")
         }
         
-        print("didUpdateLocations...")
     }
     
     /*
@@ -623,46 +555,30 @@ extension ArcGISARView: CLLocationManagerDelegate {
 // MARK: - SCNSceneRendererDelegate
 extension ArcGISARView: SCNSceneRendererDelegate {
 
+    public  func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
+        scnSceneRendererDelegate?.renderer?(renderer, updateAtTime: time)
+    }
+
+    public func renderer(_ renderer: SCNSceneRenderer, didApplyAnimationsAtTime time: TimeInterval) {
+        scnSceneRendererDelegate?.renderer?(renderer, didApplyConstraintsAtTime: time)
+    }
+    
+    public func renderer(_ renderer: SCNSceneRenderer, didSimulatePhysicsAtTime time: TimeInterval) {
+        scnSceneRendererDelegate?.renderer?(renderer, didSimulatePhysicsAtTime: time)
+    }
+    
+    @available(iOS 11.0, *)
+    public func renderer(_ renderer: SCNSceneRenderer, didApplyConstraintsAtTime time: TimeInterval) {
+        scnSceneRendererDelegate?.renderer?(renderer, didApplyConstraintsAtTime: time)
+    }
+    
     public func renderer(_ renderer: SCNSceneRenderer, willRenderScene scene: SCNScene, atTime time: TimeInterval) {
         
         //
-        // Debug - here's the switch between currentFrame and frame...
+        // get transform from SCNView.pointOfView
         //
-        
-        // create transformation matrix
-//        guard let currentFrame = session.currentFrame else { return }
-        //        let cameraTransform = currentFrame.camera.transform
-        //        let cameraTransform = frame.camera.transform
-        
-        //
-        // SCNRenderer point of View stuff
-        //
-        guard let pointOfView = arSCNView.pointOfView else { return }
-        let transform = pointOfView.transform
-        //        let orientation = SCNVector3(-transform.m31, -transform.m32, transform.m33)
-        //        let location = SCNVector3(transform.m41, transform.m42, transform.m43)
-        //        let currentPositionOfCamera = orientation + location
-        //        print(currentPositionOfCamera)
+        guard let transform = arSCNView.pointOfView?.transform else { return }
         let cameraTransform = float4x4.init(transform)
-        
-        
-        //
-        // Debug - calculate and display time difference between frame and currentFrame
-        //
-        //        let timeDiff = currentFrame.timestamp - frame.timestamp
-        //        print("timeDiff between currentFrame and didUpdate frame: \(timeDiff)")
-        
-        //
-        // Future...
-        //
-        // set FOV from ARKit camera.projectionMatrix
-        //
-        guard let currentFrame = arSCNView.session.currentFrame else { return }
-        let projectionMatrix = currentFrame.camera.projectionMatrix
-        let verticalElement = projectionMatrix.columns.0.x
-        let horizontalElement = projectionMatrix.columns.1.y
-        sceneView.setFieldOfViewFromProjection(Double(verticalElement), horizontalElement: Double(horizontalElement))
-        print("FOV-vert: \(verticalElement) horiz: \(horizontalElement)")
         
         let finalQuat:simd_quatf = simd_mul(simd_mul(compensationQuat, simd_quaternion(cameraTransform)), orientationQuat)
         var transformationMatrix = AGSTransformationMatrix(quaternionX: Double(finalQuat.vector.x),
@@ -675,24 +591,19 @@ extension ArcGISARView: SCNSceneRendererDelegate {
         
         transformationMatrix = initialTransformationMatrix.addTransformation(transformationMatrix)
         
-        //        let currentTransformationMatrix = sceneView.currentViewpointCamera().transformationMatrix
-        //        transformationMatrix = currentTransformationMatrix.addTransformation(transformationMatrix)
-        //        print("transformation values: tX = \(transformationMatrix.translationX); tY = \(transformationMatrix.translationY); tZ = \(transformationMatrix.translationZ); qX = \(transformationMatrix.quaternionX); qY = \(transformationMatrix.quaternionY); qZ = \(transformationMatrix.quaternionZ); qW =  = \(transformationMatrix.quaternionW)")
         let camera = AGSCamera(transformationMatrix: transformationMatrix)
-//        print("camera heading: \(camera.heading), pitch = \(camera.pitch), roll = \(camera.roll), location = \(camera.location)")
-        
         sceneView.setViewpointCamera(camera)
         
-        //        let svCamera = sceneView.currentViewpointCamera()
-        //        print("sceneView.Camera heading: \(svCamera.heading), pitch = \(svCamera.pitch), roll = \(svCamera.roll), location = \(svCamera.location)")
-        
-        //        Thread.sleep(forTimeInterval: 0.1)
         sceneView.renderFrame()
         frameCount = frameCount + 1
-        //        Thread.sleep(forTimeInterval: 0.1)
+        
+        //
+        // call our scnSceneRendererDelegate
+        //
+        scnSceneRendererDelegate?.renderer?(renderer, willRenderScene: scene, atTime: time)
     }
-
+    
     public func renderer(_ renderer: SCNSceneRenderer, didRenderScene scene: SCNScene, atTime time: TimeInterval) {
-
+        scnSceneRendererDelegate?.renderer?(renderer, didRenderScene: scene, atTime: time)
     }
 }
