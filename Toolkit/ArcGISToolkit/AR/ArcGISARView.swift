@@ -14,7 +14,7 @@
 
 import UIKit
 import ARKit
-import ArcGIS
+//import ArcGIS
 
 public class ArcGISARView: UIView {
     
@@ -657,11 +657,12 @@ extension ArcGISARView: SCNSceneRendererDelegate {
         //
         // set FOV from ARKit camera.projectionMatrix
         //
-//        guard let currentFrame = arSCNView.session.currentFrame else { return }
-//        let projectionMatrix = currentFrame.camera.projectionMatrix
-//        let verticalElement = projectionMatrix.columns.0.x
-//        let horizontalElement = projectionMatrix.columns.1.y
-//        sceneView.setFieldOfViewFromProjection(Double(verticalElement), horizontalElement: Double(horizontalElement))
+        guard let currentFrame = arSCNView.session.currentFrame else { return }
+        let projectionMatrix = currentFrame.camera.projectionMatrix
+        let verticalElement = projectionMatrix.columns.0.x
+        let horizontalElement = projectionMatrix.columns.1.y
+        sceneView.setFieldOfViewFromProjection(Double(verticalElement), horizontalElement: Double(horizontalElement))
+        print("FOV-vert: \(verticalElement) horiz: \(horizontalElement)")
         
         let finalQuat:simd_quatf = simd_mul(simd_mul(compensationQuat, simd_quaternion(cameraTransform)), orientationQuat)
         var transformationMatrix = AGSTransformationMatrix(quaternionX: Double(finalQuat.vector.x),

@@ -12,8 +12,10 @@
 // limitations under the License.
 
 import UIKit
-import ArcGISToolkit
-import ArcGIS
+import ARKit
+
+//import ArcGISToolkit
+//import ArcGIS
 
 open class ARExample: UIViewController {
     
@@ -21,12 +23,57 @@ open class ARExample: UIViewController {
 //    public let arView = ArcGISARView(renderVideoFeed: false)
 //    public let arView = ArcGISARSensorView(renderVideoFeed: true)
 
+    let fovLabel: UILabel = UILabel(frame: .zero)
     override open func viewDidLoad() {
         super.viewDidLoad()
         
-        arView.frame = view.bounds
-        arView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        arView.delegate = self
+        
+        //
+        // Short and fat
+        //
+
         view.addSubview(arView)
+        arView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            arView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
+            arView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
+            arView.topAnchor.constraint(equalTo: view.topAnchor, constant: 200),
+//            arView.widthAnchor.constraint(equalToConstant: 200.0),
+            arView.heightAnchor.constraint(equalToConstant:200.0)
+//            arView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            ])
+        
+        view.addSubview(fovLabel)
+        fovLabel.translatesAutoresizingMaskIntoConstraints = false
+        fovLabel.textColor = .blue
+        NSLayoutConstraint.activate([
+            fovLabel.centerXAnchor.constraint(equalTo: arView.centerXAnchor, constant: 0),
+            fovLabel.topAnchor.constraint(equalTo: arView.bottomAnchor, constant: 16),
+            ])
+        
+        //
+        // Tall and skinny
+        //
+        
+//        view.addSubview(arView)
+//        arView.translatesAutoresizingMaskIntoConstraints = false
+//        NSLayoutConstraint.activate([
+//            arView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 200),
+//            //            arView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
+//            arView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
+//            arView.widthAnchor.constraint(equalToConstant: 200.0),
+//            //            arView.heightAnchor.constraint(equalToConstant:200.0)
+//            arView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+//            ])
+//
+//        view.addSubview(fovLabel)
+//        fovLabel.translatesAutoresizingMaskIntoConstraints = false
+//        fovLabel.textColor = .blue
+//        NSLayoutConstraint.activate([
+//            fovLabel.leadingAnchor.constraint(equalTo: arView.trailingAnchor, constant: 0),
+//            fovLabel.centerYAnchor.constraint(equalTo: arView.centerYAnchor, constant: 16),
+//            ])
         
         arView.sceneView.scene = scene()
 //        arView.sceneView.alpha = 0.5
@@ -85,3 +132,15 @@ open class ARExample: UIViewController {
     }
 }
 
+extension ARExample: ARSessionDelegate {
+    
+    public func session(_ session: ARSession, didUpdate frame: ARFrame) {
+        guard let currentFrame = session.currentFrame else { return }
+        let projectionMatrix = currentFrame.camera.projectionMatrix
+        let verticalElement = projectionMatrix.columns.0.x
+        let horizontalElement = projectionMatrix.columns.1.y
+        fovLabel.text = String("FOV-vert: \(verticalElement) horiz: \(horizontalElement)")
+//        fovLabel.text = String("sceneView.fieldOfView = horizontalElement: \(horizontalElement) fieldOfViewDistortionRatio = \(arView.sceneView.fieldOfViewDistortionRatio)")
+
+    }
+}

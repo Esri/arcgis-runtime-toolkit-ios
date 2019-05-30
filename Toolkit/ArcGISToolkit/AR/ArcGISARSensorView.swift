@@ -15,7 +15,7 @@
 import UIKit
 import AVFoundation
 import CoreMotion
-import ArcGIS
+//import ArcGIS
 
 public enum LocationType {
     case anglesOnly
