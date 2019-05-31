@@ -25,34 +25,35 @@ public enum LocationType {
 
 public class ArcGISARSensorView: UIView {
 
+    /// Location type specifying what information we are interested in
     public var locationType: LocationType = .anglesAndPosition {
         didSet {
             // need to update location and heading updates to account for new LocationType
         }
     }
     
+    /// The view used to display ArcGIS 3D content
     public var sceneView = AGSSceneView(frame: .zero) {
         willSet(newSceneview) {
             removeSubviewAndConstraints(sceneView)
         }
         didSet {
             addSubviewWithConstraints(sceneView)
-            
-            // make our sceneView's background transparent
-            sceneView.isBackgroundTransparent = true
-            sceneView.atmosphereEffect = .none
         }
     }
 
+    /// Determines whether to use an absolution heading as opposed to a heading relative to the original heading
     public var useAbsoluteHeading: Bool = true
     
     // MARK: private properties
 
+    /// Whether to display the camera image or not
     public var renderVideoFeed = true
     
-    // has the client been notfiied of start/failure
+    /// Whether the client has been notfiied of start/failure
     private var notifiedStartOrFailure = false
 
+    /// Used to determine the device location
     private lazy var locationManager: CLLocationManager = {
         let lm = CLLocationManager()
         lm.desiredAccuracy = kCLLocationAccuracyBest
@@ -60,6 +61,7 @@ public class ArcGISARSensorView: UIView {
         return lm
     }()
 
+    /// Used to determine the device motion
     private lazy var motionManager: CMMotionManager = {
         let mm = CMMotionManager()
         mm.deviceMotionUpdateInterval = 1.0 / 60.0
@@ -67,27 +69,30 @@ public class ArcGISARSensorView: UIView {
         return mm
     }()
 
+    /// Initial location from locationManager
     private var initialLocation: AGSPoint?
-    private var currentCamera: AGSCamera = AGSCamera(latitude: 0, longitude: 0, altitude: 0, heading: 0, pitch: 0, roll: 0)
-
-    var updateTimer: Timer?
 
     // MARK: Capture session
     
+    /// Capture session setup results
     private enum SessionSetupResult {
         case success
         case notAuthorized
         case configurationFailed
     }
     
+    /// The current AVCaptureSession
     private lazy var session = AVCaptureSession()
     
     // Communicate with the capture session and other session objects on this queue.
     private let sessionQueue = DispatchQueue(label: "session queue", attributes: [], target: nil)
     private var setupResult: SessionSetupResult = .success
     var videoDeviceInput: AVCaptureDeviceInput!
+    
+    /// The view the camera image is displayed in
     private lazy var cameraView = CameraView(frame:CGRect.zero)
     
+    /// The quaternion used to represent the device orientation; used to calculate the current device transformation for each frame; defaults to landcape-left
     private var orientationQuat: simd_quatf = simd_quaternion(Float(0), Float(0), Float(0), Float(1))
 
     // MARK: intializers
@@ -102,11 +107,15 @@ public class ArcGISARSensorView: UIView {
         sharedInitialization()
     }
     
+    /// Initializer used to denote whether to display the live camera image
+    ///
+    /// - Parameter renderVideoFeed: whether to dispaly the live camera image
     required public convenience init(renderVideoFeed: Bool){
         self.init(frame: CGRect.zero)
         self.renderVideoFeed = renderVideoFeed
     }
     
+    /// Initialization code shared between all initializers
     private func sharedInitialization(){
         
         //
@@ -118,7 +127,7 @@ public class ArcGISARSensorView: UIView {
         addSubviewWithConstraints(sceneView)
         
         if renderVideoFeed {
-            // Set up the video preview view.
+            // set up the video preview view.
             addSubviewWithConstraints(cameraView, index: 0)
             cameraView.session = session
             
@@ -126,6 +135,7 @@ public class ArcGISARSensorView: UIView {
         }
     }
 
+    /// Starts device tracking
     public func startTracking() {
         notifiedStartOrFailure = false
         
@@ -145,6 +155,7 @@ public class ArcGISARSensorView: UIView {
         }
     }
     
+    /// Suspends device tracking
     public func stopTracking() {
         locationManager.stopUpdatingLocation()
         if CLLocationManager.headingAvailable() {
@@ -164,12 +175,17 @@ public class ArcGISARSensorView: UIView {
         }
     }
     
-    // Called when device orientation changes
+    /// Called when device orientation changes
+    ///
+    /// - Parameter notification: the notification
     @objc func orientationChanged(notification: Notification) {
         // handle rotation here
         updateCameraViewOrientation()
     }
 
+    /// Adds subView to superView with appropriate constraints
+    ///
+    /// - Parameter subview: the subView to add
     private func addSubviewWithConstraints(_ subview: UIView, index: Int = -1) {
         // add subView to view and setup constraints
         if index >= 0 {
@@ -187,12 +203,15 @@ public class ArcGISARSensorView: UIView {
             ])
     }
     
+    /// Removes subView and constraints from superView
+    ///
+    /// - Parameter subview: the subView to add
     private func removeSubviewAndConstraints(_ subview: UIView) {
-        // remove subView from view along with constraints
         subview.removeFromSuperview()
         removeConstraints(subview.constraints)
     }
     
+    /// Start the locationManager with undetermined access
     private func startWithAccessNotDetermined() {
         if (Bundle.main.object(forInfoDictionaryKey: "NSLocationWhenInUseUsageDescription") != nil) {
             locationManager.requestWhenInUseAuthorization()
@@ -201,10 +220,11 @@ public class ArcGISARSensorView: UIView {
             locationManager.requestAlwaysAuthorization()
         }
         else{
-            didStartOrFailWithError(ArcGISARView.missingPListKeyError())
+            didStartOrFailWithError(ArcGISARSensorView.missingPListKeyError())
         }
     }
     
+    /// Start updating the location and heading via the locationManager
     private func startUpdatingLocationAndHeading() {
         locationManager.startUpdatingLocation()
         if CLLocationManager.headingAvailable() {
@@ -215,7 +235,7 @@ public class ArcGISARSensorView: UIView {
     }
     
     private func startWithAccessDenied() {
-        didStartOrFailWithError(ArcGISARView.accessDeniedError())
+        didStartOrFailWithError(ArcGISARSensorView.accessDeniedError())
     }
     
     private func startWithAccessAuthorized() {
@@ -233,7 +253,7 @@ public class ArcGISARSensorView: UIView {
         if !notifiedStartOrFailure {
             stopTracking()
             // we were waiting for user prompt to come back, so notify
-            didStartOrFailWithError(ArcGISARView.accessDeniedError())
+            didStartOrFailWithError(ArcGISARSensorView.accessDeniedError())
         }
     }
     
@@ -253,35 +273,35 @@ public class ArcGISARSensorView: UIView {
         // TODO:  is there anything to do here?
     }
     
+    /// Start tracking device motion updates to get device orientation
     private func startUpdatingAngles() {
         let motionQueue = OperationQueue.init()
         motionQueue.qualityOfService = .userInteractive
         motionQueue.maxConcurrentOperationCount = 1
         
         motionManager.startDeviceMotionUpdates(to: motionQueue) { [weak self] (motion, error) in
-            guard let strongSelf = self else { return }
-            
             guard let quat = self?.motionManager.deviceMotion?.attitude.quaternion,
                 let orientationQuat = self?.orientationQuat else { return }
+            
             let currentQuat = simd_quaternion(Float(quat.x), Float(quat.y), Float(quat.z), Float(quat.w))
             let finalQuat = simd_mul(currentQuat, orientationQuat)
             
-            // Old beta code to update heading...
-//            [weakSelf didUpdateRelativePositionWithDeltaX:0
-//                deltaY:0
-//                deltaZ:0
-//                deltaRotationX:finalQuat.vector.x
-//                deltaRotationY:finalQuat.vector.y
-//                deltaRotationZ:finalQuat.vector.z
-//                deltaRotationW:finalQuat.vector.w
-//                ignoreInitialHeading:NO];
-//        }];
+            let transformationMatrix = AGSTransformationMatrix(quaternionX: Double(finalQuat.vector.x),
+                                                               quaternionY: Double(finalQuat.vector.y),
+                                                               quaternionZ: Double(finalQuat.vector.z),
+                                                               quaternionW: Double(finalQuat.vector.w),
+                                                               translationX: 0,
+                                                               translationY: 0,
+                                                               translationZ: 0)
+            let camera = AGSCamera(transformationMatrix: transformationMatrix)
+            self?.sceneView.setViewpointCamera(camera)
         }
     }
     
     // MARK: Video
     
-    func updateCameraViewOrientation() {
+    /// Udpate the orientation of the camera view
+    private func updateCameraViewOrientation() {
         if let videoPreviewLayerConnection = cameraView.videoPreviewLayer.connection {
             let deviceOrientation = UIDevice.current.orientation
             guard let newVideoOrientation = AVCaptureVideoOrientation(rawValue: deviceOrientation.rawValue),
@@ -293,6 +313,7 @@ public class ArcGISARSensorView: UIView {
         }
     }
 
+    /// Prepare the video feed
     private func prepVideoFeed() {
         //
         // Check video authorization status. Video access is required and audio
@@ -341,8 +362,8 @@ public class ArcGISARSensorView: UIView {
         }
     }
     
+    /// Setup the capture session
     private func setupSession() {
-
         // session setup
         sessionQueue.async {
             switch self.setupResult {
@@ -421,10 +442,6 @@ public class ArcGISARSensorView: UIView {
             if session.canAddInput(videoDeviceInput) {
                 session.addInput(videoDeviceInput)
                 self.videoDeviceInput = videoDeviceInput
-//
-//                DispatchQueue.main.async { [weak self] in
-//                    self?.cameraView.videoPreviewLayer.connection!.videoOrientation = .landscapeLeft
-//                }
             }
             else {
                 print("Could not add video device input to the session")
@@ -444,17 +461,19 @@ public class ArcGISARSensorView: UIView {
     }
 
     // MARK: Errors
-    class func notSupportedError() -> NSError {
-        let userInfo = [NSLocalizedDescriptionKey : "The device does not support ARKit functionality."]
-        return NSError(domain: AGSErrorDomain, code: 0, userInfo: userInfo)
-    }
     
-    class func accessDeniedError() -> NSError{
+    /// Error used when access to the device location is denied
+    ///
+    /// - Returns: error stating access to location information is denied
+    fileprivate class func accessDeniedError() -> NSError{
         let userInfo = [NSLocalizedDescriptionKey : "Access to the device location is denied."]
         return NSError(domain: kCLErrorDomain, code: CLError.Code.denied.rawValue, userInfo: userInfo)
     }
     
-    class func missingPListKeyError() -> NSError{
+    /// Error used when required plist information is missing
+    ///
+    /// - Returns: error stating plist information is missing
+    fileprivate class func missingPListKeyError() -> NSError{
         let userInfo = [NSLocalizedDescriptionKey : "You must specify a location usage description key (NSLocationWhenInUseUsageDescription or NSLocationAlwaysUsageDescription) in your plist."]
         return NSError(domain: kCLErrorDomain, code: CLError.Code.denied.rawValue, userInfo: userInfo)
     }
@@ -484,13 +503,12 @@ extension ArcGISARSensorView: CLLocationManagerDelegate {
         
         if initialLocation == nil {
             initialLocation = locationPoint
-            currentCamera = AGSCamera(location: locationPoint, heading: 0, pitch: 0, roll: 0)
-            sceneView.setViewpointCamera(currentCamera)
+            let camera = AGSCamera(location: locationPoint, heading: 0, pitch: 0, roll: 0)
+            sceneView.setViewpointCamera(camera)
             finalizeStart()
         } else {
-            let camera = sceneView.currentViewpointCamera()
-            currentCamera = camera.move(toLocation: locationPoint)
-//            sceneView.setViewpointCamera(currentCamera)
+            let camera = sceneView.currentViewpointCamera().move(toLocation: locationPoint)
+            sceneView.setViewpointCamera(camera)
         }
     }
     

@@ -19,8 +19,6 @@ import ArcGIS
 open class ARExample: UIViewController {
     
     public let arView = ArcGISARView(frame: CGRect.zero)
-//    public let arView = ArcGISARView(renderVideoFeed: false)
-//    public let arView = ArcGISARSensorView(renderVideoFeed: true)
 
     override open func viewDidLoad() {
         super.viewDidLoad()
@@ -52,9 +50,8 @@ open class ARExample: UIViewController {
     
     private func scene() -> AGSScene {
 
-        // create scene
+        // create scene with the streets basemap
         let scene = AGSScene(basemapType: .streets)
-//        let scene = AGSScene()
 
         // create elevation surface
         let elevationSource = AGSArcGISTiledElevationSource(url: URL(string: "http://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer")!)
