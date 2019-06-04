@@ -18,7 +18,7 @@ import ArcGIS
 
 open class ARExample: UIViewController {
     
-    public let arView = ArcGISARView(frame: CGRect.zero)
+    public let arView = ArcGISARView(frame: .zero)
 
     override open func viewDidLoad() {
         super.viewDidLoad()

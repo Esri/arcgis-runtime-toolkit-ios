@@ -56,7 +56,7 @@ public class ArcGISARView: UIView {
     private var renderVideoFeed = true
     
     /// Used to determine the device location when originCamera is not set.
-    private lazy var locationManager: CLLocationManager = {
+    private lazy var locationManager: CLLocationManager = { [unowned self] in
         let lm = CLLocationManager()
         lm.desiredAccuracy = kCLLocationAccuracyBest
         lm.delegate = self
@@ -67,7 +67,7 @@ public class ArcGISARView: UIView {
     private var initialLocation: CLLocation?
     
     /// Current horizontal accuracy of the device.
-    private var horizontalAccuracy: CLLocationAccuracy = .greatestFiniteMagnitude;
+    private var horizontalAccuracy: CLLocationAccuracy = .greatestFiniteMagnitude
     
     /// The intial camera position and orientation whether it was set via originCamera or the locationManager.
     private var initialTransformationMatrix = AGSTransformationMatrix()
@@ -101,7 +101,7 @@ public class ArcGISARView: UIView {
     
     /// Initializer used to denote whether to display the live camera image.
     ///
-    /// - Parameter renderVideoFeed: whether to dispaly the live camera image.
+    /// - Parameter renderVideoFeed: Whether to display the live camera image.
     public convenience init(renderVideoFeed: Bool){
         self.init(frame: .zero)
         self.renderVideoFeed = renderVideoFeed
@@ -137,7 +137,7 @@ public class ArcGISARView: UIView {
     
     /// Determines the map point for the given screen point.
     ///
-    /// - Parameter screenPoint: the point in screen coordinates.
+    /// - Parameter screenPoint: The point in screen coordinates.
     /// - Returns: The map point corresponding to screenPoint.
     public func arScreenToLocation(screenPoint: AGSPoint) -> AGSPoint {
         return AGSPoint(x: 0.0, y: 0.0, spatialReference: nil)
@@ -222,7 +222,7 @@ public class ArcGISARView: UIView {
 
     /// Adds subView to superView with appropriate constraints.
     ///
-    /// - Parameter subview: the subView to add.
+    /// - Parameter subview: The subView to add.
     fileprivate func addSubviewWithConstraints(_ subview: UIView) {
         // Add subview to view and setup constraints.
         addSubview(subview)
@@ -276,14 +276,14 @@ public class ArcGISARView: UIView {
     
     /// Potential notification to the user of an error starting device tracking.
     ///
-    /// - Parameter error: error that ocurred when starting tracking.
+    /// - Parameter error: The error that occurred when starting tracking.
     fileprivate func didStartOrFailWithError(_ error: Error?) {
         if !notifiedStartOrFailure, let error = error {
             // TODO: present error to user...
             print("didStartOrFailWithError: \(String(reflecting:error))")
         }
         
-        notifiedStartOrFailure = true;
+        notifiedStartOrFailure = true
     }
     
     /// Handle a change in authorization status to "denied".
@@ -304,18 +304,18 @@ public class ArcGISARView: UIView {
     
     /// Called when device orientation changes.
     ///
-    /// - Parameter notification: the notification.
+    /// - Parameter notification: The notification.
     @objc func orientationChanged(notification: Notification?) {
         // Handle rotation here.
         switch UIApplication.shared.statusBarOrientation {
         case .landscapeLeft:
-            orientationQuat = simd_quaternion(0, 0, 1.0, 0);
+            orientationQuat = simd_quaternion(0, 0, 1.0, 0)
         case .landscapeRight:
-            orientationQuat = simd_quaternion(0, 0, 0, 1.0);
+            orientationQuat = simd_quaternion(0, 0, 0, 1.0)
         case .portrait:
-            orientationQuat = simd_quaternion(0, 0, sqrt(0.5), sqrt(0.5));
+            orientationQuat = simd_quaternion(0, 0, sqrt(0.5), sqrt(0.5))
         case .portraitUpsideDown:
-            orientationQuat = simd_quaternion(0, 0, -sqrt(0.5), sqrt(0.5));
+            orientationQuat = simd_quaternion(0, 0, -sqrt(0.5), sqrt(0.5))
         default:
             break
         }
@@ -328,7 +328,7 @@ public class ArcGISARView: UIView {
     /// - Returns: Error stating `ARKit` not supported.
     fileprivate class func notSupportedError() -> NSError {
         let userInfo = [NSLocalizedDescriptionKey : "The device does not support ARKit functionality."]
-        return NSError(domain: AGSErrorDomain, code: ARError.unsupportedConfiguration.rawValue, userInfo: userInfo)
+        return NSError(domain: ARErrorDomain, code: ARError.unsupportedConfiguration.rawValue, userInfo: userInfo)
     }
     
     /// Error used when access to the device location is denied.
