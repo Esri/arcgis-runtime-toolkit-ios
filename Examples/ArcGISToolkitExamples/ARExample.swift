@@ -19,22 +19,6 @@ import ArcGIS
 open class ARExample: UIViewController {
     
     public let arView = ArcGISARView(frame: CGRect.zero)
-    
-    private let scene: AGSScene = {
-        // Creates a scene with the streets basemap.
-        let scene = AGSScene(basemapType: .streets)
-        
-        // create elevation surface
-        let elevationSource = AGSArcGISTiledElevationSource(url: URL(string: "https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer")!)
-        let surface = AGSSurface()
-        surface.elevationSources = [elevationSource]
-        surface.name = "baseSurface"
-        surface.isEnabled = true
-        surface.backgroundGrid.isVisible = false
-        scene.baseSurface = surface
-        
-        return scene
-    }()
 
     override open func viewDidLoad() {
         super.viewDidLoad()
@@ -51,7 +35,7 @@ open class ARExample: UIViewController {
             arView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
             ])
         
-        arView.sceneView.scene = scene
+        arView.sceneView.scene = makeStreetsScene()
     }
     
     override open func viewDidAppear(_ animated: Bool) {
@@ -60,6 +44,23 @@ open class ARExample: UIViewController {
     
     override open func viewDidDisappear(_ animated: Bool) {
         arView.stopTracking()
+    }
+
+    private func makeStreetsScene() -> AGSScene {
+        
+        // create scene with the streets basemap
+        let scene = AGSScene(basemapType: .streets)
+        
+        // create elevation surface
+        let elevationSource = AGSArcGISTiledElevationSource(url: URL(string: "http://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer")!)
+        let surface = AGSSurface()
+        surface.elevationSources = [elevationSource]
+        surface.name = "baseSurface"
+        surface.isEnabled = true
+        surface.backgroundGrid.isVisible = false
+        scene.baseSurface = surface
+        
+        return scene
     }
 }
 
