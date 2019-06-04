@@ -19,13 +19,27 @@ import ArcGIS
 open class ARExample: UIViewController {
     
     public let arView = ArcGISARView(frame: CGRect.zero)
+    
+    private let scene: AGSScene = {
+        // Creates a scene with the streets basemap.
+        let scene = AGSScene(basemapType: .streets)
+        
+        // create elevation surface
+        let elevationSource = AGSArcGISTiledElevationSource(url: URL(string: "https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer")!)
+        let surface = AGSSurface()
+        surface.elevationSources = [elevationSource]
+        surface.name = "baseSurface"
+        surface.isEnabled = true
+        surface.backgroundGrid.isVisible = false
+        scene.baseSurface = surface
+        
+        return scene
+    }()
 
     override open func viewDidLoad() {
         super.viewDidLoad()
         
-        //
-        // Example of how to get ARSessionDelegate methods from the ArcGISARView
-        //
+        // Example of how to get ARSessionDelegate methods from the ArcGISARView.
         arView.sessionDelegate = self
 
         view.addSubview(arView)
@@ -37,7 +51,7 @@ open class ARExample: UIViewController {
             arView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
             ])
         
-        arView.sceneView.scene = scene()
+        arView.sceneView.scene = scene
     }
     
     override open func viewDidAppear(_ animated: Bool) {
@@ -47,30 +61,11 @@ open class ARExample: UIViewController {
     override open func viewDidDisappear(_ animated: Bool) {
         arView.stopTracking()
     }
-    
-    private func scene() -> AGSScene {
-
-        // create scene with the streets basemap
-        let scene = AGSScene(basemapType: .streets)
-
-        // create elevation surface
-        let elevationSource = AGSArcGISTiledElevationSource(url: URL(string: "http://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer")!)
-        let surface = AGSSurface()
-        surface.elevationSources = [elevationSource]
-        surface.name = "baseSurface"
-        surface.isEnabled = true
-        surface.backgroundGrid.isVisible = false
-        scene.baseSurface = surface
-        
-        return scene
-    }
 }
 
 extension ARExample: ARSessionDelegate {
     
     public func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        //
-        // Example of how to get ARSessionDelegate methods from the ArcGISARView
-        //
+        // Example of how to get ARSessionDelegate methods from the ArcGISARView.
     }
 }
