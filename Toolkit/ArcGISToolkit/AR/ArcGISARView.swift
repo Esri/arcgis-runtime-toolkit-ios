@@ -73,7 +73,9 @@ public class ArcGISARView: UIView {
     private var initialTransformationMatrix = AGSTransformationMatrix()
     
     /// Whether `ARKit` is supported on this device.
-    private var isSupported = false
+    private var isSupported = {
+        return ARWorldTrackingConfiguration.isSupported
+    }()
     
     /// Whether the client has been notfiied of start/failure.
     private var notifiedStartOrFailure = false
@@ -107,11 +109,13 @@ public class ArcGISARView: UIView {
         self.renderVideoFeed = renderVideoFeed
     }
     
+    deinit {
+        stopTracking()
+    }
+    
     /// Initialization code shared between all initializers.
     private func sharedInitialization(){
-        // `ARKit` initialization.
-        isSupported = ARWorldTrackingConfiguration.isSupported
-        
+        // Add the ARSCNView to our view.
         addSubviewWithConstraints(arSCNView)
         arSCNView.session.delegate = self
         (arSCNView as SCNSceneRenderer).delegate = self
@@ -137,13 +141,13 @@ public class ArcGISARView: UIView {
     
     /// Determines the map point for the given screen point.
     ///
-    /// - Parameter screenPoint: The point in screen coordinates.
+    /// - Parameter toLocation: The point in screen coordinates.
     /// - Returns: The map point corresponding to screenPoint.
-    public func arScreenToLocation(screenPoint: AGSPoint) -> AGSPoint {
-        return AGSPoint(x: 0.0, y: 0.0, spatialReference: nil)
+    public func arScreen(toLocation: AGSPoint) -> AGSPoint {
+        fatalError("arScreen(toLocation:) has not been implemented")
     }
     
-    /// Resets the device tracking, using originCamera if it's not nil or the device's GPS location via the locationManager.
+    /// Resets the device tracking, using `originCamera` if it's not nil or the device's GPS location via the locationManager.
     public func resetTracking() {
         initialLocation = nil
         startTracking()
@@ -153,14 +157,14 @@ public class ArcGISARView: UIView {
     ///
     /// - Returns: Reset operation success or failure.
     public func resetUsingLocationServices() -> Bool {
-        return false
+        fatalError("resetUsingLocationServices() has not been implemented")
     }
     
     /// Resets the device tracking using a spacial anchor.
     ///
     /// - Returns: Reset operation success or failure.
     public func resetUsingSpatialAnchor() -> Bool {
-        return false
+        fatalError("resetUsingSpatialAnchor() has not been implemented")
     }
     
     /// Starts device tracking.
