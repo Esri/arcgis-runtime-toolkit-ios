@@ -25,6 +25,7 @@ open class ARExample: UIViewController {
         
         // Example of how to get ARSessionDelegate methods from the ArcGISARView.
         arView.sessionDelegate = self
+        arView.arSCNViewDelegate = self
 
         view.addSubview(arView)
         arView.translatesAutoresizingMaskIntoConstraints = false
@@ -68,5 +69,34 @@ extension ARExample: ARSessionDelegate {
     
     public func session(_ session: ARSession, didUpdate frame: ARFrame) {
         // Example of how to get ARSessionDelegate methods from the ArcGISARView.
+    }
+}
+
+extension ARExample: ARSCNViewDelegate {
+    
+    public func session(_ session: ARSession, didFailWithError error: Error) {
+        guard error is ARError else { return }
+        
+        let errorWithInfo = error as NSError
+        let messages = [
+            errorWithInfo.localizedDescription,
+            errorWithInfo.localizedFailureReason,
+            errorWithInfo.localizedRecoverySuggestion
+        ]
+        
+        // Remove optional error messages.
+        let errorMessage = messages.compactMap({ $0 }).joined(separator: "\n")
+        
+        DispatchQueue.main.async { [unowned self] in
+            // Present an alert describing the error.
+            let alertController = UIAlertController(title: "Could not start tracking.", message: errorMessage, preferredStyle: .alert)
+            let restartAction = UIAlertAction(title: "Restart Tracking", style: .default) { _ in
+                alertController.dismiss(animated: true)
+                self.arView.startTracking()
+            }
+            alertController.addAction(restartAction)
+            
+            self.present(alertController, animated: true)
+        }
     }
 }

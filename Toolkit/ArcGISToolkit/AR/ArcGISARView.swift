@@ -16,8 +16,57 @@ import UIKit
 import ARKit
 import ArcGIS
 
+extension simd_quatd {
+    init(statusBarOrientation: UIDeviceOrientation) {
+        switch statusBarOrientation {
+        case .landscapeLeft:
+            self.init(ix: 0, iy: 0, iz: 0, r: 1)
+        case .landscapeRight:
+            self.init(ix: 0, iy: 0, iz: 1, r: 0)
+        case .portrait:
+            let squareRootOfOneHalf = (0.5 as Double).squareRoot()
+            self.init(ix: 0, iy: 0, iz: squareRootOfOneHalf, r: squareRootOfOneHalf)
+        case .portraitUpsideDown:
+            let squareRootOfOneHalf = (0.5 as Double).squareRoot()
+            self.init(ix: 0, iy: 0, iz: -squareRootOfOneHalf, r: squareRootOfOneHalf)
+        default:
+            // default to landscapeLeft
+            self.init(ix: 0, iy: 0, iz: 0, r: 1)
+        }
+    }
+}
+
+extension ArcGISARView.clError: CustomNSError {
+    static var errorDomain: String {
+        return kCLErrorDomain
+    }
+
+    var errorCode: Int {
+        switch self {
+        case .accessDenied:
+            return CLError.Code.denied.rawValue
+        case .missingPListKey:
+            return CLError.Code.denied.rawValue
+        }
+    }
+    
+    var errorDescription: String? {
+        switch self {
+        case .accessDenied:
+            return "Access to the device location is denied."
+        case .missingPListKey:
+            return "You must specify a location usage description key (NSLocationWhenInUseUsageDescription or NSLocationAlwaysUsageDescription) in your plist."
+        }
+    }
+}
+
 public class ArcGISARView: UIView {
     
+    enum clError {
+        case accessDenied
+        case missingPListKey
+    }
+
     // MARK: public properties
     
     /// The view used to display the `ARKit` camera image and 3D `SceneKit` content.
@@ -47,8 +96,8 @@ public class ArcGISARView: UIView {
     // We implement ARSessionDelegate methods, but will use `sessionDelegate` to forward them to clients.
     weak open var sessionDelegate: ARSessionDelegate?
     
-    // We implement SCNSceneRendererDelegate methods, but will use `scnSceneRendererDelegate` to forward them to clients.
-    weak open var scnSceneRendererDelegate: SCNSceneRendererDelegate?
+    // We implement ARSCNViewDelegate methods, but will use `arSCNViewDelegate` to forward them to clients.
+    weak open var arSCNViewDelegate: ARSCNViewDelegate?
 
     // MARK: private properties
     
@@ -84,10 +133,10 @@ public class ArcGISARView: UIView {
     private var lastUpdateTime: TimeInterval = 0
     
     // A quaternion used to compensate for the pitch beeing 90 degrees on `ARKit`; used to calculate the current device transformation for each frame.
-    let compensationQuat:simd_quatd = simd_quaternion((sin(45 / (180 / .pi))), 0, 0, (cos(45 / (180 / .pi))))
+    let compensationQuat:simd_quatd = simd_quatd(ix: (sin(45 / (180 / .pi))), iy: 0, iz: 0, r: (cos(45 / (180 / .pi))))
     
     /// The quaternion used to represent the device orientation; used to calculate the current device transformation for each frame; defaults to landcape-left.
-    var orientationQuat:simd_quatd = simd_quaternion(0, 0, 1, 0)
+    var orientationQuat:simd_quatd = simd_quatd(statusBarOrientation: .landscapeLeft)
     
     // MARK: Initializers
     
@@ -117,8 +166,8 @@ public class ArcGISARView: UIView {
     private func sharedInitialization(){
         // Add the ARSCNView to our view.
         addSubviewWithConstraints(arSCNView)
+        arSCNView.delegate = self
         arSCNView.session.delegate = self
-        (arSCNView as SCNSceneRenderer).delegate = self
         
         // Add sceneView to view and setup constraints.
         addSubviewWithConstraints(sceneView)
@@ -143,7 +192,7 @@ public class ArcGISARView: UIView {
     ///
     /// - Parameter toLocation: The point in screen coordinates.
     /// - Returns: The map point corresponding to screenPoint.
-    public func arScreen(toLocation: AGSPoint) -> AGSPoint {
+    public func arScreenToLocation(screenPoint: AGSPoint) -> AGSPoint {
         fatalError("arScreen(toLocation:) has not been implemented")
     }
     
@@ -170,7 +219,7 @@ public class ArcGISARView: UIView {
     /// Starts device tracking.
     public func startTracking() {
         if !isSupported {
-            didStartOrFailWithError(ArcGISARView.notSupportedError())
+            didStartOrFailWithError(ARError(.unsupportedConfiguration))
             return
         }
         
@@ -193,6 +242,7 @@ public class ArcGISARView: UIView {
             }
         }
         
+        //TODO:  reloook at the mechanism by which we're getting notified of orientation changed events...
         // We need to know when the device orientation changes in order to update the Camera transformation.
         UIDevice.current.beginGeneratingDeviceOrientationNotifications()
         NotificationCenter.default.addObserver(
@@ -248,7 +298,7 @@ public class ArcGISARView: UIView {
             locationManager.requestAlwaysAuthorization()
         }
         else{
-            didStartOrFailWithError(ArcGISARView.missingPListKeyError())
+            didStartOrFailWithError(ArcGISARView.clError.missingPListKey)
         }
     }
     
@@ -270,7 +320,7 @@ public class ArcGISARView: UIView {
 
     /// Start the locationManager with denied access.
     fileprivate func startWithAccessDenied() {
-        didStartOrFailWithError(ArcGISARView.accessDeniedError())
+        didStartOrFailWithError(ArcGISARView.clError.accessDenied)
     }
     
     /// Start the locationManager with authorized access.
@@ -296,7 +346,7 @@ public class ArcGISARView: UIView {
         stopUpdatingLocationAndHeading()
         
         // We were waiting for user prompt to come back, so notify.
-        didStartOrFailWithError(ArcGISARView.accessDeniedError())
+        didStartOrFailWithError(ArcGISARView.clError.accessDenied)
     }
     
     /// Handle a change in authorization status to "authorized".
@@ -311,49 +361,11 @@ public class ArcGISARView: UIView {
     /// - Parameter notification: The notification.
     @objc func orientationChanged(notification: Notification?) {
         // Handle rotation here.
-        switch UIApplication.shared.statusBarOrientation {
-        case .landscapeLeft:
-            orientationQuat = simd_quaternion(0, 0, 1.0, 0)
-        case .landscapeRight:
-            orientationQuat = simd_quaternion(0, 0, 0, 1.0)
-        case .portrait:
-            orientationQuat = simd_quaternion(0, 0, sqrt(0.5), sqrt(0.5))
-        case .portraitUpsideDown:
-            orientationQuat = simd_quaternion(0, 0, -sqrt(0.5), sqrt(0.5))
-        default:
-            break
-        }
-    }
-    
-    // MARK: Errors
-    
-    /// Error used when `ARKit` is not supported on the current device.
-    ///
-    /// - Returns: Error stating `ARKit` not supported.
-    fileprivate class func notSupportedError() -> NSError {
-        let userInfo = [NSLocalizedDescriptionKey : "The device does not support ARKit functionality."]
-        return NSError(domain: ARErrorDomain, code: ARError.unsupportedConfiguration.rawValue, userInfo: userInfo)
-    }
-    
-    /// Error used when access to the device location is denied.
-    ///
-    /// - Returns: Error stating access to location information is denied.
-    fileprivate class func accessDeniedError() -> NSError{
-        let userInfo = [NSLocalizedDescriptionKey : "Access to the device location is denied."]
-        return NSError(domain: kCLErrorDomain, code: CLError.Code.denied.rawValue, userInfo: userInfo)
-    }
-    
-    /// Error used when required plist information is missing.
-    ///
-    /// - Returns: Error stating plist information is missing.
-    fileprivate class func missingPListKeyError() -> NSError{
-        let userInfo = [NSLocalizedDescriptionKey : "You must specify a location usage description key (NSLocationWhenInUseUsageDescription or NSLocationAlwaysUsageDescription) in your plist."]
-        return NSError(domain: kCLErrorDomain, code: CLError.Code.denied.rawValue, userInfo: userInfo)
+        orientationQuat = simd_quatd(statusBarOrientation: UIDevice.current.orientation)
     }
 }
 
 // MARK: - ARSessionDelegate
-
 extension ArcGISARView: ARSessionDelegate {
     
     public func session(_ session: ARSession, didUpdate frame: ARFrame) {
@@ -373,60 +385,55 @@ extension ArcGISARView: ARSessionDelegate {
     }
 }
 
-// MARK: - ARSessionObserver
+// MARK: - ARSCNViewDelegate
+extension ArcGISARView: ARSCNViewDelegate {
+    public func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
+        return arSCNViewDelegate?.renderer?(renderer, nodeFor: anchor)
+    }
+
+    public func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
+        arSCNViewDelegate?.renderer?(renderer, didAdd: node, for: anchor)
+    }
+
+    public func renderer(_ renderer: SCNSceneRenderer, willUpdate node: SCNNode, for anchor: ARAnchor) {
+        arSCNViewDelegate?.renderer?(renderer, willUpdate: node, for: anchor)
+    }
+
+    public func renderer(_ renderer: SCNSceneRenderer, didUpdate node: SCNNode, for anchor: ARAnchor) {
+        arSCNViewDelegate?.renderer?(renderer, didUpdate: node, for: anchor)
+    }
+
+    public func renderer(_ renderer: SCNSceneRenderer, didRemove node: SCNNode, for anchor: ARAnchor) {
+        arSCNViewDelegate?.renderer?(renderer, didRemove: node, for: anchor)
+    }
+}
+
+// MARK: - ARSessionObserver (via ARSCNViewDelegate)
 extension ArcGISARView: ARSessionObserver {
     
     public func session(_ session: ARSession, didFailWithError error: Error) {
-        guard error is ARError else { return }
-        
-        let errorWithInfo = error as NSError
-        let messages = [
-            errorWithInfo.localizedDescription,
-            errorWithInfo.localizedFailureReason,
-            errorWithInfo.localizedRecoverySuggestion
-        ]
-        
-        // Remove optional error messages.
-        let errorMessage = messages.compactMap({ $0 }).joined(separator: "\n")
-        
-        DispatchQueue.main.async {
-            // Present an alert describing the error.
-            let alertController = UIAlertController(title: "Could not start tracking.", message: errorMessage, preferredStyle: .alert)
-            let restartAction = UIAlertAction(title: "Restart Tracking", style: .default) { _ in
-                alertController.dismiss(animated: true, completion: nil)
-                self.startTracking()
-            }
-            alertController.addAction(restartAction)
-            
-            guard let rootController = UIApplication.shared.keyWindow?.rootViewController else { return }
-            rootController.present(alertController, animated: true, completion: nil)
-        }
-        
-        sessionDelegate?.session?(session, didFailWithError: error)
+        arSCNViewDelegate?.session?(session, didFailWithError: error)
     }
     
     public func session(_ session: ARSession, cameraDidChangeTrackingState camera: ARCamera) {
-        sessionDelegate?.session?(session, cameraDidChangeTrackingState: camera)
+        arSCNViewDelegate?.session?(session, cameraDidChangeTrackingState: camera)
     }
     
     public func sessionWasInterrupted(_ session: ARSession) {
-        sessionDelegate?.sessionWasInterrupted?(session)
+        arSCNViewDelegate?.sessionWasInterrupted?(session)
     }
     
     public func sessionInterruptionEnded(_ session: ARSession) {
-        sessionDelegate?.sessionWasInterrupted?(session)
+        arSCNViewDelegate?.sessionWasInterrupted?(session)
     }
     
     @available(iOS 11.3, *)
     public func sessionShouldAttemptRelocalization(_ session: ARSession) -> Bool {
-        if let result = sessionDelegate?.sessionShouldAttemptRelocalization?(session) {
-            return result
-        }
-        return false
+        return sessionDelegate?.sessionShouldAttemptRelocalization?(session) ?? false
     }
     
     public func session(_ session: ARSession, didOutputAudioSampleBuffer audioSampleBuffer: CMSampleBuffer) {
-        sessionDelegate?.session?(session, didOutputAudioSampleBuffer: audioSampleBuffer)
+        arSCNViewDelegate?.session?(session, didOutputAudioSampleBuffer: audioSampleBuffer)
     }
 }
 
@@ -473,23 +480,23 @@ extension ArcGISARView: CLLocationManagerDelegate {
     }
 }
 
-// MARK: - SCNSceneRendererDelegate
+// MARK: - SCNSceneRendererDelegate (via ARSCNViewDelegate)
 extension ArcGISARView: SCNSceneRendererDelegate {
 
     public  func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-        scnSceneRendererDelegate?.renderer?(renderer, updateAtTime: time)
+        arSCNViewDelegate?.renderer?(renderer, updateAtTime: time)
     }
 
     public func renderer(_ renderer: SCNSceneRenderer, didApplyAnimationsAtTime time: TimeInterval) {
-        scnSceneRendererDelegate?.renderer?(renderer, didApplyConstraintsAtTime: time)
+        arSCNViewDelegate?.renderer?(renderer, didApplyConstraintsAtTime: time)
     }
     
     public func renderer(_ renderer: SCNSceneRenderer, didSimulatePhysicsAtTime time: TimeInterval) {
-        scnSceneRendererDelegate?.renderer?(renderer, didSimulatePhysicsAtTime: time)
+        arSCNViewDelegate?.renderer?(renderer, didSimulatePhysicsAtTime: time)
     }
     
     public func renderer(_ renderer: SCNSceneRenderer, didApplyConstraintsAtTime time: TimeInterval) {
-        scnSceneRendererDelegate?.renderer?(renderer, didApplyConstraintsAtTime: time)
+        arSCNViewDelegate?.renderer?(renderer, didApplyConstraintsAtTime: time)
     }
     
     public func renderer(_ renderer: SCNSceneRenderer, willRenderScene scene: SCNScene, atTime time: TimeInterval) {
@@ -498,7 +505,7 @@ extension ArcGISARView: SCNSceneRendererDelegate {
         guard let transform = arSCNView.pointOfView?.transform else { return }
         let cameraTransform = simd_double4x4(transform)
         
-        let finalQuat:simd_quatd = simd_mul(simd_mul(compensationQuat, simd_quaternion(cameraTransform)), orientationQuat)
+        let finalQuat:simd_quatd = simd_mul(simd_mul(compensationQuat, simd_quatd(cameraTransform)), orientationQuat)
         var transformationMatrix = AGSTransformationMatrix(quaternionX: finalQuat.vector.x,
                                                            quaternionY: finalQuat.vector.y,
                                                            quaternionZ: finalQuat.vector.z,
@@ -520,12 +527,12 @@ extension ArcGISARView: SCNSceneRendererDelegate {
         lastUpdateTime = time
         
         //
-        // Call our scnSceneRendererDelegate.
+        // Call our arSCNViewDelegate.
         //
-        scnSceneRendererDelegate?.renderer?(renderer, willRenderScene: scene, atTime: time)
+        arSCNViewDelegate?.renderer?(renderer, willRenderScene: scene, atTime: time)
     }
     
     public func renderer(_ renderer: SCNSceneRenderer, didRenderScene scene: SCNScene, atTime time: TimeInterval) {
-        scnSceneRendererDelegate?.renderer?(renderer, didRenderScene: scene, atTime: time)
+        arSCNViewDelegate?.renderer?(renderer, didRenderScene: scene, atTime: time)
     }
 }
