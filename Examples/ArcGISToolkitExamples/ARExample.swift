@@ -16,17 +16,16 @@ import ARKit
 import ArcGISToolkit
 import ArcGIS
 
-open class ARExample: UIViewController {
+class ARExample: UIViewController {
     
     public let arView = ArcGISARView(frame: .zero)
 
-    override open func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Example of how to get ARSessionDelegate methods from the ArcGISARView.
-        arView.sessionDelegate = self
+        // Set ourself as delegate so we can get ARSCNViewDelegate method calls.
         arView.arSCNViewDelegate = self
-
+        
         view.addSubview(arView)
         arView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -39,11 +38,11 @@ open class ARExample: UIViewController {
         arView.sceneView.scene = makeStreetsScene()
     }
     
-    override open func viewDidAppear(_ animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         arView.startTracking()
     }
     
-    override open func viewDidDisappear(_ animated: Bool) {
+    override func viewDidDisappear(_ animated: Bool) {
         arView.stopTracking()
     }
 
@@ -65,15 +64,8 @@ open class ARExample: UIViewController {
     }
 }
 
-extension ARExample: ARSessionDelegate {
-    
-    public func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        // Example of how to get ARSessionDelegate methods from the ArcGISARView.
-    }
-}
-
 extension ARExample: ARSCNViewDelegate {
-    
+
     public func session(_ session: ARSession, didFailWithError error: Error) {
         guard error is ARError else { return }
         
@@ -87,16 +79,15 @@ extension ARExample: ARSCNViewDelegate {
         // Remove optional error messages.
         let errorMessage = messages.compactMap({ $0 }).joined(separator: "\n")
         
-        DispatchQueue.main.async { [unowned self] in
+        DispatchQueue.main.async { [weak self] in
             // Present an alert describing the error.
             let alertController = UIAlertController(title: "Could not start tracking.", message: errorMessage, preferredStyle: .alert)
             let restartAction = UIAlertAction(title: "Restart Tracking", style: .default) { _ in
-                alertController.dismiss(animated: true)
-                self.arView.startTracking()
+                self?.arView.startTracking()
             }
             alertController.addAction(restartAction)
             
-            self.present(alertController, animated: true)
+            self?.present(alertController, animated: true)
         }
     }
 }

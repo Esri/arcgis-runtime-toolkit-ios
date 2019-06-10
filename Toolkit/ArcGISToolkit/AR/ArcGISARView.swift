@@ -93,9 +93,6 @@ public class ArcGISARView: UIView {
     /// The translation factor used to support a table top AR experience.
     public var translationTransformationFactor: Double = 1.0
     
-    // We implement ARSessionDelegate methods, but will use `sessionDelegate` to forward them to clients.
-    weak open var sessionDelegate: ARSessionDelegate?
-    
     // We implement ARSCNViewDelegate methods, but will use `arSCNViewDelegate` to forward them to clients.
     weak open var arSCNViewDelegate: ARSCNViewDelegate?
 
@@ -167,7 +164,6 @@ public class ArcGISARView: UIView {
         // Add the ARSCNView to our view.
         addSubviewWithConstraints(arSCNView)
         arSCNView.delegate = self
-        arSCNView.session.delegate = self
         
         // Add sceneView to view and setup constraints.
         addSubviewWithConstraints(sceneView)
@@ -365,26 +361,6 @@ public class ArcGISARView: UIView {
     }
 }
 
-// MARK: - ARSessionDelegate
-extension ArcGISARView: ARSessionDelegate {
-    
-    public func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        sessionDelegate?.session?(session, didUpdate: frame)
-    }
-
-    public func session(_ session: ARSession, didAdd anchors: [ARAnchor]) {
-        sessionDelegate?.session?(session, didAdd: anchors)
-    }
-    
-    public func session(_ session: ARSession, didUpdate anchors: [ARAnchor]) {
-        sessionDelegate?.session?(session, didUpdate: anchors)
-    }
-    
-    public func session(_ session: ARSession, didRemove anchors: [ARAnchor]) {
-        sessionDelegate?.session?(session, didRemove: anchors)
-    }
-}
-
 // MARK: - ARSCNViewDelegate
 extension ArcGISARView: ARSCNViewDelegate {
     public func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
@@ -429,54 +405,11 @@ extension ArcGISARView: ARSessionObserver {
     
     @available(iOS 11.3, *)
     public func sessionShouldAttemptRelocalization(_ session: ARSession) -> Bool {
-        return sessionDelegate?.sessionShouldAttemptRelocalization?(session) ?? false
+        return arSCNViewDelegate?.sessionShouldAttemptRelocalization?(session) ?? false
     }
     
     public func session(_ session: ARSession, didOutputAudioSampleBuffer audioSampleBuffer: CMSampleBuffer) {
         arSCNViewDelegate?.session?(session, didOutputAudioSampleBuffer: audioSampleBuffer)
-    }
-}
-
-// MARK: - CLLocationManagerDelegate
-extension ArcGISARView: CLLocationManagerDelegate {
-
-    public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.last, location.horizontalAccuracy >= 0.0 else { return }
-        
-        if initialLocation == nil {
-            initialLocation = location
-            horizontalAccuracy = location.horizontalAccuracy
-            
-            let locationPoint = AGSPoint(x: location.coordinate.longitude,
-                                         y: location.coordinate.latitude,
-                                         z: location.altitude,
-                                         spatialReference: .wgs84())
-            let camera = AGSCamera(location: locationPoint, heading: 0.0, pitch: 0.0, roll: 0.0)
-            initialTransformationMatrix = camera.transformationMatrix
-            sceneView.setViewpointCamera(camera)
-            
-            finalizeStart()
-        }
-        else if location.horizontalAccuracy < horizontalAccuracy {
-            horizontalAccuracy = location.horizontalAccuracy
-        }
-        
-    }
-    
-    public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        didStartOrFailWithError(error)
-    }
-
-    public  func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        let authStatus = CLLocationManager.authorizationStatus()
-        switch authStatus {
-        case .notDetermined:
-            break
-        case .restricted, .denied:
-            handleAuthStatusChangedAccessDenied()
-        case .authorizedAlways, .authorizedWhenInUse:
-            handleAuthStatusChangedAccessAuthorized()
-        }
     }
 }
 
@@ -526,13 +459,54 @@ extension ArcGISARView: SCNSceneRendererDelegate {
         print("Frame rate = \(String(reflecting: Int((1.0 / frametime).rounded())))")
         lastUpdateTime = time
         
-        //
-        // Call our arSCNViewDelegate.
-        //
+        // Call our arSCNViewDelegate method.
         arSCNViewDelegate?.renderer?(renderer, willRenderScene: scene, atTime: time)
     }
     
     public func renderer(_ renderer: SCNSceneRenderer, didRenderScene scene: SCNScene, atTime time: TimeInterval) {
         arSCNViewDelegate?.renderer?(renderer, didRenderScene: scene, atTime: time)
+    }
+}
+
+// MARK: - CLLocationManagerDelegate
+extension ArcGISARView: CLLocationManagerDelegate {
+    
+    public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let location = locations.last, location.horizontalAccuracy >= 0.0 else { return }
+        
+        if initialLocation == nil {
+            initialLocation = location
+            horizontalAccuracy = location.horizontalAccuracy
+            
+            let locationPoint = AGSPoint(x: location.coordinate.longitude,
+                                         y: location.coordinate.latitude,
+                                         z: location.altitude,
+                                         spatialReference: .wgs84())
+            let camera = AGSCamera(location: locationPoint, heading: 0.0, pitch: 0.0, roll: 0.0)
+            initialTransformationMatrix = camera.transformationMatrix
+            sceneView.setViewpointCamera(camera)
+            
+            finalizeStart()
+        }
+        else if location.horizontalAccuracy < horizontalAccuracy {
+            horizontalAccuracy = location.horizontalAccuracy
+        }
+        
+    }
+    
+    public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        didStartOrFailWithError(error)
+    }
+    
+    public  func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        let authStatus = CLLocationManager.authorizationStatus()
+        switch authStatus {
+        case .notDetermined:
+            break
+        case .restricted, .denied:
+            handleAuthStatusChangedAccessDenied()
+        case .authorizedAlways, .authorizedWhenInUse:
+            handleAuthStatusChangedAccessAuthorized()
+        }
     }
 }
