@@ -498,7 +498,7 @@ extension ArcGISARView: CLLocationManagerDelegate {
         didStartOrFailWithError(error)
     }
     
-    public  func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+    public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         let authStatus = CLLocationManager.authorizationStatus()
         switch authStatus {
         case .notDetermined:
