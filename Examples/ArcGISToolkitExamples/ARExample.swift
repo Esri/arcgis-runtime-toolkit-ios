@@ -66,7 +66,7 @@ class ARExample: UIViewController {
 
 extension ARExample: ARSCNViewDelegate {
 
-    public func session(_ session: ARSession, didFailWithError error: Error) {
+    func session(_ session: ARSession, didFailWithError error: Error) {
         guard error is ARError else { return }
         
         let errorWithInfo = error as NSError
