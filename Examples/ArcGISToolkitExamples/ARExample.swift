@@ -52,7 +52,7 @@ class ARExample: UIViewController {
         let scene = AGSScene(basemapType: .streets)
         
         // create elevation surface
-        let elevationSource = AGSArcGISTiledElevationSource(url: URL(string: "http://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer")!)
+        let elevationSource = AGSArcGISTiledElevationSource(url: URL(string: "https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer")!)
         let surface = AGSSurface()
         surface.elevationSources = [elevationSource]
         surface.name = "baseSurface"
