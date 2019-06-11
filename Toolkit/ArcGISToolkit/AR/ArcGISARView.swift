@@ -36,18 +36,13 @@ extension simd_quatd {
     }
 }
 
-extension ArcGISARView.clError: CustomNSError {
+extension ArcGISARView.CoreLocationError: CustomNSError {
     static var errorDomain: String {
         return kCLErrorDomain
     }
 
     var errorCode: Int {
-        switch self {
-        case .accessDenied:
-            return CLError.Code.denied.rawValue
-        case .missingPListKey:
-            return CLError.Code.denied.rawValue
-        }
+        return CLError.Code.denied.rawValue
     }
     
     var errorDescription: String? {
@@ -62,7 +57,7 @@ extension ArcGISARView.clError: CustomNSError {
 
 public class ArcGISARView: UIView {
     
-    enum clError {
+    enum CoreLocationError: Swift.Error {
         case accessDenied
         case missingPListKey
     }
@@ -70,10 +65,10 @@ public class ArcGISARView: UIView {
     // MARK: public properties
     
     /// The view used to display the `ARKit` camera image and 3D `SceneKit` content.
-    public lazy private(set) var arSCNView = ARSCNView(frame: .zero)
+    public let arSCNView = ARSCNView(frame: .zero)
     
     /// The view used to display ArcGIS 3D content.
-    public lazy private(set) var sceneView = AGSSceneView(frame: .zero)
+    public let sceneView = AGSSceneView(frame: .zero)
     
     /// The world tracking information used by `ARKit`.
     public var arConfiguration: ARConfiguration = {
@@ -130,10 +125,13 @@ public class ArcGISARView: UIView {
     private var lastUpdateTime: TimeInterval = 0
     
     // A quaternion used to compensate for the pitch beeing 90 degrees on `ARKit`; used to calculate the current device transformation for each frame.
-    let compensationQuat:simd_quatd = simd_quatd(ix: (sin(45 / (180 / .pi))), iy: 0, iz: 0, r: (cos(45 / (180 / .pi))))
+    let compensationQuat: simd_quatd = simd_quatd(ix: (sin(45 / (180 / .pi))), iy: 0, iz: 0, r: (cos(45 / (180 / .pi))))
     
     /// The quaternion used to represent the device orientation; used to calculate the current device transformation for each frame; defaults to landcape-left.
-    var orientationQuat:simd_quatd = simd_quatd(statusBarOrientation: .landscapeLeft)
+    var orientationQuat: simd_quatd = simd_quatd(statusBarOrientation: .landscapeLeft)
+    
+    // Denotes whether the orientation observer has been added to the NotificationCenter; used to prevent removing a not-yet-added observer.
+    private var orientationObserverAdded = false
     
     // MARK: Initializers
     
@@ -238,7 +236,6 @@ public class ArcGISARView: UIView {
             }
         }
         
-        //TODO:  reloook at the mechanism by which we're getting notified of orientation changed events...
         // We need to know when the device orientation changes in order to update the Camera transformation.
         UIDevice.current.beginGeneratingDeviceOrientationNotifications()
         NotificationCenter.default.addObserver(
@@ -247,6 +244,7 @@ public class ArcGISARView: UIView {
             name: UIDevice.orientationDidChangeNotification,
             object: nil
         )
+        orientationObserverAdded = true
     }
 
     /// Suspends device tracking.
@@ -255,7 +253,10 @@ public class ArcGISARView: UIView {
         stopUpdatingLocationAndHeading()
         
         UIDevice.current.endGeneratingDeviceOrientationNotifications()
-        NotificationCenter.default.removeObserver(self)
+        if (orientationObserverAdded) {
+            NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
+            orientationObserverAdded = false
+        }
     }
     
     // MARK: Private
@@ -294,7 +295,7 @@ public class ArcGISARView: UIView {
             locationManager.requestAlwaysAuthorization()
         }
         else{
-            didStartOrFailWithError(ArcGISARView.clError.missingPListKey)
+            didStartOrFailWithError(ArcGISARView.CoreLocationError.missingPListKey)
         }
     }
     
@@ -316,7 +317,7 @@ public class ArcGISARView: UIView {
 
     /// Start the locationManager with denied access.
     fileprivate func startWithAccessDenied() {
-        didStartOrFailWithError(ArcGISARView.clError.accessDenied)
+        didStartOrFailWithError(ArcGISARView.CoreLocationError.accessDenied)
     }
     
     /// Start the locationManager with authorized access.
@@ -330,7 +331,6 @@ public class ArcGISARView: UIView {
     fileprivate func didStartOrFailWithError(_ error: Error?) {
         if !notifiedStartOrFailure, let error = error {
             // TODO: present error to user...
-            print("didStartOrFailWithError: \(String(reflecting:error))")
         }
         
         notifiedStartOrFailure = true
@@ -342,7 +342,7 @@ public class ArcGISARView: UIView {
         stopUpdatingLocationAndHeading()
         
         // We were waiting for user prompt to come back, so notify.
-        didStartOrFailWithError(ArcGISARView.clError.accessDenied)
+        didStartOrFailWithError(ArcGISARView.CoreLocationError.accessDenied)
     }
     
     /// Handle a change in authorization status to "authorized".
@@ -455,9 +455,9 @@ extension ArcGISARView: SCNSceneRendererDelegate {
         sceneView.renderFrame()
 
         // Calculate frame rate.
-        let frametime = time - lastUpdateTime
-        print("Frame rate = \(String(reflecting: Int((1.0 / frametime).rounded())))")
-        lastUpdateTime = time
+//        let frametime = time - lastUpdateTime
+//        print("Frame rate = \(String(reflecting: Int((1.0 / frametime).rounded())))")
+//        lastUpdateTime = time
         
         // Call our arSCNViewDelegate method.
         arSCNViewDelegate?.renderer?(renderer, willRenderScene: scene, atTime: time)
