@@ -295,7 +295,7 @@ public class ArcGISARView: UIView {
             locationManager.requestAlwaysAuthorization()
         }
         else{
-            didStartOrFailWithError(ArcGISARView.CoreLocationError.missingPListKey)
+            didStartOrFailWithError(CoreLocationError.missingPListKey)
         }
     }
     
@@ -317,7 +317,7 @@ public class ArcGISARView: UIView {
 
     /// Start the locationManager with denied access.
     fileprivate func startWithAccessDenied() {
-        didStartOrFailWithError(ArcGISARView.CoreLocationError.accessDenied)
+        didStartOrFailWithError(CoreLocationError.accessDenied)
     }
     
     /// Start the locationManager with authorized access.
@@ -342,7 +342,7 @@ public class ArcGISARView: UIView {
         stopUpdatingLocationAndHeading()
         
         // We were waiting for user prompt to come back, so notify.
-        didStartOrFailWithError(ArcGISARView.CoreLocationError.accessDenied)
+        didStartOrFailWithError(CoreLocationError.accessDenied)
     }
     
     /// Handle a change in authorization status to "authorized".
