@@ -69,7 +69,9 @@ public class ArcGISARView: UIView {
     public var originCamera: AGSCamera? {
         didSet {
             if let newCamera = originCamera {
+                // Set the camera as the originCamera on the cameraController and reset tracking.
                 cameraController.originCamera = newCamera
+                resetTracking()
             }
         }
     }
@@ -98,9 +100,6 @@ public class ArcGISARView: UIView {
     
     /// Current horizontal accuracy of the device.
     private var horizontalAccuracy: CLLocationAccuracy = .greatestFiniteMagnitude
-    
-    /// The intial camera position and orientation whether it was set via originCamera or the locationManager.
-    private var initialTransformationMatrix = AGSTransformationMatrix()
     
     /// Whether `ARKit` is supported on this device.
     private var isSupported = {
@@ -199,10 +198,8 @@ public class ArcGISARView: UIView {
             return
         }
         
-        if let origin = originCamera {
-            // We have a starting camera.
-            initialTransformationMatrix = origin.transformationMatrix
-            sceneView.setViewpointCamera(origin)
+        if let _ = originCamera {
+            // We have a starting camera, so no need to start the location manager, just finalizeStart().
             finalizeStart()
         }
         else {
@@ -391,6 +388,8 @@ extension ArcGISARView: SCNSceneRendererDelegate {
     }
     
     public func renderer(_ renderer: SCNSceneRenderer, willRenderScene scene: SCNScene, atTime time: TimeInterval) {
+        // If we haven't started yet, return.
+        guard notifiedStartOrFailure else { return }
         
         // Get transform from SCNView.pointOfView.
         guard let transform = arSCNView.pointOfView?.transform else { return }
@@ -398,16 +397,13 @@ extension ArcGISARView: SCNSceneRendererDelegate {
         
         // Calculate our final quaternion and create the new transformation matrix.
         let finalQuat:simd_quatd = simd_mul(compensationQuat, simd_quatd(cameraTransform))
-        var transformationMatrix = AGSTransformationMatrix(quaternionX: finalQuat.vector.x,
+        let transformationMatrix = AGSTransformationMatrix(quaternionX: finalQuat.vector.x,
                                                            quaternionY: finalQuat.vector.y,
                                                            quaternionZ: finalQuat.vector.z,
                                                            quaternionW: finalQuat.vector.w,
                                                            translationX: (cameraTransform.columns.3.x) * translationTransformationFactor,
                                                            translationY: (-cameraTransform.columns.3.z) * translationTransformationFactor,
                                                            translationZ: (cameraTransform.columns.3.y) * translationTransformationFactor)
-        
-        // Add the new trasformation matrix to the initial matrix.
-        transformationMatrix = initialTransformationMatrix.addTransformation(transformationMatrix)
         
         // Set the matrix on the camera controller.
         cameraController.transformationMatrix = transformationMatrix
@@ -443,10 +439,9 @@ extension ArcGISARView: CLLocationManagerDelegate {
                                          y: location.coordinate.latitude,
                                          z: location.altitude,
                                          spatialReference: .wgs84())
-            let camera = AGSCamera(location: locationPoint, heading: 0.0, pitch: 0.0, roll: 0.0)
-            initialTransformationMatrix = camera.transformationMatrix
-            sceneView.setViewpointCamera(camera)
             
+            // Create a new camera based on our location and set it on the cameraController.
+            cameraController.originCamera = AGSCamera(location: locationPoint, heading: 0.0, pitch: 0.0, roll: 0.0)
             finalizeStart()
         }
         else if location.horizontalAccuracy < horizontalAccuracy {
