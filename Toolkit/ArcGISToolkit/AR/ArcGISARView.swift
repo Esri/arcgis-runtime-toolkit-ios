@@ -16,26 +16,6 @@ import UIKit
 import ARKit
 import ArcGIS
 
-extension simd_quatd {
-    init(statusBarOrientation: UIDeviceOrientation) {
-        switch statusBarOrientation {
-        case .landscapeLeft:
-            self.init(ix: 0, iy: 0, iz: 0, r: 1)
-        case .landscapeRight:
-            self.init(ix: 0, iy: 0, iz: 1, r: 0)
-        case .portrait:
-            let squareRootOfOneHalf = (0.5 as Double).squareRoot()
-            self.init(ix: 0, iy: 0, iz: squareRootOfOneHalf, r: squareRootOfOneHalf)
-        case .portraitUpsideDown:
-            let squareRootOfOneHalf = (0.5 as Double).squareRoot()
-            self.init(ix: 0, iy: 0, iz: -squareRootOfOneHalf, r: squareRootOfOneHalf)
-        default:
-            // default to landscapeLeft
-            self.init(ix: 0, iy: 0, iz: 0, r: 1)
-        }
-    }
-}
-
 extension ArcGISARView.CoreLocationError: CustomNSError {
     static var errorDomain: String {
         return kCLErrorDomain
@@ -70,6 +50,9 @@ public class ArcGISARView: UIView {
     /// The view used to display ArcGIS 3D content.
     public let sceneView = AGSSceneView(frame: .zero)
     
+    /// The camera controller used to control the Scene
+    private let cameraController = AGSTransformationMatrixCameraController()
+    
     /// The world tracking information used by `ARKit`.
     public var arConfiguration: ARConfiguration = {
         let config = ARWorldTrackingConfiguration()
@@ -83,12 +66,18 @@ public class ArcGISARView: UIView {
     }
 
     /// The viewpoint camera used to set the initial view of the sceneView instead of the devices GPS location via the locationManager.
-    public var originCamera: AGSCamera?
+    public var originCamera: AGSCamera? {
+        didSet {
+            if let newCamera = originCamera {
+                cameraController.originCamera = newCamera
+            }
+        }
+    }
     
     /// The translation factor used to support a table top AR experience.
     public var translationTransformationFactor: Double = 1.0
     
-    // We implement ARSCNViewDelegate methods, but will use `arSCNViewDelegate` to forward them to clients.
+    /// We implement ARSCNViewDelegate methods, but will use `arSCNViewDelegate` to forward them to clients.
     weak open var arSCNViewDelegate: ARSCNViewDelegate?
 
     // MARK: private properties
@@ -124,14 +113,8 @@ public class ArcGISARView: UIView {
     /// Used when calculating framerate.
     private var lastUpdateTime: TimeInterval = 0
     
-    // A quaternion used to compensate for the pitch beeing 90 degrees on `ARKit`; used to calculate the current device transformation for each frame.
-    let compensationQuat: simd_quatd = simd_quatd(ix: (sin(45 / (180 / .pi))), iy: 0, iz: 0, r: (cos(45 / (180 / .pi))))
-    
-    /// The quaternion used to represent the device orientation; used to calculate the current device transformation for each frame; defaults to landcape-left.
-    var orientationQuat: simd_quatd = simd_quatd(statusBarOrientation: .landscapeLeft)
-    
-    // Denotes whether the orientation observer has been added to the NotificationCenter; used to prevent removing a not-yet-added observer.
-    private var orientationObserverAdded = false
+    /// A quaternion used to compensate for the pitch beeing 90 degrees on `ARKit`; used to calculate the current device transformation for each frame.
+    private let compensationQuat: simd_quatd = simd_quatd(ix: (sin(45 / (180 / .pi))), iy: 0, iz: 0, r: (cos(45 / (180 / .pi))))
     
     // MARK: Initializers
     
@@ -166,18 +149,17 @@ public class ArcGISARView: UIView {
         // Add sceneView to view and setup constraints.
         addSubviewWithConstraints(sceneView)
 
-        // Make our sceneView's background transparent, no atmosphereEffect.
-        sceneView.isBackgroundTransparent = true
+        // Make our sceneView's space effect be transparent, no atmosphereEffect.
+        sceneView.spaceEffect = .transparent
         sceneView.atmosphereEffect = .none
+        
+        sceneView.cameraController = cameraController
         
         // Tell the sceneView we will be calling `renderFrame()` manually.
         sceneView.isManualRendering = true
         
         // We haven't yet notified user of start or failure.
         notifiedStartOrFailure = false
-        
-        // Set intitial orientationQuat.
-        orientationChanged(notification: nil)
     }
     
     // MARK: Public
@@ -235,28 +217,12 @@ public class ArcGISARView: UIView {
                 startWithAccessAuthorized()
             }
         }
-        
-        // We need to know when the device orientation changes in order to update the Camera transformation.
-        UIDevice.current.beginGeneratingDeviceOrientationNotifications()
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(self.orientationChanged(notification:)),
-            name: UIDevice.orientationDidChangeNotification,
-            object: nil
-        )
-        orientationObserverAdded = true
     }
 
     /// Suspends device tracking.
     public func stopTracking() {
         arSCNView.session.pause()
         stopUpdatingLocationAndHeading()
-        
-        UIDevice.current.endGeneratingDeviceOrientationNotifications()
-        if (orientationObserverAdded) {
-            NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
-            orientationObserverAdded = false
-        }
     }
     
     // MARK: Private
@@ -351,14 +317,6 @@ public class ArcGISARView: UIView {
         didStartOrFailWithError(nil)
         startUpdatingLocationAndHeading()
     }
-    
-    /// Called when device orientation changes.
-    ///
-    /// - Parameter notification: The notification.
-    @objc func orientationChanged(notification: Notification?) {
-        // Handle rotation here.
-        orientationQuat = simd_quatd(statusBarOrientation: UIDevice.current.orientation)
-    }
 }
 
 // MARK: - ARSCNViewDelegate
@@ -438,7 +396,8 @@ extension ArcGISARView: SCNSceneRendererDelegate {
         guard let transform = arSCNView.pointOfView?.transform else { return }
         let cameraTransform = simd_double4x4(transform)
         
-        let finalQuat:simd_quatd = simd_mul(simd_mul(compensationQuat, simd_quatd(cameraTransform)), orientationQuat)
+        // Calculate our final quaternion and create the new transformation matrix.
+        let finalQuat:simd_quatd = simd_mul(compensationQuat, simd_quatd(cameraTransform))
         var transformationMatrix = AGSTransformationMatrix(quaternionX: finalQuat.vector.x,
                                                            quaternionY: finalQuat.vector.y,
                                                            quaternionZ: finalQuat.vector.z,
@@ -447,11 +406,13 @@ extension ArcGISARView: SCNSceneRendererDelegate {
                                                            translationY: (-cameraTransform.columns.3.z) * translationTransformationFactor,
                                                            translationZ: (cameraTransform.columns.3.y) * translationTransformationFactor)
         
+        // Add the new trasformation matrix to the initial matrix.
         transformationMatrix = initialTransformationMatrix.addTransformation(transformationMatrix)
         
-        let camera = AGSCamera(transformationMatrix: transformationMatrix)
-        sceneView.setViewpointCamera(camera)
+        // Set the matrix on the camera controller.
+        cameraController.transformationMatrix = transformationMatrix
         
+        // Render the Scene with the new transformation.
         sceneView.renderFrame()
 
         // Calculate frame rate.
