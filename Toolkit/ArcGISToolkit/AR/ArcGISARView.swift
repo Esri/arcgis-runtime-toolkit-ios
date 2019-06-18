@@ -68,18 +68,17 @@ public class ArcGISARView: UIView {
     /// The viewpoint camera used to set the initial view of the sceneView instead of the devices GPS location via the locationManager.
     public var originCamera: AGSCamera? {
         didSet {
-            if let newCamera = originCamera {
-                // Set the camera as the originCamera on the cameraController and reset tracking.
-                cameraController.originCamera = newCamera
-                resetTracking()
-            }
+            guard let newCamera = originCamera else { return }
+            // Set the camera as the originCamera on the cameraController and reset tracking.
+            cameraController.originCamera = newCamera
+            resetTracking()
         }
     }
     
     /// The translation factor used to support a table top AR experience.
     public var translationTransformationFactor: Double = 1.0
     
-    /// We implement ARSCNViewDelegate methods, but will use `arSCNViewDelegate` to forward them to clients.
+    /// We implement `ARSCNViewDelegate` methods, but will use `arSCNViewDelegate` to forward them to clients.
     weak open var arSCNViewDelegate: ARSCNViewDelegate?
 
     // MARK: private properties
@@ -198,7 +197,7 @@ public class ArcGISARView: UIView {
             return
         }
         
-        if let _ = originCamera {
+        if originCamera != nil {
             // We have a starting camera, so no need to start the location manager, just finalizeStart().
             finalizeStart()
         }
