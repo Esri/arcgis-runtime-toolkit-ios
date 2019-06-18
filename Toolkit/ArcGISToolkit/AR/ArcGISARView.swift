@@ -111,7 +111,7 @@ public class ArcGISARView: UIView {
     /// Used when calculating framerate.
     private var lastUpdateTime: TimeInterval = 0
     
-    /// A quaternion used to compensate for the pitch beeing 90 degrees on `ARKit`; used to calculate the current device transformation for each frame.
+    /// A quaternion used to compensate for the pitch being 90 degrees on `ARKit`; used to calculate the current device transformation for each frame.
     private let compensationQuat: simd_quatd = simd_quatd(ix: (sin(45 / (180 / .pi))), iy: 0, iz: 0, r: (cos(45 / (180 / .pi))))
     
     // MARK: Initializers
