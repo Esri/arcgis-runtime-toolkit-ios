@@ -16,6 +16,24 @@ import UIKit
 import ARKit
 import ArcGIS
 
+extension AGSDeviceOrientation {
+    init?(statusBarOrientation: UIDeviceOrientation) {
+        switch statusBarOrientation {
+        case .landscapeLeft:
+            self.init(rawValue: AGSDeviceOrientation.landscapeRight.rawValue)
+        case .landscapeRight:
+            self.init(rawValue: AGSDeviceOrientation.landscapeLeft.rawValue)
+        case .portrait:
+            self.init(rawValue: AGSDeviceOrientation.portrait.rawValue)
+        case .portraitUpsideDown:
+            self.init(rawValue: AGSDeviceOrientation.reversePortrait.rawValue)
+        default:
+            // default to landscapeLeft
+            self.init(rawValue: AGSDeviceOrientation.landscapeLeft.rawValue)
+        }
+    }
+}
+
 extension ArcGISARView.CoreLocationError: CustomNSError {
     static var errorDomain: String {
         return kCLErrorDomain
@@ -407,6 +425,20 @@ extension ArcGISARView: SCNSceneRendererDelegate {
         // Set the matrix on the camera controller.
         cameraController.transformationMatrix = transformationMatrix
         
+        // Set FOV on camera.
+        if let camera = arSCNView.session.currentFrame?.camera {
+            let intrinsics = camera.intrinsics
+            let imageResolution = camera.imageResolution
+            sceneView.setFieldOfViewFromLensIntrinsicsWithXFocalLength(intrinsics[0][0],
+                                                                       yFocalLength: intrinsics[1][1],
+                                                                       xPrincipal: intrinsics[2][0],
+                                                                       yPrincipal: intrinsics[2][1],
+                                                                       xImageSize: Float(imageResolution.width),
+                                                                       yImageSize: Float(imageResolution.height),
+                                                                       deviceOrientation: AGSDeviceOrientation.init(statusBarOrientation: UIDevice.current.orientation) ?? .landscapeRight)
+        }
+        //        print("FOV: \(sceneView.fieldOfView); distortion = \(sceneView.fieldOfViewDistortionRatio)")
+
         // Render the Scene with the new transformation.
         sceneView.renderFrame()
 
