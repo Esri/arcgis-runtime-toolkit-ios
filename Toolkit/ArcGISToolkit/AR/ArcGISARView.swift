@@ -17,6 +17,9 @@ import ARKit
 import ArcGIS
 
 extension AGSDeviceOrientation {
+    /// Allows creation of an `AGSDeviceOrientation` from a `UIDeviceOrientation`.
+    ///
+    /// - Parameter statusBarOrientation: The `UIDeviceOrientation` to create the `AGSDeviceOrientation` from.
     init?(statusBarOrientation: UIDeviceOrientation) {
         switch statusBarOrientation {
         case .landscapeLeft:
