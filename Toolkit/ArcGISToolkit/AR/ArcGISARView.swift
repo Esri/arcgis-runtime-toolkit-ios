@@ -437,7 +437,6 @@ extension ArcGISARView: SCNSceneRendererDelegate {
                                                                        yImageSize: Float(imageResolution.height),
                                                                        deviceOrientation: AGSDeviceOrientation.init(statusBarOrientation: UIDevice.current.orientation) ?? .landscapeRight)
         }
-        //        print("FOV: \(sceneView.fieldOfView); distortion = \(sceneView.fieldOfViewDistortionRatio)")
 
         // Render the Scene with the new transformation.
         sceneView.renderFrame()
