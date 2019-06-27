@@ -438,7 +438,7 @@ extension ArcGISARView: SCNSceneRendererDelegate {
                                                                        yPrincipal: intrinsics[2][1],
                                                                        xImageSize: Float(imageResolution.width),
                                                                        yImageSize: Float(imageResolution.height),
-                                                                       deviceOrientation: AGSDeviceOrientation.init(statusBarOrientation: UIDevice.current.orientation) ?? .landscapeRight)
+                                                                       deviceOrientation: AGSDeviceOrientation(statusBarOrientation: UIDevice.current.orientation) ?? .landscapeRight)
         }
 
         // Render the Scene with the new transformation.
