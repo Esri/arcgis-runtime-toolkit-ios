@@ -20,19 +20,18 @@ extension AGSDeviceOrientation {
     /// Allows creation of an `AGSDeviceOrientation` from a `UIDeviceOrientation`.
     ///
     /// - Parameter statusBarOrientation: The `UIDeviceOrientation` to create the `AGSDeviceOrientation` from.
-    init?(statusBarOrientation: UIDeviceOrientation) {
+    init(statusBarOrientation: UIDeviceOrientation) {
         switch statusBarOrientation {
         case .landscapeLeft:
-            self.init(rawValue: AGSDeviceOrientation.landscapeRight.rawValue)
+            self = .landscapeRight
         case .landscapeRight:
-            self.init(rawValue: AGSDeviceOrientation.landscapeLeft.rawValue)
+            self = .landscapeLeft
         case .portrait:
-            self.init(rawValue: AGSDeviceOrientation.portrait.rawValue)
+            self = .portrait
         case .portraitUpsideDown:
-            self.init(rawValue: AGSDeviceOrientation.reversePortrait.rawValue)
+            self = .reversePortrait
         default:
-            // default to landscapeLeft
-            self.init(rawValue: AGSDeviceOrientation.landscapeLeft.rawValue)
+            self = .landscapeRight
         }
     }
 }
@@ -438,7 +437,7 @@ extension ArcGISARView: SCNSceneRendererDelegate {
                                                                        yPrincipal: intrinsics[2][1],
                                                                        xImageSize: Float(imageResolution.width),
                                                                        yImageSize: Float(imageResolution.height),
-                                                                       deviceOrientation: AGSDeviceOrientation(statusBarOrientation: UIDevice.current.orientation) ?? .landscapeRight)
+                                                                       deviceOrientation: AGSDeviceOrientation(statusBarOrientation: UIDevice.current.orientation))
         }
 
         // Render the Scene with the new transformation.
