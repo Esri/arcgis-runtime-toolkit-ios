@@ -16,26 +16,6 @@ import UIKit
 import ARKit
 import ArcGIS
 
-extension AGSDeviceOrientation {
-    /// Allows creation of an `AGSDeviceOrientation` from a `UIDeviceOrientation`.
-    ///
-    /// - Parameter statusBarOrientation: The `UIDeviceOrientation` to create the `AGSDeviceOrientation` from.
-    init(statusBarOrientation: UIDeviceOrientation) {
-        switch statusBarOrientation {
-        case .landscapeLeft:
-            self = .landscapeRight
-        case .landscapeRight:
-            self = .landscapeLeft
-        case .portrait:
-            self = .portrait
-        case .portraitUpsideDown:
-            self = .reversePortrait
-        default:
-            self = .landscapeRight
-        }
-    }
-}
-
 extension ArcGISARView.CoreLocationError: CustomNSError {
     static var errorDomain: String {
         return kCLErrorDomain
@@ -437,7 +417,7 @@ extension ArcGISARView: SCNSceneRendererDelegate {
                                                                        yPrincipal: intrinsics[2][1],
                                                                        xImageSize: Float(imageResolution.width),
                                                                        yImageSize: Float(imageResolution.height),
-                                                                       deviceOrientation: AGSDeviceOrientation(statusBarOrientation: UIDevice.current.orientation))
+                                                                       deviceOrientation: UIDevice.current.orientation)
         }
 
         // Render the Scene with the new transformation.
