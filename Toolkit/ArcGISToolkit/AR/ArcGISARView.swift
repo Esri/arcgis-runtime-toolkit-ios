@@ -407,6 +407,19 @@ extension ArcGISARView: SCNSceneRendererDelegate {
         // Set the matrix on the camera controller.
         cameraController.transformationMatrix = transformationMatrix
         
+        // Set FOV on camera.
+        if let camera = arSCNView.session.currentFrame?.camera {
+            let intrinsics = camera.intrinsics
+            let imageResolution = camera.imageResolution
+            sceneView.setFieldOfViewFromLensIntrinsicsWithXFocalLength(intrinsics[0][0],
+                                                                       yFocalLength: intrinsics[1][1],
+                                                                       xPrincipal: intrinsics[2][0],
+                                                                       yPrincipal: intrinsics[2][1],
+                                                                       xImageSize: Float(imageResolution.width),
+                                                                       yImageSize: Float(imageResolution.height),
+                                                                       deviceOrientation: UIDevice.current.orientation)
+        }
+
         // Render the Scene with the new transformation.
         sceneView.renderFrame()
 
