@@ -18,7 +18,7 @@ import ArcGIS
 
 class ARExample: UIViewController {
     
-    let arView = ArcGISARView(frame: .zero)
+    let arView = ArcGISARView(renderVideoFeed: true, tryUsingARKit: true)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,10 +36,13 @@ class ARExample: UIViewController {
             ])
         
         arView.sceneView.scene = makeStreetsScene()
+        arView.locationDataSource = AGSCLLocationDataSource()
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        arView.startTracking()
+        arView.startTracking { (error) in
+            print("Error starting ArcGISARView tracking: \(String(describing: error))")
+        }
     }
     
     override func viewDidDisappear(_ animated: Bool) {
