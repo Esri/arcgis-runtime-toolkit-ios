@@ -335,7 +335,7 @@ extension ArcGISARView: SCNSceneRendererDelegate {
                                                            quaternionY: finalQuat.vector.y,
                                                            quaternionZ: finalQuat.vector.z,
                                                            quaternionW: finalQuat.vector.w,
-                                                           translationX: (cameraTransform.columns.3.x),
+                                                           translationX: cameraTransform.columns.3.x,
                                                            translationY: (-cameraTransform.columns.3.z),
                                                            translationZ: (cameraTransform.columns.3.y))
         
