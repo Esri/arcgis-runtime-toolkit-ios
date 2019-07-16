@@ -16,57 +16,31 @@ import UIKit
 import ARKit
 import ArcGIS
 
-extension ArcGISARView.CoreLocationError: CustomNSError {
-    static var errorDomain: String {
-        return kCLErrorDomain
-    }
-
-    var errorCode: Int {
-        return CLError.Code.denied.rawValue
-    }
-    
-    var errorDescription: String? {
-        switch self {
-        case .accessDenied:
-            return "Access to the device location is denied."
-        case .missingPListKey:
-            return "You must specify a location usage description key (NSLocationWhenInUseUsageDescription or NSLocationAlwaysUsageDescription) in your plist."
-        }
-    }
-}
-
 public class ArcGISARView: UIView {
-    
-    enum CoreLocationError: Swift.Error {
-        case accessDenied
-        case missingPListKey
-    }
 
     // MARK: public properties
     
     /// The view used to display the `ARKit` camera image and 3D `SceneKit` content.
     public let arSCNView = ARSCNView(frame: .zero)
     
-    /// The view used to display ArcGIS 3D content.
-    public let sceneView = AGSSceneView(frame: .zero)
+    /// The initial transformation used for a table top experience.  Defaults to the Identity Matrix.
+    public private(set) var initialTransformation = AGSTransformationMatrix.identity
     
-    /// The camera controller used to control the Scene
-    private let cameraController = AGSTransformationMatrixCameraController()
+    /// Denotes whether tracking location and angles has started.
+    public private(set) var isTracking: Bool = false
     
-    /// The world tracking information used by `ARKit`.
-    public var arConfiguration: ARConfiguration = {
-        let config = ARWorldTrackingConfiguration()
-        config.worldAlignment = .gravityAndHeading
-        return config
-        }() {
+    /// Denotes whether ARKit is being used to track location and angles.
+    public private(set) var isUsingARKit: Bool = true
+
+    /// The data source used to get device location.  Used either in conjuction with ARKit data or when ARKit is not present or not being used.
+    public var locationDataSource: AGSCLLocationDataSource? {
         didSet {
-            // Start tracking using the new configuration.
-            startTracking()
+            locationDataSource?.locationChangeHandlerDelegate = self
         }
     }
 
-    /// The viewpoint camera used to set the initial view of the sceneView instead of the devices GPS location via the locationManager.
-    public var originCamera: AGSCamera? {
+    /// The viewpoint camera used to set the initial view of the sceneView instead of the device's GPS location via the location data source.  You can use Key-Value Observing to track changes to the origin camera.
+    @objc public dynamic var originCamera: AGSCamera? {
         didSet {
             guard let newCamera = originCamera else { return }
             // Set the camera as the originCamera on the cameraController and reset tracking.
@@ -74,39 +48,42 @@ public class ArcGISARView: UIView {
             resetTracking()
         }
     }
+
+    /// The view used to display ArcGIS 3D content.
+    public let sceneView = AGSSceneView(frame: .zero)
     
     /// The translation factor used to support a table top AR experience.
-    public var translationTransformationFactor: Double = 1.0
+    public var translationFactor: Double = 1.0 {
+        didSet {
+            cameraController.translationFactor = translationFactor
+        }
+    }
+    
+    /// The world tracking information used by `ARKit`.
+    public var arConfiguration: ARConfiguration = {
+        let config = ARWorldTrackingConfiguration()
+        config.worldAlignment = .gravityAndHeading
+        config.planeDetection = [.horizontal]
+        return config
+        }() {
+        didSet {
+            // If we're already tracking, reset tracking to use the new configuration.
+            if isTracking {
+                resetTracking()
+            }
+        }
+    }
     
     /// We implement `ARSCNViewDelegate` methods, but will use `arSCNViewDelegate` to forward them to clients.
-    weak open var arSCNViewDelegate: ARSCNViewDelegate?
+    weak public var arSCNViewDelegate: ARSCNViewDelegate?
 
-    // MARK: private properties
+    // MARK: Private properties
     
-    /// Whether to display the camera image or not.
-    private var renderVideoFeed = true
+    /// The camera controller used to control the Scene.
+    private let cameraController = AGSTransformationMatrixCameraController()
     
-    /// Used to determine the device location when originCamera is not set.
-    private lazy var locationManager: CLLocationManager = { [unowned self] in
-        let lm = CLLocationManager()
-        lm.desiredAccuracy = kCLLocationAccuracyBest
-        lm.delegate = self
-        return lm
-    }()
-    
-    /// Initial location from locationManager.
-    private var initialLocation: CLLocation?
-    
-    /// Current horizontal accuracy of the device.
-    private var horizontalAccuracy: CLLocationAccuracy = .greatestFiniteMagnitude
-    
-    /// Whether `ARKit` is supported on this device.
-    private var isSupported = {
-        return ARWorldTrackingConfiguration.isSupported
-    }()
-    
-    /// Whether the client has been notfiied of start/failure.
-    private var notifiedStartOrFailure = false
+    /// Initial location from location data source.
+    private var initialLocation: AGSPoint?
     
     /// Used when calculating framerate.
     private var lastUpdateTime: TimeInterval = 0
@@ -114,6 +91,11 @@ public class ArcGISARView: UIView {
     /// A quaternion used to compensate for the pitch being 90 degrees on `ARKit`; used to calculate the current device transformation for each frame.
     private let compensationQuat: simd_quatd = simd_quatd(ix: (sin(45 / (180 / .pi))), iy: 0, iz: 0, r: (cos(45 / (180 / .pi))))
     
+    /// Whether `ARKit` is supported on this device.
+    private let deviceSupportsARKit: Bool = {
+        return ARWorldTrackingConfiguration.isSupported
+    }()
+
     // MARK: Initializers
     
     public override init(frame: CGRect) {
@@ -128,10 +110,24 @@ public class ArcGISARView: UIView {
     
     /// Initializer used to denote whether to display the live camera image.
     ///
-    /// - Parameter renderVideoFeed: Whether to display the live camera image.
-    public convenience init(renderVideoFeed: Bool){
+    /// - Parameters:
+    ///   - renderVideoFeed: Whether to display the live camera image.
+    ///   - tryUsingARKit: Whether or not to use ARKit, regardless if it's available.
+    public convenience init(renderVideoFeed: Bool, tryUsingARKit: Bool){
         self.init(frame: .zero)
-        self.renderVideoFeed = renderVideoFeed
+        
+        // This overrides the `sharedInitialization()` isUsingARKit code
+        isUsingARKit = tryUsingARKit && deviceSupportsARKit
+        
+        if !isUsingARKit || !renderVideoFeed {
+            // User is not using ARKit, or they don't want to see video, so remove the arSCNView from the superView (it was added in sharedInitialization()).
+            // This overrides the `sharedInitialization()` arSCNView code
+            arSCNView.removeFromSuperview()
+        }
+        
+        // Tell the sceneView we will be calling `renderFrame()` manually if we're using ARKit.
+        // This overrides the `sharedInitialization()` `isManualRendering` code
+        sceneView.isManualRendering = isUsingARKit
     }
     
     deinit {
@@ -141,23 +137,26 @@ public class ArcGISARView: UIView {
     /// Initialization code shared between all initializers.
     private func sharedInitialization(){
         // Add the ARSCNView to our view.
-        addSubviewWithConstraints(arSCNView)
-        arSCNView.delegate = self
-        
+        if deviceSupportsARKit {
+            addSubviewWithConstraints(arSCNView)
+            arSCNView.delegate = self
+        }
+
+        // Always use ARKit if device supports it.
+        isUsingARKit = deviceSupportsARKit
+
         // Add sceneView to view and setup constraints.
         addSubviewWithConstraints(sceneView)
 
-        // Make our sceneView's space effect be transparent, no atmosphereEffect.
+        // Make our sceneView's spaceEffect be transparent, no atmosphereEffect.
         sceneView.spaceEffect = .transparent
         sceneView.atmosphereEffect = .none
         
+        // Set the camera controller on the sceneView
         sceneView.cameraController = cameraController
         
-        // Tell the sceneView we will be calling `renderFrame()` manually.
-        sceneView.isManualRendering = true
-        
-        // We haven't yet notified user of start or failure.
-        notifiedStartOrFailure = false
+        // Tell the sceneView we will be calling `renderFrame()` manually if we're using ARKit.
+        sceneView.isManualRendering = isUsingARKit
     }
     
     // MARK: Public
@@ -166,71 +165,70 @@ public class ArcGISARView: UIView {
     ///
     /// - Parameter toLocation: The point in screen coordinates.
     /// - Returns: The map point corresponding to screenPoint.
-    public func arScreenToLocation(screenPoint: AGSPoint) -> AGSPoint {
+    public func arScreenToLocation(screenPoint: CGPoint) -> AGSPoint {
         fatalError("arScreen(toLocation:) has not been implemented")
     }
     
-    /// Resets the device tracking, using `originCamera` if it's not nil or the device's GPS location via the locationManager.
+    /// Resets the device tracking, using `originCamera` if it's not nil or the device's GPS location via the location data source.
     public func resetTracking() {
         initialLocation = nil
         startTracking()
     }
+    
+    /// Sets the initial transformation used to offset the originCamera.
+    ///
+    /// - Parameter initialTransformation: The initial transformation for originCamera offset.
+    /// - Returns: Whether setting the `initialTransformation` succeeded or failed.
+    public func setInitialTransformation(initialTransformation: AGSTransformationMatrix) -> Bool {
+        fatalError("setInitialTransformation(initialTransformation:) has not been implemented")
+    }
+    
+    /// Sets the initial transformation used to offset the originCamera.  The initial transformation is based on an AR point determined via existing plan hit detection from `screenPoint`.  If an AR point cannot be determined, this method will return `false`.
+    ///
+    /// - Parameter screenPoint: The screen point to determine the `initialTransformation` from.
+    /// - Returns: Whether setting the `initialTransformation` succeeded or failed.
+    public func setInitialTransformation(screenPoint: CGPoint) -> Bool {
+        fatalError("setInitialTransformationPlacingOriginOnPlane(screenPoint:) has not been implemented")
+    }
 
-    /// Resets the device tracking, using the device's GPS location via the locationManager.
-    ///
-    /// - Returns: Reset operation success or failure.
-    public func resetUsingLocationServices() -> Bool {
-        fatalError("resetUsingLocationServices() has not been implemented")
-    }
-    
-    /// Resets the device tracking using a spacial anchor.
-    ///
-    /// - Returns: Reset operation success or failure.
-    public func resetUsingSpatialAnchor() -> Bool {
-        fatalError("resetUsingSpatialAnchor() has not been implemented")
-    }
-    
     /// Starts device tracking.
-    public func startTracking() {
-        if !isSupported {
-            didStartOrFailWithError(ARError(.unsupportedConfiguration))
-            return
-        }
-        
-        if originCamera != nil {
-            // We have a starting camera, so no need to start the location manager, just finalizeStart().
-            finalizeStart()
+    public func startTracking(_ completion: ((_ error: Error?) -> Void)? = nil) {
+        // We have a location data source that needs to be started.
+        if let locationDataSource = self.locationDataSource {
+            locationDataSource.start { [weak self] (error) in
+                if error == nil {
+                    self?.finalizeStart()
+                }
+                completion?(error)
+            }
         }
         else {
-            // No starting camera, use location manger to get initial location.
-            let authStatus = CLLocationManager.authorizationStatus()
-            switch authStatus {
-            case .notDetermined:
-                startWithAccessNotDetermined()
-            case .restricted, .denied:
-                startWithAccessDenied()
-            case .authorizedAlways, .authorizedWhenInUse:
-                startWithAccessAuthorized()
-            }
+            // No data source, continue with defaults.
+            finalizeStart()
+            completion?(nil)
         }
     }
 
     /// Suspends device tracking.
     public func stopTracking() {
         arSCNView.session.pause()
-        stopUpdatingLocationAndHeading()
+        locationDataSource?.stop()
+        isTracking = false
     }
     
     // MARK: Private
     
     /// Operations that happen after device tracking has started.
     fileprivate func finalizeStart() {
-        // Hide the camera image if necessary.
-        arSCNView.isHidden = !renderVideoFeed
-        
-        // Run the ARSession.
-        arSCNView.session.run(arConfiguration, options:.resetTracking)
-        didStartOrFailWithError(nil)
+        DispatchQueue.main.async { [weak self] in
+            guard let strongSelf = self else { return }
+            // Run the ARSession.
+            if strongSelf.isUsingARKit {
+                strongSelf.arSCNView.session.run(strongSelf.arConfiguration, options: .resetTracking)
+            }
+            
+            strongSelf.isTracking = true
+        }
     }
 
     /// Adds subView to superView with appropriate constraints.
@@ -246,72 +244,6 @@ public class ArcGISARView: UIView {
             subview.topAnchor.constraint(equalTo: self.topAnchor),
             subview.bottomAnchor.constraint(equalTo: self.bottomAnchor)
             ])
-    }
-    
-    /// Start the locationManager with undetermined access.
-    fileprivate func startWithAccessNotDetermined() {
-        if (Bundle.main.object(forInfoDictionaryKey: "NSLocationWhenInUseUsageDescription") != nil) {
-            locationManager.requestWhenInUseAuthorization()
-        }
-        if (Bundle.main.object(forInfoDictionaryKey: "NSLocationAlwaysUsageDescription") != nil) {
-            locationManager.requestAlwaysAuthorization()
-        }
-        else{
-            didStartOrFailWithError(CoreLocationError.missingPListKey)
-        }
-    }
-    
-    /// Start updating the location and heading via the locationManager.
-    fileprivate func startUpdatingLocationAndHeading() {
-        locationManager.startUpdatingLocation()
-        if CLLocationManager.headingAvailable() {
-            locationManager.startUpdatingHeading()
-        }
-    }
-    
-    /// Stop updating location and heading.
-    fileprivate func stopUpdatingLocationAndHeading() {
-        locationManager.stopUpdatingLocation()
-        if CLLocationManager.headingAvailable() {
-            locationManager.stopUpdatingHeading()
-        }
-    }
-
-    /// Start the locationManager with denied access.
-    fileprivate func startWithAccessDenied() {
-        didStartOrFailWithError(CoreLocationError.accessDenied)
-    }
-    
-    /// Start the locationManager with authorized access.
-    fileprivate func startWithAccessAuthorized() {
-        startUpdatingLocationAndHeading()
-    }
-    
-    /// Potential notification to the user of an error starting device tracking.
-    ///
-    /// - Parameter error: The error that occurred when starting tracking.
-    fileprivate func didStartOrFailWithError(_ error: Error?) {
-        if !notifiedStartOrFailure, let error = error {
-            // TODO: present error to user...
-        }
-        
-        notifiedStartOrFailure = true
-    }
-    
-    /// Handle a change in authorization status to "denied".
-    fileprivate func handleAuthStatusChangedAccessDenied() {
-        // auth status changed to denied
-        stopUpdatingLocationAndHeading()
-        
-        // We were waiting for user prompt to come back, so notify.
-        didStartOrFailWithError(CoreLocationError.accessDenied)
-    }
-    
-    /// Handle a change in authorization status to "authorized".
-    fileprivate func handleAuthStatusChangedAccessAuthorized() {
-        // Auth status changed to authorized; now that we have authorization - start updating location and heading.
-        didStartOrFailWithError(nil)
-        startUpdatingLocationAndHeading()
     }
 }
 
@@ -387,8 +319,8 @@ extension ArcGISARView: SCNSceneRendererDelegate {
     }
     
     public func renderer(_ renderer: SCNSceneRenderer, willRenderScene scene: SCNScene, atTime time: TimeInterval) {
-        // If we haven't started yet, return.
-        guard notifiedStartOrFailure else { return }
+        // If we aren't tracking yet, return.
+        guard isTracking else { return }
         
         // Get transform from SCNView.pointOfView.
         guard let transform = arSCNView.pointOfView?.transform else { return }
@@ -400,9 +332,9 @@ extension ArcGISARView: SCNSceneRendererDelegate {
                                                            quaternionY: finalQuat.vector.y,
                                                            quaternionZ: finalQuat.vector.z,
                                                            quaternionW: finalQuat.vector.w,
-                                                           translationX: (cameraTransform.columns.3.x) * translationTransformationFactor,
-                                                           translationY: (-cameraTransform.columns.3.z) * translationTransformationFactor,
-                                                           translationZ: (cameraTransform.columns.3.y) * translationTransformationFactor)
+                                                           translationX: cameraTransform.columns.3.x,
+                                                           translationY: -cameraTransform.columns.3.z,
+                                                           translationZ: cameraTransform.columns.3.y)
         
         // Set the matrix on the camera controller.
         cameraController.transformationMatrix = transformationMatrix
@@ -437,44 +369,39 @@ extension ArcGISARView: SCNSceneRendererDelegate {
     }
 }
 
-// MARK: - CLLocationManagerDelegate
-extension ArcGISARView: CLLocationManagerDelegate {
+// MARK: - AGSLocationChangeHandlerDelegate
+extension ArcGISARView: AGSLocationChangeHandlerDelegate {
     
-    public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.last, location.horizontalAccuracy >= 0.0 else { return }
+    public func locationDataSource(_ locationDataSource: AGSLocationDataSource, headingDidChange heading: Double) {
+        // Heading changed.
+        if !isUsingARKit {
+            // Not using ARKit, so update heading on the camera directly; otherwise, let ARKit handle heading changes.
+            let currentCamera = sceneView.currentViewpointCamera()
+            let camera = currentCamera.rotate(toHeading: heading, pitch: currentCamera.pitch, roll: currentCamera.roll)
+            sceneView.setViewpointCamera(camera)
+//            print("heading changed: \(heading)")
+        }
+    }
+    
+    public func locationDataSource(_ locationDataSource: AGSLocationDataSource, locationDidChange location: AGSLocation) {
+        // Location changed.
+        guard let locationPoint = location.position else { return }
         
         if initialLocation == nil {
-            initialLocation = location
-            horizontalAccuracy = location.horizontalAccuracy
-            
-            let locationPoint = AGSPoint(x: location.coordinate.longitude,
-                                         y: location.coordinate.latitude,
-                                         z: location.altitude,
-                                         spatialReference: .wgs84())
+            initialLocation = locationPoint
             
             // Create a new camera based on our location and set it on the cameraController.
             cameraController.originCamera = AGSCamera(location: locationPoint, heading: 0.0, pitch: 0.0, roll: 0.0)
-            finalizeStart()
         }
-        else if location.horizontalAccuracy < horizontalAccuracy {
-            horizontalAccuracy = location.horizontalAccuracy
+        else if !isUsingARKit {
+            let camera = sceneView.currentViewpointCamera().move(toLocation: locationPoint)
+            sceneView.setViewpointCamera(camera)
+//            print("location changed: \(locationPoint), accuracy: \(location.horizontalAccuracy)")
         }
-        
     }
-    
-    public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        didStartOrFailWithError(error)
-    }
-    
-    public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        let authStatus = CLLocationManager.authorizationStatus()
-        switch authStatus {
-        case .notDetermined:
-            break
-        case .restricted, .denied:
-            handleAuthStatusChangedAccessDenied()
-        case .authorizedAlways, .authorizedWhenInUse:
-            handleAuthStatusChangedAccessAuthorized()
-        }
+
+    public func locationDataSource(_ locationDataSource: AGSLocationDataSource, statusDidChange status: AGSLocationDataSourceStatus) {
+        // Status changed.
+//        print("locationDataSource status changed: \(status.rawValue)")
     }
 }
