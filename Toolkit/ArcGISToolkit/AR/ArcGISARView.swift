@@ -185,7 +185,7 @@ public class ArcGISARView: UIView {
     
     /// Sets the initial transformation used to offset the originCamera.  The initial transformation is based on an AR point determined via existing plan hit detection from `screenPoint`.  If an AR point cannot be determined, this method will return `false`.
     ///
-    /// - Parameter screenPoint: The screen point to determine the `initialTransformation` from..
+    /// - Parameter screenPoint: The screen point to determine the `initialTransformation` from.
     /// - Returns: Whether setting the `initialTransformation` succeeded or failed.
     public func setInitialTransformation(screenPoint: CGPoint) -> Bool {
         fatalError("setInitialTransformationPlacingOriginOnPlane(screenPoint:) has not been implemented")
