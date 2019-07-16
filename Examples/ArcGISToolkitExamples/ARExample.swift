@@ -40,12 +40,14 @@ class ARExample: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         arView.startTracking { (error) in
             print("Error starting ArcGISARView tracking: \(String(describing: error))")
         }
     }
     
     override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
         arView.stopTracking()
     }
 

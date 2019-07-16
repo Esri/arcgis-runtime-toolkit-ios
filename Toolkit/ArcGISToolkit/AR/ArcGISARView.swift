@@ -196,13 +196,10 @@ public class ArcGISARView: UIView {
         // We have a location data source that needs to be started.
         if let locationDataSource = self.locationDataSource {
             locationDataSource.start { [weak self] (error) in
-                if let error = error {
-                    completion?(error)
-                }
-                else {
+                if error == nil {
                     self?.finalizeStart()
-                    completion?(nil)
                 }
+                completion?(error)
             }
         }
         else {
@@ -227,7 +224,7 @@ public class ArcGISARView: UIView {
             guard let strongSelf = self else { return }
             // Run the ARSession.
             if strongSelf.isUsingARKit {
-                strongSelf.arSCNView.session.run(strongSelf.arConfiguration, options:.resetTracking)
+                strongSelf.arSCNView.session.run(strongSelf.arConfiguration, options: .resetTracking)
             }
             
             strongSelf.isTracking = true
