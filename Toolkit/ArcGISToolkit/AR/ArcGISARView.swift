@@ -282,8 +282,8 @@ public class ArcGISARView: UIView {
         guard let worldTransform = results.first?.worldTransform else { return nil }
         
         // Create our hit test matrix based on the worldTransform location.
-        let hitTestMatrix = AGSTransformationMatrix(quaternionX: 0,
-                                                    quaternionY: 0,
+        let hitTestMatrix = AGSTransformationMatrix(quaternionX: 0.0,
+                                                    quaternionY: 0.0,
                                                     quaternionZ: 0.0,
                                                     quaternionW: 1.0,
                                                     translationX: Double(worldTransform.columns.3.x),
@@ -297,7 +297,7 @@ public class ArcGISARView: UIView {
 // MARK: - ARSCNViewDelegate
 extension ArcGISARView: ARSCNViewDelegate {
 
-    // This is not implemnted as we are letting ARKit create and manage nodes.
+    // This is not implemented as we are letting ARKit create and manage nodes.
     // If you want to manage your own nodes, uncomment this and implement it in your code.
 //    public func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
 //        return arSCNViewDelegate?.renderer?(renderer, nodeFor: anchor)
