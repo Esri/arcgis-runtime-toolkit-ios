@@ -272,7 +272,7 @@ public class ArcGISARView: UIView {
     
     /// Internal method to perform a hit test operation to get the transformation matrix representing the corresponding real-world point for `screenPoint`.
     ///
-    /// - Parameter screenPoint: screenPoint: The screen point to determine the real world transformation matrix from.
+    /// - Parameter screenPoint: The screen point to determine the real world transformation matrix from.
     /// - Returns: An `AGSTransformationMatrix` representing the real-world point corresponding to `screenPoint`.
     fileprivate func internalHitTest(screenPoint: CGPoint) -> AGSTransformationMatrix? {
         // Use the `hitTest` method on ARSCNView to get the location of `screenPoint`.
