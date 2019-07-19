@@ -205,7 +205,7 @@ public class ArcGISARView: UIView {
     ///
     /// - Parameter screenPoint: The screen point to determine the `initialTransformation` from.
     /// - Returns: Whether setting the `initialTransformation` succeeded or failed.
-    public func setInitialTransformation(_ screenPoint: CGPoint) -> Bool {
+    public func setInitialTransformation(using screenPoint: CGPoint) -> Bool {
         // Use the `internalHitTest` method to get the matrix of `screenPoint`.
         guard let matrix = internalHitTest(screenPoint: screenPoint) else { return false }
         
