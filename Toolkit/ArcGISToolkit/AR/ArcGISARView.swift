@@ -172,7 +172,7 @@ public class ArcGISARView: UIView {
     
     /// Determines the map point for the given screen point.
     ///
-    /// - Parameter toLocation: The point in screen coordinates.
+    /// - Parameter screenPoint: The point in screen coordinates.
     /// - Returns: The map point corresponding to screenPoint.
     public func arScreenToLocation(screenPoint: CGPoint) -> AGSPoint? {
         // Use the `internalHitTest` method to get the matrix of `screenPoint`.
