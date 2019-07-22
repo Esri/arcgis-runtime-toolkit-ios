@@ -31,7 +31,15 @@ class ARExample: UIViewController {
     
     /// Denotes whether we've performed a hit test yet.
     var didHitTest: Bool = false
-    
+        private let statusViewController: ARStatusViewController? = {
+        let storyBoard = UIStoryboard(name: "ARStatusViewController", bundle: nil)
+        let vc = storyBoard.instantiateInitialViewController() as? ARStatusViewController
+        vc?.modalPresentationStyle = .popover
+        return vc
+    }()
+    /// Used when calculating framerate.
+    private var lastUpdateTime: TimeInterval = 0
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -133,7 +141,17 @@ class ARExample: UIViewController {
         // Show the popover.
         present(controller, animated: true)
     }
-    
+        @objc func showStatus(){
+        guard let statusVC = statusViewController else { return }
+        statusVC.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItem
+        statusVC.preferredContentSize = {
+            let height: CGFloat = CGFloat(statusVC.tableView.numberOfRows(inSection: 0)) * statusVC.tableView.rowHeight
+            return CGSize(width: 375, height: height)
+        }()
+
+        navigationController?.present(statusVC, animated: true, completion: nil)
+    }
+
     // MARK: Scene Init Functions
     
     /// Creates a scene based on the Streets base map.
@@ -262,6 +280,9 @@ extension ARExample: ARSCNViewDelegate {
         // Remove optional error messages.
         let errorMessage = messages.compactMap({ $0 }).joined(separator: "\n")
         
+        // Set the error message on the status vc.
+        statusViewController?.errorMessage = errorMessage
+        
         DispatchQueue.main.async { [weak self] in
             // Present an alert describing the error.
             let alertController = UIAlertController(title: "Could not start tracking.", message: errorMessage, preferredStyle: .alert)
@@ -272,6 +293,17 @@ extension ARExample: ARSCNViewDelegate {
             
             self?.present(alertController, animated: true)
         }
+    }
+    func session(_ session: ARSession, cameraDidChangeTrackingState camera: ARCamera) {
+        // Set the tracking state on the status vc.
+        statusViewController?.trackingState = camera.trackingState
+    }
+    
+    func renderer(_ renderer: SCNSceneRenderer, willRenderScene scene: SCNScene, atTime time: TimeInterval) {
+        // Calculate frame rate and set on the statuc vc.
+        let frametime = time - lastUpdateTime
+        statusViewController?.frameRate = Int((1.0 / frametime).rounded())
+        lastUpdateTime = time
     }
 }
 
