@@ -47,6 +47,13 @@ class ARExample: UIViewController {
     
     /// Used when calculating framerate.
     private var lastUpdateTime: TimeInterval = 0
+    
+    /// Overlay used to display user-placed graphics.
+    private let graphicsOverlay: AGSGraphicsOverlay = {
+        let overlay = AGSGraphicsOverlay()
+        let properties = AGSLayerSceneProperties(surfacePlacement: .relative)
+        return overlay
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -56,6 +63,9 @@ class ARExample: UIViewController {
         
         // Set ourself as touch delegate so we can get touch events.
         arView.sceneView.touchDelegate = self
+        
+        // Add our graphics overlay to the sceneView.
+        arView.sceneView.graphicsOverlays.add(graphicsOverlay)
         
         // Add arView to the view and setup the constraints.
         view.addSubview(arView)
@@ -170,6 +180,7 @@ class ARExample: UIViewController {
     // MARK: Scene Init Functions
     
     /// Creates a scene based on the Streets base map.
+    /// Mode:  Full-Scale AR
     ///
     /// - Returns: The new scene.
     private func streetsScene() -> AGSScene {
@@ -184,6 +195,7 @@ class ARExample: UIViewController {
     }
     
     /// Creates a scene based on the Mount Everest web scene.
+    /// Mode:  Tabletop AR
     ///
     /// - Returns: The new scene.
     private func everestScene() -> AGSScene {
@@ -202,6 +214,7 @@ class ARExample: UIViewController {
     }
     
     /// Creates a scene based on the Broncos stadium web scene.
+    /// Mode:  Tabletop AR
     ///
     /// - Returns: The new scene.
     private func broncosStadiumScene() -> AGSScene {
@@ -229,6 +242,7 @@ class ARExample: UIViewController {
     }
     
     /// Creates an empty scene with an elevation source.
+    /// Mode:  Full-Scale AR
     ///
     /// - Returns: The new scene.
     private func emptyScene() -> AGSScene {
@@ -330,30 +344,17 @@ extension ARExample: AGSGeoViewTouchDelegate {
             // We have a location data source, so we're in full-scale AR mode.
             // Get the real world location for screen point from arView.
             guard let point = arView.arScreenToLocation(screenPoint: screenPoint) else { return }
+
+            let sym = AGSSimpleMarkerSceneSymbol(style: .sphere, color: .yellow, height: 1.0, width: 1.0, depth: 1.0, anchorPosition: .bottom)
+            let graphic = AGSGraphic(geometry: point, symbol: sym, attributes: nil)
+            graphicsOverlay.graphics.add(graphic)
         }
         else {
             // We do not have a location data source, so we're in table-top mode.
-            if arView.setInitialTransformation(screenPoint: screenPoint) {
+            if arView.setInitialTransformation(using: screenPoint) {
                 didHitTest = true
             }
         }
-        
-        //        guard let point = arView.arScreenToLocation(screenPoint: screenPoint) else { return }
-        //
-        //        let newpoint = AGSPointMake3D(point.x, point.y, 0, 0, point.spatialReference)
-        //        let sym = AGSModelSceneSymbol(name:"Bristol", extension: "dae", scale: 50.0)
-        //        sym.load { (error) in
-        //            print("error loading sym: \(String(describing: error))")
-        //        }
-        //        let graphic = AGSGraphic(geometry: newpoint, symbol: sym, attributes: nil)
-        //        graphicsOverlay.graphics.add(graphic)
-        //        print("mapPoint: \(mapPoint)")
-        //        print("point: \(point)")
-        
-        //        guard let initialCamera = initialCamera else { print("No initial camera"); return }
-        //        var initialTransformation = arView.initialTransformation
-        //        initialTransformation = initialTransformation.subtractTransformation(initialCamera.transformationMatrix)
-        //        let _ = arView.setInitialTransformation(initialTransformation: initialTransformation)
     }
 }
 
