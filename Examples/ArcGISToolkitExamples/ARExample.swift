@@ -24,19 +24,27 @@ class ARExample: UIViewController {
     private var sceneInfo: [(sceneFunction: sceneInitFunction, label: String)] = []
     
     /// The current scene info.
-    private var currentSceneInfo: (sceneFunction: sceneInitFunction, label: String)?
+    private var currentSceneInfo: (sceneFunction: sceneInitFunction, label: String)? {
+        didSet {
+            guard let label = currentSceneInfo?.label else { return }
+            statusViewController?.currentScene = label
+        }
+    }
     
     /// The `ArcGISARView` that displays the camera feed and handles ARKit functionality.
-    let arView = ArcGISARView(renderVideoFeed: true, tryUsingARKit: true)
+    private let arView = ArcGISARView(renderVideoFeed: true, tryUsingARKit: true)
     
     /// Denotes whether we've performed a hit test yet.
-    var didHitTest: Bool = false
-        private let statusViewController: ARStatusViewController? = {
+    private var didHitTest: Bool = false
+
+    // View controller displaying current status of `ARExample`.
+    private let statusViewController: ARStatusViewController? = {
         let storyBoard = UIStoryboard(name: "ARStatusViewController", bundle: nil)
         let vc = storyBoard.instantiateInitialViewController() as? ARStatusViewController
         vc?.modalPresentationStyle = .popover
         return vc
     }()
+    
     /// Used when calculating framerate.
     private var lastUpdateTime: TimeInterval = 0
 
@@ -70,11 +78,16 @@ class ARExample: UIViewController {
             toolbar.bottomAnchor.constraint(equalTo: arView.sceneView.attributionTopAnchor)
             ])
         
-        // Add a toolbar button to change the current scene.
+        // Create a toolbar button to change the current scene.
         let sceneItem = UIBarButtonItem(title: "Change Scene", style: .plain, target: self, action: #selector(changeScene(_:)))
+        
+        // Create a toolbar button to display the status.
+        let statusItem = UIBarButtonItem(title: "Status", style: .plain, target: self, action: #selector(showStatus(_:)))
+
         toolbar.setItems([UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
                           sceneItem,
-                          UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)], animated: false)
+                          UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
+                          statusItem], animated: false)
         
         // Set up the `sceneInfo` array with our scene init functions and labels.
         sceneInfo.append(contentsOf: [(sceneFunction: streetsScene, label: "Streets"),
@@ -141,15 +154,17 @@ class ARExample: UIViewController {
         // Show the popover.
         present(controller, animated: true)
     }
-        @objc func showStatus(){
-        guard let statusVC = statusViewController else { return }
-        statusVC.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItem
-        statusVC.preferredContentSize = {
-            let height: CGFloat = CGFloat(statusVC.tableView.numberOfRows(inSection: 0)) * statusVC.tableView.rowHeight
+    
+    /// Dislays the status view controller
+    @objc func showStatus(_ sender: UIBarButtonItem){
+        guard let controller = statusViewController else { return }
+        controller.popoverPresentationController?.barButtonItem = sender
+        controller.preferredContentSize = {
+            let height: CGFloat = CGFloat(controller.tableView.numberOfRows(inSection: 0)) * controller.tableView.rowHeight
             return CGSize(width: 375, height: height)
         }()
 
-        navigationController?.present(statusVC, animated: true, completion: nil)
+        present(controller, animated: true)
     }
 
     // MARK: Scene Init Functions
@@ -311,8 +326,16 @@ extension ARExample: AGSGeoViewTouchDelegate {
     public func geoView(_ geoView: AGSGeoView, didTapAtScreenPoint screenPoint: CGPoint, mapPoint: AGSPoint) {
         guard !didHitTest else { return }
         
-        if arView.setInitialTransformation(screenPoint: screenPoint) {
-            didHitTest = true
+        if let _ = arView.locationDataSource {
+            // We have a location data source, so we're in full-scale AR mode.
+            // Get the real world location for screen point from arView.
+            guard let point = arView.arScreenToLocation(screenPoint: screenPoint) else { return }
+        }
+        else {
+            // We do not have a location data source, so we're in table-top mode.
+            if arView.setInitialTransformation(screenPoint: screenPoint) {
+                didHitTest = true
+            }
         }
         
         //        guard let point = arView.arScreenToLocation(screenPoint: screenPoint) else { return }
