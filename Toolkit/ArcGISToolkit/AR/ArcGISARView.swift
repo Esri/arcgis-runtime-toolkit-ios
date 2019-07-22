@@ -24,7 +24,7 @@ public class ArcGISARView: UIView {
     public let arSCNView = ARSCNView(frame: .zero)
     
     /// The initial transformation used for a table top experience.  Defaults to the Identity Matrix.
-    public var initialTransformation: AGSTransformationMatrix = AGSTransformationMatrix.identity
+    public private(set) var initialTransformation: AGSTransformationMatrix = .identity
     
     /// Denotes whether tracking location and angles has started.
     public private(set) var isTracking: Bool = false
