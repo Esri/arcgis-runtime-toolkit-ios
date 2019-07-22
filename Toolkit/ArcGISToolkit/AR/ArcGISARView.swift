@@ -189,7 +189,7 @@ public class ArcGISARView: UIView {
     ///
     /// - Parameter initialTransformation: The initial transformation for originCamera offset.
     /// - Returns: Whether setting the `initialTransformation` succeeded or failed.
-    public func setInitialTransformation(_ initialTransformation: AGSTransformationMatrix) -> Bool {
+    @discardableResult public func setInitialTransformation(_ initialTransformation: AGSTransformationMatrix) -> Bool {
         self.initialTransformation = initialTransformation
         return true
     }
