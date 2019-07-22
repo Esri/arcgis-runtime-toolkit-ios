@@ -59,15 +59,16 @@ public class JobManager: NSObject {
         jobs.forEach { unObserveJobStatus(job: $0) }
     }
     
-    public private(set) var keyedJobs = [String: AGSJob](){
+    public private(set) var keyedJobs = [String: AGSJob]() {
         didSet{
-            self.updateJobsArray()
+            updateJobsArray()
             saveJobsToUserDefaults()
         }
     }
+    
     public private(set) var jobs = [AGSJob]()
-    private func updateJobsArray(){
-        
+    
+    private func updateJobsArray() {
         // when our jobs array changes we need to observe the jobs' status
         // that we aren't currently observing. The best way to do that is to
         // just unObserve all, then re-observe all job status events
@@ -76,38 +77,39 @@ public class JobManager: NSObject {
         jobs.forEach { unObserveJobStatus(job: $0) }
         
         // set new jobs array
-        jobs = keyedJobs.map{ $0.1 }
+        jobs = keyedJobs.map{ $0.value }
         
         // now observe all jobs
         jobs.forEach { observeJobStatus(job: $0) }
     }
     
-    private func toJSON() -> JSONDictionary{
-        var d = [String: Any]()
-        for (jobID, job) in self.keyedJobs{
-            if let json = try? job.toJSON(){
-                d[jobID] = json
+    private func toJSON() -> JSONDictionary {
+        var jsonDictionary = [String: Any]()
+        for (jobID, job) in keyedJobs {
+            if let json = try? job.toJSON() {
+                jsonDictionary[jobID] = json
             }
         }
-        return d
+        return jsonDictionary
     }
     
     /// Create a JobManager with an ID.
-    public required init(jobManagerID: String){
+    public required init(jobManagerID: String) {
         self.jobManagerID = jobManagerID
         super.init()
-        if let d = UserDefaults.standard.dictionary(forKey: self.jobsDefaultsKey){
+        if let storedJobsJSON = UserDefaults.standard.dictionary(forKey: jobsDefaultsKey) {
+            // Populate from previously serialized stored values.
             suppressSaveToUserDefaults = true
-            self.instantiateStateFromJSON(json: d)
+            instantiateStateFromJSON(json: storedJobsJSON)
             suppressSaveToUserDefaults = false
         }
     }
     
-    private func instantiateStateFromJSON(json: JSONDictionary){
-        for (jobID, value) in json{
-            if let jobJSON = value as? JSONDictionary{
-                if let job = (try? AGSJob.fromJSON(jobJSON)) as? AGSJob{
-                    self.keyedJobs[jobID] = job
+    private func instantiateStateFromJSON(json: JSONDictionary) {
+        for (jobID, value) in json {
+            if let jobJSON = value as? JSONDictionary {
+                if let job = (try? AGSJob.fromJSON(jobJSON)) as? AGSJob {
+                    keyedJobs[jobID] = job
                 }
             }
         }
@@ -119,16 +121,17 @@ public class JobManager: NSObject {
     
     // observing job status code
     
-    private func observeJobStatus(job: AGSJob){
+    private func observeJobStatus(job: AGSJob) {
         job.addObserver(self, forKeyPath: #keyPath(AGSJob.status), options: [], context: &kvoContext)
     }
-    private func unObserveJobStatus(job: AGSJob){
+    
+    private func unObserveJobStatus(job: AGSJob) {
         job.removeObserver(self, forKeyPath: #keyPath(AGSJob.status))
     }
     
     override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
-        if context == &kvoContext{
-            if keyPath == #keyPath(AGSJob.status){
+        if context == &kvoContext {
+            if keyPath == #keyPath(AGSJob.status) {
                 // when a job's status changes we need to save to user defaults again
                 // so that the correct job state is reflected in our saved state
                 saveJobsToUserDefaults()
@@ -143,7 +146,7 @@ public class JobManager: NSObject {
      Register a Job with the JobManager.
      Returns a uniqueID for the Job.
      */
-    @discardableResult public func register(job: AGSJob) -> String{
+    @discardableResult public func register(job: AGSJob) -> String {
         let jobUniqueID = NSUUID().uuidString
         keyedJobs[jobUniqueID] = job
         return jobUniqueID
@@ -153,12 +156,10 @@ public class JobManager: NSObject {
      Unregister a Job with the JobManager
      Returns true if it found the Job and was able to unregister it.
      */
-    @discardableResult public func unregister(job: AGSJob) -> Bool{
-        for (key, value) in keyedJobs{
-            if value === job{
-                keyedJobs.removeValue(forKey: key)
-                return true
-            }
+    @discardableResult public func unregister(job: AGSJob) -> Bool {
+        if let registeredJobInfo = keyedJobs.filter({ $0.value === job }).first {
+            keyedJobs.removeValue(forKey: registeredJobInfo.key)
+            return true
         }
         return false
     }
@@ -167,41 +168,35 @@ public class JobManager: NSObject {
      Unregister a Job with the JobManager, using the Job's unique ID.
      Returns true if it found the Job and was able to unregister it.
      */
-    @discardableResult public func unregister(jobUniqueID: String) -> Bool{
+    @discardableResult public func unregister(jobUniqueID: String) -> Bool {
         let removed = keyedJobs.removeValue(forKey: jobUniqueID) != nil
         return removed
     }
     
     /// Clears the finished Jobs from the Job manager.
-    public func clearFinishedJobs(){
-        
+    public func clearFinishedJobs() {
         suppressSaveToUserDefaults = true
-        for (jobUniqueID, job) in keyedJobs{
-            if job.status == .failed || job.status == .succeeded{
-                keyedJobs.removeValue(forKey: jobUniqueID)
-            }
+        keyedJobs.filter({ $0.value.status == .failed || $0.value.status == .succeeded }).forEach {
+            keyedJobs.removeValue(forKey: $0.key)
         }
         suppressSaveToUserDefaults = false
         saveJobsToUserDefaults()
-        
     }
     
     /**
      Checks the status for all Jobs and returns when completed.
      */
-    @discardableResult public func checkStatusForAllJobs(completion: @escaping (Bool)->Void) -> AGSCancelable{
-        
-        
+    @discardableResult public func checkStatusForAllJobs(completion: @escaping (Bool)->Void) -> AGSCancelable {
         let cancelGroup = CancelGroup()
         
         let group = DispatchGroup()
         
         var completedWithoutErrors = true
         
-        keyedJobs.forEach{
+        keyedJobs.forEach {
             group.enter()
-            let cancellable = $0.1.checkStatus{ error in
-                if error != nil{
+            let cancellable = $0.value.checkStatus { error in
+                if error != nil {
                     completedWithoutErrors = false
                 }
                 group.leave()
@@ -209,7 +204,7 @@ public class JobManager: NSObject {
             cancelGroup.children.append(cancellable)
         }
         
-        group.notify(queue: DispatchQueue.main){
+        group.notify(queue: DispatchQueue.main) {
             completion(completedWithoutErrors)
         }
         
@@ -222,26 +217,25 @@ public class JobManager: NSObject {
      `func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping`
      */
     public func application(application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        if self.jobs.count > 0{
-            self.checkStatusForAllJobs{ completedWithoutErrors in
-                if completedWithoutErrors{
-                    completionHandler(.newData)
-                }
-                else{
-                    completionHandler(.failed)
-                }
-            }
+        guard jobs.count > 0 else {
+            return completionHandler(.noData)
         }
-        else{
-            completionHandler(.noData)
+        
+        checkStatusForAllJobs { completedWithoutErrors in
+            if completedWithoutErrors {
+                completionHandler(.newData)
+            }
+            else{
+                completionHandler(.failed)
+            }
         }
     }
 
     
     /// Resume all paused and not-started jobs.
-    public func resumeAllPausedJobs(statusHandler: @escaping JobStatusHandler, completion: @escaping JobCompletionHandler){
-        keyedJobs.filter{ $0.1.status == .paused || $0.1.status == .notStarted}.forEach{
-            $0.1.start(statusHandler: statusHandler, completion:completion)
+    public func resumeAllPausedJobs(statusHandler: @escaping JobStatusHandler, completion: @escaping JobCompletionHandler) {
+        keyedJobs.filter({ $0.value.status == .paused || $0.value.status == .notStarted }).forEach {
+            $0.value.start(statusHandler: statusHandler, completion:completion)
         }
     }
     
@@ -250,20 +244,11 @@ public class JobManager: NSObject {
      This happens automatically when the jobs are registered/unregistered.
      It also happens when job status changes.
      */
-    private func saveJobsToUserDefaults(){
-        
-        if suppressSaveToUserDefaults{
+    private func saveJobsToUserDefaults() {
+        if suppressSaveToUserDefaults {
             return
         }
         
-        let d = self.toJSON()
-        UserDefaults.standard.set(d, forKey: self.jobsDefaultsKey)
+        UserDefaults.standard.set(self.toJSON(), forKey: jobsDefaultsKey)
     }
 }
-
-
-
-
-
-
-
