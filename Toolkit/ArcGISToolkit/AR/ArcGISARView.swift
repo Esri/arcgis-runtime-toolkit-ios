@@ -24,7 +24,7 @@ public class ArcGISARView: UIView {
     public let arSCNView = ARSCNView(frame: .zero)
     
     /// The initial transformation used for a table top experience.  Defaults to the Identity Matrix.
-    public private(set) var initialTransformation = AGSTransformationMatrix.identity
+    public private(set) var initialTransformation: AGSTransformationMatrix = .identity
     
     /// Denotes whether tracking location and angles has started.
     public private(set) var isTracking: Bool = false
@@ -45,7 +45,9 @@ public class ArcGISARView: UIView {
             guard let newCamera = originCamera else { return }
             // Set the camera as the originCamera on the cameraController and reset tracking.
             cameraController.originCamera = newCamera
-            resetTracking()
+            if isTracking {
+                resetTracking()
+            }
         }
     }
 
@@ -76,7 +78,7 @@ public class ArcGISARView: UIView {
     
     /// We implement `ARSCNViewDelegate` methods, but will use `arSCNViewDelegate` to forward them to clients.
     weak public var arSCNViewDelegate: ARSCNViewDelegate?
-
+    
     // MARK: Private properties
     
     /// The camera controller used to control the Scene.
@@ -90,7 +92,7 @@ public class ArcGISARView: UIView {
     
     /// A quaternion used to compensate for the pitch being 90 degrees on `ARKit`; used to calculate the current device transformation for each frame.
     private let compensationQuat: simd_quatd = simd_quatd(ix: (sin(45 / (180 / .pi))), iy: 0, iz: 0, r: (cos(45 / (180 / .pi))))
-    
+
     /// Whether `ARKit` is supported on this device.
     private let deviceSupportsARKit: Bool = {
         return ARWorldTrackingConfiguration.isSupported
@@ -163,12 +165,20 @@ public class ArcGISARView: UIView {
     
     /// Determines the map point for the given screen point.
     ///
-    /// - Parameter toLocation: The point in screen coordinates.
+    /// - Parameter screenPoint: The point in screen coordinates.
     /// - Returns: The map point corresponding to screenPoint.
-    public func arScreenToLocation(screenPoint: CGPoint) -> AGSPoint {
-        fatalError("arScreen(toLocation:) has not been implemented")
+    public func arScreenToLocation(screenPoint: CGPoint) -> AGSPoint? {
+        // Use the `internalHitTest` method to get the matrix of `screenPoint`.
+        guard let matrix = internalHitTest(screenPoint: screenPoint) else { return nil }
+
+        // Get the TransformationMatrix from the sceneView.currentViewpointCamera and add the hit test matrix to it.
+        let currentCamera = sceneView.currentViewpointCamera()
+        let transformationMatrix = currentCamera.transformationMatrix.addTransformation(matrix)
+        
+        // Create a camera from transformationMatrix and return it's location.
+        return AGSCamera(transformationMatrix: transformationMatrix).location
     }
-    
+
     /// Resets the device tracking, using `originCamera` if it's not nil or the device's GPS location via the location data source.
     public func resetTracking() {
         initialLocation = nil
@@ -179,18 +189,25 @@ public class ArcGISARView: UIView {
     ///
     /// - Parameter initialTransformation: The initial transformation for originCamera offset.
     /// - Returns: Whether setting the `initialTransformation` succeeded or failed.
-    public func setInitialTransformation(initialTransformation: AGSTransformationMatrix) -> Bool {
-        fatalError("setInitialTransformation(initialTransformation:) has not been implemented")
+    @discardableResult public func setInitialTransformation(_ initialTransformation: AGSTransformationMatrix) -> Bool {
+        self.initialTransformation = initialTransformation
+        return true
     }
     
-    /// Sets the initial transformation used to offset the originCamera.  The initial transformation is based on an AR point determined via existing plan hit detection from `screenPoint`.  If an AR point cannot be determined, this method will return `false`.
+    /// Sets the initial transformation used to offset the originCamera.  The initial transformation is based on an AR point determined via existing plane hit detection from `screenPoint`.  If an AR point cannot be determined, this method will return `false`.
     ///
     /// - Parameter screenPoint: The screen point to determine the `initialTransformation` from.
     /// - Returns: Whether setting the `initialTransformation` succeeded or failed.
-    public func setInitialTransformation(screenPoint: CGPoint) -> Bool {
-        fatalError("setInitialTransformationPlacingOriginOnPlane(screenPoint:) has not been implemented")
-    }
+    public func setInitialTransformation(using screenPoint: CGPoint) -> Bool {
+        // Use the `internalHitTest` method to get the matrix of `screenPoint`.
+        guard let matrix = internalHitTest(screenPoint: screenPoint) else { return false }
+        
+        // Set the `initialTransformation` as the AGSTransformationMatrix.identity - hit test matrix.
+        initialTransformation = AGSTransformationMatrix.identity.subtractTransformation(matrix)
 
+        return true
+    }
+    
     /// Starts device tracking.
     public func startTracking(_ completion: ((_ error: Error?) -> Void)? = nil) {
         // We have a location data source that needs to be started.
@@ -245,14 +262,40 @@ public class ArcGISARView: UIView {
             subview.bottomAnchor.constraint(equalTo: self.bottomAnchor)
             ])
     }
+    
+    /// Internal method to perform a hit test operation to get the transformation matrix representing the corresponding real-world point for `screenPoint`.
+    ///
+    /// - Parameter screenPoint: The screen point to determine the real world transformation matrix from.
+    /// - Returns: An `AGSTransformationMatrix` representing the real-world point corresponding to `screenPoint`.
+    fileprivate func internalHitTest(screenPoint: CGPoint) -> AGSTransformationMatrix? {
+        // Use the `hitTest` method on ARSCNView to get the location of `screenPoint`.
+        let results = arSCNView.hitTest(screenPoint, types: [.existingPlane, .estimatedHorizontalPlane])
+        
+        // Get the worldTransform from the first result; if there's no worldTransform, return nil.
+        guard let worldTransform = results.first?.worldTransform else { return nil }
+        
+        // Create our hit test matrix based on the worldTransform location.
+        let hitTestMatrix = AGSTransformationMatrix(quaternionX: 0.0,
+                                                    quaternionY: 0.0,
+                                                    quaternionZ: 0.0,
+                                                    quaternionW: 1.0,
+                                                    translationX: Double(worldTransform.columns.3.x),
+                                                    translationY: Double(-worldTransform.columns.3.z),
+                                                    translationZ: Double(worldTransform.columns.3.y))
+
+        return hitTestMatrix
+    }
 }
 
 // MARK: - ARSCNViewDelegate
 extension ArcGISARView: ARSCNViewDelegate {
-    public func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
-        return arSCNViewDelegate?.renderer?(renderer, nodeFor: anchor)
-    }
 
+    // This is not implemented as we are letting ARKit create and manage nodes.
+    // If you want to manage your own nodes, uncomment this and implement it in your code.
+//    public func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
+//        return arSCNViewDelegate?.renderer?(renderer, nodeFor: anchor)
+//    }
+    
     public func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
         arSCNViewDelegate?.renderer?(renderer, didAdd: node, for: anchor)
     }
@@ -337,7 +380,7 @@ extension ArcGISARView: SCNSceneRendererDelegate {
                                                            translationZ: cameraTransform.columns.3.y)
         
         // Set the matrix on the camera controller.
-        cameraController.transformationMatrix = transformationMatrix
+        cameraController.transformationMatrix = initialTransformation.addTransformation(transformationMatrix)
         
         // Set FOV on camera.
         if let camera = arSCNView.session.currentFrame?.camera {
