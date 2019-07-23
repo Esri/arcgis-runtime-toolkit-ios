@@ -100,10 +100,10 @@ class ARExample: UIViewController {
                           statusItem], animated: false)
         
         // Set up the `sceneInfo` array with our scene init functions and labels.
-        sceneInfo.append(contentsOf: [(sceneFunction: streetsScene, label: "Streets"),
-                                      (sceneFunction: everestScene, label: "Everest"),
-                                      (sceneFunction: broncosStadiumScene, label: "Broncos Stadium"),
-                                      (sceneFunction: emptyScene, label: "Empty")])
+        sceneInfo.append(contentsOf: [(sceneFunction: streetsScene, label: "Streets - Full Scale"),
+                                      (sceneFunction: everestScene, label: "Everest - Tabletop"),
+                                      (sceneFunction: broncosStadiumScene, label: "Broncos Stadium - Tabletop"),
+                                      (sceneFunction: emptyScene, label: "Empty - Full Scale")])
         
         // Use the first sceneInfo to create and set the scene.
         currentSceneInfo = sceneInfo.first
@@ -151,6 +151,9 @@ class ARExample: UIViewController {
                 self.arView.stopTracking()
                 self.arView.sceneView.scene = self.sceneInfo[newIndex].sceneFunction()
                 self.arView.startTracking()
+                
+                // Reset didHitTest variable
+                self.didHitTest = false
             }
         }
         
