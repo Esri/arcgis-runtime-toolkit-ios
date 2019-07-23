@@ -234,6 +234,8 @@ public class JobManager: NSObject {
     
     /// Resume all paused and not-started jobs.
     public func resumeAllPausedJobs(statusHandler: @escaping JobStatusHandler, completion: @escaping JobCompletionHandler) {
+        // Note that a job is also paused if it is created from JSON. So any jobs that have been stored in
+        // UserDefaults and reloaded will be in the paused state.
         keyedJobs.filter({ $0.value.status == .paused || $0.value.status == .notStarted }).forEach {
             $0.value.start(statusHandler: statusHandler, completion:completion)
         }
