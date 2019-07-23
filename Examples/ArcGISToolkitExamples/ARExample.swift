@@ -112,9 +112,9 @@ class ARExample: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        arView.startTracking { (error) in
+        arView.startTracking { [weak self] (error) in
             if let error = error {
-                print("Error starting ArcGISARView tracking: \(error)")
+                self?.statusViewController?.errorMessage = error.localizedDescription
             }
         }
     }
@@ -204,9 +204,15 @@ class ARExample: UIViewController {
         let portalItem = AGSPortalItem(portal: portal, itemID: "27f76008eeb04765b8a94d998aaa46c7")
         let scene = AGSScene(item: portalItem)
         
-        // Set camera to Everest summit.
-        arView.originCamera = AGSCamera(latitude: 27.988153, longitude: 86.925174, altitude: 8868.069399, heading: 159.56, pitch: 0.00, roll: 0.00)
-        arView.translationFactor = 1000
+        scene.load { [weak self] (error) in
+            if let error = error {
+                self?.statusViewController?.errorMessage = error.localizedDescription
+                return
+            }
+            // Set camera to Everest summit.
+            self?.arView.originCamera = AGSCamera(latitude: 27.988153, longitude: 86.925174, altitude: 8868.069399, heading: 159.56, pitch: 0.00, roll: 0.00)
+            self?.arView.translationFactor = 1000
+        }
         
         // Clear the location data source, as we're setting the originCamera directly.
         arView.locationDataSource = nil
@@ -225,7 +231,7 @@ class ARExample: UIViewController {
         
         scene.load { [weak self] (error) in
             if let error = error {
-                print("Error loading scene: \(error)")
+                self?.statusViewController?.errorMessage = error.localizedDescription
                 return
             }
             // Set the originCamera to be the initial viewpoint of the web scene.
