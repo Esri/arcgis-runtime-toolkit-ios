@@ -147,10 +147,10 @@ class ARExample: UIViewController {
                 // Set currentSceneInfo to the selected scene.
                 self.currentSceneInfo = self.sceneInfo[newIndex]
                 
-                // Stop tracking, update the scene with the selected Scene and start tracking again.
+                // Stop tracking, update the scene with the selected Scene and reset tracking.
                 self.arView.stopTracking()
                 self.arView.sceneView.scene = self.sceneInfo[newIndex].sceneFunction()
-                self.arView.startTracking()
+                self.arView.resetTracking()
                 
                 // Reset didHitTest variable
                 self.didHitTest = false

@@ -209,6 +209,8 @@ public class ArcGISARView: UIView {
     }
     
     /// Starts device tracking.
+    ///
+    /// - Parameter completion: The completion handler called when start tracking completes.  If it tracking starts successfully, the `error` property will be nil; if tracking fails to start, the error will be non-nil and contain the reason for failure.
     public func startTracking(_ completion: ((_ error: Error?) -> Void)? = nil) {
         // We have a location data source that needs to be started.
         if let locationDataSource = self.locationDataSource {
