@@ -53,20 +53,22 @@ public class JobManager: NSObject {
     // Or maybe we are waiting until a group of modifications are made before writing to the defaults.
     private var suppressSaveToUserDefaults = false
     
-    private var kvoContext = 0
-    
     public private(set) var keyedJobs = [String: AGSJob]() {
         willSet {
+            guard keyedJobs != newValue else { return }
+            
             // Need `self` because of a Swift bug.
-            self.keyedJobs.values.forEach { unObserveJobStatus(job: $0) }
+            self.keyedJobs.lazy
+                .filter { newValue[$0.key] == nil }
+                .forEach { stopObservingJob($0.value) }
         }
         didSet {
-            keyedJobs.values.forEach { observeJobStatus(job: $0) }
-
-            // If there was a change, then re-store the serialized jobs in UserDefaults
-            if keyedJobs != oldValue {
-                saveJobsToUserDefaults()
-            }
+            guard keyedJobs != oldValue else { return }
+            
+            self.keyedJobs.lazy
+                .filter { oldValue[$0.key] == nil }
+                .forEach { startObservingJob($0.value) }
+            saveJobsToUserDefaults()
         }
     }
 
@@ -85,35 +87,25 @@ public class JobManager: NSObject {
         loadJobsFromUserDefaults()
     }
     
-    deinit {
-        keyedJobs = [:]
-    }
-    
     private func toJSON() -> JSONDictionary {
         return keyedJobs.compactMapValues { try? $0.toJSON() }
     }
     
     // observing job status code
     
-    private func observeJobStatus(job: AGSJob) {
-        job.addObserver(self, forKeyPath: #keyPath(AGSJob.status), context: &kvoContext)
+    private var observations = [AGSJob: NSKeyValueObservation]()
+    
+    private func startObservingJob(_ job: AGSJob) {
+        guard observations[job] == nil else { return }
+        let observation = job.observe(\.status) { [unowned self] (_, _) in
+            self.saveJobsToUserDefaults()
+        }
+        observations[job] = observation
     }
     
-    private func unObserveJobStatus(job: AGSJob) {
-        job.removeObserver(self, forKeyPath: #keyPath(AGSJob.status))
-    }
-    
-    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
-        if context == &kvoContext {
-            if keyPath == #keyPath(AGSJob.status) {
-                // when a job's status changes we need to save to user defaults again
-                // so that the correct job state is reflected in our saved state
-                saveJobsToUserDefaults()
-            }
-        }
-        else {
-            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
-        }
+    private func stopObservingJob(_ job: AGSJob) {
+        guard let observation = observations.removeValue(forKey: job) else { return }
+        observation.invalidate()
     }
 
     /**
