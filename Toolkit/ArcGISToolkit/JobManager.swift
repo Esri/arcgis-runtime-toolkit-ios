@@ -46,7 +46,7 @@ public class JobManager: NSObject {
         return _jobManagerSharedInstance
     }
     
-    public private(set) var jobManagerID: String
+    public let jobManagerID: String
     
     // Flag to signify that we shouldn't write to defaults
     // Maybe we are currently reading from the defaults so it's pointless to write to them.
@@ -55,74 +55,48 @@ public class JobManager: NSObject {
     
     private var kvoContext = 0
     
-    deinit {
-        jobs.forEach { unObserveJobStatus(job: $0) }
-    }
-    
     public private(set) var keyedJobs = [String: AGSJob]() {
-        didSet{
-            updateJobsArray()
-            saveJobsToUserDefaults()
+        willSet {
+            // Need `self` because of a Swift bug.
+            self.keyedJobs.values.forEach { unObserveJobStatus(job: $0) }
         }
-    }
-    
-    public private(set) var jobs = [AGSJob]()
-    
-    private func updateJobsArray() {
-        // when our jobs array changes we need to observe the jobs' status
-        // that we aren't currently observing. The best way to do that is to
-        // just unObserve all, then re-observe all job status events
-        
-        // so first un-observe all current jobs
-        jobs.forEach { unObserveJobStatus(job: $0) }
-        
-        // set new jobs array
-        jobs = keyedJobs.map{ $0.value }
-        
-        // now observe all jobs
-        jobs.forEach { observeJobStatus(job: $0) }
-    }
-    
-    private func toJSON() -> JSONDictionary {
-        var jsonDictionary = [String: Any]()
-        for (jobID, job) in keyedJobs {
-            if let json = try? job.toJSON() {
-                jsonDictionary[jobID] = json
+        didSet {
+            keyedJobs.values.forEach { observeJobStatus(job: $0) }
+
+            // If there was a change, then re-store the serialized jobs in UserDefaults
+            if keyedJobs != oldValue {
+                saveJobsToUserDefaults()
             }
         }
-        return jsonDictionary
     }
-    
-    /// Create a JobManager with an ID.
-    public required init(jobManagerID: String) {
-        self.jobManagerID = jobManagerID
-        super.init()
-        if let storedJobsJSON = UserDefaults.standard.dictionary(forKey: jobsDefaultsKey) {
-            // Populate from previously serialized stored values.
-            suppressSaveToUserDefaults = true
-            instantiateStateFromJSON(json: storedJobsJSON)
-            suppressSaveToUserDefaults = false
-        }
-    }
-    
-    private func instantiateStateFromJSON(json: JSONDictionary) {
-        for (jobID, value) in json {
-            if let jobJSON = value as? JSONDictionary {
-                if let job = (try? AGSJob.fromJSON(jobJSON)) as? AGSJob {
-                    keyedJobs[jobID] = job
-                }
-            }
-        }
+
+    public var jobs: [AGSJob] {
+        return Array(keyedJobs.values)
     }
     
     private var jobsDefaultsKey: String {
         return "com.esri.arcgis.runtime.toolkit.jobManager.\(jobManagerID).jobs"
     }
     
+    /// Create a JobManager with an ID.
+    public required init(jobManagerID: String) {
+        self.jobManagerID = jobManagerID
+        super.init()
+        loadJobsFromUserDefaults()
+    }
+    
+    deinit {
+        keyedJobs = [:]
+    }
+    
+    private func toJSON() -> JSONDictionary {
+        return keyedJobs.compactMapValues { try? $0.toJSON() }
+    }
+    
     // observing job status code
     
     private func observeJobStatus(job: AGSJob) {
-        job.addObserver(self, forKeyPath: #keyPath(AGSJob.status), options: [], context: &kvoContext)
+        job.addObserver(self, forKeyPath: #keyPath(AGSJob.status), context: &kvoContext)
     }
     
     private func unObserveJobStatus(job: AGSJob) {
@@ -141,7 +115,7 @@ public class JobManager: NSObject {
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
     }
-    
+
     /**
      Register a Job with the JobManager.
      Returns a uniqueID for the Job.
@@ -157,8 +131,8 @@ public class JobManager: NSObject {
      Returns true if it found the Job and was able to unregister it.
      */
     @discardableResult public func unregister(job: AGSJob) -> Bool {
-        if let registeredJobInfo = keyedJobs.filter({ $0.value === job }).first {
-            keyedJobs.removeValue(forKey: registeredJobInfo.key)
+        if let jobUniqueID = keyedJobs.first(where: { $0.value === job })?.key {
+            keyedJobs[jobUniqueID] = nil
             return true
         }
         return false
@@ -175,12 +149,10 @@ public class JobManager: NSObject {
     
     /// Clears the finished Jobs from the Job manager.
     public func clearFinishedJobs() {
-        suppressSaveToUserDefaults = true
-        keyedJobs.filter({ $0.value.status == .failed || $0.value.status == .succeeded }).forEach {
-            keyedJobs.removeValue(forKey: $0.key)
+        keyedJobs = keyedJobs.filter {
+            let status = $0.value.status
+            return !(status == .failed || status == .succeeded)
         }
-        suppressSaveToUserDefaults = false
-        saveJobsToUserDefaults()
     }
     
     /**
@@ -204,7 +176,7 @@ public class JobManager: NSObject {
             cancelGroup.children.append(cancellable)
         }
         
-        group.notify(queue: DispatchQueue.main) {
+        group.notify(queue: .main) {
             completion(completedWithoutErrors)
         }
         
@@ -217,16 +189,16 @@ public class JobManager: NSObject {
      `func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping`
      */
     public func application(application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        guard jobs.count > 0 else {
+        if keyedJobs.isEmpty {
             return completionHandler(.noData)
-        }
-        
-        checkStatusForAllJobs { completedWithoutErrors in
-            if completedWithoutErrors {
-                completionHandler(.newData)
-            }
-            else{
-                completionHandler(.failed)
+        } else {
+            checkStatusForAllJobs { completedWithoutErrors in
+                if completedWithoutErrors {
+                    completionHandler(.newData)
+                }
+                else{
+                    completionHandler(.failed)
+                }
             }
         }
     }
@@ -236,7 +208,7 @@ public class JobManager: NSObject {
     public func resumeAllPausedJobs(statusHandler: @escaping JobStatusHandler, completion: @escaping JobCompletionHandler) {
         // Note that a job is also paused if it is created from JSON. So any jobs that have been stored in
         // UserDefaults and reloaded will be in the paused state.
-        keyedJobs.filter({ $0.value.status == .paused || $0.value.status == .notStarted }).forEach {
+        keyedJobs.lazy.filter({ $0.value.status == .paused || $0.value.status == .notStarted }).forEach {
             $0.value.start(statusHandler: statusHandler, completion:completion)
         }
     }
@@ -247,10 +219,16 @@ public class JobManager: NSObject {
      It also happens when job status changes.
      */
     private func saveJobsToUserDefaults() {
-        if suppressSaveToUserDefaults {
-            return
-        }
+        guard !suppressSaveToUserDefaults else { return }
         
         UserDefaults.standard.set(self.toJSON(), forKey: jobsDefaultsKey)
+    }
+    
+    private func loadJobsFromUserDefaults() {
+        if let storedJobsJSON = UserDefaults.standard.dictionary(forKey: jobsDefaultsKey) {
+            suppressSaveToUserDefaults = true
+            keyedJobs = storedJobsJSON.compactMapValues { $0 is JSONDictionary ? (try? AGSJob.fromJSON($0)) as? AGSJob : nil }
+            suppressSaveToUserDefaults = false
+        }
     }
 }
