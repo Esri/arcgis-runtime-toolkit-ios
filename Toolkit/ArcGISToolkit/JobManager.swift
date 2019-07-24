@@ -91,7 +91,7 @@ public class JobManager: NSObject {
     }
     
     deinit {
-        keyedJobs = [:]
+        keyedJobs.values.forEach { unObserveJobStatus(job: $0) }
     }
     
     private func toJSON() -> JSONDictionary {
