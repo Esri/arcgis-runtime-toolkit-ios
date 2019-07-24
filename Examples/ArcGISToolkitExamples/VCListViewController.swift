@@ -14,7 +14,7 @@
 import UIKit
 import ArcGISToolkit
 
-open class VCListViewController: TableViewController {
+open class VCListViewController: UITableViewController {
     
     public var storyboardName: String?
     
@@ -25,30 +25,17 @@ open class VCListViewController: TableViewController {
         }
     }
     
-    override open func viewDidLoad() {
-        super.viewDidLoad()
-    }
-    
-    required public init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-    
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nil, bundle: nil)
-    }
-    
     override open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewControllerInfos.count
     }
     
     override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellReuseIdentifier)!
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         cell.textLabel?.text = viewControllerInfos[indexPath.row].vcName
         return cell
     }
     
-    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
+    override open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let t = viewControllerInfos[indexPath.row].viewControllerType
         let nibName = viewControllerInfos[indexPath.row].nibName
         var vcOpt: UIViewController? = nil
