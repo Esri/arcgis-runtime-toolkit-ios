@@ -39,6 +39,7 @@ class ARStatusViewController: UITableViewController {
     @IBOutlet var frameRateLabel: UILabel!
     @IBOutlet var errorDescriptionLabel: UILabel!
     @IBOutlet var sceneLabel: UILabel!
+    @IBOutlet var translationFactorLabel: UILabel!
     
     public var trackingState: ARCamera.TrackingState = .notAvailable {
         didSet {
@@ -78,6 +79,15 @@ class ARStatusViewController: UITableViewController {
         }
     }
 
+    public var translationFactor: Double = 1.0 {
+        didSet {
+            DispatchQueue.main.async{ [weak self] in
+                guard let self = self else { return }
+                self.translationFactorLabel.text = String(format: "%.2f", self.translationFactor)
+            }
+        }
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
     }
@@ -89,6 +99,6 @@ class ARStatusViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 4
+        return 5
     }
 }

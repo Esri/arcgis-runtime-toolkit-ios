@@ -41,7 +41,7 @@ class ARExample: UIViewController {
     private let statusViewController: ARStatusViewController? = {
         let storyBoard = UIStoryboard(name: "ARStatusViewController", bundle: nil)
         let vc = storyBoard.instantiateInitialViewController() as? ARStatusViewController
-        vc?.modalPresentationStyle = .popover
+//        vc?.modalPresentationStyle = .popover
         return vc
     }()
     
@@ -54,6 +54,9 @@ class ARExample: UIViewController {
         let properties = AGSLayerSceneProperties(surfacePlacement: .relative)
         return overlay
     }()
+    
+    /// The observer for the `SceneView`'s `translationFactor` property
+    private var cameraControllerObservation: NSKeyValueObservation?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -67,6 +70,13 @@ class ARExample: UIViewController {
         // Add our graphics overlay to the sceneView.
         arView.sceneView.graphicsOverlays.add(graphicsOverlay)
         
+        // Set up observer for the camera controller's translationFactor.
+        if let cameraController = arView.sceneView.cameraController as? AGSTransformationMatrixCameraController {
+            cameraControllerObservation = cameraController.observe(\AGSTransformationMatrixCameraController.translationFactor, options: [.initial, .new]){[weak self] tmcc, change in
+                self?.statusViewController?.translationFactor = tmcc.translationFactor
+            }
+        }
+        
         // Add arView to the view and setup the constraints.
         view.addSubview(arView)
         arView.translatesAutoresizingMaskIntoConstraints = false
@@ -76,7 +86,6 @@ class ARExample: UIViewController {
             arView.topAnchor.constraint(equalTo: view.topAnchor),
             arView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
             ])
-        
         
         // Create a toolbar and add it to the arView.
         let toolbar = UIToolbar(frame: .zero)
@@ -99,6 +108,24 @@ class ARExample: UIViewController {
                           UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
                           statusItem], animated: false)
         
+        // Add the status view and setup constraints.
+        if let controller = statusViewController {
+            view.addSubview(controller.view)
+            controller.view.translatesAutoresizingMaskIntoConstraints = false
+            controller.preferredContentSize = {
+                let height: CGFloat = CGFloat(controller.tableView.numberOfRows(inSection: 0)) * controller.tableView.rowHeight
+                return CGSize(width: 350, height: height)
+            }()
+            NSLayoutConstraint.activate([
+                controller.view.heightAnchor.constraint(equalToConstant: 175),
+                controller.view.widthAnchor.constraint(equalToConstant: 350),
+                controller.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
+                controller.view.bottomAnchor.constraint(equalTo: toolbar.topAnchor, constant: -8)
+                ])
+            
+            controller.view.alpha = 0.0
+        }
+
         // Set up the `sceneInfo` array with our scene init functions and labels.
         sceneInfo.append(contentsOf: [(sceneFunction: streetsScene, label: "Streets - Full Scale"),
                                       (sceneFunction: everestScene, label: "Everest - Tabletop"),
@@ -171,13 +198,9 @@ class ARExample: UIViewController {
     /// Dislays the status view controller
     @objc func showStatus(_ sender: UIBarButtonItem){
         guard let controller = statusViewController else { return }
-        controller.popoverPresentationController?.barButtonItem = sender
-        controller.preferredContentSize = {
-            let height: CGFloat = CGFloat(controller.tableView.numberOfRows(inSection: 0)) * controller.tableView.rowHeight
-            return CGSize(width: 375, height: height)
-        }()
-
-        present(controller, animated: true)
+        UIView.animate(withDuration: 0.25) {
+            controller.view.alpha = controller.view.alpha == 1.0 ? 0.0 : 1.0
+        }
     }
 
     // MARK: Scene Init Functions
@@ -332,6 +355,7 @@ extension ARExample: ARSCNViewDelegate {
             self?.present(alertController, animated: true)
         }
     }
+    
     func session(_ session: ARSession, cameraDidChangeTrackingState camera: ARCamera) {
         // Set the tracking state on the status vc.
         statusViewController?.trackingState = camera.trackingState

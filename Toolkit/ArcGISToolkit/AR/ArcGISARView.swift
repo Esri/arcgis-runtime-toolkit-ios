@@ -55,8 +55,11 @@ public class ArcGISARView: UIView {
     public let sceneView = AGSSceneView(frame: .zero)
     
     /// The translation factor used to support a table top AR experience.
-    public var translationFactor: Double = 1.0 {
-        didSet {
+    public var translationFactor: Double {
+        get {
+            return cameraController.translationFactor
+        }
+        set {
             cameraController.translationFactor = translationFactor
         }
     }
