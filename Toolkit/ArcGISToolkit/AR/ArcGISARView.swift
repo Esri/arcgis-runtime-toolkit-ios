@@ -40,7 +40,7 @@ public class ArcGISARView: UIView {
     }
 
     /// The viewpoint camera used to set the initial view of the sceneView instead of the device's GPS location via the location data source.  You can use Key-Value Observing to track changes to the origin camera.
-    @objc public dynamic var originCamera: AGSCamera? {
+    @objc dynamic public var originCamera: AGSCamera? {
         didSet {
             guard let newCamera = originCamera else { return }
             // Set the camera as the originCamera on the cameraController and reset tracking.
@@ -55,12 +55,12 @@ public class ArcGISARView: UIView {
     public let sceneView = AGSSceneView(frame: .zero)
     
     /// The translation factor used to support a table top AR experience.
-    public var translationFactor: Double {
+    @objc dynamic public var translationFactor: Double {
         get {
             return cameraController.translationFactor
         }
         set {
-            cameraController.translationFactor = translationFactor
+            cameraController.translationFactor = newValue
         }
     }
     
@@ -85,7 +85,7 @@ public class ArcGISARView: UIView {
     // MARK: Private properties
     
     /// The camera controller used to control the Scene.
-    private let cameraController = AGSTransformationMatrixCameraController()
+    @objc private let cameraController = AGSTransformationMatrixCameraController()
     
     /// Initial location from location data source.
     private var initialLocation: AGSPoint?
@@ -164,6 +164,21 @@ public class ArcGISARView: UIView {
         sceneView.isManualRendering = isUsingARKit
     }
     
+    /// Implementing this method will allow the computed `translationFactor` property to generate KVO events when the `cameraController.translationFactor` value changes.
+    ///
+    /// - Parameter key: The key we want to observe.
+    /// - Returns: A set of key paths for properties whose values affect the value of the specified key.
+    public override class func keyPathsForValuesAffectingValue(forKey key: String) -> Set<String>
+    {
+        var set = super.keyPathsForValuesAffectingValue(forKey: key)
+        if key == "translationFactor" {
+            // Get the key paths for super and append our key path to it.
+            set = set.union(Set(["cameraController.translationFactor"]))
+        }
+        
+        return set
+    }
+
     // MARK: Public
     
     /// Determines the map point for the given screen point.

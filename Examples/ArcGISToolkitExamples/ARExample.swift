@@ -56,7 +56,7 @@ class ARExample: UIViewController {
     }()
     
     /// The observer for the `SceneView`'s `translationFactor` property
-    private var cameraControllerObservation: NSKeyValueObservation?
+    private var translationFactorObservation: NSKeyValueObservation?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -70,11 +70,9 @@ class ARExample: UIViewController {
         // Add our graphics overlay to the sceneView.
         arView.sceneView.graphicsOverlays.add(graphicsOverlay)
         
-        // Set up observer for the camera controller's translationFactor.
-        if let cameraController = arView.sceneView.cameraController as? AGSTransformationMatrixCameraController {
-            cameraControllerObservation = cameraController.observe(\AGSTransformationMatrixCameraController.translationFactor, options: [.initial, .new]){[weak self] tmcc, change in
-                self?.statusViewController?.translationFactor = tmcc.translationFactor
-            }
+        // Observe the `cameraController.translationFactor` property and update status when it changes.
+        translationFactorObservation = arView.observe(\ArcGISARView.translationFactor, options: [.initial, .new]){ [weak self] arView, change in
+            self?.statusViewController?.translationFactor = arView.translationFactor
         }
         
         // Add arView to the view and setup the constraints.
@@ -150,7 +148,7 @@ class ARExample: UIViewController {
         super.viewDidDisappear(animated)
         arView.stopTracking()
     }
-    
+
     /// Changes the scene to a newly selected scene.
     ///
     /// - Parameter sender: The bar button item tapped on.
@@ -217,6 +215,8 @@ class ARExample: UIViewController {
         
         // Set the location data source so we use our GPS location as the originCamera.
         arView.locationDataSource = AGSCLLocationDataSource()
+        arView.translationFactor = 1
+        arView.originCamera = nil
         return scene
     }
     
@@ -283,9 +283,11 @@ class ARExample: UIViewController {
         
         // Set the location data source so we use our GPS location as the originCamera.
         arView.locationDataSource = AGSCLLocationDataSource()
+        arView.translationFactor = 1
+        arView.originCamera = nil
         return scene
     }
-    
+
     /// Adds an elevation source to the given `scene`.
     ///
     /// - Parameter scene: The scene to add the elevation source to.
