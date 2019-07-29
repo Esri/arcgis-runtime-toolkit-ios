@@ -41,7 +41,6 @@ class ARExample: UIViewController {
     private let statusViewController: ARStatusViewController? = {
         let storyBoard = UIStoryboard(name: "ARStatusViewController", bundle: nil)
         let vc = storyBoard.instantiateInitialViewController() as? ARStatusViewController
-//        vc?.modalPresentationStyle = .popover
         return vc
     }()
     
