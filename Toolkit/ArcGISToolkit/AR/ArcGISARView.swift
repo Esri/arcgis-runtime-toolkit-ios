@@ -101,6 +101,9 @@ public class ArcGISARView: UIView {
         return ARWorldTrackingConfiguration.isSupported
     }()
 
+    /// The last portrait or landscape orientation value.
+    private var lastGoodDeviceOrientation = UIDeviceOrientation.portrait
+    
     // MARK: Initializers
     
     public override init(frame: CGRect) {
@@ -406,13 +409,22 @@ extension ArcGISARView: SCNSceneRendererDelegate {
         if let camera = arSCNView.session.currentFrame?.camera {
             let intrinsics = camera.intrinsics
             let imageResolution = camera.imageResolution
+            
+            // Get the device orientation, but don't allow non-landscape/portrait values.
+            var deviceOrientation = UIDevice.current.orientation
+            if deviceOrientation.isValidInterfaceOrientation {
+                lastGoodDeviceOrientation = deviceOrientation
+            }
+            else {
+                deviceOrientation = lastGoodDeviceOrientation
+            }
             sceneView.setFieldOfViewFromLensIntrinsicsWithXFocalLength(intrinsics[0][0],
                                                                        yFocalLength: intrinsics[1][1],
                                                                        xPrincipal: intrinsics[2][0],
                                                                        yPrincipal: intrinsics[2][1],
                                                                        xImageSize: Float(imageResolution.width),
                                                                        yImageSize: Float(imageResolution.height),
-                                                                       deviceOrientation: UIDevice.current.orientation)
+                                                                       deviceOrientation: deviceOrientation)
         }
 
         // Render the Scene with the new transformation.
