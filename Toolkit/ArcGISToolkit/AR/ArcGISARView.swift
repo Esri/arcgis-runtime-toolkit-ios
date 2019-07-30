@@ -24,7 +24,7 @@ public class ArcGISARView: UIView {
     public let arSCNView = ARSCNView(frame: .zero)
     
     /// The initial transformation used for a table top experience.  Defaults to the Identity Matrix.
-    public private(set) var initialTransformation: AGSTransformationMatrix = .identity
+    public var initialTransformation: AGSTransformationMatrix = .identity
     
     /// Denotes whether tracking location and angles has started.
     public private(set) var isTracking: Bool = false
@@ -204,15 +204,6 @@ public class ArcGISARView: UIView {
     public func resetTracking() {
         initialLocation = nil
         startTracking()
-    }
-    
-    /// Sets the initial transformation used to offset the originCamera.
-    ///
-    /// - Parameter initialTransformation: The initial transformation for originCamera offset.
-    /// - Returns: Whether setting the `initialTransformation` succeeded or failed.
-    @discardableResult public func setInitialTransformation(_ initialTransformation: AGSTransformationMatrix) -> Bool {
-        self.initialTransformation = initialTransformation
-        return true
     }
     
     /// Sets the initial transformation used to offset the originCamera.  The initial transformation is based on an AR point determined via existing plane hit detection from `screenPoint`.  If an AR point cannot be determined, this method will return `false`.
