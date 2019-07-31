@@ -223,10 +223,10 @@ extension ARExample: ARSCNViewDelegate {
             else { return }
         
         // Update extent visualization to the anchor's new bounding rectangle.
-        if let extentGeometry = plane.extentNode.geometry as? SCNPlane {
+        if let extentGeometry = plane.node.geometry as? SCNPlane {
             extentGeometry.width = CGFloat(planeAnchor.extent.x)
             extentGeometry.height = CGFloat(planeAnchor.extent.z)
-            plane.extentNode.simdPosition = planeAnchor.center
+            plane.node.simdPosition = planeAnchor.center
         }
     }
     
