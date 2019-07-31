@@ -26,10 +26,10 @@
 		E447A12B2267BB9500578C0B /* ARExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = E447A12A2267BB9500578C0B /* ARExample.swift */; };
 		E464AA9122E62DC600969DBA /* Plane.swift in Sources */ = {isa = PBXBuildFile; fileRef = E464AA9022E62DC600969DBA /* Plane.swift */; };
 		E464AA9322E633C500969DBA /* OptionsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E464AA9222E633C500969DBA /* OptionsTableViewController.swift */; };
-		E464AA9922E6542E00969DBA /* ARStatusViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E464AA9722E6542E00969DBA /* ARStatusViewController.swift */; };
-		E464AA9A22E6542E00969DBA /* ARStatusViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E464AA9822E6542E00969DBA /* ARStatusViewController.storyboard */; };
 		E46893271FEDAE29008ADA79 /* CompassExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46893261FEDAE29008ADA79 /* CompassExample.swift */; };
 		E48405751E9BE7E600927208 /* LegendExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48405741E9BE7E600927208 /* LegendExample.swift */; };
+		E4CDFD0D22EF844F002B2C66 /* ARStatusViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CDFD0C22EF844F002B2C66 /* ARStatusViewController.swift */; };
+		E4CDFD0F22EF8462002B2C66 /* ARStatusViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E4CDFD0E22EF8462002B2C66 /* ARStatusViewController.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -91,10 +91,10 @@
 		E447A12A2267BB9500578C0B /* ARExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARExample.swift; sourceTree = "<group>"; };
 		E464AA9022E62DC600969DBA /* Plane.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Plane.swift; sourceTree = "<group>"; };
 		E464AA9222E633C500969DBA /* OptionsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsTableViewController.swift; sourceTree = "<group>"; };
-		E464AA9722E6542E00969DBA /* ARStatusViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ARStatusViewController.swift; sourceTree = "<group>"; };
-		E464AA9822E6542E00969DBA /* ARStatusViewController.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ARStatusViewController.storyboard; sourceTree = "<group>"; };
 		E46893261FEDAE29008ADA79 /* CompassExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassExample.swift; sourceTree = "<group>"; };
 		E48405741E9BE7E600927208 /* LegendExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegendExample.swift; sourceTree = "<group>"; };
+		E4CDFD0C22EF844F002B2C66 /* ARStatusViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARStatusViewController.swift; sourceTree = "<group>"; };
+		E4CDFD0E22EF8462002B2C66 /* ARStatusViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = ARStatusViewController.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -173,8 +173,8 @@
 			children = (
 				E464AA9222E633C500969DBA /* OptionsTableViewController.swift */,
 				E464AA9022E62DC600969DBA /* Plane.swift */,
-				E464AA9822E6542E00969DBA /* ARStatusViewController.storyboard */,
-				E464AA9722E6542E00969DBA /* ARStatusViewController.swift */,
+				E4CDFD0C22EF844F002B2C66 /* ARStatusViewController.swift */,
+				E4CDFD0E22EF8462002B2C66 /* ARStatusViewController.storyboard */,
 			);
 			path = Misc;
 			sourceTree = "<group>";
@@ -266,7 +266,7 @@
 			files = (
 				883904491DF6022A001F3188 /* LaunchScreen.storyboard in Resources */,
 				883904461DF6022A001F3188 /* Assets.xcassets in Resources */,
-				E464AA9A22E6542E00969DBA /* ARStatusViewController.storyboard in Resources */,
+				E4CDFD0F22EF8462002B2C66 /* ARStatusViewController.storyboard in Resources */,
 				883904441DF6022A001F3188 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -304,7 +304,7 @@
 				88B689D11E96EDF400B67FAB /* VCListViewController.swift in Sources */,
 				8800656E2228577A00F76945 /* TemplatePickerExample.swift in Sources */,
 				88B689CE1E96EDF400B67FAB /* ScalebarExample.swift in Sources */,
-				E464AA9922E6542E00969DBA /* ARStatusViewController.swift in Sources */,
+				E4CDFD0D22EF844F002B2C66 /* ARStatusViewController.swift in Sources */,
 				88B689C91E96EDF400B67FAB /* ExamplesViewController.swift in Sources */,
 				E447A12B2267BB9500578C0B /* ARExample.swift in Sources */,
 				E48405751E9BE7E600927208 /* LegendExample.swift in Sources */,
