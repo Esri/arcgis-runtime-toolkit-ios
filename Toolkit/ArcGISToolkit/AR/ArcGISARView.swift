@@ -174,9 +174,9 @@ public class ArcGISARView: UIView {
     public override class func keyPathsForValuesAffectingValue(forKey key: String) -> Set<String>
     {
         var set = super.keyPathsForValuesAffectingValue(forKey: key)
-        if key == "translationFactor" {
+        if key == #keyPath(translationFactor) {
             // Get the key paths for super and append our key path to it.
-            set = set.union(Set(["cameraController.translationFactor"]))
+            set.insert(#keyPath(cameraController.translationFactor))
         }
         
         return set
@@ -222,7 +222,7 @@ public class ArcGISARView: UIView {
     
     /// Starts device tracking.
     ///
-    /// - Parameter completion: The completion handler called when start tracking completes.  If it tracking starts successfully, the `error` property will be nil; if tracking fails to start, the error will be non-nil and contain the reason for failure.
+    /// - Parameter completion: The completion handler called when start tracking completes.  If tracking starts successfully, the `error` property will be nil; if tracking fails to start, the error will be non-nil and contain the reason for failure.
     public func startTracking(_ completion: ((_ error: Error?) -> Void)? = nil) {
         // We have a location data source that needs to be started.
         if let locationDataSource = self.locationDataSource {
@@ -402,12 +402,9 @@ extension ArcGISARView: SCNSceneRendererDelegate {
             let imageResolution = camera.imageResolution
             
             // Get the device orientation, but don't allow non-landscape/portrait values.
-            var deviceOrientation = UIDevice.current.orientation
+            let deviceOrientation = UIDevice.current.orientation
             if deviceOrientation.isValidInterfaceOrientation {
                 lastGoodDeviceOrientation = deviceOrientation
-            }
-            else {
-                deviceOrientation = lastGoodDeviceOrientation
             }
             sceneView.setFieldOfViewFromLensIntrinsicsWithXFocalLength(intrinsics[0][0],
                                                                        yFocalLength: intrinsics[1][1],
@@ -415,7 +412,7 @@ extension ArcGISARView: SCNSceneRendererDelegate {
                                                                        yPrincipal: intrinsics[2][1],
                                                                        xImageSize: Float(imageResolution.width),
                                                                        yImageSize: Float(imageResolution.height),
-                                                                       deviceOrientation: deviceOrientation)
+                                                                       deviceOrientation: lastGoodDeviceOrientation)
         }
 
         // Render the Scene with the new transformation.
