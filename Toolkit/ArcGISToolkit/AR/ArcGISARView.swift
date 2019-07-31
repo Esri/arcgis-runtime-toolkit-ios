@@ -24,7 +24,7 @@ public class ArcGISARView: UIView {
     public let arSCNView = ARSCNView(frame: .zero)
     
     /// The initial transformation used for a table top experience.  Defaults to the Identity Matrix.
-    public private(set) var initialTransformation: AGSTransformationMatrix = .identity
+    public var initialTransformation: AGSTransformationMatrix = .identity
     
     /// Denotes whether tracking location and angles has started.
     public private(set) var isTracking: Bool = false
@@ -40,7 +40,7 @@ public class ArcGISARView: UIView {
     }
 
     /// The viewpoint camera used to set the initial view of the sceneView instead of the device's GPS location via the location data source.  You can use Key-Value Observing to track changes to the origin camera.
-    @objc public dynamic var originCamera: AGSCamera? {
+    @objc dynamic public var originCamera: AGSCamera? {
         didSet {
             guard let newCamera = originCamera else { return }
             // Set the camera as the originCamera on the cameraController and reset tracking.
@@ -55,9 +55,12 @@ public class ArcGISARView: UIView {
     public let sceneView = AGSSceneView(frame: .zero)
     
     /// The translation factor used to support a table top AR experience.
-    public var translationFactor: Double = 1.0 {
-        didSet {
-            cameraController.translationFactor = translationFactor
+    @objc dynamic public var translationFactor: Double {
+        get {
+            return cameraController.translationFactor
+        }
+        set {
+            cameraController.translationFactor = newValue
         }
     }
     
@@ -82,7 +85,7 @@ public class ArcGISARView: UIView {
     // MARK: Private properties
     
     /// The camera controller used to control the Scene.
-    private let cameraController = AGSTransformationMatrixCameraController()
+    @objc private let cameraController = AGSTransformationMatrixCameraController()
     
     /// Initial location from location data source.
     private var initialLocation: AGSPoint?
@@ -98,6 +101,9 @@ public class ArcGISARView: UIView {
         return ARWorldTrackingConfiguration.isSupported
     }()
 
+    /// The last portrait or landscape orientation value.
+    private var lastGoodDeviceOrientation = UIDeviceOrientation.portrait
+    
     // MARK: Initializers
     
     public override init(frame: CGRect) {
@@ -161,6 +167,21 @@ public class ArcGISARView: UIView {
         sceneView.isManualRendering = isUsingARKit
     }
     
+    /// Implementing this method will allow the computed `translationFactor` property to generate KVO events when the `cameraController.translationFactor` value changes.
+    ///
+    /// - Parameter key: The key we want to observe.
+    /// - Returns: A set of key paths for properties whose values affect the value of the specified key.
+    public override class func keyPathsForValuesAffectingValue(forKey key: String) -> Set<String>
+    {
+        var set = super.keyPathsForValuesAffectingValue(forKey: key)
+        if key == "translationFactor" {
+            // Get the key paths for super and append our key path to it.
+            set = set.union(Set(["cameraController.translationFactor"]))
+        }
+        
+        return set
+    }
+
     // MARK: Public
     
     /// Determines the map point for the given screen point.
@@ -185,15 +206,6 @@ public class ArcGISARView: UIView {
         startTracking()
     }
     
-    /// Sets the initial transformation used to offset the originCamera.
-    ///
-    /// - Parameter initialTransformation: The initial transformation for originCamera offset.
-    /// - Returns: Whether setting the `initialTransformation` succeeded or failed.
-    @discardableResult public func setInitialTransformation(_ initialTransformation: AGSTransformationMatrix) -> Bool {
-        self.initialTransformation = initialTransformation
-        return true
-    }
-    
     /// Sets the initial transformation used to offset the originCamera.  The initial transformation is based on an AR point determined via existing plane hit detection from `screenPoint`.  If an AR point cannot be determined, this method will return `false`.
     ///
     /// - Parameter screenPoint: The screen point to determine the `initialTransformation` from.
@@ -209,6 +221,8 @@ public class ArcGISARView: UIView {
     }
     
     /// Starts device tracking.
+    ///
+    /// - Parameter completion: The completion handler called when start tracking completes.  If it tracking starts successfully, the `error` property will be nil; if tracking fails to start, the error will be non-nil and contain the reason for failure.
     public func startTracking(_ completion: ((_ error: Error?) -> Void)? = nil) {
         // We have a location data source that needs to be started.
         if let locationDataSource = self.locationDataSource {
@@ -386,13 +400,22 @@ extension ArcGISARView: SCNSceneRendererDelegate {
         if let camera = arSCNView.session.currentFrame?.camera {
             let intrinsics = camera.intrinsics
             let imageResolution = camera.imageResolution
+            
+            // Get the device orientation, but don't allow non-landscape/portrait values.
+            var deviceOrientation = UIDevice.current.orientation
+            if deviceOrientation.isValidInterfaceOrientation {
+                lastGoodDeviceOrientation = deviceOrientation
+            }
+            else {
+                deviceOrientation = lastGoodDeviceOrientation
+            }
             sceneView.setFieldOfViewFromLensIntrinsicsWithXFocalLength(intrinsics[0][0],
                                                                        yFocalLength: intrinsics[1][1],
                                                                        xPrincipal: intrinsics[2][0],
                                                                        yPrincipal: intrinsics[2][1],
                                                                        xImageSize: Float(imageResolution.width),
                                                                        yImageSize: Float(imageResolution.height),
-                                                                       deviceOrientation: UIDevice.current.orientation)
+                                                                       deviceOrientation: deviceOrientation)
         }
 
         // Render the Scene with the new transformation.
