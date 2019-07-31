@@ -402,12 +402,9 @@ extension ArcGISARView: SCNSceneRendererDelegate {
             let imageResolution = camera.imageResolution
             
             // Get the device orientation, but don't allow non-landscape/portrait values.
-            var deviceOrientation = UIDevice.current.orientation
+            let deviceOrientation = UIDevice.current.orientation
             if deviceOrientation.isValidInterfaceOrientation {
                 lastGoodDeviceOrientation = deviceOrientation
-            }
-            else {
-                deviceOrientation = lastGoodDeviceOrientation
             }
             sceneView.setFieldOfViewFromLensIntrinsicsWithXFocalLength(intrinsics[0][0],
                                                                        yFocalLength: intrinsics[1][1],
@@ -415,7 +412,7 @@ extension ArcGISARView: SCNSceneRendererDelegate {
                                                                        yPrincipal: intrinsics[2][1],
                                                                        xImageSize: Float(imageResolution.width),
                                                                        yImageSize: Float(imageResolution.height),
-                                                                       deviceOrientation: deviceOrientation)
+                                                                       deviceOrientation: lastGoodDeviceOrientation)
         }
 
         // Render the Scene with the new transformation.
