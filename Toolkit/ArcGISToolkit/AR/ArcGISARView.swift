@@ -176,7 +176,7 @@ public class ArcGISARView: UIView {
         var set = super.keyPathsForValuesAffectingValue(forKey: key)
         if key == "translationFactor" {
             // Get the key paths for super and append our key path to it.
-            set = set.union(Set(["cameraController.translationFactor"]))
+            set.insert(#keyPath(cameraController.translationFactor))
         }
         
         return set
