@@ -174,7 +174,7 @@ public class ArcGISARView: UIView {
     public override class func keyPathsForValuesAffectingValue(forKey key: String) -> Set<String>
     {
         var set = super.keyPathsForValuesAffectingValue(forKey: key)
-        if key == "translationFactor" {
+        if key == #keyPath(translationFactor) {
             // Get the key paths for super and append our key path to it.
             set.insert(#keyPath(cameraController.translationFactor))
         }
