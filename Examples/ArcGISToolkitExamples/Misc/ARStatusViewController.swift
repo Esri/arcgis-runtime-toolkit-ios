@@ -33,6 +33,7 @@ extension ARCamera.TrackingState {
     }
 }
 
+/// A view controller for display AR-related status information.
 class ARStatusViewController: UITableViewController {
 
     @IBOutlet var trackingStateLabel: UILabel!
