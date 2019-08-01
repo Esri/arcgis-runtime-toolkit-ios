@@ -85,7 +85,7 @@ class ARExample: UIViewController {
             ])
         
         // Create a toolbar and add it to the arView.
-        let toolbar = UIToolbar(frame: .zero)
+        let toolbar = UIToolbar()
         arView.addSubview(toolbar)
         toolbar.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
