@@ -27,7 +27,7 @@ class ARExample: UIViewController {
     private var currentSceneInfo: (sceneFunction: sceneInitFunction, label: String)? {
         didSet {
             guard let label = currentSceneInfo?.label else { return }
-            statusViewController?.currentScene = label
+            statusViewController.currentScene = label
         }
     }
     
@@ -38,10 +38,8 @@ class ARExample: UIViewController {
     private var didHitTest: Bool = false
 
     // View controller displaying current status of `ARExample`.
-    private let statusViewController: ARStatusViewController? = {
-        let storyBoard = UIStoryboard(name: "ARStatusViewController", bundle: nil)
-        let vc = storyBoard.instantiateInitialViewController() as? ARStatusViewController
-        return vc
+    private let statusViewController: ARStatusTableViewController = {
+        return ARStatusTableViewController(nibName: "ARStatusTableViewController", bundle: nil)
     }()
     
     /// Used when calculating framerate.
@@ -50,10 +48,10 @@ class ARExample: UIViewController {
     /// Overlay used to display user-placed graphics.
     private let graphicsOverlay: AGSGraphicsOverlay = {
         let overlay = AGSGraphicsOverlay()
-        let properties = AGSLayerSceneProperties(surfacePlacement: .relative)
+        overlay.sceneProperties = AGSLayerSceneProperties(surfacePlacement: .relative)
         return overlay
     }()
-    
+        
     /// The observer for the `SceneView`'s `translationFactor` property
     private var translationFactorObservation: NSKeyValueObservation?
 
@@ -71,7 +69,7 @@ class ARExample: UIViewController {
         
         // Observe the `cameraController.translationFactor` property and update status when it changes.
         translationFactorObservation = arView.observe(\ArcGISARView.translationFactor, options: [.initial, .new]){ [weak self] arView, change in
-            self?.statusViewController?.translationFactor = arView.translationFactor
+            self?.statusViewController.translationFactor = arView.translationFactor
         }
         
         // Add arView to the view and setup the constraints.
@@ -106,22 +104,17 @@ class ARExample: UIViewController {
                           statusItem], animated: false)
         
         // Add the status view and setup constraints.
-        if let controller = statusViewController {
-            view.addSubview(controller.view)
-            controller.view.translatesAutoresizingMaskIntoConstraints = false
-            controller.preferredContentSize = {
-                let height: CGFloat = CGFloat(controller.tableView.numberOfRows(inSection: 0)) * controller.tableView.rowHeight
-                return CGSize(width: 350, height: height)
-            }()
-            NSLayoutConstraint.activate([
-                controller.view.heightAnchor.constraint(equalToConstant: 175),
-                controller.view.widthAnchor.constraint(equalToConstant: 350),
-                controller.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
-                controller.view.bottomAnchor.constraint(equalTo: toolbar.topAnchor, constant: -8)
-                ])
-            
-            controller.view.alpha = 0.0
-        }
+        addChild(statusViewController)
+        view.addSubview(statusViewController.view)
+        statusViewController.view.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            statusViewController.view.heightAnchor.constraint(equalToConstant: statusViewController.height()),
+            statusViewController.view.widthAnchor.constraint(equalToConstant: 350),
+            statusViewController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
+            statusViewController.view.bottomAnchor.constraint(equalTo: toolbar.topAnchor, constant: -8)
+            ])
+        
+        statusViewController.view.alpha = 0.0
 
         // Set up the `sceneInfo` array with our scene init functions and labels.
         sceneInfo.append(contentsOf: [(sceneFunction: streetsScene, label: "Streets - Full Scale"),
@@ -139,7 +132,7 @@ class ARExample: UIViewController {
         super.viewDidAppear(animated)
         arView.startTracking { [weak self] (error) in
             if let error = error {
-                self?.statusViewController?.errorMessage = error.localizedDescription
+                self?.statusViewController.errorMessage = error.localizedDescription
             }
         }
     }
@@ -153,51 +146,33 @@ class ARExample: UIViewController {
     ///
     /// - Parameter sender: The bar button item tapped on.
     @objc func changeScene(_ sender: UIBarButtonItem){
-        guard let label = currentSceneInfo?.label,
-            // Get the index of the scene currently shown in the sceneView.
-            let selectedIndex = sceneInfo.firstIndex(where: { $0.label == label }) else {
-                return
-        }
-        
-        // Create the array of labels for the options table view controller.
-        let sceneLabels = sceneInfo.map { $0.label }
-        
-        // A view controller allowing the user to select the scene to show.
-        // Note: the `OptionsTableViewController` is copied from the "ArcGIS Runtime SDK for iOS Samples" code, found here:  https://github.com/Esri/arcgis-runtime-samples-ios
-        let controller = OptionsTableViewController(labels: sceneLabels, selectedIndex: selectedIndex) { [weak self] (newIndex) in
-            if let self = self {
-                // Dismiss the popover.
-                self.dismiss(animated: true, completion: nil)
-                
+        // Display an alert controller displaying the scenes to choose from.
+        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertController.Style.actionSheet)
+        alertController.popoverPresentationController?.barButtonItem = sender
+        sceneInfo.forEach { (sceneFunction, label) in
+            let action = UIAlertAction(title: label, style: .default, handler: { [weak self] (action) in
                 // Set currentSceneInfo to the selected scene.
-                self.currentSceneInfo = self.sceneInfo[newIndex]
+                self?.currentSceneInfo = (sceneFunction, label)
                 
                 // Stop tracking, update the scene with the selected Scene and reset tracking.
-                self.arView.stopTracking()
-                self.arView.sceneView.scene = self.sceneInfo[newIndex].sceneFunction()
-                self.arView.resetTracking()
+                self?.arView.stopTracking()
+                self?.arView.sceneView.scene = sceneFunction()
+                self?.arView.resetTracking()
                 
                 // Reset didHitTest variable
-                self.didHitTest = false
-            }
+                self?.didHitTest = false
+            })
+            // Display current scene as disabled.
+            action.isEnabled = !(label == currentSceneInfo?.label)
+            alertController.addAction(action)
         }
-        
-        // Configure the options controller as a popover.
-        controller.modalPresentationStyle = .popover
-        controller.presentationController?.delegate = self
-        controller.preferredContentSize = CGSize(width: 300, height: 300)
-        controller.popoverPresentationController?.barButtonItem = sender
-        controller.popoverPresentationController?.passthroughViews?.append(arView)
-        
-        // Show the popover.
-        present(controller, animated: true)
+        present(alertController, animated: true)
     }
     
     /// Dislays the status view controller
     @objc func showStatus(_ sender: UIBarButtonItem){
-        guard let controller = statusViewController else { return }
-        UIView.animate(withDuration: 0.25) {
-            controller.view.alpha = controller.view.alpha == 1.0 ? 0.0 : 1.0
+        UIView.animate(withDuration: 0.25) { [weak self] in
+            self?.statusViewController.view.alpha = self?.statusViewController.view.alpha == 1.0 ? 0.0 : 1.0
         }
     }
 }
@@ -244,7 +219,7 @@ extension ARExample: ARSCNViewDelegate {
         let errorMessage = messages.compactMap({ $0 }).joined(separator: "\n")
         
         // Set the error message on the status vc.
-        statusViewController?.errorMessage = errorMessage
+        statusViewController.errorMessage = errorMessage
         
         DispatchQueue.main.async { [weak self] in
             // Present an alert describing the error.
@@ -260,13 +235,13 @@ extension ARExample: ARSCNViewDelegate {
     
     func session(_ session: ARSession, cameraDidChangeTrackingState camera: ARCamera) {
         // Set the tracking state on the status vc.
-        statusViewController?.trackingState = camera.trackingState
+        statusViewController.trackingState = camera.trackingState
     }
     
     func renderer(_ renderer: SCNSceneRenderer, willRenderScene scene: SCNScene, atTime time: TimeInterval) {
         // Calculate frame rate and set on the statuc vc.
         let frametime = time - lastUpdateTime
-        statusViewController?.frameRate = Int((1.0 / frametime).rounded())
+        statusViewController.frameRate = Int((1.0 / frametime).rounded())
         lastUpdateTime = time
     }
 }
@@ -337,7 +312,7 @@ extension ARExample {
         
         layer.load { [weak self] (error) in
             if let error = error {
-                self?.statusViewController?.errorMessage = error.localizedDescription
+                self?.statusViewController.errorMessage = error.localizedDescription
                 return
             }
 
@@ -368,7 +343,7 @@ extension ARExample {
         scene.operationalLayers.add(layer)
         scene.load { [weak self, weak scene] (error) in
             if let error = error {
-                self?.statusViewController?.errorMessage = error.localizedDescription
+                self?.statusViewController.errorMessage = error.localizedDescription
                 return
             }
             
@@ -379,14 +354,14 @@ extension ARExample {
             
             scene?.baseSurface?.elevationSources.first?.load { (error) in
                 if let error = error {
-                    self?.statusViewController?.errorMessage = error.localizedDescription
+                    self?.statusViewController.errorMessage = error.localizedDescription
                     return
                 }
                 
                 // Find the elevation of the layer at the center point.
                 scene?.baseSurface?.elevation(for: center, completion: { (elevation, error) in
                     if let error = error {
-                        self?.statusViewController?.errorMessage = error.localizedDescription
+                        self?.statusViewController.errorMessage = error.localizedDescription
                         return
                     }
                     
@@ -416,7 +391,7 @@ extension ARExample {
         scene.operationalLayers.add(layer)
         scene.load { [weak self, weak scene] (error) in
             if let error = error {
-                self?.statusViewController?.errorMessage = error.localizedDescription
+                self?.statusViewController.errorMessage = error.localizedDescription
                 return
             }
             
@@ -427,14 +402,14 @@ extension ARExample {
             
             scene?.baseSurface?.elevationSources.first?.load { (error) in
                 if let error = error {
-                    self?.statusViewController?.errorMessage = error.localizedDescription
+                    self?.statusViewController.errorMessage = error.localizedDescription
                     return
                 }
                 
                 // Find the elevation of the layer at the center point.
                 scene?.baseSurface?.elevation(for: center, completion: { (elevation, error) in
                     if let error = error {
-                        self?.statusViewController?.errorMessage = error.localizedDescription
+                        self?.statusViewController.errorMessage = error.localizedDescription
                         return
                     }
                     
