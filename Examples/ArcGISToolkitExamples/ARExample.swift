@@ -27,7 +27,7 @@ class ARExample: UIViewController {
     private var currentSceneInfo: (sceneFunction: sceneInitFunction, label: String)? {
         didSet {
             guard let label = currentSceneInfo?.label else { return }
-            statusViewController.currentScene = label
+            statusViewController?.currentScene = label
         }
     }
     
@@ -38,7 +38,11 @@ class ARExample: UIViewController {
     private var didHitTest: Bool = false
 
     // View controller displaying current status of `ARExample`.
-    private let statusViewController: ARStatusTableViewController = ARStatusTableViewController()
+    private let statusViewController: ARStatusViewController? = {
+        let storyBoard = UIStoryboard(name: "ARStatusViewController", bundle: nil)
+        let vc = storyBoard.instantiateInitialViewController() as? ARStatusViewController
+        return vc
+    }()
     
     /// Used when calculating framerate.
     private var lastUpdateTime: TimeInterval = 0
@@ -67,7 +71,7 @@ class ARExample: UIViewController {
         
         // Observe the `cameraController.translationFactor` property and update status when it changes.
         translationFactorObservation = arView.observe(\ArcGISARView.translationFactor, options: [.initial, .new]){ [weak self] arView, change in
-            self?.statusViewController.translationFactor = arView.translationFactor
+            self?.statusViewController?.translationFactor = arView.translationFactor
         }
         
         // Add arView to the view and setup the constraints.
@@ -81,7 +85,7 @@ class ARExample: UIViewController {
             ])
         
         // Create a toolbar and add it to the arView.
-        let toolbar = UIToolbar()
+        let toolbar = UIToolbar(frame: .zero)
         arView.addSubview(toolbar)
         toolbar.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -102,19 +106,22 @@ class ARExample: UIViewController {
                           statusItem], animated: false)
         
         // Add the status view and setup constraints.
-        addChild(statusViewController)
-        view.addSubview(statusViewController.view)
-        statusViewController.didMove(toParent: self)
-        statusViewController.view.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            statusViewController.view.heightAnchor.constraint(equalToConstant: statusViewController.height()),
-            statusViewController.view.widthAnchor.constraint(equalToConstant: 350),
-            statusViewController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
-            statusViewController.view.bottomAnchor.constraint(equalTo: toolbar.topAnchor, constant: -8)
-            ])
         
-        statusViewController.view.alpha = 0.0
+        if let statusVC = statusViewController {
+            addChild(statusVC)
+            view.addSubview(statusVC.view)
+            statusVC.didMove(toParent: self)
+            statusVC.view.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                statusVC.view.heightAnchor.constraint(equalToConstant: 110),
+                statusVC.view.widthAnchor.constraint(equalToConstant: 350),
+                statusVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
+                statusVC.view.bottomAnchor.constraint(equalTo: toolbar.topAnchor, constant: -8)
+                ])
 
+            statusVC.view.alpha = 0.0
+        }
+        
         // Set up the `sceneInfo` array with our scene init functions and labels.
         sceneInfo.append(contentsOf: [(sceneFunction: streetsScene, label: "Streets - Full Scale"),
                                       (sceneFunction: pointCloudScene, label: "Point Cloud - Tabletop"),
@@ -131,7 +138,7 @@ class ARExample: UIViewController {
         super.viewDidAppear(animated)
         arView.startTracking { [weak self] (error) in
             if let error = error {
-                self?.statusViewController.errorMessage = error.localizedDescription
+                self?.statusViewController?.errorMessage = error.localizedDescription
             }
         }
     }
@@ -171,7 +178,7 @@ class ARExample: UIViewController {
     /// Dislays the status view controller
     @objc func showStatus(_ sender: UIBarButtonItem){
         UIView.animate(withDuration: 0.25) { [weak self] in
-            self?.statusViewController.view.alpha = self?.statusViewController.view.alpha == 1.0 ? 0.0 : 1.0
+            self?.statusViewController?.view.alpha = self?.statusViewController?.view.alpha == 1.0 ? 0.0 : 1.0
         }
     }
 }
@@ -218,7 +225,7 @@ extension ARExample: ARSCNViewDelegate {
         let errorMessage = messages.compactMap({ $0 }).joined(separator: "\n")
         
         // Set the error message on the status vc.
-        statusViewController.errorMessage = errorMessage
+        statusViewController?.errorMessage = errorMessage
         
         DispatchQueue.main.async { [weak self] in
             // Present an alert describing the error.
@@ -234,13 +241,13 @@ extension ARExample: ARSCNViewDelegate {
     
     func session(_ session: ARSession, cameraDidChangeTrackingState camera: ARCamera) {
         // Set the tracking state on the status vc.
-        statusViewController.trackingState = camera.trackingState
+        statusViewController?.trackingState = camera.trackingState
     }
     
     func renderer(_ renderer: SCNSceneRenderer, willRenderScene scene: SCNScene, atTime time: TimeInterval) {
         // Calculate frame rate and set on the statuc vc.
         let frametime = time - lastUpdateTime
-        statusViewController.frameRate = Int((1.0 / frametime).rounded())
+        statusViewController?.frameRate = Int((1.0 / frametime).rounded())
         lastUpdateTime = time
     }
 }
@@ -311,7 +318,7 @@ extension ARExample {
         
         layer.load { [weak self] (error) in
             if let error = error {
-                self?.statusViewController.errorMessage = error.localizedDescription
+                self?.statusViewController?.errorMessage = error.localizedDescription
                 return
             }
 
@@ -342,7 +349,7 @@ extension ARExample {
         scene.operationalLayers.add(layer)
         scene.load { [weak self, weak scene] (error) in
             if let error = error {
-                self?.statusViewController.errorMessage = error.localizedDescription
+                self?.statusViewController?.errorMessage = error.localizedDescription
                 return
             }
             
@@ -353,14 +360,14 @@ extension ARExample {
             
             scene?.baseSurface?.elevationSources.first?.load { (error) in
                 if let error = error {
-                    self?.statusViewController.errorMessage = error.localizedDescription
+                    self?.statusViewController?.errorMessage = error.localizedDescription
                     return
                 }
                 
                 // Find the elevation of the layer at the center point.
                 scene?.baseSurface?.elevation(for: center, completion: { (elevation, error) in
                     if let error = error {
-                        self?.statusViewController.errorMessage = error.localizedDescription
+                        self?.statusViewController?.errorMessage = error.localizedDescription
                         return
                     }
                     
@@ -390,7 +397,7 @@ extension ARExample {
         scene.operationalLayers.add(layer)
         scene.load { [weak self, weak scene] (error) in
             if let error = error {
-                self?.statusViewController.errorMessage = error.localizedDescription
+                self?.statusViewController?.errorMessage = error.localizedDescription
                 return
             }
             
@@ -401,14 +408,14 @@ extension ARExample {
             
             scene?.baseSurface?.elevationSources.first?.load { (error) in
                 if let error = error {
-                    self?.statusViewController.errorMessage = error.localizedDescription
+                    self?.statusViewController?.errorMessage = error.localizedDescription
                     return
                 }
                 
                 // Find the elevation of the layer at the center point.
                 scene?.baseSurface?.elevation(for: center, completion: { (elevation, error) in
                     if let error = error {
-                        self?.statusViewController.errorMessage = error.localizedDescription
+                        self?.statusViewController?.errorMessage = error.localizedDescription
                         return
                     }
                     

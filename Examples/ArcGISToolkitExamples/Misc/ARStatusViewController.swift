@@ -34,13 +34,21 @@ extension ARCamera.TrackingState {
 }
 
 /// A view controller for display AR-related status information.
-class ARStatusTableViewController: UITableViewController {
+class ARStatusViewController: UITableViewController {
+
+    @IBOutlet var trackingStateLabel: UILabel!
+    @IBOutlet var frameRateLabel: UILabel!
+    @IBOutlet var errorDescriptionLabel: UILabel!
+    @IBOutlet var sceneLabel: UILabel!
+    @IBOutlet var translationFactorLabel: UILabel!
     
     /// The `ARKit` camera tracking state.
     public var trackingState: ARCamera.TrackingState = .notAvailable {
         didSet {
+            guard trackingStateLabel != nil else { return }
             DispatchQueue.main.async{ [weak self] in
-                self?.tableView.reloadData()
+                guard let self = self else { return }
+                self.trackingStateLabel.text = self.trackingState.description
             }
         }
     }
@@ -48,17 +56,20 @@ class ARStatusTableViewController: UITableViewController {
     /// The calculated frame rate of the `SceneView` and `ARKit` display.
     public var frameRate: Int = 0 {
         didSet {
+            guard frameRateLabel != nil else { return }
             DispatchQueue.main.async{ [weak self] in
-                self?.tableView.reloadData()
+                guard let self = self else { return }
+                self.frameRateLabel.text = "\(self.frameRate)"
             }
         }
     }
-    
+
     /// The current error message.
     public var errorMessage: String = "None" {
         didSet {
             DispatchQueue.main.async{ [weak self] in
-                self?.tableView.reloadData()
+                guard let self = self else { return }
+                self.errorDescriptionLabel.text = self.errorMessage
             }
         }
     }
@@ -67,80 +78,36 @@ class ARStatusTableViewController: UITableViewController {
     public var currentScene: String = "None" {
         didSet {
             DispatchQueue.main.async{ [weak self] in
-                self?.tableView.reloadData()
+                guard let self = self else { return }
+                self.sceneLabel.text = self.currentScene
             }
         }
     }
-    
+
     /// The translation factor applied to the current scene.
     public var translationFactor: Double = 1.0 {
         didSet {
             DispatchQueue.main.async{ [weak self] in
-                self?.tableView.reloadData()
+                guard let self = self else { return }
+                self.translationFactorLabel.text = String(format: "%.2f", self.translationFactor)
             }
         }
     }
-    
-    /// The labels for each status item.
-    private let cellLabels = ["Tracking State", "Frame Rate", "Error", "Scene", "Translation Factor"]
-    
-    /// The height of our rows.
-    private let rowHeight: CGFloat = 24.0
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // Set the rowHeight of our table view.
-        tableView.rowHeight = rowHeight
         
         // Add a blur effect behind the table view.
         tableView.backgroundView = UIVisualEffectView(effect: UIBlurEffect(style: .regular))
     }
-    
-    /// Calculates and returns the height of the table view based on the row height and number of rows.
-    ///
-    /// - Returns: The calculated height of the table view.
-    public func height() -> CGFloat {
-        return CGFloat(cellLabels.count) * rowHeight
-    }
-    
+
     // MARK: - Table view data source
-    
+
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
-    
+
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return (section == 0) ? cellLabels.count : 0
-    }
-    
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        // Don't reuse cells, as our table is essentially static.
-        let statusCell = UITableViewCell(style: .value1, reuseIdentifier: nil)
-        statusCell.backgroundColor = .clear
-        statusCell.textLabel?.font = UIFont.systemFont(ofSize: 12.0)
-        statusCell.detailTextLabel?.font = UIFont.boldSystemFont(ofSize: 12.0)
-        statusCell.detailTextLabel?.textColor = .black
-        
-        statusCell.textLabel?.text = cellLabels[indexPath.row]
-        
-        var detailString = ""
-        switch indexPath.row {
-        case 0:
-            detailString = trackingState.description
-        case 1:
-            detailString = "\(self.frameRate)"
-        case 2:
-            detailString = errorMessage
-        case 3:
-            detailString = currentScene
-        case 4:
-            detailString = String(format: "%.2f", self.translationFactor)
-        default:
-            detailString = ""
-        }
-        statusCell.detailTextLabel?.text = detailString
-        
-        return statusCell
+        return 5
     }
 }
