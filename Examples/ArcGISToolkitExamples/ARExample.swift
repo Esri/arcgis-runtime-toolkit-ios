@@ -38,9 +38,7 @@ class ARExample: UIViewController {
     private var didHitTest: Bool = false
 
     // View controller displaying current status of `ARExample`.
-    private let statusViewController: ARStatusTableViewController = {
-        return ARStatusTableViewController(nibName: "ARStatusTableViewController", bundle: nil)
-    }()
+    private let statusViewController: ARStatusTableViewController = ARStatusTableViewController()
     
     /// Used when calculating framerate.
     private var lastUpdateTime: TimeInterval = 0
@@ -106,6 +104,7 @@ class ARExample: UIViewController {
         // Add the status view and setup constraints.
         addChild(statusViewController)
         view.addSubview(statusViewController.view)
+        statusViewController.didMove(toParent: self)
         statusViewController.view.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             statusViewController.view.heightAnchor.constraint(equalToConstant: statusViewController.height()),
