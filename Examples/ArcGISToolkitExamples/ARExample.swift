@@ -115,7 +115,7 @@ class ARExample: UIViewController {
             NSLayoutConstraint.activate([
                 statusVC.view.heightAnchor.constraint(equalToConstant: 110),
                 statusVC.view.widthAnchor.constraint(equalToConstant: 350),
-                statusVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
+                statusVC.view.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -8),
                 statusVC.view.bottomAnchor.constraint(equalTo: toolbar.topAnchor, constant: -8)
                 ])
 

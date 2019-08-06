@@ -67,6 +67,7 @@ class ARStatusViewController: UITableViewController {
     /// The current error message.
     public var errorMessage: String = "None" {
         didSet {
+            guard errorDescriptionLabel != nil else { return }
             DispatchQueue.main.async{ [weak self] in
                 guard let self = self else { return }
                 self.errorDescriptionLabel.text = self.errorMessage
@@ -77,6 +78,7 @@ class ARStatusViewController: UITableViewController {
     /// The label for the currently selected scene.
     public var currentScene: String = "None" {
         didSet {
+            guard sceneLabel != nil else { return }
             DispatchQueue.main.async{ [weak self] in
                 guard let self = self else { return }
                 self.sceneLabel.text = self.currentScene
@@ -87,6 +89,7 @@ class ARStatusViewController: UITableViewController {
     /// The translation factor applied to the current scene.
     public var translationFactor: Double = 1.0 {
         didSet {
+            guard translationFactorLabel != nil else { return }
             DispatchQueue.main.async{ [weak self] in
                 guard let self = self else { return }
                 self.translationFactorLabel.text = String(format: "%.2f", self.translationFactor)
