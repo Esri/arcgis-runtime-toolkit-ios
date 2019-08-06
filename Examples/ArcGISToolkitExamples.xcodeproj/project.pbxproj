@@ -24,7 +24,10 @@
 		88B689D11E96EDF400B67FAB /* VCListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689C71E96EDF400B67FAB /* VCListViewController.swift */; };
 		88DBC2A11FE83D6000255921 /* JobManagerExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88DBC2A01FE83D6000255921 /* JobManagerExample.swift */; };
 		E447A12B2267BB9500578C0B /* ARExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = E447A12A2267BB9500578C0B /* ARExample.swift */; };
+		E464AA9122E62DC600969DBA /* Plane.swift in Sources */ = {isa = PBXBuildFile; fileRef = E464AA9022E62DC600969DBA /* Plane.swift */; };
 		E46893271FEDAE29008ADA79 /* CompassExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46893261FEDAE29008ADA79 /* CompassExample.swift */; };
+		E47B16FA22F8DECC000C9C8B /* ARStatusViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47B16F822F8DECC000C9C8B /* ARStatusViewController.swift */; };
+		E47B16FB22F8DECC000C9C8B /* ARStatusViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E47B16F922F8DECC000C9C8B /* ARStatusViewController.storyboard */; };
 		E48405751E9BE7E600927208 /* LegendExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48405741E9BE7E600927208 /* LegendExample.swift */; };
 /* End PBXBuildFile section */
 
@@ -85,7 +88,10 @@
 		88B689C71E96EDF400B67FAB /* VCListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VCListViewController.swift; sourceTree = "<group>"; };
 		88DBC2A01FE83D6000255921 /* JobManagerExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobManagerExample.swift; sourceTree = "<group>"; };
 		E447A12A2267BB9500578C0B /* ARExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARExample.swift; sourceTree = "<group>"; };
+		E464AA9022E62DC600969DBA /* Plane.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Plane.swift; sourceTree = "<group>"; };
 		E46893261FEDAE29008ADA79 /* CompassExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassExample.swift; sourceTree = "<group>"; };
+		E47B16F822F8DECC000C9C8B /* ARStatusViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ARStatusViewController.swift; sourceTree = "<group>"; };
+		E47B16F922F8DECC000C9C8B /* ARStatusViewController.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ARStatusViewController.storyboard; sourceTree = "<group>"; };
 		E48405741E9BE7E600927208 /* LegendExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegendExample.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -123,6 +129,7 @@
 		8839043D1DF6022A001F3188 /* ArcGISToolkitExamples */ = {
 			isa = PBXGroup;
 			children = (
+				E464AA8F22E62D5B00969DBA /* Misc */,
 				883904421DF6022A001F3188 /* Main.storyboard */,
 				883904451DF6022A001F3188 /* Assets.xcassets */,
 				883904471DF6022A001F3188 /* LaunchScreen.storyboard */,
@@ -157,6 +164,16 @@
 				E447A12A2267BB9500578C0B /* ARExample.swift */,
 			);
 			name = Examples;
+			sourceTree = "<group>";
+		};
+		E464AA8F22E62D5B00969DBA /* Misc */ = {
+			isa = PBXGroup;
+			children = (
+				E47B16F922F8DECC000C9C8B /* ARStatusViewController.storyboard */,
+				E47B16F822F8DECC000C9C8B /* ARStatusViewController.swift */,
+				E464AA9022E62DC600969DBA /* Plane.swift */,
+			);
+			path = Misc;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -246,6 +263,7 @@
 			files = (
 				883904491DF6022A001F3188 /* LaunchScreen.storyboard in Resources */,
 				883904461DF6022A001F3188 /* Assets.xcassets in Resources */,
+				E47B16FB22F8DECC000C9C8B /* ARStatusViewController.storyboard in Resources */,
 				883904441DF6022A001F3188 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -276,9 +294,11 @@
 				883EA74B20741A56006D6F72 /* PopupExample.swift in Sources */,
 				88B689C81E96EDF400B67FAB /* AppDelegate.swift in Sources */,
 				2140781E209B629000FBFDCC /* TimeSliderExample.swift in Sources */,
+				E464AA9122E62DC600969DBA /* Plane.swift in Sources */,
 				88B689CB1E96EDF400B67FAB /* MeasureExample.swift in Sources */,
 				88DBC2A11FE83D6000255921 /* JobManagerExample.swift in Sources */,
 				88B689D11E96EDF400B67FAB /* VCListViewController.swift in Sources */,
+				E47B16FA22F8DECC000C9C8B /* ARStatusViewController.swift in Sources */,
 				8800656E2228577A00F76945 /* TemplatePickerExample.swift in Sources */,
 				88B689CE1E96EDF400B67FAB /* ScalebarExample.swift in Sources */,
 				88B689C91E96EDF400B67FAB /* ExamplesViewController.swift in Sources */,
