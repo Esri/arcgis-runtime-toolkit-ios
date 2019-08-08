@@ -56,6 +56,8 @@ class ARExample: UIViewController {
         
     /// The observer for the `SceneView`'s `translationFactor` property
     private var translationFactorObservation: NSKeyValueObservation?
+    
+    private var featureTable: AGSServiceFeatureTable?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -127,6 +129,8 @@ class ARExample: UIViewController {
                                       (sceneFunction: pointCloudScene, label: "Point Cloud - Tabletop"),
                                       (sceneFunction: yosemiteScene, label: "Yosemite - Tabletop"),
                                       (sceneFunction: borderScene, label: "US - Mexico Border - Tabletop"),
+                                      (sceneFunction: redlandsWaterScene, label: "Redlands Water - OriginCamera - Full Scale"),
+                                      (sceneFunction: redlandsWaterGPSScene, label: "Redlands Water - GPS - Full Scale"),
                                       (sceneFunction: emptyScene, label: "Empty - Full Scale")])
         
         // Use the first sceneInfo to create and set the scene.
@@ -256,7 +260,29 @@ extension ARExample: AGSGeoViewTouchDelegate {
     public func geoView(_ geoView: AGSGeoView, didTapAtScreenPoint screenPoint: CGPoint, mapPoint: AGSPoint) {
         guard !didHitTest else { return }
         
-        if let _ = arView.locationDataSource {
+        if let sceneInfo = currentSceneInfo, sceneInfo.label.contains("Redlands Water") {
+            // Tap on Scene to add a hydrant.
+            guard let ft = featureTable else { print("no featureTable"); return }
+            guard let mapPoint = arView.arScreenToLocation(screenPoint: screenPoint) else { statusViewController?.errorMessage = "No hit test location found."; return}
+            
+            statusViewController?.errorMessage = "Found hit test location"
+            
+            let zLessGeometry = AGSPoint(x: mapPoint.x, y: mapPoint.y, spatialReference: mapPoint.spatialReference)
+            let feature = ft.createFeature(attributes: [:], geometry: zLessGeometry)
+            feature.attributes["Name"] = "Created with ArcGISRuntimeToolkit for iOS"
+            // Add the feature to the feature table.
+            print("adding feature")
+            ft.add(feature) { [weak self] (error: Error?) in
+                if let error = error {
+                    self?.statusViewController?.errorMessage = String("Error while adding feature: \(error.localizedDescription)")
+                } else {
+                    //applied edits on success
+                    self?.statusViewController?.errorMessage = "Feature added successfully"
+                    self?.applyEdits()
+                }
+            }
+
+        } else if let _ = arView.locationDataSource {
             // We have a location data source, so we're in full-scale AR mode.
             // Get the real world location for screen point from arView.
             guard let point = arView.arScreenToLocation(screenPoint: screenPoint) else { return }
@@ -269,6 +295,20 @@ extension ARExample: AGSGeoViewTouchDelegate {
             // We do not have a location data source, so we're in table-top mode.
             if arView.setInitialTransformation(using: screenPoint) {
                 didHitTest = true
+            }
+        }
+    }
+
+    func applyEdits() {
+        guard let ft = featureTable else { print("no featureTable"); return }
+        ft.applyEdits { (featureEditResults: [AGSFeatureEditResult]?, error: Error?) in
+            if let error = error {
+                print("Error while applying edits :: \(error.localizedDescription)")
+            } else {
+                if let featureEditResults = featureEditResults,
+                    featureEditResults.first?.completedWithErrors == false {
+                    print("Edits applied successfully")
+                }
             }
         }
     }
@@ -429,6 +469,58 @@ extension ARExample {
         
         // Clear the location data source, as we're setting the originCamera directly.
         arView.locationDataSource = nil
+        return scene
+    }
+    
+    /// Creates a scene displaying Redlands fire hydrants using an origin camera to determine the device location.
+    ///
+    /// - Returns: The new scene.
+    private func redlandsWaterScene() -> AGSScene {
+        
+        // Redlands fire hydrants
+        let scene = AGSScene(url: URL(string: "http://www.arcgis.com/home/webscene/viewer.html?webscene=d406d82dbc714d5da146d15b024e8d33")!)!
+        let originTransformationMatrix = AGSTransformationMatrix(quaternionX: -0.46559,
+                                                                 quaternionY: 0.86919,
+                                                                 quaternionZ: -0.0587096,
+                                                                 quaternionW: 0.155847,
+                                                                 translationX: -4.70028e+06,
+                                                                 translationY: 3.57203e+06,
+                                                                 translationZ: -2.41528e+06)
+        let originCamera = AGSCamera(transformationMatrix: originTransformationMatrix)
+        arView.originCamera = originCamera
+        
+        scene.load { [weak self] (error) in
+            print("sceneLoaded")
+            // Get FeatureLayer and table from Scene
+            guard let featureLayer = scene.operationalLayers.firstObject as? AGSFeatureLayer else { print("not a feature layer"); return }
+            self?.featureTable = featureLayer.featureTable as? AGSServiceFeatureTable
+        }
+        
+        arView.locationDataSource = nil
+        arView.translationFactor = 1
+
+        return scene
+    }
+    
+    /// Creates a scene displaying Redlands fire hydrants using the GPS to determine the device location.
+    ///
+    /// - Returns: The new scene.
+    private func redlandsWaterGPSScene() -> AGSScene {
+        
+        // Redlands fire hydrants
+        let scene = AGSScene(url: URL(string: "http://www.arcgis.com/home/webscene/viewer.html?webscene=d406d82dbc714d5da146d15b024e8d33")!)!
+        
+        scene.load { [weak self] (error) in
+            print("sceneLoaded")
+            // Get FeatureLayer and table from Scene
+            guard let featureLayer = scene.operationalLayers.firstObject as? AGSFeatureLayer else { print("not a feature layer"); return }
+            self?.featureTable = featureLayer.featureTable as? AGSServiceFeatureTable
+        }
+        
+        arView.locationDataSource = AGSCLLocationDataSource()
+        arView.originCamera = nil
+        arView.translationFactor = 1
+
         return scene
     }
 
