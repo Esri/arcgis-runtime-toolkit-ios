@@ -448,7 +448,14 @@ extension ArcGISARView: AGSLocationChangeHandlerDelegate {
     
     public func locationDataSource(_ locationDataSource: AGSLocationDataSource, locationDidChange location: AGSLocation) {
         // Location changed.
-        guard let locationPoint = location.position else { return }
+        guard var locationPoint = location.position else { return }
+        
+        // The AGSCLLocationDataSource does not include altitude information from the CLLocation when
+        // creating the `AGSLocation` geometry, so grab the altitude directly from the CLLocationManager.
+        if let clLocationDataSource = locationDataSource as? AGSCLLocationDataSource,
+            let altitude = clLocationDataSource.locationManager.location?.altitude {
+            locationPoint = AGSPoint(x: locationPoint.x, y: locationPoint.y, z: altitude, spatialReference: locationPoint.spatialReference)
+        }
         
         if initialLocation == nil {
             initialLocation = locationPoint
