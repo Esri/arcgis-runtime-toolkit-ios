@@ -18,6 +18,8 @@ import ArcGIS
 
 class ARExample: UIViewController {
     
+    var hitCount = 0
+    
     typealias sceneInitFunction = () -> AGSScene
     typealias sceneInfoType = (sceneFunction: sceneInitFunction, label: String, tableTop: Bool)
     
@@ -140,9 +142,7 @@ class ARExample: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         arView.startTracking { [weak self] (error) in
-            if let error = error {
-                self?.statusViewController?.errorMessage = error.localizedDescription
-            }
+            self?.statusViewController?.errorMessage = error?.localizedDescription ?? ""
         }
     }
     
@@ -204,7 +204,11 @@ class ARExample: UIViewController {
                     // Dim the SceneView until the user taps on a surface.
                     self?.arView.sceneView.alpha = 0.5
                 }
+                // Reset AR tracking and then start tracking.
                 self?.arView.resetTracking()
+                self?.arView.startTracking { [weak self] (error) in
+                    self?.statusViewController?.errorMessage = error?.localizedDescription ?? ""
+                }
                 
                 // Reset didHitTest variable
                 self?.didHitTest = false
@@ -304,7 +308,9 @@ extension ARExample: ARSCNViewDelegate {
             // Present an alert describing the error.
             let alertController = UIAlertController(title: "Could not start tracking.", message: errorMessage, preferredStyle: .alert)
             let restartAction = UIAlertAction(title: "Restart Tracking", style: .default) { _ in
-                self?.arView.startTracking()
+                self?.arView.startTracking { [weak self] (error) in
+                    self?.statusViewController?.errorMessage = error?.localizedDescription ?? ""
+                }
             }
             alertController.addAction(restartAction)
             

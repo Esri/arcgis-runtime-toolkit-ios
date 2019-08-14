@@ -34,7 +34,7 @@ class Plane: SCNNode {
         guard let material = node.geometry?.firstMaterial
             else { fatalError("SCNPlane always has one material") }
         
-        material.diffuse.contents = UIColor.blue
+        material.diffuse.contents = UIColor.white
 
         // Add the plane node as child node so they appear in the scene.
         addChildNode(node)

@@ -45,9 +45,6 @@ public class ArcGISARView: UIView {
             guard let newCamera = originCamera else { return }
             // Set the camera as the originCamera on the cameraController and reset tracking.
             cameraController.originCamera = newCamera
-            if isTracking {
-                resetTracking()
-            }
         }
     }
 
@@ -73,8 +70,8 @@ public class ArcGISARView: UIView {
         }() {
         didSet {
             // If we're already tracking, reset tracking to use the new configuration.
-            if isTracking {
-                resetTracking()
+            if isTracking, isUsingARKit {
+                arSCNView.session.run(arConfiguration, options: [.resetTracking])
             }
         }
     }
@@ -87,12 +84,12 @@ public class ArcGISARView: UIView {
     /// The camera controller used to control the Scene.
     @objc private let cameraController = AGSTransformationMatrixCameraController()
     
-    /// Initial location from location data source.
-    private var initialLocation: AGSPoint?
-    
     /// Used when calculating framerate.
     private var lastUpdateTime: TimeInterval = 0
     
+    /// A quaternion used to compensate for the pitch being 90 degrees on `ARKit`; used to calculate the current device transformation for each frame.
+    private let compensationQuat: simd_quatd = simd_quatd(ix: (sin(45 / (180 / .pi))), iy: 0, iz: 0, r: (cos(45 / (180 / .pi))))
+
     /// Whether `ARKit` is supported on this device.
     private let deviceSupportsARKit: Bool = {
         return ARWorldTrackingConfiguration.isSupported
@@ -100,6 +97,9 @@ public class ArcGISARView: UIView {
 
     /// The last portrait or landscape orientation value.
     private var lastGoodDeviceOrientation = UIDeviceOrientation.portrait
+    
+    /// Are we using only the first location provided by the LocationDataSource?
+    private var useLocationDataSourceOnce = false
     
     // MARK: Initializers
     
@@ -207,15 +207,18 @@ public class ArcGISARView: UIView {
         //        print("cqx: \(mapPointMatrix.quaternionX); cqy: \(mapPointMatrix.quaternionY); cqz: \(mapPointMatrix.quaternionZ); cqw: \(mapPointMatrix.quaternionW); ctx: \(mapPointMatrix.translationX); cty: \(mapPointMatrix.translationY); ctz: \(mapPointMatrix.translationZ)")
         print("\(mapPointMatrix.translationX) \(mapPointMatrix.translationY) \(mapPointMatrix.translationZ)")
         
-        // Create a camera from transformationMatrix and return it's location.
+        // Create a camera from transformationMatrix and return its location.
         return AGSCamera(transformationMatrix: mapPointMatrix).location
     }
 
-    /// Resets the device tracking, using `originCamera` if it's not nil or the device's GPS location via the location data source.
+    /// Resets the device tracking and related properties.
     public func resetTracking() {
-        initialLocation = nil
         initialTransformation = .identity
-        startTracking()
+        if isUsingARKit {
+            arSCNView.session.run(arConfiguration, options: [.resetTracking])
+        }
+        
+        cameraController.transformationMatrix = .identity
     }
     
     /// Sets the initial transformation used to offset the originCamera.  The initial transformation is based on an AR point determined via existing plane hit detection from `screenPoint`.  If an AR point cannot be determined, this method will return `false`.
@@ -235,8 +238,9 @@ public class ArcGISARView: UIView {
     /// Starts device tracking.
     ///
     /// - Parameter completion: The completion handler called when start tracking completes.  If tracking starts successfully, the `error` property will be nil; if tracking fails to start, the error will be non-nil and contain the reason for failure.
-    public func startTracking(_ completion: ((_ error: Error?) -> Void)? = nil) {
+    public func startTracking(useLocationDataSourceOnce: Bool = false, completion: ((_ error: Error?) -> Void)? = nil) {
         // We have a location data source that needs to be started.
+        self.useLocationDataSourceOnce = useLocationDataSourceOnce
         if let locationDataSource = self.locationDataSource {
             locationDataSource.start { [weak self] (error) in
                 if error == nil {
@@ -270,6 +274,7 @@ public class ArcGISARView: UIView {
                 strongSelf.arSCNView.session.run(strongSelf.arConfiguration, options: [.resetTracking])
             }
             
+            strongSelf.cameraController.transformationMatrix = .identity
             strongSelf.isTracking = true
         }
     }
@@ -471,16 +476,23 @@ extension ArcGISARView: AGSLocationChangeHandlerDelegate {
             locationPoint = AGSPoint(x: locationPoint.x, y: locationPoint.y, z: altitude, spatialReference: locationPoint.spatialReference)
         }
         
-        if initialLocation == nil {
-            initialLocation = locationPoint
+        // Always set originCamera; then reset ARKit
+        let oldCamera = cameraController.originCamera
             
             // Create a new camera based on our location and set it on the cameraController.
-            cameraController.originCamera = AGSCamera(location: locationPoint, heading: 0.0, pitch: 0.0, roll: 0.0)
+        cameraController.originCamera = AGSCamera(location: locationPoint, heading: oldCamera.heading, pitch: oldCamera.pitch, roll: oldCamera.roll)
+        
+        // If we're using ARKit, reset its tracking.
+        if isUsingARKit {
+            arSCNView.session.run(arConfiguration, options: [.resetTracking])
         }
-        else if !isUsingARKit {
-            let camera = sceneView.currentViewpointCamera().move(toLocation: locationPoint)
-            sceneView.setViewpointCamera(camera)
-//            print("location changed: \(locationPoint), accuracy: \(location.horizontalAccuracy)")
+        
+        // Reset the camera controller's transformationMatrix to its initial state, the Idenity matrix.
+        cameraController.transformationMatrix = .identity
+
+        if (useLocationDataSourceOnce) {
+            // If we are only using the intitial data source location, stop the data source.
+            locationDataSource.stop()
         }
     }
 
