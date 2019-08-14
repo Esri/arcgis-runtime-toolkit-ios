@@ -323,7 +323,7 @@ extension ARExample: ARSCNViewDelegate {
         statusViewController?.trackingState = camera.trackingState
         updateUserDirections(session.currentFrame!, trackingState: camera.trackingState)
     }
-    xxx need willrenderScene
+    
     func renderer(_ renderer: SCNSceneRenderer, didRenderScene scene: SCNScene, atTime time: TimeInterval) {
         // Calculate frame rate and set on the statuc vc.
         let frametime = time - lastUpdateTime
