@@ -97,12 +97,24 @@ class ARExample: UIViewController {
             ])
         
         // Create a toolbar button to change the current scene.
-        let sceneItem = UIBarButtonItem(title: "Change Scene", style: .plain, target: self, action: #selector(changeScene(_:)))
+        let sceneItem = UIBarButtonItem(title: "Change", style: .plain, target: self, action: #selector(changeScene(_:)))
         
         // Create a toolbar button to display the status.
         let statusItem = UIBarButtonItem(title: "Status", style: .plain, target: self, action: #selector(showStatus(_:)))
+      
+      let suf = UIBarButtonItem(title: "Surface", style: .plain, target: self, action: #selector(surface(_:)))
+      
+      let dec = UIBarButtonItem(title: "Dec", style: .plain, target: self, action: #selector(decAlt(_:)))
+      
+       let Inc = UIBarButtonItem(title: "Inc", style: .plain, target: self, action: #selector(incAlt(_:)))
 
-        toolbar.setItems([UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
+      toolbar.setItems([UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
+                        suf,
+                        UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
+                        dec,
+                        UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
+                        Inc,
+                          UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
                           sceneItem,
                           UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
                           statusItem], animated: false)
@@ -185,6 +197,48 @@ class ARExample: UIViewController {
             self?.statusViewController?.view.alpha = self?.statusViewController?.view.alpha == 1.0 ? 0.0 : 1.0
         }
     }
+  
+  @objc func surface(_ sender: UIBarButtonItem){
+    let tmcc = arView.sceneView.cameraController as! AGSTransformationMatrixCameraController
+    let camera = tmcc.originCamera
+    let point = camera.location
+    arView.sceneView.scene?.baseSurface?.elevation(for: point, completion: { (elevation, error) in
+      let sur_point = AGSPoint(x: point.x, y: point.y, z: elevation + 1.8, spatialReference: point.spatialReference)
+      let sur_cam = AGSCamera(location: sur_point, heading: camera.heading, pitch: camera.pitch, roll:camera.roll)
+      tmcc.originCamera = sur_cam
+    })
+  }
+  
+  @objc func rotLeft(_ sender: UIBarButtonItem){
+    let tmcc = arView.sceneView.cameraController as! AGSTransformationMatrixCameraController
+    let camera = tmcc.originCamera
+    tmcc.originCamera = camera.rotate(toHeading: camera.heading + 1.0, pitch: camera.pitch, roll: camera.roll)
+  }
+  
+  @objc func rotRight(_ sender: UIBarButtonItem){
+    let tmcc = arView.sceneView.cameraController as! AGSTransformationMatrixCameraController
+    let camera = tmcc.originCamera
+    tmcc.originCamera = camera.rotate(toHeading: camera.heading - 1.0, pitch: camera.pitch, roll: camera.roll)
+  }
+  
+  @objc func bigIncAlt(_ sender: UIBarButtonItem){
+    let tmcc = arView.sceneView.cameraController as! AGSTransformationMatrixCameraController
+    let camera = tmcc.originCamera
+    tmcc.originCamera = camera.elevate(withDeltaAltitude: 10.0)
+  }
+  
+  @objc func incAlt(_ sender: UIBarButtonItem){
+    let tmcc = arView.sceneView.cameraController as! AGSTransformationMatrixCameraController
+    let camera = tmcc.originCamera
+    tmcc.originCamera = camera.elevate(withDeltaAltitude: 0.1)
+  }
+  
+  @objc func decAlt(_ sender: UIBarButtonItem){
+    let tmcc = arView.sceneView.cameraController as! AGSTransformationMatrixCameraController
+    let camera = tmcc.originCamera
+    tmcc.originCamera = camera.elevate(withDeltaAltitude: -1.0)
+  }
+  
 }
 
 extension ARExample: ARSCNViewDelegate {
