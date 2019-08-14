@@ -93,9 +93,6 @@ public class ArcGISARView: UIView {
     /// Used when calculating framerate.
     private var lastUpdateTime: TimeInterval = 0
     
-    /// A quaternion used to compensate for the pitch being 90 degrees on `ARKit`; used to calculate the current device transformation for each frame.
-    private let compensationQuat: simd_quatd = simd_quatd(ix: (sin(45 / (180 / .pi))), iy: 0, iz: 0, r: (cos(45 / (180 / .pi))))
-
     /// Whether `ARKit` is supported on this device.
     private let deviceSupportsARKit: Bool = {
         return ARWorldTrackingConfiguration.isSupported
@@ -190,19 +187,34 @@ public class ArcGISARView: UIView {
     /// - Returns: The map point corresponding to screenPoint.
     public func arScreenToLocation(screenPoint: CGPoint) -> AGSPoint? {
         // Use the `internalHitTest` method to get the matrix of `screenPoint`.
-        guard let matrix = internalHitTest(screenPoint: screenPoint) else { return nil }
+        guard let localOffsetMatrix = internalHitTest(screenPoint: screenPoint) else { return nil }
 
-        // Get the TransformationMatrix from the sceneView.currentViewpointCamera and add the hit test matrix to it.
-        let currentCamera = sceneView.currentViewpointCamera()
-        let transformationMatrix = currentCamera.transformationMatrix.addTransformation(matrix)
+        print("Local offset XYZ, World origin XYZ, Combined world coordinate XYZ")
+        
+        //TODO: generalize the debug print function
+        //        print("lqx: \(localOffsetMatrix.quaternionX); lqy: \(localOffsetMatrix.quaternionY); lqz: \(localOffsetMatrix.quaternionZ); lqw: \(localOffsetMatrix.quaternionW); ltx: \(localOffsetMatrix.translationX); lty: \(localOffsetMatrix.translationY); ltz: \(localOffsetMatrix.translationZ)")
+        print("\(localOffsetMatrix.translationX) \(localOffsetMatrix.translationY) \(localOffsetMatrix.translationZ)")
+        
+        let currOriginCamera = cameraController.originCamera
+        let currOriginMatrix = currOriginCamera.transformationMatrix
+        
+        //        print("oqx: \(currOriginMatrix.quaternionX); oqy: \(currOriginMatrix.quaternionY); oqz: \(currOriginMatrix.quaternionZ); oqw: \(currOriginMatrix.quaternionW); otx: \(currOriginMatrix.translationX); oty: \(currOriginMatrix.translationY); otz: \(currOriginMatrix.translationZ)")
+        print("\(currOriginMatrix.translationX) \(currOriginMatrix.translationY) \(currOriginMatrix.translationZ)")
+        
+        //TODO: for tabletop application scale translation by TranslationFactor
+        let mapPointMatrix = currOriginMatrix.addTransformation(localOffsetMatrix)
+        
+        //        print("cqx: \(mapPointMatrix.quaternionX); cqy: \(mapPointMatrix.quaternionY); cqz: \(mapPointMatrix.quaternionZ); cqw: \(mapPointMatrix.quaternionW); ctx: \(mapPointMatrix.translationX); cty: \(mapPointMatrix.translationY); ctz: \(mapPointMatrix.translationZ)")
+        print("\(mapPointMatrix.translationX) \(mapPointMatrix.translationY) \(mapPointMatrix.translationZ)")
         
         // Create a camera from transformationMatrix and return it's location.
-        return AGSCamera(transformationMatrix: transformationMatrix).location
+        return AGSCamera(transformationMatrix: mapPointMatrix).location
     }
 
     /// Resets the device tracking, using `originCamera` if it's not nil or the device's GPS location via the location data source.
     public func resetTracking() {
         initialLocation = nil
+        initialTransformation = .identity
         startTracking()
     }
     
@@ -255,7 +267,7 @@ public class ArcGISARView: UIView {
             guard let strongSelf = self else { return }
             // Run the ARSession.
             if strongSelf.isUsingARKit {
-                strongSelf.arSCNView.session.run(strongSelf.arConfiguration, options: .resetTracking)
+                strongSelf.arSCNView.session.run(strongSelf.arConfiguration, options: [.resetTracking])
             }
             
             strongSelf.isTracking = true
@@ -289,6 +301,9 @@ public class ArcGISARView: UIView {
         guard let worldTransform = results.first?.worldTransform else { return nil }
         
         // Create our hit test matrix based on the worldTransform location.
+        // right now we ignore the orientation of the plane that was hit to find the point
+        // since we only use horizontal planes, when we will start using vertical planes
+        // we should stop suppressing the quternion rotation to a null rotation (0,0,0,1)
         let hitTestMatrix = AGSTransformationMatrix(quaternionX: 0.0,
                                                     quaternionY: 0.0,
                                                     quaternionZ: 0.0,
@@ -383,15 +398,14 @@ extension ArcGISARView: SCNSceneRendererDelegate {
         guard let transform = arSCNView.pointOfView?.transform else { return }
         let cameraTransform = simd_double4x4(transform)
         
-        // Calculate our final quaternion and create the new transformation matrix.
-        let finalQuat:simd_quatd = simd_mul(compensationQuat, simd_quatd(cameraTransform))
-        let transformationMatrix = AGSTransformationMatrix(quaternionX: finalQuat.vector.x,
-                                                           quaternionY: finalQuat.vector.y,
-                                                           quaternionZ: finalQuat.vector.z,
-                                                           quaternionW: finalQuat.vector.w,
+        let cameraQuat:simd_quatd = simd_quatd(cameraTransform)
+        let transformationMatrix = AGSTransformationMatrix(quaternionX: cameraQuat.vector.x,
+                                                           quaternionY: cameraQuat.vector.y,
+                                                           quaternionZ: cameraQuat.vector.z,
+                                                           quaternionW: cameraQuat.vector.w,
                                                            translationX: cameraTransform.columns.3.x,
-                                                           translationY: -cameraTransform.columns.3.z,
-                                                           translationZ: cameraTransform.columns.3.y)
+                                                           translationY: cameraTransform.columns.3.y,
+                                                           translationZ: cameraTransform.columns.3.z)
         
         // Set the matrix on the camera controller.
         cameraController.transformationMatrix = initialTransformation.addTransformation(transformationMatrix)
@@ -475,3 +489,4 @@ extension ArcGISARView: AGSLocationChangeHandlerDelegate {
 //        print("locationDataSource status changed: \(status.rawValue)")
     }
 }
+
