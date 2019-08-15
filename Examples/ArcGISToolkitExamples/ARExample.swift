@@ -186,9 +186,9 @@ class ARExample: UIViewController {
                 }
                 // Reset AR tracking and then start tracking.
                 self?.arView.resetTracking()
-                self?.arView.startTracking(useLocationDataSourceOnce: true, completion: { [weak self] (error) in
+                self?.arView.startTracking { [weak self] (error) in
                     self?.statusViewController?.errorMessage = error?.localizedDescription
-                })
+                }
                 
                 // Reset didPlaceScene variable
                 self?.didPlaceScene = false
