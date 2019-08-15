@@ -38,6 +38,9 @@ public class ArcGISARView: UIView {
             locationDataSource?.locationChangeHandlerDelegate = self
         }
     }
+    
+    /// The `AGSTransformationMatrixCameraController` used to control the Scene.
+    @objc public let cameraController = AGSTransformationMatrixCameraController()
 
     /// The viewpoint camera used to set the initial view of the sceneView instead of the device's GPS location via the location data source.  You can use Key-Value Observing to track changes to the origin camera.
     @objc dynamic public var originCamera: AGSCamera? {
@@ -75,21 +78,15 @@ public class ArcGISARView: UIView {
             }
         }
     }
-    
+
     /// We implement `ARSCNViewDelegate` methods, but will use `arSCNViewDelegate` to forward them to clients.
     weak public var arSCNViewDelegate: ARSCNViewDelegate?
     
     // MARK: Private properties
     
-    /// The camera controller used to control the Scene.
-    @objc private let cameraController = AGSTransformationMatrixCameraController()
-    
     /// Used when calculating framerate.
     private var lastUpdateTime: TimeInterval = 0
     
-    /// A quaternion used to compensate for the pitch being 90 degrees on `ARKit`; used to calculate the current device transformation for each frame.
-    private let compensationQuat: simd_quatd = simd_quatd(ix: (sin(45 / (180 / .pi))), iy: 0, iz: 0, r: (cos(45 / (180 / .pi))))
-
     /// Whether `ARKit` is supported on this device.
     private let deviceSupportsARKit: Bool = {
         return ARWorldTrackingConfiguration.isSupported
@@ -172,10 +169,12 @@ public class ArcGISARView: UIView {
     {
         var set = super.keyPathsForValuesAffectingValue(forKey: key)
         if key == #keyPath(translationFactor) {
-            // Get the key paths for super and append our key path to it.
             set.insert(#keyPath(cameraController.translationFactor))
         }
-        
+        else if key == #keyPath(originCamera) {
+            set.insert(#keyPath(cameraController.originCamera))
+        }
+
         return set
     }
 
@@ -189,23 +188,23 @@ public class ArcGISARView: UIView {
         // Use the `internalHitTest` method to get the matrix of `screenPoint`.
         guard let localOffsetMatrix = internalHitTest(screenPoint: screenPoint) else { return nil }
 
-        print("Local offset XYZ, World origin XYZ, Combined world coordinate XYZ")
-        
-        //TODO: generalize the debug print function
-        //        print("lqx: \(localOffsetMatrix.quaternionX); lqy: \(localOffsetMatrix.quaternionY); lqz: \(localOffsetMatrix.quaternionZ); lqw: \(localOffsetMatrix.quaternionW); ltx: \(localOffsetMatrix.translationX); lty: \(localOffsetMatrix.translationY); ltz: \(localOffsetMatrix.translationZ)")
-        print("\(localOffsetMatrix.translationX) \(localOffsetMatrix.translationY) \(localOffsetMatrix.translationZ)")
+//        print("Local offset XYZ, World origin XYZ, Combined world coordinate XYZ")
+//
+//        //TODO: generalize the debug print function
+//        //        print("lqx: \(localOffsetMatrix.quaternionX); lqy: \(localOffsetMatrix.quaternionY); lqz: \(localOffsetMatrix.quaternionZ); lqw: \(localOffsetMatrix.quaternionW); ltx: \(localOffsetMatrix.translationX); lty: \(localOffsetMatrix.translationY); ltz: \(localOffsetMatrix.translationZ)")
+//        print("\(localOffsetMatrix.translationX) \(localOffsetMatrix.translationY) \(localOffsetMatrix.translationZ)")
         
         let currOriginCamera = cameraController.originCamera
         let currOriginMatrix = currOriginCamera.transformationMatrix
-        
-        //        print("oqx: \(currOriginMatrix.quaternionX); oqy: \(currOriginMatrix.quaternionY); oqz: \(currOriginMatrix.quaternionZ); oqw: \(currOriginMatrix.quaternionW); otx: \(currOriginMatrix.translationX); oty: \(currOriginMatrix.translationY); otz: \(currOriginMatrix.translationZ)")
-        print("\(currOriginMatrix.translationX) \(currOriginMatrix.translationY) \(currOriginMatrix.translationZ)")
+//
+//        //        print("oqx: \(currOriginMatrix.quaternionX); oqy: \(currOriginMatrix.quaternionY); oqz: \(currOriginMatrix.quaternionZ); oqw: \(currOriginMatrix.quaternionW); otx: \(currOriginMatrix.translationX); oty: \(currOriginMatrix.translationY); otz: \(currOriginMatrix.translationZ)")
+//        print("\(currOriginMatrix.translationX) \(currOriginMatrix.translationY) \(currOriginMatrix.translationZ)")
         
         //TODO: for tabletop application scale translation by TranslationFactor
         let mapPointMatrix = currOriginMatrix.addTransformation(localOffsetMatrix)
-        
-        //        print("cqx: \(mapPointMatrix.quaternionX); cqy: \(mapPointMatrix.quaternionY); cqz: \(mapPointMatrix.quaternionZ); cqw: \(mapPointMatrix.quaternionW); ctx: \(mapPointMatrix.translationX); cty: \(mapPointMatrix.translationY); ctz: \(mapPointMatrix.translationZ)")
-        print("\(mapPointMatrix.translationX) \(mapPointMatrix.translationY) \(mapPointMatrix.translationZ)")
+//
+//        //        print("cqx: \(mapPointMatrix.quaternionX); cqy: \(mapPointMatrix.quaternionY); cqz: \(mapPointMatrix.quaternionZ); cqw: \(mapPointMatrix.quaternionW); ctx: \(mapPointMatrix.translationX); cty: \(mapPointMatrix.translationY); ctz: \(mapPointMatrix.translationZ)")
+//        print("\(mapPointMatrix.translationX) \(mapPointMatrix.translationY) \(mapPointMatrix.translationZ)")
         
         // Create a camera from transformationMatrix and return its location.
         return AGSCamera(transformationMatrix: mapPointMatrix).location
@@ -213,9 +212,10 @@ public class ArcGISARView: UIView {
 
     /// Resets the device tracking and related properties.
     public func resetTracking() {
+        originCamera = nil
         initialTransformation = .identity
         if isUsingARKit {
-            arSCNView.session.run(arConfiguration, options: [.resetTracking])
+            arSCNView.session.run(arConfiguration, options: [.resetTracking, .removeExistingAnchors])
         }
         
         cameraController.transformationMatrix = .identity
@@ -274,7 +274,6 @@ public class ArcGISARView: UIView {
                 strongSelf.arSCNView.session.run(strongSelf.arConfiguration, options: [.resetTracking])
             }
             
-            strongSelf.cameraController.transformationMatrix = .identity
             strongSelf.isTracking = true
         }
     }
@@ -314,8 +313,8 @@ public class ArcGISARView: UIView {
                                                     quaternionZ: 0.0,
                                                     quaternionW: 1.0,
                                                     translationX: Double(worldTransform.columns.3.x),
-                                                    translationY: Double(-worldTransform.columns.3.z),
-                                                    translationZ: Double(worldTransform.columns.3.y))
+                                                    translationY: Double(worldTransform.columns.3.y),
+                                                    translationZ: Double(worldTransform.columns.3.z))
 
         return hitTestMatrix
     }
@@ -469,6 +468,8 @@ extension ArcGISARView: AGSLocationChangeHandlerDelegate {
         // Location changed.
         guard var locationPoint = location.position else { return }
         
+        print("New Location")
+        
         // The AGSCLLocationDataSource does not include altitude information from the CLLocation when
         // creating the `AGSLocation` geometry, so grab the altitude directly from the CLLocationManager.
         if let clLocationDataSource = locationDataSource as? AGSCLLocationDataSource,
@@ -479,8 +480,14 @@ extension ArcGISARView: AGSLocationChangeHandlerDelegate {
         // Always set originCamera; then reset ARKit
         let oldCamera = cameraController.originCamera
             
-            // Create a new camera based on our location and set it on the cameraController.
-        cameraController.originCamera = AGSCamera(location: locationPoint, heading: oldCamera.heading, pitch: oldCamera.pitch, roll: oldCamera.roll)
+        // Create a new camera based on our location and set it on the cameraController.
+        if originCamera == nil {
+            let newCamera = AGSCamera(location: locationPoint, heading: 0.0, pitch: 90.0, roll: 0.0)
+            originCamera = newCamera
+        }
+        else {
+            cameraController.originCamera = AGSCamera(location: locationPoint, heading: oldCamera.heading, pitch: oldCamera.pitch, roll: oldCamera.roll)
+        }
         
         // If we're using ARKit, reset its tracking.
         if isUsingARKit {
