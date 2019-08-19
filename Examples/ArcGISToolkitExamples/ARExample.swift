@@ -110,10 +110,11 @@ class ARExample: UIViewController {
         
         // Add the UserDirectionsView.
         addUserDirectionsView()
-        
-        // Add the CalibrationView.
-        addCalibrationView()
-        
+
+        // Create the CalibrationView.
+        calibrationView = CalibrationView(sceneView: arView.sceneView, cameraController: arView.cameraController)
+        calibrationView?.alpha = 0.0
+
         // Set up the `sceneInfo` array with our scene init functions and labels.
         sceneInfo.append(contentsOf: [(sceneFunction: streetsScene, label: "Streets - Full Scale", tableTop: false),
                                       (sceneFunction: imageryScene, label: "Imagery - Full Scale", tableTop: false),
@@ -145,16 +146,26 @@ class ARExample: UIViewController {
     ///
     /// - Parameter sender: The bar button item tapped on.
     @objc func displayCalibration(_ sender: UIBarButtonItem) {
+        
         // If the sceneView's alpha is 0.0, that means we are not in calibration mode and we need to start calibrating.
         let startCalibrating = (calibrationView?.alpha == 0.0)
-        
+
         // Enable/disable sceneView touch interactions.
         arView.sceneView.interactionOptions.isEnabled = startCalibrating
         userDirectionsView.updateUserDirections(nil)
         
         // Display calibration view.
-        UIView.animate(withDuration: 0.25) { [weak self] in
+        UIView.animate(withDuration: 0.25, animations: { [weak self] in
+            if startCalibrating {
+                self?.arView.sceneView.isAttributionTextVisible = false
+                self?.addCalibrationView()
+            }
             self?.calibrationView?.alpha = startCalibrating ? 1.0 : 0.0
+        }) { [weak self] (_) in
+            if !startCalibrating {
+                self?.removeCalibrationView()
+                self?.arView.sceneView.isAttributionTextVisible = true
+            }
         }
         
         // Dim the sceneView if we're calibrating.
@@ -444,7 +455,6 @@ extension ARExample {
     
     /// Add the calibration view to the view and setup constraints.
     func addCalibrationView() {
-        calibrationView = CalibrationView(sceneView: arView.sceneView, cameraController: arView.cameraController)
         guard let calibrationView = calibrationView else { return }
         view.addSubview(calibrationView)
         calibrationView.translatesAutoresizingMaskIntoConstraints = false
@@ -454,8 +464,12 @@ extension ARExample {
             calibrationView.topAnchor.constraint(equalTo: view.topAnchor),
             calibrationView.bottomAnchor.constraint(equalTo: toolbar.topAnchor)
             ])
-        
-        calibrationView.alpha = 0.0
+    }
+    
+    /// Add the calibration view to the view and setup constraints.
+    func removeCalibrationView() {
+        guard let calibrationView = calibrationView else { return }
+        calibrationView.removeFromSuperview()
     }
 }
 
