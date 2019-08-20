@@ -96,7 +96,7 @@ public class ArcGISARView: UIView {
     private var lastGoodDeviceOrientation = UIDeviceOrientation.portrait
     
     /// Are we using only the first location provided by the LocationDataSource?
-    private var useLocationDataSourceOnce = false
+    private var useLocationDataSourceOnce = true
     
     // MARK: Initializers
     
@@ -238,7 +238,7 @@ public class ArcGISARView: UIView {
     /// Starts device tracking.
     ///
     /// - Parameter completion: The completion handler called when start tracking completes.  If tracking starts successfully, the `error` property will be nil; if tracking fails to start, the error will be non-nil and contain the reason for failure.
-    public func startTracking(useLocationDataSourceOnce: Bool = false, completion: ((_ error: Error?) -> Void)? = nil) {
+    public func startTracking(useLocationDataSourceOnce: Bool = true, completion: ((_ error: Error?) -> Void)? = nil) {
         // We have a location data source that needs to be started.
         self.useLocationDataSourceOnce = useLocationDataSourceOnce
         if let locationDataSource = self.locationDataSource {

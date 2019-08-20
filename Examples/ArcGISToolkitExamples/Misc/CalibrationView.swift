@@ -16,7 +16,7 @@ import UIKit
 import ArcGIS
 
 /// A view displaying controls for adjusting a scene view's location, heading, and elevation. Used to calibrate an AR session.
-class CalibrationView: UIView, UIGestureRecognizerDelegate {
+class CalibrationView: UIView {
     
     // The scene view displaying the scene.
     private var sceneView: AGSSceneView!
@@ -38,19 +38,16 @@ class CalibrationView: UIView, UIGestureRecognizerDelegate {
     /// The UISlider used to adjust elevation.
     private let elevationSlider: UISlider = {
         let slider = UISlider(frame: .zero)
-        slider.minimumValue = -100.0
-        slider.maximumValue = 100.0
-        
-        // Rotate the slider so it slides up/down.
-        slider.transform = CGAffineTransform(rotationAngle: -CGFloat.pi/2)
+        slider.minimumValue = -50.0
+        slider.maximumValue = 50.0
         return slider
     }()
     
     /// The UISlider used to adjust heading.
     private let headingSlider: UISlider = {
         let slider = UISlider(frame: .zero)
-        slider.minimumValue = -180.0
-        slider.maximumValue = 180.0
+        slider.minimumValue = -10.0
+        slider.maximumValue = 10.0
         return slider
     }()
     
@@ -70,10 +67,6 @@ class CalibrationView: UIView, UIGestureRecognizerDelegate {
         
         self.cameraController = cameraController
         self.sceneView = sceneView
-
-        // Set a corner radius on the directions label.
-//        calibrationDirectionsLabel.layer.cornerRadius = 8.0
-//        calibrationDirectionsLabel.layer.masksToBounds = true
         
         // Create visual effects view to show the label on a blurred background.
         let labelView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
@@ -98,26 +91,54 @@ class CalibrationView: UIView, UIGestureRecognizerDelegate {
             labelView.topAnchor.constraint(equalTo: topAnchor, constant: 88.0)
             ])
         
-        // Add the elevation slider.
-        addSubview(elevationSlider)
-        elevationSlider.addTarget(self, action: #selector(elevationChanged(_:)), for: .valueChanged)
-        elevationSlider.translatesAutoresizingMaskIntoConstraints = false
-        let width: CGFloat = 500.0
+        // Add the heading label and slider.
+        let headingLabel = UILabel(frame: .zero)
+        headingLabel.text = "Heading"
+        headingLabel.textColor = .yellow
+        addSubview(headingLabel)
+        headingLabel.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            elevationSlider.centerYAnchor.constraint(equalTo: centerYAnchor),
-            elevationSlider.widthAnchor.constraint(greaterThanOrEqualToConstant: width),
-            elevationSlider.trailingAnchor.constraint(equalTo: trailingAnchor, constant: width / 2.0 - 36)
+            headingLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            headingLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -16)
             ])
         
-        // Add the heading slider.
         addSubview(headingSlider)
-        headingSlider.addTarget(self, action: #selector(headingChanged(_:)), for: .valueChanged)
         headingSlider.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            headingSlider.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
-            headingSlider.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
-            headingSlider.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -24)
+            headingSlider.leadingAnchor.constraint(equalTo: headingLabel.trailingAnchor, constant: 16),
+            headingSlider.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
+            headingSlider.centerYAnchor.constraint(equalTo: headingLabel.centerYAnchor)
             ])
+
+        // Add the elevation label and slider.
+        let elevationLabel = UILabel(frame: .zero)
+        elevationLabel.text = "Elevation"
+        elevationLabel.textColor = .yellow
+        addSubview(elevationLabel)
+        elevationLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            elevationLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            elevationLabel.bottomAnchor.constraint(equalTo: headingLabel.topAnchor, constant: -24)
+            ])
+
+        addSubview(elevationSlider)
+        elevationSlider.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            elevationSlider.leadingAnchor.constraint(equalTo: elevationLabel.trailingAnchor, constant: 16),
+            elevationSlider.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
+            elevationSlider.centerYAnchor.constraint(equalTo: elevationLabel.centerYAnchor)
+            ])
+
+        // Setup actions for the two sliders. The sliders operate as "joysticks", where moving the slider thumb will start a timer
+        // which roates or elevates the current camera when the timer fires.  The elevation and heading delta
+        // values increase the further you move away from center.  Moving and holding the thumb a little bit from center
+        // will roate/elevate just a little bit, but get progressively more the further from center the thumb is moved.
+        headingSlider.addTarget(self, action: #selector(headingChanged(_:)), for: .valueChanged)
+        headingSlider.addTarget(self, action: #selector(touchUpHeading(_:)), for: .touchUpInside)
+
+        elevationSlider.addTarget(self, action: #selector(elevationChanged(_:)), for: .valueChanged)
+        elevationSlider.addTarget(self, action: #selector(touchUpElevation(_:)), for: .touchUpInside)
+
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -126,6 +147,8 @@ class CalibrationView: UIView, UIGestureRecognizerDelegate {
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         // If the user tapped in the view (and not in the sliders), do not handle the event.
+        // This allows the view below the calibration view to handle touch events.  In this case,
+        // that view is the SceneView.
         let hitView = super.hitTest(point, with: event)
         if hitView == self {
             return nil;
@@ -134,22 +157,94 @@ class CalibrationView: UIView, UIGestureRecognizerDelegate {
         }
     }
 
+    // The timers for the "joystick" behavior.
+    private var elevationTimer: Timer?
+    private var headingTimer: Timer?
+    
     /// Handle an elevation slider value-changed event.
     ///
     /// - Parameter sender: The slider tapped on.
-    @objc func elevationChanged(_ sender: UISlider){
-        let camera = cameraController.originCamera
-        cameraController.originCamera = camera.elevate(withDeltaAltitude: Double(sender.value - lastElevationValue))
-        lastElevationValue = sender.value
+    @objc func elevationChanged(_ sender: UISlider) {
+        if elevationTimer == nil {
+            // Create a timer which elevates the camera when fired.
+            elevationTimer = Timer(timeInterval: 0.25, repeats: true, block: { [weak self] (timer) in
+                let delta = self?.joystickElevation() ?? 0.0
+                print("elevate delta = \(delta)")
+                self?.elevate(delta)
+            })
+            
+            // Add the timer to the main run loop.
+            guard let timer = elevationTimer else { return }
+            RunLoop.main.add(timer, forMode: .default)
+        }
     }
     
     /// Handle an heading slider value-changed event.
     ///
     /// - Parameter sender: The slider tapped on.
-    @objc func headingChanged(_ sender: UISlider){
+    @objc func headingChanged(_ sender: UISlider) {
+        if headingTimer == nil {
+            // Create a timer which rotates the camera when fired.
+            headingTimer = Timer(timeInterval: 0.25, repeats: true, block: { [weak self] (timer) in
+                let delta = self?.joystickHeading() ?? 0.0
+                print("rotate delta = \(delta)")
+                self?.rotate(delta)
+            })
+            
+            // Add the timer to the main run loop.
+            guard let timer = headingTimer else { return }
+            RunLoop.main.add(timer, forMode: .default)
+        }
+    }
+    
+    /// Handle an elevation slider touchUp event.  This will stop the timer.
+    ///
+    /// - Parameter sender: The slider tapped on.
+    @objc func touchUpElevation(_ sender: UISlider) {
+        elevationTimer?.invalidate()
+        elevationTimer = nil
+        sender.value = 0.0
+    }
+    
+    /// Handle a heading slider touchUp event.  This will stop the timer.
+    ///
+    /// - Parameter sender: The slider tapped on.
+    @objc func touchUpHeading(_ sender: UISlider) {
+        headingTimer?.invalidate()
+        headingTimer = nil
+        sender.value = 0.0
+    }
+
+    /// Rotates the camera by `deltaHeading`.
+    ///
+    /// - Parameter deltaHeading: The amount to rotate the camera.
+    private func rotate(_ deltaHeading: Double) {
         let camera = cameraController.originCamera
-        let newHeading = Float(camera.heading) + sender.value - lastHeadingValue
-        cameraController.originCamera = camera.rotate(toHeading: Double(newHeading), pitch: camera.pitch, roll: camera.roll)
-        lastHeadingValue = sender.value
+        let newHeading = camera.heading + deltaHeading
+        cameraController.originCamera = camera.rotate(toHeading: newHeading, pitch: camera.pitch, roll: camera.roll)
+    }
+    
+    /// Change the cameras altitude by `deltaAltitude`.
+    ///
+    /// - Parameter deltaAltitude: The amount to elevate the camera.
+    private func elevate(_ deltaAltitude: Double) {
+        let camera = cameraController.originCamera
+        cameraController.originCamera = camera.elevate(withDeltaAltitude: deltaAltitude)
+    }
+    
+    /// Calculates the elevation delta amount based on the elevation slider value.
+    ///
+    /// - Returns: The elevation delta.
+    private func joystickElevation() -> Double {
+        let deltaElevation = Double(elevationSlider.value)
+        return pow(deltaElevation, 2) / 10.0 * (deltaElevation < 0 ? -1.0 : 1.0)
+    }
+    
+    /// Calculates the heading delta amount based on the heading slider value.
+    ///
+    /// - Returns: The heading delta.
+    private func joystickHeading() -> Double {
+        let deltaHeading = Double(headingSlider.value)
+        return pow(deltaHeading, 2) / 10.0 * (deltaHeading < 0 ? -1.0 : 1.0)
     }
 }
