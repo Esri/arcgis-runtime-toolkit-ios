@@ -29,9 +29,10 @@ class UserDirectionsView: UIVisualEffectView {
 
     override init(effect: UIVisualEffect?) {
         super.init(effect: effect)
-            // Set a corner radius.
-            layer.cornerRadius = 8.0
-            layer.masksToBounds = true
+        
+        // Set a corner radius.
+        layer.cornerRadius = 8.0
+        layer.masksToBounds = true
         
         contentView.addSubview(userDirectionsLabel)
         userDirectionsLabel.translatesAutoresizingMaskIntoConstraints = false

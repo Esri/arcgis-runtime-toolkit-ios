@@ -19,10 +19,10 @@ import ArcGIS
 class CalibrationView: UIView {
     
     // The scene view displaying the scene.
-    private var sceneView: AGSSceneView!
+    private let sceneView: AGSSceneView
 
     /// The camera controller used to adjust user interactions.
-    private var cameraController: AGSTransformationMatrixCameraController!
+    private let cameraController: AGSTransformationMatrixCameraController
 
     /// The label displaying calibration directions.
     private let calibrationDirectionsLabel: UILabel = {
@@ -63,10 +63,11 @@ class CalibrationView: UIView {
     ///   - sceneView: The scene view displaying the scene.
     ///   - cameraController: The camera controller used to adjust user interactions.
     init(sceneView: AGSSceneView, cameraController: AGSTransformationMatrixCameraController) {
-        super.init(frame: .zero)
-        
         self.cameraController = cameraController
         self.sceneView = sceneView
+
+        super.init(frame: .zero)
+        
         
         // Create visual effects view to show the label on a blurred background.
         let labelView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
@@ -151,9 +152,9 @@ class CalibrationView: UIView {
         // that view is the SceneView.
         let hitView = super.hitTest(point, with: event)
         if hitView == self {
-            return nil;
+            return nil
         } else {
-            return hitView;
+            return hitView
         }
     }
 
@@ -169,7 +170,7 @@ class CalibrationView: UIView {
             // Create a timer which elevates the camera when fired.
             elevationTimer = Timer(timeInterval: 0.25, repeats: true, block: { [weak self] (timer) in
                 let delta = self?.joystickElevation() ?? 0.0
-                print("elevate delta = \(delta)")
+//                print("elevate delta = \(delta)")
                 self?.elevate(delta)
             })
             
@@ -187,7 +188,7 @@ class CalibrationView: UIView {
             // Create a timer which rotates the camera when fired.
             headingTimer = Timer(timeInterval: 0.25, repeats: true, block: { [weak self] (timer) in
                 let delta = self?.joystickHeading() ?? 0.0
-                print("rotate delta = \(delta)")
+//                print("rotate delta = \(delta)")
                 self?.rotate(delta)
             })
             

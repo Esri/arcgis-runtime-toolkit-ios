@@ -18,14 +18,14 @@ import ArcGIS
 
 class ARExample: UIViewController {
     
-    typealias sceneInitFunction = () -> AGSScene
-    typealias sceneInfoType = (sceneFunction: sceneInitFunction, label: String, tableTop: Bool)
+    typealias SceneInitFunction = () -> AGSScene
+    typealias SceneInfoType = (sceneFunction: SceneInitFunction, label: String, tableTop: Bool, continuousLocation: Bool)
     
-    /// The scene creation functions plus labels and whehter it represents a table top experience.  The functions create a new scene and perform any necessary `ArcGISARView` initialization.  This allows for changing the scene and AR "mode" (table top or full-scale).
-    private var sceneInfo: [sceneInfoType] = []
+    /// The scene creation functions plus labels and whether it represents a table top experience.  The functions create a new scene and perform any necessary `ArcGISARView` initialization.  This allows for changing the scene and AR "mode" (table top or full-scale).
+    private var sceneInfo: [SceneInfoType] = []
     
     /// The current scene info.
-    private var currentSceneInfo: sceneInfoType? {
+    private var currentSceneInfo: SceneInfoType? {
         didSet {
             guard let label = currentSceneInfo?.label else { return }
             statusViewController?.currentScene = label
@@ -58,7 +58,7 @@ class ARExample: UIViewController {
     /// View for displaying directions to the user.
     private let userDirectionsView = UserDirectionsView(effect: UIBlurEffect(style: .light))
     
-    /// The observer for the `SceneView`'s `translationFactor` property.
+    /// The observation for the `SceneView`'s `translationFactor` property.
     private var translationFactorObservation: NSKeyValueObservation?
 
     /// View for displaying calibration controls to the user.
@@ -88,7 +88,7 @@ class ARExample: UIViewController {
         arView.sceneView.graphicsOverlays.add(graphicsOverlay)
         
         // Observe the `arView.translationFactor` property and update status when it changes.
-        translationFactorObservation = arView.observe(\ArcGISARView.translationFactor, options: [.initial, .new]){ [weak self] arView, change in
+        translationFactorObservation = arView.observe(\ArcGISARView.translationFactor, options: [.initial, .new]) { [weak self] arView, change in
             self?.statusViewController?.translationFactor = arView.translationFactor
         }
         
@@ -116,12 +116,12 @@ class ARExample: UIViewController {
         calibrationView?.alpha = 0.0
 
         // Set up the `sceneInfo` array with our scene init functions and labels.
-        sceneInfo.append(contentsOf: [(sceneFunction: streetsScene, label: "Streets - Full Scale", tableTop: false),
-                                      (sceneFunction: imageryScene, label: "Imagery - Full Scale", tableTop: false),
-                                      (sceneFunction: pointCloudScene, label: "Point Cloud - Tabletop", tableTop: true),
-                                      (sceneFunction: yosemiteScene, label: "Yosemite - Tabletop", tableTop: true),
-                                      (sceneFunction: borderScene, label: "US - Mexico Border - Tabletop", tableTop: true),
-                                      (sceneFunction: emptyScene, label: "Empty - Full Scale", tableTop: false)])
+        sceneInfo.append(contentsOf: [(sceneFunction: streetsScene, label: "Streets - Full Scale", tableTop: false, continuousLocation: true),
+                                      (sceneFunction: imageryScene, label: "Imagery - Full Scale", tableTop: false, continuousLocation: true),
+                                      (sceneFunction: pointCloudScene, label: "Point Cloud - Tabletop", tableTop: true, continuousLocation: false),
+                                      (sceneFunction: yosemiteScene, label: "Yosemite - Tabletop", tableTop: true, continuousLocation: false),
+                                      (sceneFunction: borderScene, label: "US - Mexico Border - Tabletop", tableTop: true, continuousLocation: false),
+                                      (sceneFunction: emptyScene, label: "Empty - Full Scale", tableTop: false, continuousLocation: false)])
 
         // Use the first sceneInfo to create and set the scene.
         currentSceneInfo = sceneInfo.first
@@ -130,9 +130,9 @@ class ARExample: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        arView.startTracking { [weak self] (error) in
+        arView.startTracking(useLocationDataSourceOnce: currentSceneInfo?.continuousLocation ?? false, completion: { [weak self] (error) in
             self?.statusViewController?.errorMessage = error?.localizedDescription
-        }
+        })
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -155,16 +155,16 @@ class ARExample: UIViewController {
         userDirectionsView.updateUserDirections(nil)
         
         // Display calibration view.
-        UIView.animate(withDuration: 0.25, animations: { [weak self] in
+        UIView.animate(withDuration: 0.25, animations: {
             if startCalibrating {
-                self?.arView.sceneView.isAttributionTextVisible = false
-                self?.addCalibrationView()
+                self.arView.sceneView.isAttributionTextVisible = false
+                self.addCalibrationView()
             }
-            self?.calibrationView?.alpha = startCalibrating ? 1.0 : 0.0
-        }) { [weak self] (_) in
+            self.calibrationView?.alpha = startCalibrating ? 1.0 : 0.0
+        }) { (_) in
             if !startCalibrating {
-                self?.removeCalibrationView()
-                self?.arView.sceneView.isAttributionTextVisible = true
+                self.removeCalibrationView()
+                self.arView.sceneView.isAttributionTextVisible = true
             }
         }
         
@@ -172,40 +172,43 @@ class ARExample: UIViewController {
         UIView.animate(withDuration: 0.25) { [weak self] in
             self?.arView.sceneView.alpha = startCalibrating ? 0.65 : 1.0
         }
+        
+        // Hide directions view if we're calibrating.
+        userDirectionsView.isHidden = startCalibrating
     }
 
     /// Allow users to change the current scene.
     ///
     /// - Parameter sender: The bar button item tapped on.
-    @objc func changeScene(_ sender: UIBarButtonItem){
+    @objc func changeScene(_ sender: UIBarButtonItem) {
         // Display an alert controller displaying the scenes to choose from.
         let alertController = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertController.Style.actionSheet)
         alertController.popoverPresentationController?.barButtonItem = sender
         
         // Loop through all sceneInfos and add `UIAlertActions` for each.
         sceneInfo.forEach { info in
-            let action = UIAlertAction(title: info.label, style: .default, handler: { [weak self] (action) in
+            let action = UIAlertAction(title: info.label, style: .default, handler: { (action) in
                 // Set currentSceneInfo to the selected scene.
-                self?.currentSceneInfo = info
+                self.currentSceneInfo = info
                 
                 // Stop tracking, update the scene with the selected Scene and reset tracking.
-                self?.arView.stopTracking()
-                self?.arView.sceneView.scene = info.sceneFunction()
+                self.arView.stopTracking()
+                self.arView.sceneView.scene = info.sceneFunction()
                 if info.tableTop {
                     // Dim the SceneView until the user taps on a surface.
-                    self?.arView.sceneView.alpha = 0.5
+                    self.arView.sceneView.alpha = 0.5
                 }
                 // Reset AR tracking and then start tracking.
-                self?.arView.resetTracking()
-                self?.arView.startTracking { [weak self] (error) in
-                    self?.statusViewController?.errorMessage = error?.localizedDescription
-                }
+                self.arView.resetTracking()
+                self.arView.startTracking(useLocationDataSourceOnce: info.continuousLocation, completion: { [weak self] (error) in
+                        self?.statusViewController?.errorMessage = error?.localizedDescription
+                })
                 
                 // Reset didPlaceScene variable
-                self?.didPlaceScene = false
+                self.didPlaceScene = false
             })
             // Display current scene as disabled.
-            action.isEnabled = !(info.label == currentSceneInfo?.label)
+            action.isEnabled = (info.label != currentSceneInfo?.label)
             alertController.addAction(action)
         }
         present(alertController, animated: true)
@@ -214,7 +217,7 @@ class ARExample: UIViewController {
     /// Dislays the status view controller.
     ///
     /// - Parameter sender: The bar button item tapped on.
-    @objc func showStatus(_ sender: UIBarButtonItem){
+    @objc func showStatus(_ sender: UIBarButtonItem) {
         UIView.animate(withDuration: 0.25) { [weak self] in
             self?.statusViewController?.view.alpha = self?.statusViewController?.view.alpha == 1.0 ? 0.0 : 1.0
         }
@@ -223,11 +226,11 @@ class ARExample: UIViewController {
     /// Sets up the toolbar and add it to the view.
     private func addToolbar() {
         // Add it to the arView and set up constraints.
-        arView.addSubview(toolbar)
+        view.addSubview(toolbar)
         toolbar.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            toolbar.leadingAnchor.constraint(equalTo: arView.sceneView.leadingAnchor),
-            toolbar.trailingAnchor.constraint(equalTo: arView.sceneView.trailingAnchor),
+            toolbar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            toolbar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             toolbar.bottomAnchor.constraint(equalTo: arView.sceneView.attributionTopAnchor)
             ])
         
@@ -315,9 +318,9 @@ extension ARExample: ARSCNViewDelegate {
             // Present an alert describing the error.
             let alertController = UIAlertController(title: "Could not start tracking.", message: errorMessage, preferredStyle: .alert)
             let restartAction = UIAlertAction(title: "Restart Tracking", style: .default) { _ in
-                self?.arView.startTracking { [weak self] (error) in
+                self?.arView.startTracking(useLocationDataSourceOnce: self?.currentSceneInfo?.continuousLocation ?? false, completion: { (error) in
                     self?.statusViewController?.errorMessage = error?.localizedDescription
-                }
+                })
             }
             alertController.addAction(restartAction)
             
@@ -375,21 +378,13 @@ extension ARExample: AGSGeoViewTouchDelegate {
             // Create and place a graphic and shadown at the real world location.
             let shadowColor = UIColor.lightGray.withAlphaComponent(0.5)
             let shadow = AGSSimpleMarkerSceneSymbol(style: .sphere, color: shadowColor, height: 0.01, width: 0.25, depth: 0.25, anchorPosition: .center)
-            let shadowGraphic = AGSGraphic(geometry: point, symbol: shadow, attributes: nil)
+            let shadowGraphic = AGSGraphic(geometry: point, symbol: shadow)
             graphicsOverlay.graphics.add(shadowGraphic)
 
             let sphere = AGSSimpleMarkerSceneSymbol(style: .sphere, color: .red, height: 0.25, width: 0.25, depth: 0.25, anchorPosition: .bottom)
-            let sphereGraphic = AGSGraphic(geometry: point, symbol: sphere, attributes: nil)
+            let sphereGraphic = AGSGraphic(geometry: point, symbol: sphere)
             graphicsOverlay.graphics.add(sphereGraphic)
         }
-    }
-}
-
-// MARK: UIAdaptivePresentationControllerDelegate
-extension ARExample: UIAdaptivePresentationControllerDelegate {
-    func adaptivePresentationStyle(for controller: UIPresentationController, traitCollection: UITraitCollection) -> UIModalPresentationStyle {
-        // show presented controller as popovers even on small displays
-        return .none
     }
 }
 
@@ -402,7 +397,7 @@ extension ARExample {
         userDirectionsView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             userDirectionsView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            userDirectionsView.topAnchor.constraint(equalTo: view.topAnchor, constant: 88.0)
+            userDirectionsView.topAnchor.constraint(equalToSystemSpacingBelow: view.safeAreaLayoutGuide.topAnchor, multiplier: 1)
             ])
     }
     
@@ -415,35 +410,27 @@ extension ARExample {
         var message = ""
         
         switch trackingState {
-        case .normal where frame.anchors.isEmpty:
+        case .normal:
             if let sceneInfo = currentSceneInfo, sceneInfo.tableTop, !didPlaceScene {
-                message = "Move the device around to detect horizontal surfaces."
+                if frame.anchors.isEmpty {
+                    message = "Move the device around to detect horizontal surfaces."
+                } else {
+                    message = "Tap to place the Scene on a surface."
+                }
             }
-            break
-        case .normal where !frame.anchors.isEmpty:
-            if let sceneInfo = currentSceneInfo, sceneInfo.tableTop, !didPlaceScene {
-                message = "Tap to place the Scene on a surface."
-            }
-            break
         case .notAvailable:
             message = "Location not available."
-            break
         case .limited(let reason):
-            switch(reason){
+            switch(reason) {
             case .excessiveMotion:
                 message = "Try moving your device more slowly."
-                break
             case .initializing:
                 message = "Keep moving your device."
-                break
             case .insufficientFeatures:
                 message = "Try turning on more lights and moving around."
-                break
             default:
                 break
             }
-        default:
-            break
         }
         
         userDirectionsView.updateUserDirections(message)
@@ -528,17 +515,14 @@ extension ARExample {
         
         layer.load { [weak self] (error) in
             self?.statusViewController?.errorMessage = error?.localizedDescription
-            if let _ = error {
-                return
+            if let extent = layer.fullExtent, error == nil {
+                let center = extent.center
+                
+                // Create the origin camera at the center point of the data.  This will ensure the data is anchored to the table.
+                let camera = AGSCamera(latitude: center.y, longitude: center.x, altitude: 0, heading: 0, pitch: 90.0, roll: 0)
+                self?.arView.originCamera = camera
+                self?.arView.translationFactor = 2000
             }
-
-            guard let extent = layer.fullExtent else { return }
-            let center = extent.center
-            
-            // Create the origin camera at the center point of the data.  This will ensure the data is anchored to the table.
-            let camera = AGSCamera(latitude: center.y, longitude: center.x, altitude: 0, heading: 0, pitch: 90.0, roll: 0)
-            self?.arView.originCamera = camera
-            self?.arView.translationFactor = 2000
         }
         
         // Clear the location data source, as we're setting the originCamera directly.

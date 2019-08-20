@@ -74,7 +74,7 @@ public class ArcGISARView: UIView {
         didSet {
             // If we're already tracking, reset tracking to use the new configuration.
             if isTracking, isUsingARKit {
-                arSCNView.session.run(arConfiguration, options: [.resetTracking])
+                arSCNView.session.run(arConfiguration, options: .resetTracking)
             }
         }
     }
@@ -271,7 +271,7 @@ public class ArcGISARView: UIView {
             guard let strongSelf = self else { return }
             // Run the ARSession.
             if strongSelf.isUsingARKit {
-                strongSelf.arSCNView.session.run(strongSelf.arConfiguration, options: [.resetTracking])
+                strongSelf.arSCNView.session.run(strongSelf.arConfiguration, options: .resetTracking)
             }
             
             strongSelf.isTracking = true
@@ -468,14 +468,12 @@ extension ArcGISARView: AGSLocationChangeHandlerDelegate {
         // Location changed.
         guard var locationPoint = location.position else { return }
         
-        print("New Location")
-        
         // The AGSCLLocationDataSource does not include altitude information from the CLLocation when
         // creating the `AGSLocation` geometry, so grab the altitude directly from the CLLocationManager.
         if let clLocationDataSource = locationDataSource as? AGSCLLocationDataSource,
             let location = clLocationDataSource.locationManager.location,
             location.verticalAccuracy >= 0 {
-            let altitude = location.altitude,
+            let altitude = location.altitude
             locationPoint = AGSPoint(x: locationPoint.x, y: locationPoint.y, z: altitude, spatialReference: locationPoint.spatialReference)
         }
         
@@ -493,7 +491,7 @@ extension ArcGISARView: AGSLocationChangeHandlerDelegate {
         
         // If we're using ARKit, reset its tracking.
         if isUsingARKit {
-            arSCNView.session.run(arConfiguration, options: [.resetTracking])
+            arSCNView.session.run(arConfiguration, options: .resetTracking)
         }
         
         // Reset the camera controller's transformationMatrix to its initial state, the Idenity matrix.
