@@ -19,7 +19,7 @@ import ArcGIS
 class ARExample: UIViewController {
     
     typealias SceneInitFunction = () -> AGSScene
-    typealias SceneInfoType = (sceneFunction: SceneInitFunction, label: String, tableTop: Bool, continuousLocation: Bool)
+    typealias SceneInfoType = (sceneFunction: SceneInitFunction, label: String, tableTop: Bool, useLocationDataSourceOnce: Bool)
     
     /// The scene creation functions plus labels and whether it represents a table top experience.  The functions create a new scene and perform any necessary `ArcGISARView` initialization.  This allows for changing the scene and AR "mode" (table top or full-scale).
     private var sceneInfo: [SceneInfoType] = []
@@ -116,12 +116,12 @@ class ARExample: UIViewController {
         calibrationView?.alpha = 0.0
 
         // Set up the `sceneInfo` array with our scene init functions and labels.
-        sceneInfo.append(contentsOf: [(sceneFunction: streetsScene, label: "Streets - Full Scale", tableTop: false, continuousLocation: true),
-                                      (sceneFunction: imageryScene, label: "Imagery - Full Scale", tableTop: false, continuousLocation: true),
-                                      (sceneFunction: pointCloudScene, label: "Point Cloud - Tabletop", tableTop: true, continuousLocation: false),
-                                      (sceneFunction: yosemiteScene, label: "Yosemite - Tabletop", tableTop: true, continuousLocation: false),
-                                      (sceneFunction: borderScene, label: "US - Mexico Border - Tabletop", tableTop: true, continuousLocation: false),
-                                      (sceneFunction: emptyScene, label: "Empty - Full Scale", tableTop: false, continuousLocation: false)])
+        sceneInfo.append(contentsOf: [(sceneFunction: streetsScene, label: "Streets - Full Scale", tableTop: false, useLocationDataSourceOnce: false),
+                                      (sceneFunction: imageryScene, label: "Imagery - Full Scale", tableTop: false, useLocationDataSourceOnce: false),
+                                      (sceneFunction: pointCloudScene, label: "Point Cloud - Tabletop", tableTop: true, useLocationDataSourceOnce: true),
+                                      (sceneFunction: yosemiteScene, label: "Yosemite - Tabletop", tableTop: true, useLocationDataSourceOnce: true),
+                                      (sceneFunction: borderScene, label: "US - Mexico Border - Tabletop", tableTop: true, useLocationDataSourceOnce: true),
+                                      (sceneFunction: emptyScene, label: "Empty - Full Scale", tableTop: false, useLocationDataSourceOnce: true)])
 
         // Use the first sceneInfo to create and set the scene.
         currentSceneInfo = sceneInfo.first
@@ -130,7 +130,7 @@ class ARExample: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        arView.startTracking(useLocationDataSourceOnce: currentSceneInfo?.continuousLocation ?? false, completion: { [weak self] (error) in
+        arView.startTracking(useLocationDataSourceOnce: currentSceneInfo?.useLocationDataSourceOnce ?? false, completion: { [weak self] (error) in
             self?.statusViewController?.errorMessage = error?.localizedDescription
         })
     }
@@ -200,7 +200,7 @@ class ARExample: UIViewController {
                 }
                 // Reset AR tracking and then start tracking.
                 self.arView.resetTracking()
-                self.arView.startTracking(useLocationDataSourceOnce: info.continuousLocation, completion: { [weak self] (error) in
+                self.arView.startTracking(useLocationDataSourceOnce: info.useLocationDataSourceOnce, completion: { [weak self] (error) in
                         self?.statusViewController?.errorMessage = error?.localizedDescription
                 })
                 
@@ -318,7 +318,7 @@ extension ARExample: ARSCNViewDelegate {
             // Present an alert describing the error.
             let alertController = UIAlertController(title: "Could not start tracking.", message: errorMessage, preferredStyle: .alert)
             let restartAction = UIAlertAction(title: "Restart Tracking", style: .default) { _ in
-                self?.arView.startTracking(useLocationDataSourceOnce: self?.currentSceneInfo?.continuousLocation ?? false, completion: { (error) in
+                self?.arView.startTracking(useLocationDataSourceOnce: self?.currentSceneInfo?.useLocationDataSourceOnce ?? false, completion: { (error) in
                     self?.statusViewController?.errorMessage = error?.localizedDescription
                 })
             }

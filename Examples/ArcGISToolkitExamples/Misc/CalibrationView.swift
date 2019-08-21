@@ -186,7 +186,7 @@ class CalibrationView: UIView {
     @objc func headingChanged(_ sender: UISlider) {
         if headingTimer == nil {
             // Create a timer which rotates the camera when fired.
-            headingTimer = Timer(timeInterval: 0.25, repeats: true, block: { [weak self] (timer) in
+            headingTimer = Timer(timeInterval: 0.1, repeats: true, block: { [weak self] (timer) in
                 let delta = self?.joystickHeading() ?? 0.0
 //                print("rotate delta = \(delta)")
                 self?.rotate(delta)
@@ -238,7 +238,7 @@ class CalibrationView: UIView {
     /// - Returns: The elevation delta.
     private func joystickElevation() -> Double {
         let deltaElevation = Double(elevationSlider.value)
-        return pow(deltaElevation, 2) / 10.0 * (deltaElevation < 0 ? -1.0 : 1.0)
+        return pow(deltaElevation, 2) / 50.0 * (deltaElevation < 0 ? -1.0 : 1.0)
     }
     
     /// Calculates the heading delta amount based on the heading slider value.
@@ -246,6 +246,6 @@ class CalibrationView: UIView {
     /// - Returns: The heading delta.
     private func joystickHeading() -> Double {
         let deltaHeading = Double(headingSlider.value)
-        return pow(deltaHeading, 2) / 10.0 * (deltaHeading < 0 ? -1.0 : 1.0)
+        return pow(deltaHeading, 2) / 25.0 * (deltaHeading < 0 ? -1.0 : 1.0)
     }
 }
