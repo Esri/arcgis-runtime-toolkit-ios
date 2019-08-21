@@ -89,7 +89,7 @@ class CalibrationView: UIView {
         labelView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             labelView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            labelView.topAnchor.constraint(equalTo: topAnchor, constant: 88.0)
+            labelView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 8.0)
             ])
         
         // Add the heading label and slider.
@@ -99,15 +99,15 @@ class CalibrationView: UIView {
         addSubview(headingLabel)
         headingLabel.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            headingLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            headingLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -16)
+            headingLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            headingLabel.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -16)
             ])
         
         addSubview(headingSlider)
         headingSlider.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             headingSlider.leadingAnchor.constraint(equalTo: headingLabel.trailingAnchor, constant: 16),
-            headingSlider.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
+            headingSlider.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -16),
             headingSlider.centerYAnchor.constraint(equalTo: headingLabel.centerYAnchor)
             ])
 
@@ -118,7 +118,7 @@ class CalibrationView: UIView {
         addSubview(elevationLabel)
         elevationLabel.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            elevationLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            elevationLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 16),
             elevationLabel.bottomAnchor.constraint(equalTo: headingLabel.topAnchor, constant: -24)
             ])
 
@@ -126,7 +126,7 @@ class CalibrationView: UIView {
         elevationSlider.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             elevationSlider.leadingAnchor.constraint(equalTo: elevationLabel.trailingAnchor, constant: 16),
-            elevationSlider.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
+            elevationSlider.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -16),
             elevationSlider.centerYAnchor.constraint(equalTo: elevationLabel.centerYAnchor)
             ])
 
@@ -135,10 +135,10 @@ class CalibrationView: UIView {
         // values increase the further you move away from center.  Moving and holding the thumb a little bit from center
         // will roate/elevate just a little bit, but get progressively more the further from center the thumb is moved.
         headingSlider.addTarget(self, action: #selector(headingChanged(_:)), for: .valueChanged)
-        headingSlider.addTarget(self, action: #selector(touchUpHeading(_:)), for: .touchUpInside)
+        headingSlider.addTarget(self, action: #selector(touchUpHeading(_:)), for: [.touchUpInside, .touchUpOutside])
 
         elevationSlider.addTarget(self, action: #selector(elevationChanged(_:)), for: .valueChanged)
-        elevationSlider.addTarget(self, action: #selector(touchUpElevation(_:)), for: .touchUpInside)
+        elevationSlider.addTarget(self, action: #selector(touchUpElevation(_:)), for: [.touchUpInside, .touchUpOutside])
 
     }
     
