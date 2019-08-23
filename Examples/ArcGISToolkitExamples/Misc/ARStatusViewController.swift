@@ -65,7 +65,7 @@ class ARStatusViewController: UITableViewController {
     }
 
     /// The current error message.
-    public var errorMessage: String = "None" {
+    public var errorMessage: String? {
         didSet {
             guard errorDescriptionLabel != nil else { return }
             DispatchQueue.main.async{ [weak self] in
