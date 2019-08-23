@@ -211,6 +211,11 @@ class ARExample: UIViewController {
             action.isEnabled = (info.label != currentSceneInfo?.label)
             alertController.addAction(action)
         }
+
+        // Add "cancel" action.
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        alertController.addAction(cancelAction)
+
         present(alertController, animated: true)
     }
     
