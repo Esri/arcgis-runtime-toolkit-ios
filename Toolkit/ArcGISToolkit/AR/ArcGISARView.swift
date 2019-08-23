@@ -307,7 +307,7 @@ public class ArcGISARView: UIView {
         // Create our hit test matrix based on the worldTransform location.
         // right now we ignore the orientation of the plane that was hit to find the point
         // since we only use horizontal planes, when we will start using vertical planes
-        // we should stop suppressing the quternion rotation to a null rotation (0,0,0,1)
+        // we should stop suppressing the quaternion rotation to a null rotation (0,0,0,1)
         let hitTestMatrix = AGSTransformationMatrix(quaternionX: 0.0,
                                                     quaternionY: 0.0,
                                                     quaternionZ: 0.0,
