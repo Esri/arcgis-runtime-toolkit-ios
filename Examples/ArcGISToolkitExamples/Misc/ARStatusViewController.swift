@@ -13,7 +13,7 @@
 
 import UIKit
 import ARKit
-
+import ArcGIS
 extension ARCamera.TrackingState {
     var description: String {
         switch self {
@@ -33,6 +33,21 @@ extension ARCamera.TrackingState {
     }
 }
 
+extension AGSLocationDataSourceStatus {
+    var description: String {
+        switch self {
+        case .stopped:
+            return "Stopped"
+        case .starting:
+            return "Starting"
+        case .started:
+            return "Started"
+        case .failedToStart:
+            return "Failed to start"
+        }
+    }
+}
+
 /// A view controller for display AR-related status information.
 class ARStatusViewController: UITableViewController {
 
@@ -41,7 +56,10 @@ class ARStatusViewController: UITableViewController {
     @IBOutlet var errorDescriptionLabel: UILabel!
     @IBOutlet var sceneLabel: UILabel!
     @IBOutlet var translationFactorLabel: UILabel!
-    
+    @IBOutlet var horizontalAccuracyLabel: UILabel!
+    @IBOutlet var verticalAccuracyLabel: UILabel!
+    @IBOutlet var locationDataSourceStatusLabel: UILabel!
+
     /// The `ARKit` camera tracking state.
     public var trackingState: ARCamera.TrackingState = .notAvailable {
         didSet {
@@ -93,6 +111,39 @@ class ARStatusViewController: UITableViewController {
             DispatchQueue.main.async{ [weak self] in
                 guard let self = self else { return }
                 self.translationFactorLabel.text = String(format: "%.2f", self.translationFactor)
+            }
+        }
+    }
+
+    /// The horizontal accuracy of the last location.
+    public var horizontalAccuracy: Double = 1.0 {
+        didSet {
+            guard horizontalAccuracyLabel != nil else { return }
+            DispatchQueue.main.async{ [weak self] in
+                guard let self = self else { return }
+                self.horizontalAccuracyLabel.text = String(format: "%.0f", self.horizontalAccuracy)
+            }
+        }
+    }
+
+    /// The vertical accuracy of the last location.
+    public var verticalAccuracy: Double = 1.0 {
+        didSet {
+            guard verticalAccuracyLabel != nil else { return }
+            DispatchQueue.main.async{ [weak self] in
+                guard let self = self else { return }
+                self.verticalAccuracyLabel.text = String(format: "%.0f", self.verticalAccuracy)
+            }
+        }
+    }
+
+    /// The status of the location data source.
+    public var locationDataSourceStatus: AGSLocationDataSourceStatus = .stopped {
+        didSet {
+            guard locationDataSourceStatusLabel != nil else { return }
+            DispatchQueue.main.async{ [weak self] in
+                guard let self = self else { return }
+                self.locationDataSourceStatusLabel.text = self.locationDataSourceStatus.description
             }
         }
     }

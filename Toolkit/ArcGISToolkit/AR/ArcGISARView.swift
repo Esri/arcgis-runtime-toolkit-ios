@@ -81,7 +81,10 @@ public class ArcGISARView: UIView {
 
     /// We implement `ARSCNViewDelegate` methods, but will use `arSCNViewDelegate` to forward them to clients.
     weak public var arSCNViewDelegate: ARSCNViewDelegate?
-    
+
+    /// We implement `AGSLocationChangeHandlerDelegate` methods, but will use `locationChangeHandlerDelegate` to forward them to clients.
+    weak public var locationChangeHandlerDelegate: AGSLocationChangeHandlerDelegate?
+
     // MARK: Private properties
     
     /// Used when calculating framerate.
@@ -462,19 +465,29 @@ extension ArcGISARView: AGSLocationChangeHandlerDelegate {
             sceneView.setViewpointCamera(camera)
 //            print("heading changed: \(heading)")
         }
+
+        locationChangeHandlerDelegate?.locationDataSource?(locationDataSource, headingDidChange: heading)
     }
     
     public func locationDataSource(_ locationDataSource: AGSLocationDataSource, locationDidChange location: AGSLocation) {
         // Location changed.
         guard var locationPoint = location.position else { return }
-        
+//        print("AGS Horizontal Accuracy = \(location.horizontalAccuracy)")
+
         // The AGSCLLocationDataSource does not include altitude information from the CLLocation when
         // creating the `AGSLocation` geometry, so grab the altitude directly from the CLLocationManager.
-        if let clLocationDataSource = locationDataSource as? AGSCLLocationDataSource,
-            let location = clLocationDataSource.locationManager.location,
-            location.verticalAccuracy >= 0 {
-            let altitude = location.altitude
-            locationPoint = AGSPoint(x: locationPoint.x, y: locationPoint.y, z: altitude, spatialReference: locationPoint.spatialReference)
+        if let clLocationDataSource = locationDataSource as? AGSCLLocationDataSource {
+            if let location = clLocationDataSource.locationManager.location,
+                location.verticalAccuracy >= 0 {
+                let altitude = location.altitude
+                locationPoint = AGSPoint(x: locationPoint.x, y: locationPoint.y, z: altitude, spatialReference: locationPoint.spatialReference)
+                print("Horizontal Accuracy = \(location.horizontalAccuracy)")
+            }
+            else {
+                // We don't have a valid altitude, so use the old altitude.
+                let oldLocationPoint = cameraController.originCamera.location
+                locationPoint = AGSPoint(x: locationPoint.x, y: locationPoint.y, z: oldLocationPoint.z, spatialReference: locationPoint.spatialReference)
+            }
         }
         
         // Always set originCamera; then reset ARKit
@@ -501,11 +514,15 @@ extension ArcGISARView: AGSLocationChangeHandlerDelegate {
             // If we are only using the intitial data source location, stop the data source.
             locationDataSource.stop()
         }
+        
+        locationChangeHandlerDelegate?.locationDataSource?(locationDataSource, locationDidChange: location)
+        
     }
 
     public func locationDataSource(_ locationDataSource: AGSLocationDataSource, statusDidChange status: AGSLocationDataSourceStatus) {
         // Status changed.
 //        print("locationDataSource status changed: \(status.rawValue)")
+        locationChangeHandlerDelegate?.locationDataSource?(locationDataSource, statusDidChange: status)
     }
 }
 

@@ -78,6 +78,9 @@ class ARExample: UIViewController {
         // Set ourself as touch delegate so we can get touch events.
         arView.sceneView.touchDelegate = self
         
+        // Set ourself as touch delegate so we can get touch events.
+        arView.locationChangeHandlerDelegate = self
+
         // Disble user interactions on the sceneView.
         arView.sceneView.interactionOptions.isEnabled = false
         
@@ -117,7 +120,7 @@ class ARExample: UIViewController {
 
         // Set up the `sceneInfo` array with our scene init functions and labels.
         sceneInfo.append(contentsOf: [(sceneFunction: streetsScene, label: "Streets - Full Scale", tableTop: false, useLocationDataSourceOnce: false),
-                                      (sceneFunction: imageryScene, label: "Imagery - Full Scale", tableTop: false, useLocationDataSourceOnce: false),
+                                      (sceneFunction: imageryScene, label: "Imagery - Full Scale", tableTop: false, useLocationDataSourceOnce: true),
                                       (sceneFunction: pointCloudScene, label: "Point Cloud - Tabletop", tableTop: true, useLocationDataSourceOnce: true),
                                       (sceneFunction: yosemiteScene, label: "Yosemite - Tabletop", tableTop: true, useLocationDataSourceOnce: true),
                                       (sceneFunction: borderScene, label: "US - Mexico Border - Tabletop", tableTop: true, useLocationDataSourceOnce: true),
@@ -263,7 +266,7 @@ class ARExample: UIViewController {
             statusVC.didMove(toParent: self)
             statusVC.view.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate([
-                statusVC.view.heightAnchor.constraint(equalToConstant: 110),
+                statusVC.view.heightAnchor.constraint(equalToConstant: 176),
                 statusVC.view.widthAnchor.constraint(equalToConstant: 350),
                 statusVC.view.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -8),
                 statusVC.view.bottomAnchor.constraint(equalTo: toolbar.topAnchor, constant: -8)
@@ -661,6 +664,20 @@ extension AGSScene {
         surface.backgroundGrid.isVisible = false
         surface.navigationConstraint = .none
         baseSurface = surface
+    }
+}
+
+// MARK: AGSLocationChangeHandlerDelegate methods
+extension ARExample: AGSLocationChangeHandlerDelegate {
+    public func locationDataSource(_ locationDataSource: AGSLocationDataSource, locationDidChange location: AGSLocation) {
+        // When we get a new location, update the status view controller with the new horizontal and vertical accuracy.
+        statusViewController?.horizontalAccuracy = location.horizontalAccuracy
+        statusViewController?.verticalAccuracy = location.verticalAccuracy
+    }
+    
+    func locationDataSource(_ locationDataSource: AGSLocationDataSource, statusDidChange status: AGSLocationDataSourceStatus) {
+        // Update the data source status.
+        statusViewController?.locationDataSourceStatus = status
     }
 }
 
