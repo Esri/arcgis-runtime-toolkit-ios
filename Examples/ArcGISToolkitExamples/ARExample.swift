@@ -17,7 +17,7 @@ import ArcGISToolkit
 import ArcGIS
 
 class ARExample: UIViewController {
-
+    
     typealias SceneInitFunction = () -> AGSScene
     typealias SceneInfoType = (sceneFunction: SceneInitFunction, label: String, tableTop: Bool, useLocationDataSourceOnce: Bool)
     
@@ -54,19 +54,19 @@ class ARExample: UIViewController {
         overlay.sceneProperties = AGSLayerSceneProperties(surfacePlacement: .absolute)
         return overlay
     }()
-        
+    
     /// View for displaying directions to the user.
     private let userDirectionsView = UserDirectionsView(effect: UIBlurEffect(style: .light))
     
     /// The observation for the `SceneView`'s `translationFactor` property.
     private var translationFactorObservation: NSKeyValueObservation?
-
+    
     /// View for displaying calibration controls to the user.
     private var calibrationView: CalibrationView?
-
+    
     /// The toolbar used to display controls for calibration, changing scenes, and status.
     private var toolbar = UIToolbar(frame: .zero)
-
+    
     // MARK: Initialization
     
     override func viewDidLoad() {
@@ -80,7 +80,7 @@ class ARExample: UIViewController {
         
         // Set ourself as touch delegate so we can get touch events.
         arView.locationChangeHandlerDelegate = self
-
+        
         // Disble user interactions on the sceneView.
         arView.sceneView.interactionOptions.isEnabled = false
         
@@ -113,11 +113,11 @@ class ARExample: UIViewController {
         
         // Add the UserDirectionsView.
         addUserDirectionsView()
-
+        
         // Create the CalibrationView.
         calibrationView = CalibrationView(arView)
         calibrationView?.alpha = 0.0
-
+        
         // Set up the `sceneInfo` array with our scene init functions and labels.
         sceneInfo.append(contentsOf: [(sceneFunction: streetsScene, label: "Streets - Full Scale", tableTop: false, useLocationDataSourceOnce: false),
                                       (sceneFunction: imageryScene, label: "Imagery - Full Scale", tableTop: false, useLocationDataSourceOnce: true),
@@ -125,7 +125,7 @@ class ARExample: UIViewController {
                                       (sceneFunction: yosemiteScene, label: "Yosemite - Tabletop", tableTop: true, useLocationDataSourceOnce: true),
                                       (sceneFunction: borderScene, label: "US - Mexico Border - Tabletop", tableTop: true, useLocationDataSourceOnce: true),
                                       (sceneFunction: emptyScene, label: "Empty - Full Scale", tableTop: false, useLocationDataSourceOnce: true)])
-
+        
         // Use the first sceneInfo to create and set the scene.
         currentSceneInfo = sceneInfo.first
         arView.sceneView.scene = currentSceneInfo?.sceneFunction()
@@ -142,7 +142,7 @@ class ARExample: UIViewController {
         super.viewDidDisappear(animated)
         arView.stopTracking()
     }
-
+    
     // MARK: Toolbar button actions
     
     /// Initialize scene location/heading/elevation calibration.
@@ -152,7 +152,7 @@ class ARExample: UIViewController {
         
         // If the sceneView's alpha is 0.0, that means we are not in calibration mode and we need to start calibrating.
         let startCalibrating = (calibrationView?.alpha == 0.0)
-
+        
         // Enable/disable sceneView touch interactions.
         arView.sceneView.interactionOptions.isEnabled = startCalibrating
         userDirectionsView.updateUserDirections(nil)
@@ -179,7 +179,7 @@ class ARExample: UIViewController {
         // Hide directions view if we're calibrating.
         userDirectionsView.isHidden = startCalibrating
     }
-
+    
     /// Allow users to change the current scene.
     ///
     /// - Parameter sender: The bar button item tapped on.
@@ -204,7 +204,7 @@ class ARExample: UIViewController {
                 // Reset AR tracking and then start tracking.
                 self.arView.resetTracking()
                 self.arView.startTracking(useLocationDataSourceOnce: info.useLocationDataSourceOnce, completion: { [weak self] (error) in
-                        self?.statusViewController?.errorMessage = error?.localizedDescription
+                    self?.statusViewController?.errorMessage = error?.localizedDescription
                 })
                 
                 // Reset didPlaceScene variable
@@ -214,11 +214,11 @@ class ARExample: UIViewController {
             action.isEnabled = (info.label != currentSceneInfo?.label)
             alertController.addAction(action)
         }
-
+        
         // Add "cancel" action.
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         alertController.addAction(cancelAction)
-
+        
         present(alertController, animated: true)
     }
     
@@ -244,20 +244,20 @@ class ARExample: UIViewController {
         
         // Create a toolbar button for calibration.
         let calibrationItem = UIBarButtonItem(title: "Calibration", style: .plain, target: self, action: #selector(displayCalibration(_:)))
-
+        
         // Create a toolbar button to change the current scene.
         let sceneItem = UIBarButtonItem(title: "Change Scene", style: .plain, target: self, action: #selector(changeScene(_:)))
         
         // Create a toolbar button to display the status.
         let statusItem = UIBarButtonItem(title: "Status", style: .plain, target: self, action: #selector(showStatus(_:)))
-
+        
         toolbar.setItems([calibrationItem,
                           UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
                           sceneItem,
                           UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
                           statusItem], animated: false)
     }
-
+    
     /// Set up the status view controller and adds it to the view.
     private func addStatusViewController() {
         if let statusVC = statusViewController {
@@ -366,7 +366,7 @@ extension ARExample: ARSessionDelegate {
 // MARK: AGSGeoViewTouchDelegate
 extension ARExample: AGSGeoViewTouchDelegate {
     public func geoView(_ geoView: AGSGeoView, didTapAtScreenPoint screenPoint: CGPoint, mapPoint: AGSPoint) {
-        if let sceneInfo = currentSceneInfo, sceneInfo.tableTop, !didPlaceScene {
+        if let sceneInfo = currentSceneInfo, sceneInfo.tableTop {
             // We're in table-top mode and haven't placed the scene yet.  Place the scene at the given point by setting the initial transformation.
             if arView.setInitialTransformation(using: screenPoint) {
                 // Show the SceneView now that the user has tapped on the surface.
@@ -382,13 +382,13 @@ extension ARExample: AGSGeoViewTouchDelegate {
         else {
             // We're in full-scale AR mode or have already placed the scene. Get the real world location for screen point from arView.
             guard let point = arView.arScreenToLocation(screenPoint: screenPoint) else { return }
-
+            
             // Create and place a graphic and shadown at the real world location.
             let shadowColor = UIColor.lightGray.withAlphaComponent(0.5)
             let shadow = AGSSimpleMarkerSceneSymbol(style: .sphere, color: shadowColor, height: 0.01, width: 0.25, depth: 0.25, anchorPosition: .center)
             let shadowGraphic = AGSGraphic(geometry: point, symbol: shadow)
             graphicsOverlay.graphics.add(shadowGraphic)
-
+            
             let sphere = AGSSimpleMarkerSceneSymbol(style: .sphere, color: .red, height: 0.25, width: 0.25, depth: 0.25, anchorPosition: .bottom)
             let sphereGraphic = AGSGraphic(geometry: point, symbol: sphere)
             graphicsOverlay.graphics.add(sphereGraphic)
@@ -433,7 +433,8 @@ extension ARExample {
             case .excessiveMotion:
                 message = "Try moving your device more slowly."
             case .initializing:
-                message = "Keep moving your device."
+                // Because ARKit gets reset often when using continuous GPS, only dipslay initializing message if we're using the initial GPS.
+                message = (currentSceneInfo?.useLocationDataSourceOnce ?? false) ? "Keep moving your device." : ""
             case .insufficientFeatures:
                 message = "Try turning on more lights and moving around."
             default:
@@ -633,7 +634,7 @@ extension ARExample {
         arView.locationDataSource = nil
         return scene
     }
-
+    
     /// Creates an empty scene with an elevation source.
     /// Mode:  Full-Scale AR
     ///
@@ -649,7 +650,7 @@ extension ARExample {
         return scene
     }
 }
-    
+
 // MARK: AGSScene extension.
 extension AGSScene {
     /// Adds an elevation source to the given `scene`.
