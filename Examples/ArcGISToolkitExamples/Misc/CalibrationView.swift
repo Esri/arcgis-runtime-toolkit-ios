@@ -14,15 +14,13 @@
 
 import UIKit
 import ArcGIS
+import ArcGISToolkit
 
 /// A view displaying controls for adjusting a scene view's location, heading, and elevation. Used to calibrate an AR session.
 class CalibrationView: UIView {
-    
-    // The scene view displaying the scene.
-    private let sceneView: AGSSceneView
 
-    /// The camera controller used to adjust user interactions.
-    private let cameraController: AGSTransformationMatrixCameraController
+    /// The `ArcGISARView` containing the origin camera we will be updating.
+    private var arcgisARView: ArcGISARView!
 
     /// The label displaying calibration directions.
     private let calibrationDirectionsLabel: UILabel = {
@@ -57,17 +55,14 @@ class CalibrationView: UIView {
     // The last heading slider value.
     var lastHeadingValue: Float = 0
 
-    /// Initialized a new calibration view with the given scene view and camera controller.
+    /// Initialized a new calibration view with the `ArcGISARView`.
     ///
     /// - Parameters:
-    ///   - sceneView: The scene view displaying the scene.
-    ///   - cameraController: The camera controller used to adjust user interactions.
-    init(sceneView: AGSSceneView, cameraController: AGSTransformationMatrixCameraController) {
-        self.cameraController = cameraController
-        self.sceneView = sceneView
+    ///   - arcgisARView: The `ArcGISARView` containing the originCamera we're updating.
+    init(_ arcgisARView: ArcGISARView) {
+        self.arcgisARView = arcgisARView
 
         super.init(frame: .zero)
-        
         
         // Create visual effects view to show the label on a blurred background.
         let labelView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
@@ -220,17 +215,17 @@ class CalibrationView: UIView {
     ///
     /// - Parameter deltaHeading: The amount to rotate the camera.
     private func rotate(_ deltaHeading: Double) {
-        let camera = cameraController.originCamera
+        guard let camera = arcgisARView.originCamera else { return }
         let newHeading = camera.heading + deltaHeading
-        cameraController.originCamera = camera.rotate(toHeading: newHeading, pitch: camera.pitch, roll: camera.roll)
+        arcgisARView.originCamera = camera.rotate(toHeading: newHeading, pitch: camera.pitch, roll: camera.roll)
     }
     
     /// Change the cameras altitude by `deltaAltitude`.
     ///
     /// - Parameter deltaAltitude: The amount to elevate the camera.
     private func elevate(_ deltaAltitude: Double) {
-        let camera = cameraController.originCamera
-        cameraController.originCamera = camera.elevate(withDeltaAltitude: deltaAltitude)
+        guard let camera = arcgisARView.originCamera else { return }
+        arcgisARView.originCamera = camera.elevate(withDeltaAltitude: deltaAltitude)
     }
     
     /// Calculates the elevation delta amount based on the elevation slider value.

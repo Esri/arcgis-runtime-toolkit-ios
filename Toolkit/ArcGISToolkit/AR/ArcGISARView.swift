@@ -38,9 +38,6 @@ public class ArcGISARView: UIView {
             locationDataSource?.locationChangeHandlerDelegate = self
         }
     }
-    
-    /// The `AGSTransformationMatrixCameraController` used to control the Scene.
-    @objc public let cameraController = AGSTransformationMatrixCameraController()
 
     /// The viewpoint camera used to set the initial view of the sceneView instead of the device's GPS location via the location data source.  You can use Key-Value Observing to track changes to the origin camera.
     @objc dynamic public var originCamera: AGSCamera? {
@@ -86,7 +83,10 @@ public class ArcGISARView: UIView {
     weak public var locationChangeHandlerDelegate: AGSLocationChangeHandlerDelegate?
 
     // MARK: Private properties
-    
+        
+    /// The `AGSTransformationMatrixCameraController` used to control the Scene.
+    @objc private let cameraController = AGSTransformationMatrixCameraController()
+
     /// Used when calculating framerate.
     private var lastUpdateTime: TimeInterval = 0
     

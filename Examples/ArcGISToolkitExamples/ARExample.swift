@@ -17,7 +17,7 @@ import ArcGISToolkit
 import ArcGIS
 
 class ARExample: UIViewController {
-    
+
     typealias SceneInitFunction = () -> AGSScene
     typealias SceneInfoType = (sceneFunction: SceneInitFunction, label: String, tableTop: Bool, useLocationDataSourceOnce: Bool)
     
@@ -115,7 +115,7 @@ class ARExample: UIViewController {
         addUserDirectionsView()
 
         // Create the CalibrationView.
-        calibrationView = CalibrationView(sceneView: arView.sceneView, cameraController: arView.cameraController)
+        calibrationView = CalibrationView(arView)
         calibrationView?.alpha = 0.0
 
         // Set up the `sceneInfo` array with our scene init functions and labels.
