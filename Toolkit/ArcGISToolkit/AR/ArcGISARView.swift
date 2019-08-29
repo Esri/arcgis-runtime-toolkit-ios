@@ -21,18 +21,23 @@ public class ArcGISARView: UIView {
     // MARK: public properties
     
     /// The view used to display the `ARKit` camera image and 3D `SceneKit` content.
+    /// - Since: 100.6.0
     public let arSCNView = ARSCNView(frame: .zero)
     
     /// The initial transformation used for a table top experience.  Defaults to the Identity Matrix.
+    /// - Since: 100.6.0
     public var initialTransformation: AGSTransformationMatrix = .identity
     
     /// Denotes whether tracking location and angles has started.
+    /// - Since: 100.6.0
     public private(set) var isTracking: Bool = false
     
     /// Denotes whether ARKit is being used to track location and angles.
+    /// - Since: 100.6.0
     public private(set) var isUsingARKit: Bool = true
 
     /// The data source used to get device location.  Used either in conjuction with ARKit data or when ARKit is not present or not being used.
+    /// - Since: 100.6.0
     public var locationDataSource: AGSCLLocationDataSource? {
         didSet {
             locationDataSource?.locationChangeHandlerDelegate = self
@@ -40,6 +45,7 @@ public class ArcGISARView: UIView {
     }
 
     /// The viewpoint camera used to set the initial view of the sceneView instead of the device's GPS location via the location data source.  You can use Key-Value Observing to track changes to the origin camera.
+    /// - Since: 100.6.0
     @objc dynamic public var originCamera: AGSCamera? {
         didSet {
             guard let newCamera = originCamera else { return }
@@ -49,9 +55,11 @@ public class ArcGISARView: UIView {
     }
 
     /// The view used to display ArcGIS 3D content.
+    /// - Since: 100.6.0
     public let sceneView = AGSSceneView(frame: .zero)
     
     /// The translation factor used to support a table top AR experience.
+    /// - Since: 100.6.0
     @objc dynamic public var translationFactor: Double {
         get {
             return cameraController.translationFactor
@@ -62,6 +70,7 @@ public class ArcGISARView: UIView {
     }
     
     /// The world tracking information used by `ARKit`.
+    /// - Since: 100.6.0
     public var arConfiguration: ARConfiguration = {
         let config = ARWorldTrackingConfiguration()
         config.worldAlignment = .gravityAndHeading
@@ -77,18 +86,17 @@ public class ArcGISARView: UIView {
     }
 
     /// We implement `ARSCNViewDelegate` methods, but will use `arSCNViewDelegate` to forward them to clients.
+    /// - Since: 100.6.0
     weak public var arSCNViewDelegate: ARSCNViewDelegate?
 
     /// We implement `AGSLocationChangeHandlerDelegate` methods, but will use `locationChangeHandlerDelegate` to forward them to clients.
+    /// - Since: 100.6.0
     weak public var locationChangeHandlerDelegate: AGSLocationChangeHandlerDelegate?
 
     // MARK: Private properties
         
     /// The `AGSTransformationMatrixCameraController` used to control the Scene.
     @objc private let cameraController = AGSTransformationMatrixCameraController()
-
-    /// Used when calculating framerate.
-    private var lastUpdateTime: TimeInterval = 0
     
     /// Whether `ARKit` is supported on this device.
     private let deviceSupportsARKit: Bool = {
@@ -118,6 +126,7 @@ public class ArcGISARView: UIView {
     /// - Parameters:
     ///   - renderVideoFeed: Whether to display the live camera image.
     ///   - tryUsingARKit: Whether or not to use ARKit, regardless if it's available.
+    /// - Since: 100.6.0
     public convenience init(renderVideoFeed: Bool, tryUsingARKit: Bool){
         self.init(frame: .zero)
         
@@ -187,33 +196,29 @@ public class ArcGISARView: UIView {
     ///
     /// - Parameter screenPoint: The point in screen coordinates.
     /// - Returns: The map point corresponding to screenPoint.
+    /// - Since: 100.6.0
     public func arScreenToLocation(screenPoint: CGPoint) -> AGSPoint? {
         // Use the `internalHitTest` method to get the matrix of `screenPoint`.
         guard let localOffsetMatrix = internalHitTest(screenPoint: screenPoint) else { return nil }
+        
+        let currOriginMatrix = cameraController.originCamera.transformationMatrix
 
-//        print("Local offset XYZ, World origin XYZ, Combined world coordinate XYZ")
-//
-//        //TODO: generalize the debug print function
-//        //        print("lqx: \(localOffsetMatrix.quaternionX); lqy: \(localOffsetMatrix.quaternionY); lqz: \(localOffsetMatrix.quaternionZ); lqw: \(localOffsetMatrix.quaternionW); ltx: \(localOffsetMatrix.translationX); lty: \(localOffsetMatrix.translationY); ltz: \(localOffsetMatrix.translationZ)")
-//        print("\(localOffsetMatrix.translationX) \(localOffsetMatrix.translationY) \(localOffsetMatrix.translationZ)")
-        
-        let currOriginCamera = cameraController.originCamera
-        let currOriginMatrix = currOriginCamera.transformationMatrix
-//
-//        //        print("oqx: \(currOriginMatrix.quaternionX); oqy: \(currOriginMatrix.quaternionY); oqz: \(currOriginMatrix.quaternionZ); oqw: \(currOriginMatrix.quaternionW); otx: \(currOriginMatrix.translationX); oty: \(currOriginMatrix.translationY); otz: \(currOriginMatrix.translationZ)")
-//        print("\(currOriginMatrix.translationX) \(currOriginMatrix.translationY) \(currOriginMatrix.translationZ)")
-        
-        //TODO: for tabletop application scale translation by TranslationFactor
-        let mapPointMatrix = currOriginMatrix.addTransformation(localOffsetMatrix)
-//
-//        //        print("cqx: \(mapPointMatrix.quaternionX); cqy: \(mapPointMatrix.quaternionY); cqz: \(mapPointMatrix.quaternionZ); cqw: \(mapPointMatrix.quaternionW); ctx: \(mapPointMatrix.translationX); cty: \(mapPointMatrix.translationY); ctz: \(mapPointMatrix.translationZ)")
-//        print("\(mapPointMatrix.translationX) \(mapPointMatrix.translationY) \(mapPointMatrix.translationZ)")
+        // Scale translation by translationFactor.
+        let translatedMatrix = AGSTransformationMatrix(quaternionX: localOffsetMatrix.quaternionX,
+                                                       quaternionY: localOffsetMatrix.quaternionY,
+                                                       quaternionZ: localOffsetMatrix.quaternionZ,
+                                                       quaternionW: localOffsetMatrix.quaternionW,
+                                                       translationX: localOffsetMatrix.translationX * translationFactor,
+                                                       translationY: localOffsetMatrix.translationY * translationFactor,
+                                                       translationZ: localOffsetMatrix.translationZ * translationFactor)
+        let mapPointMatrix = currOriginMatrix.addTransformation(translatedMatrix)
         
         // Create a camera from transformationMatrix and return its location.
         return AGSCamera(transformationMatrix: mapPointMatrix).location
     }
 
     /// Resets the device tracking and related properties.
+    /// - Since: 100.6.0
     public func resetTracking() {
         originCamera = nil
         initialTransformation = .identity
@@ -228,6 +233,7 @@ public class ArcGISARView: UIView {
     ///
     /// - Parameter screenPoint: The screen point to determine the `initialTransformation` from.
     /// - Returns: Whether setting the `initialTransformation` succeeded or failed.
+    /// - Since: 100.6.0
     public func setInitialTransformation(using screenPoint: CGPoint) -> Bool {
         // Use the `internalHitTest` method to get the matrix of `screenPoint`.
         guard let matrix = internalHitTest(screenPoint: screenPoint) else { return false }
@@ -241,6 +247,7 @@ public class ArcGISARView: UIView {
     /// Starts device tracking.
     ///
     /// - Parameter completion: The completion handler called when start tracking completes.  If tracking starts successfully, the `error` property will be nil; if tracking fails to start, the error will be non-nil and contain the reason for failure.
+    /// - Since: 100.6.0
     public func startTracking(useLocationDataSourceOnce: Bool = true, completion: ((_ error: Error?) -> Void)? = nil) {
         // We have a location data source that needs to be started.
         self.useLocationDataSourceOnce = useLocationDataSourceOnce
@@ -260,6 +267,7 @@ public class ArcGISARView: UIView {
     }
 
     /// Suspends device tracking.
+    /// - Since: 100.6.0
     public func stopTracking() {
         arSCNView.session.pause()
         locationDataSource?.stop()
@@ -438,11 +446,6 @@ extension ArcGISARView: SCNSceneRendererDelegate {
 
         // Render the Scene with the new transformation.
         sceneView.renderFrame()
-
-        // Calculate frame rate.
-//        let frametime = time - lastUpdateTime
-//        print("Frame rate = \(String(reflecting: Int((1.0 / frametime).rounded())))")
-//        lastUpdateTime = time
         
         // Call our arSCNViewDelegate method.
         arSCNViewDelegate?.renderer?(renderer, willRenderScene: scene, atTime: time)
@@ -463,7 +466,6 @@ extension ArcGISARView: AGSLocationChangeHandlerDelegate {
             let currentCamera = sceneView.currentViewpointCamera()
             let camera = currentCamera.rotate(toHeading: heading, pitch: currentCamera.pitch, roll: currentCamera.roll)
             sceneView.setViewpointCamera(camera)
-//            print("heading changed: \(heading)")
         }
 
         locationChangeHandlerDelegate?.locationDataSource?(locationDataSource, headingDidChange: heading)
@@ -472,7 +474,6 @@ extension ArcGISARView: AGSLocationChangeHandlerDelegate {
     public func locationDataSource(_ locationDataSource: AGSLocationDataSource, locationDidChange location: AGSLocation) {
         // Location changed.
         guard var locationPoint = location.position else { return }
-//        print("AGS Horizontal Accuracy = \(location.horizontalAccuracy)")
 
         // The AGSCLLocationDataSource does not include altitude information from the CLLocation when
         // creating the `AGSLocation` geometry, so grab the altitude directly from the CLLocationManager.
@@ -481,7 +482,6 @@ extension ArcGISARView: AGSLocationChangeHandlerDelegate {
                 location.verticalAccuracy >= 0 {
                 let altitude = location.altitude
                 locationPoint = AGSPoint(x: locationPoint.x, y: locationPoint.y, z: altitude, spatialReference: locationPoint.spatialReference)
-                print("Horizontal Accuracy = \(location.horizontalAccuracy)")
             }
             else {
                 // We don't have a valid altitude, so use the old altitude.
@@ -521,7 +521,6 @@ extension ArcGISARView: AGSLocationChangeHandlerDelegate {
 
     public func locationDataSource(_ locationDataSource: AGSLocationDataSource, statusDidChange status: AGSLocationDataSourceStatus) {
         // Status changed.
-//        print("locationDataSource status changed: \(status.rawValue)")
         locationChangeHandlerDelegate?.locationDataSource?(locationDataSource, statusDidChange: status)
     }
 }
