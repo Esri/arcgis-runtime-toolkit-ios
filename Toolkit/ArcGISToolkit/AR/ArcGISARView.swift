@@ -310,7 +310,7 @@ public class ArcGISARView: UIView {
     /// - Returns: An `AGSTransformationMatrix` representing the real-world point corresponding to `screenPoint`.
     fileprivate func internalHitTest(screenPoint: CGPoint) -> AGSTransformationMatrix? {
         // Use the `hitTest` method on ARSCNView to get the location of `screenPoint`.
-        let results = arSCNView.hitTest(screenPoint, types: [.existingPlane, .estimatedHorizontalPlane])
+        let results = arSCNView.hitTest(screenPoint, types: .existingPlaneUsingExtent)
         
         // Get the worldTransform from the first result; if there's no worldTransform, return nil.
         guard let worldTransform = results.first?.worldTransform else { return nil }

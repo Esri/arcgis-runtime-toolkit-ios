@@ -129,6 +129,9 @@ class ARExample: UIViewController {
         // Use the first sceneInfo to create and set the scene.
         currentSceneInfo = sceneInfo.first
         arView.sceneView.scene = currentSceneInfo?.sceneFunction()
+        
+        // Debug options for showing world origin and point cloud scene analysis points.
+//        arView.arSCNView.debugOptions = [.showWorldOrigin, .showFeaturePoints]
     }
     
     override func viewDidAppear(_ animated: Bool) {
