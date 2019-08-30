@@ -67,6 +67,12 @@ class ARExample: UIViewController {
     /// The toolbar used to display controls for calibration, changing scenes, and status.
     private var toolbar = UIToolbar(frame: .zero)
     
+    /// Button used to display the `CalibrationView`.
+    private let calibrationItem = UIBarButtonItem(title: "Calibration", style: .plain, target: self, action: #selector(displayCalibration(_:)))
+    
+    /// Button used to change the current scene.
+    private let sceneItem = UIBarButtonItem(title: "Change Scene", style: .plain, target: self, action: #selector(changeScene(_:)))
+
     // MARK: Initialization
     
     override func viewDidLoad() {
@@ -181,6 +187,9 @@ class ARExample: UIViewController {
         
         // Hide directions view if we're calibrating.
         userDirectionsView.isHidden = startCalibrating
+        
+        // Disable changing scenes if we're calibrating.
+        sceneItem.isEnabled = !startCalibrating
     }
     
     /// Allow users to change the current scene.
@@ -209,6 +218,12 @@ class ARExample: UIViewController {
                 self.arView.startTracking(useLocationDataSourceOnce: info.useLocationDataSourceOnce, completion: { [weak self] (error) in
                     self?.statusViewController?.errorMessage = error?.localizedDescription
                 })
+                
+                // Disable elevation control if we're using continuous GPS.
+                self.calibrationView?.elevationControlVisibility = info.useLocationDataSourceOnce
+                
+                // Disable calibration if we're in table top
+                self.calibrationItem.isEnabled = !info.tableTop
                 
                 // Reset didPlaceScene variable
                 self.didPlaceScene = false
@@ -244,12 +259,6 @@ class ARExample: UIViewController {
             toolbar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             toolbar.bottomAnchor.constraint(equalTo: arView.sceneView.attributionTopAnchor)
             ])
-        
-        // Create a toolbar button for calibration.
-        let calibrationItem = UIBarButtonItem(title: "Calibration", style: .plain, target: self, action: #selector(displayCalibration(_:)))
-        
-        // Create a toolbar button to change the current scene.
-        let sceneItem = UIBarButtonItem(title: "Change Scene", style: .plain, target: self, action: #selector(changeScene(_:)))
         
         // Create a toolbar button to display the status.
         let statusItem = UIBarButtonItem(title: "Status", style: .plain, target: self, action: #selector(showStatus(_:)))

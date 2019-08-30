@@ -19,6 +19,14 @@ import ArcGISToolkit
 /// A view displaying controls for adjusting a scene view's location, heading, and elevation. Used to calibrate an AR session.
 class CalibrationView: UIView {
 
+    /// Denotes whether to show the elevation control and label; defaults to `true`.
+    public var elevationControlVisibility: Bool = true {
+        didSet {
+            elevationSlider.isHidden = !elevationControlVisibility
+            elevationLabel.isHidden = !elevationControlVisibility
+        }
+    }
+    
     /// The `ArcGISARView` containing the origin camera we will be updating.
     private var arcgisARView: ArcGISARView!
 
@@ -50,10 +58,13 @@ class CalibrationView: UIView {
     }()
     
     /// The last elevation slider value.
-    var lastElevationValue: Float = 0
+    private var lastElevationValue: Float = 0
     
     // The last heading slider value.
-    var lastHeadingValue: Float = 0
+    private var lastHeadingValue: Float = 0
+    
+    /// The elevation label..
+    private let elevationLabel = UILabel(frame: .zero)
 
     /// Initialized a new calibration view with the `ArcGISARView`.
     ///
@@ -107,7 +118,6 @@ class CalibrationView: UIView {
             ])
 
         // Add the elevation label and slider.
-        let elevationLabel = UILabel(frame: .zero)
         elevationLabel.text = "Elevation"
         elevationLabel.textColor = .yellow
         addSubview(elevationLabel)
@@ -135,6 +145,8 @@ class CalibrationView: UIView {
         elevationSlider.addTarget(self, action: #selector(elevationChanged(_:)), for: .valueChanged)
         elevationSlider.addTarget(self, action: #selector(touchUpElevation(_:)), for: [.touchUpInside, .touchUpOutside])
 
+        elevationSlider.isHidden = !elevationControlVisibility
+        elevationLabel.isHidden = !elevationControlVisibility
     }
     
     required init?(coder aDecoder: NSCoder) {
