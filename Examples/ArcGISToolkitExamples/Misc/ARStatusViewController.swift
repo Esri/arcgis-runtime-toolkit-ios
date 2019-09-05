@@ -14,6 +14,7 @@
 import UIKit
 import ARKit
 import ArcGIS
+
 extension ARCamera.TrackingState {
     var description: String {
         switch self {
@@ -63,10 +64,9 @@ class ARStatusViewController: UITableViewController {
     /// The `ARKit` camera tracking state.
     public var trackingState: ARCamera.TrackingState = .notAvailable {
         didSet {
-            guard trackingStateLabel != nil else { return }
             DispatchQueue.main.async{ [weak self] in
                 guard let self = self else { return }
-                self.trackingStateLabel.text = self.trackingState.description
+                self.trackingStateLabel?.text = self.trackingState.description
             }
         }
     }
@@ -74,10 +74,9 @@ class ARStatusViewController: UITableViewController {
     /// The calculated frame rate of the `SceneView` and `ARKit` display.
     public var frameRate: Int = 0 {
         didSet {
-            guard frameRateLabel != nil else { return }
             DispatchQueue.main.async{ [weak self] in
                 guard let self = self else { return }
-                self.frameRateLabel.text = "\(self.frameRate)"
+                self.frameRateLabel?.text = "\(self.frameRate)"
             }
         }
     }
@@ -85,10 +84,9 @@ class ARStatusViewController: UITableViewController {
     /// The current error message.
     public var errorMessage: String? {
         didSet {
-            guard errorDescriptionLabel != nil else { return }
             DispatchQueue.main.async{ [weak self] in
                 guard let self = self else { return }
-                self.errorDescriptionLabel.text = self.errorMessage
+                self.errorDescriptionLabel?.text = self.errorMessage
             }
         }
     }
@@ -96,10 +94,9 @@ class ARStatusViewController: UITableViewController {
     /// The label for the currently selected scene.
     public var currentScene: String = "None" {
         didSet {
-            guard sceneLabel != nil else { return }
             DispatchQueue.main.async{ [weak self] in
                 guard let self = self else { return }
-                self.sceneLabel.text = self.currentScene
+                self.sceneLabel?.text = self.currentScene
             }
         }
     }
@@ -107,10 +104,9 @@ class ARStatusViewController: UITableViewController {
     /// The translation factor applied to the current scene.
     public var translationFactor: Double = 1.0 {
         didSet {
-            guard translationFactorLabel != nil else { return }
             DispatchQueue.main.async{ [weak self] in
                 guard let self = self else { return }
-                self.translationFactorLabel.text = String(format: "%.2f", self.translationFactor)
+                self.translationFactorLabel?.text = String(format: "%.2f", self.translationFactor)
             }
         }
     }
@@ -118,10 +114,9 @@ class ARStatusViewController: UITableViewController {
     /// The horizontal accuracy of the last location.
     public var horizontalAccuracy: Double = 1.0 {
         didSet {
-            guard horizontalAccuracyLabel != nil else { return }
             DispatchQueue.main.async{ [weak self] in
                 guard let self = self else { return }
-                self.horizontalAccuracyLabel.text = String(format: "%.0f", self.horizontalAccuracy)
+                self.horizontalAccuracyLabel?.text = String(format: "%.0f", self.horizontalAccuracy)
             }
         }
     }
@@ -129,10 +124,9 @@ class ARStatusViewController: UITableViewController {
     /// The vertical accuracy of the last location.
     public var verticalAccuracy: Double = 1.0 {
         didSet {
-            guard verticalAccuracyLabel != nil else { return }
             DispatchQueue.main.async{ [weak self] in
                 guard let self = self else { return }
-                self.verticalAccuracyLabel.text = String(format: "%.0f", self.verticalAccuracy)
+                self.verticalAccuracyLabel?.text = String(format: "%.0f", self.verticalAccuracy)
             }
         }
     }
@@ -140,10 +134,9 @@ class ARStatusViewController: UITableViewController {
     /// The status of the location data source.
     public var locationDataSourceStatus: AGSLocationDataSourceStatus = .stopped {
         didSet {
-            guard locationDataSourceStatusLabel != nil else { return }
             DispatchQueue.main.async{ [weak self] in
                 guard let self = self else { return }
-                self.locationDataSourceStatusLabel.text = self.locationDataSourceStatus.description
+                self.locationDataSourceStatusLabel?.text = self.locationDataSourceStatus.description
             }
         }
     }
