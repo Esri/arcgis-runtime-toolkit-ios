@@ -76,7 +76,7 @@ class ARStatusViewController: UITableViewController {
         didSet {
             DispatchQueue.main.async{ [weak self] in
                 guard let self = self else { return }
-                self.frameRateLabel?.text = "\(self.frameRate)"
+                self.frameRateLabel?.text = "\(self.frameRate) fps"
             }
         }
     }
@@ -106,27 +106,27 @@ class ARStatusViewController: UITableViewController {
         didSet {
             DispatchQueue.main.async{ [weak self] in
                 guard let self = self else { return }
-                self.translationFactorLabel?.text = String(format: "%.2f", self.translationFactor)
+                self.translationFactorLabel?.text = String(format: "%.1f", self.translationFactor)
             }
         }
     }
 
     /// The horizontal accuracy of the last location.
-    public var horizontalAccuracy: Double = 1.0 {
+    public var horizontalAccuracyMeasurement = Measurement(value: 1, unit: UnitLength.meters) {
         didSet {
             DispatchQueue.main.async{ [weak self] in
                 guard let self = self else { return }
-                self.horizontalAccuracyLabel?.text = String(format: "%.0f", self.horizontalAccuracy)
+                self.horizontalAccuracyLabel?.text = self.measurementFormatter.string(from: self.horizontalAccuracyMeasurement)
             }
         }
     }
 
     /// The vertical accuracy of the last location.
-    public var verticalAccuracy: Double = 1.0 {
+    public var verticalAccuracyMeasurement = Measurement(value: 1, unit: UnitLength.meters) {
         didSet {
             DispatchQueue.main.async{ [weak self] in
                 guard let self = self else { return }
-                self.verticalAccuracyLabel?.text = String(format: "%.0f", self.verticalAccuracy)
+                self.verticalAccuracyLabel?.text = self.measurementFormatter.string(from: self.verticalAccuracyMeasurement)
             }
         }
     }
@@ -140,6 +140,12 @@ class ARStatusViewController: UITableViewController {
             }
         }
     }
+
+    private let measurementFormatter: MeasurementFormatter = {
+        let formatter = MeasurementFormatter()
+        formatter.unitOptions = [.naturalScale, .providedUnit]
+        return formatter
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()

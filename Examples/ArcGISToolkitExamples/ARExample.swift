@@ -684,8 +684,8 @@ extension AGSScene {
 extension ARExample: AGSLocationChangeHandlerDelegate {
     public func locationDataSource(_ locationDataSource: AGSLocationDataSource, locationDidChange location: AGSLocation) {
         // When we get a new location, update the status view controller with the new horizontal and vertical accuracy.
-        statusViewController?.horizontalAccuracy = location.horizontalAccuracy
-        statusViewController?.verticalAccuracy = location.verticalAccuracy
+        statusViewController?.horizontalAccuracyMeasurement = Measurement(value: location.horizontalAccuracy, unit: UnitLength.meters)
+        statusViewController?.verticalAccuracyMeasurement = Measurement(value: location.verticalAccuracy, unit: UnitLength.meters)
     }
     
     func locationDataSource(_ locationDataSource: AGSLocationDataSource, statusDidChange status: AGSLocationDataSourceStatus) {
