@@ -57,12 +57,6 @@ class CalibrationView: UIView {
         return slider
     }()
     
-    /// The last elevation slider value.
-    private var lastElevationValue: Float = 0
-    
-    // The last heading slider value.
-    private var lastHeadingValue: Float = 0
-    
     /// The elevation label..
     private let elevationLabel = UILabel(frame: .zero)
 

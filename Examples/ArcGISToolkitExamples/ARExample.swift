@@ -84,7 +84,7 @@ class ARExample: UIViewController {
         // Set ourself as touch delegate so we can get touch events.
         arView.sceneView.touchDelegate = self
         
-        // Set ourself as touch delegate so we can get touch events.
+        // Set ourself as location change delegate so we can get location data source events.
         arView.locationChangeHandlerDelegate = self
         
         // Disble user interactions on the sceneView.
