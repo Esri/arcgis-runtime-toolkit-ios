@@ -16,6 +16,17 @@ import UIKit
 import ARKit
 import ArcGIS
 
+/// Controls how the locations generated from the location data source are used during AR tracking.
+///
+/// - ignore: Ignore all location data source locations.
+/// - initial: Use only the initial location from the location data source and ignore all subsequent locations.
+/// - continuous: Use all locations from the location data source.
+public enum ARLocationTrackingMode {
+    case ignore
+    case initial
+    case continuous
+}
+
 public class ArcGISARView: UIView {
 
     // MARK: public properties
@@ -46,11 +57,12 @@ public class ArcGISARView: UIView {
 
     /// The viewpoint camera used to set the initial view of the sceneView instead of the device's GPS location via the location data source.  You can use Key-Value Observing to track changes to the origin camera.
     /// - Since: 100.6.0
-    @objc dynamic public var originCamera: AGSCamera? {
-        didSet {
-            guard let newCamera = originCamera else { return }
-            // Set the camera as the originCamera on the cameraController and reset tracking.
-            cameraController.originCamera = newCamera
+    @objc dynamic public var originCamera: AGSCamera {
+        get {
+            return cameraController.originCamera
+        }
+        set {
+            cameraController.originCamera = newValue
         }
     }
 
@@ -103,12 +115,15 @@ public class ArcGISARView: UIView {
         return ARWorldTrackingConfiguration.isSupported
     }()
 
+    /// Denotes whether we've received our initial location from the data source.
+    private var didSetInitialLocation: Bool = false
+
     /// The last portrait or landscape orientation value.
     private var lastGoodDeviceOrientation = UIDeviceOrientation.portrait
     
-    /// Are we using only the first location provided by the LocationDataSource?
-    private var useLocationDataSourceOnce = true
-    
+    /// The tracking mode controlling how the locations generated from the location data source are used during AR tracking.
+    private var locationTrackingMode: ARLocationTrackingMode = .ignore
+
     // MARK: Initializers
     
     public override init(frame: CGRect) {
@@ -125,13 +140,9 @@ public class ArcGISARView: UIView {
     ///
     /// - Parameters:
     ///   - renderVideoFeed: Whether to display the live camera image.
-    ///   - tryUsingARKit: Whether or not to use ARKit, regardless if it's available.
     /// - Since: 100.6.0
-    public convenience init(renderVideoFeed: Bool, tryUsingARKit: Bool){
+    public convenience init(renderVideoFeed: Bool){
         self.init(frame: .zero)
-        
-        // This overrides the `sharedInitialization()` isUsingARKit code
-        isUsingARKit = tryUsingARKit && deviceSupportsARKit
         
         if !isUsingARKit || !renderVideoFeed {
             // User is not using ARKit, or they don't want to see video, so remove the arSCNView from the superView (it was added in sharedInitialization()).
@@ -201,7 +212,7 @@ public class ArcGISARView: UIView {
         // Use the `internalHitTest` method to get the matrix of `screenPoint`.
         guard let localOffsetMatrix = internalHitTest(screenPoint: screenPoint) else { return nil }
         
-        let currOriginMatrix = cameraController.originCamera.transformationMatrix
+        let currOriginMatrix = originCamera.transformationMatrix
 
         // Scale translation by translationFactor.
         let translatedMatrix = AGSTransformationMatrix(quaternionX: localOffsetMatrix.quaternionX,
@@ -220,7 +231,7 @@ public class ArcGISARView: UIView {
     /// Resets the device tracking and related properties.
     /// - Since: 100.6.0
     public func resetTracking() {
-        originCamera = nil
+        didSetInitialLocation = false
         initialTransformation = .identity
         if isUsingARKit {
             arSCNView.session.run(arConfiguration, options: [.resetTracking, .removeExistingAnchors])
@@ -248,10 +259,11 @@ public class ArcGISARView: UIView {
     ///
     /// - Parameter completion: The completion handler called when start tracking completes.  If tracking starts successfully, the `error` property will be nil; if tracking fails to start, the error will be non-nil and contain the reason for failure.
     /// - Since: 100.6.0
-    public func startTracking(useLocationDataSourceOnce: Bool = true, completion: ((_ error: Error?) -> Void)? = nil) {
+    public func startTracking(_ locationTrackingMode: ARLocationTrackingMode, completion: ((_ error: Error?) -> Void)? = nil) {
         // We have a location data source that needs to be started.
-        self.useLocationDataSourceOnce = useLocationDataSourceOnce
-        if let locationDataSource = self.locationDataSource {
+        self.locationTrackingMode = locationTrackingMode
+        if locationTrackingMode != .ignore,
+            let locationDataSource = self.locationDataSource {
             locationDataSource.start { [weak self] (error) in
                 if error == nil {
                     self?.finalizeStart()
@@ -260,7 +272,7 @@ public class ArcGISARView: UIView {
             }
         }
         else {
-            // No data source, continue with defaults.
+            // We're either ignoring the data source or there is no data source so continue with defaults.
             finalizeStart()
             completion?(nil)
         }
@@ -473,7 +485,7 @@ extension ArcGISARView: AGSLocationChangeHandlerDelegate {
     
     public func locationDataSource(_ locationDataSource: AGSLocationDataSource, locationDidChange location: AGSLocation) {
         // Location changed.
-        guard var locationPoint = location.position else { return }
+        guard locationTrackingMode != .ignore, var locationPoint = location.position else { return }
 
         // The AGSCLLocationDataSource does not include altitude information from the CLLocation when
         // creating the `AGSLocation` geometry, so grab the altitude directly from the CLLocationManager.
@@ -485,21 +497,23 @@ extension ArcGISARView: AGSLocationChangeHandlerDelegate {
             }
             else {
                 // We don't have a valid altitude, so use the old altitude.
-                let oldLocationPoint = cameraController.originCamera.location
+                let oldLocationPoint = originCamera.location
                 locationPoint = AGSPoint(x: locationPoint.x, y: locationPoint.y, z: oldLocationPoint.z, spatialReference: locationPoint.spatialReference)
             }
         }
         
-        // Always set originCamera; then reset ARKit
-        let oldCamera = cameraController.originCamera
-            
+        // Always set originCamera; then reset ARKit            
         // Create a new camera based on our location and set it on the cameraController.
-        if originCamera == nil {
+        // Note for the .initial tracking mode (or if we've yet to set an initial locatin),
+        //   we create a new camera with the location and defaults for heading, pitch, roll.
+        // For .continuous mode, we use the location and the old camera's heading, pitch, roll.
+        if locationTrackingMode == .initial || !didSetInitialLocation {
             let newCamera = AGSCamera(location: locationPoint, heading: 0.0, pitch: 90.0, roll: 0.0)
             originCamera = newCamera
+            didSetInitialLocation = true
         }
-        else {
-            cameraController.originCamera = AGSCamera(location: locationPoint, heading: oldCamera.heading, pitch: oldCamera.pitch, roll: oldCamera.roll)
+        else if locationTrackingMode == .continuous {
+            originCamera = AGSCamera(location: locationPoint, heading: originCamera.heading, pitch: originCamera.pitch, roll: originCamera.roll)
         }
         
         // If we're using ARKit, reset its tracking.
@@ -510,13 +524,12 @@ extension ArcGISARView: AGSLocationChangeHandlerDelegate {
         // Reset the camera controller's transformationMatrix to its initial state, the Idenity matrix.
         cameraController.transformationMatrix = .identity
 
-        if (useLocationDataSourceOnce) {
-            // If we are only using the intitial data source location, stop the data source.
+        if (locationTrackingMode != .continuous) {
+            // Stop the data source if the tracking mode is not continuous.
             locationDataSource.stop()
         }
         
         locationChangeHandlerDelegate?.locationDataSource?(locationDataSource, locationDidChange: location)
-        
     }
 
     public func locationDataSource(_ locationDataSource: AGSLocationDataSource, statusDidChange status: AGSLocationDataSourceStatus) {

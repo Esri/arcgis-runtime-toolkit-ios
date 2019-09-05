@@ -227,7 +227,7 @@ class CalibrationView: UIView {
     ///
     /// - Parameter deltaHeading: The amount to rotate the camera.
     private func rotate(_ deltaHeading: Double) {
-        guard let camera = arcgisARView.originCamera else { return }
+        let camera = arcgisARView.originCamera
         let newHeading = camera.heading + deltaHeading
         arcgisARView.originCamera = camera.rotate(toHeading: newHeading, pitch: camera.pitch, roll: camera.roll)
     }
@@ -236,8 +236,7 @@ class CalibrationView: UIView {
     ///
     /// - Parameter deltaAltitude: The amount to elevate the camera.
     private func elevate(_ deltaAltitude: Double) {
-        guard let camera = arcgisARView.originCamera else { return }
-        arcgisARView.originCamera = camera.elevate(withDeltaAltitude: deltaAltitude)
+        arcgisARView.originCamera = arcgisARView.originCamera.elevate(withDeltaAltitude: deltaAltitude)
     }
     
     /// Calculates the elevation delta amount based on the elevation slider value.
