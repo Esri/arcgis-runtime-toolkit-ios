@@ -133,7 +133,9 @@ class ARExample: UIViewController {
                                       (sceneFunction: emptyScene, label: "Empty - Full Scale", tableTop: false, trackingMode: .initial)])
         
         // Use the first sceneInfo to create and set the scene.
-        selectSceneInfo(sceneInfo.first)
+        if let info = sceneInfo.first {
+            selectSceneInfo(info)
+        }
         
         // Debug options for showing world origin and point cloud scene analysis points.
 //        arView.arSCNView.debugOptions = [.showWorldOrigin, .showFeaturePoints]
@@ -194,34 +196,33 @@ class ARExample: UIViewController {
     /// Sets up the required functionality in order to display the scene and AR experience represented by `sceneInfo`.
     ///
     /// - Parameter sceneInfo: The sceneInfo used to set up the scene and AR experience.
-    fileprivate func selectSceneInfo(_ sceneInfo: SceneInfoType?) {
-        guard let info = sceneInfo else { return }
+    fileprivate func selectSceneInfo(_ sceneInfo: SceneInfoType) {
         
         // Set currentSceneInfo to the selected scene info.
-        self.currentSceneInfo = info
+        currentSceneInfo = sceneInfo
         
         // Stop tracking, update the scene with the selected Scene and reset tracking.
-        self.arView.stopTracking()
-        self.arView.sceneView.scene = info.sceneFunction()
-        if info.tableTop {
+        arView.stopTracking()
+        arView.sceneView.scene = sceneInfo.sceneFunction()
+        if sceneInfo.tableTop {
             // Dim the SceneView until the user taps on a surface.
-            self.arView.sceneView.alpha = 0.5
+            arView.sceneView.alpha = 0.5
         }
         
         // Reset AR tracking and then start tracking.
-        self.arView.resetTracking()
-        self.arView.startTracking(info.trackingMode, completion: { [weak self] (error) in
+        arView.resetTracking()
+        arView.startTracking(sceneInfo.trackingMode, completion: { [weak self] (error) in
             self?.statusViewController?.errorMessage = error?.localizedDescription
         })
         
         // Disable elevation control if we're using continuous GPS.
-        self.calibrationView?.elevationControlVisibility = (info.trackingMode != .continuous)
+        calibrationView?.elevationControlVisibility = (sceneInfo.trackingMode != .continuous)
         
         // Disable calibration if we're in table top
-        self.calibrationItem.isEnabled = !info.tableTop
+        calibrationItem.isEnabled = !sceneInfo.tableTop
         
         // Reset didPlaceScene variable
-        self.didPlaceScene = false
+        didPlaceScene = false
     }
     
     /// Allow users to change the current scene.
@@ -696,8 +697,8 @@ extension AGSScene {
 extension ARExample: AGSLocationChangeHandlerDelegate {
     public func locationDataSource(_ locationDataSource: AGSLocationDataSource, locationDidChange location: AGSLocation) {
         // When we get a new location, update the status view controller with the new horizontal and vertical accuracy.
-        statusViewController?.horizontalAccuracyMeasurement = Measurement(value: location.horizontalAccuracy, unit: UnitLength.meters)
-        statusViewController?.verticalAccuracyMeasurement = Measurement(value: location.verticalAccuracy, unit: UnitLength.meters)
+        statusViewController?.horizontalAccuracyMeasurement.value = location.horizontalAccuracy
+        statusViewController?.verticalAccuracyMeasurement.value = location.verticalAccuracy
     }
     
     func locationDataSource(_ locationDataSource: AGSLocationDataSource, statusDidChange status: AGSLocationDataSourceStatus) {
