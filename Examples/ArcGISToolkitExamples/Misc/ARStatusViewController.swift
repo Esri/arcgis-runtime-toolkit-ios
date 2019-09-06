@@ -13,6 +13,7 @@
 
 import UIKit
 import ARKit
+import ArcGIS
 
 extension ARCamera.TrackingState {
     var description: String {
@@ -33,6 +34,21 @@ extension ARCamera.TrackingState {
     }
 }
 
+extension AGSLocationDataSourceStatus {
+    var description: String {
+        switch self {
+        case .stopped:
+            return "Stopped"
+        case .starting:
+            return "Starting"
+        case .started:
+            return "Started"
+        case .failedToStart:
+            return "Failed to start"
+        }
+    }
+}
+
 /// A view controller for display AR-related status information.
 class ARStatusViewController: UITableViewController {
 
@@ -41,14 +57,16 @@ class ARStatusViewController: UITableViewController {
     @IBOutlet var errorDescriptionLabel: UILabel!
     @IBOutlet var sceneLabel: UILabel!
     @IBOutlet var translationFactorLabel: UILabel!
-    
+    @IBOutlet var horizontalAccuracyLabel: UILabel!
+    @IBOutlet var verticalAccuracyLabel: UILabel!
+    @IBOutlet var locationDataSourceStatusLabel: UILabel!
+
     /// The `ARKit` camera tracking state.
     public var trackingState: ARCamera.TrackingState = .notAvailable {
         didSet {
-            guard trackingStateLabel != nil else { return }
             DispatchQueue.main.async{ [weak self] in
                 guard let self = self else { return }
-                self.trackingStateLabel.text = self.trackingState.description
+                self.trackingStateLabel?.text = self.trackingState.description
             }
         }
     }
@@ -56,10 +74,9 @@ class ARStatusViewController: UITableViewController {
     /// The calculated frame rate of the `SceneView` and `ARKit` display.
     public var frameRate: Int = 0 {
         didSet {
-            guard frameRateLabel != nil else { return }
             DispatchQueue.main.async{ [weak self] in
                 guard let self = self else { return }
-                self.frameRateLabel.text = "\(self.frameRate)"
+                self.frameRateLabel?.text = "\(self.frameRate) fps"
             }
         }
     }
@@ -67,10 +84,9 @@ class ARStatusViewController: UITableViewController {
     /// The current error message.
     public var errorMessage: String? {
         didSet {
-            guard errorDescriptionLabel != nil else { return }
             DispatchQueue.main.async{ [weak self] in
                 guard let self = self else { return }
-                self.errorDescriptionLabel.text = self.errorMessage
+                self.errorDescriptionLabel?.text = self.errorMessage
             }
         }
     }
@@ -78,10 +94,9 @@ class ARStatusViewController: UITableViewController {
     /// The label for the currently selected scene.
     public var currentScene: String = "None" {
         didSet {
-            guard sceneLabel != nil else { return }
             DispatchQueue.main.async{ [weak self] in
                 guard let self = self else { return }
-                self.sceneLabel.text = self.currentScene
+                self.sceneLabel?.text = self.currentScene
             }
         }
     }
@@ -89,13 +104,48 @@ class ARStatusViewController: UITableViewController {
     /// The translation factor applied to the current scene.
     public var translationFactor: Double = 1.0 {
         didSet {
-            guard translationFactorLabel != nil else { return }
             DispatchQueue.main.async{ [weak self] in
                 guard let self = self else { return }
-                self.translationFactorLabel.text = String(format: "%.2f", self.translationFactor)
+                self.translationFactorLabel?.text = String(format: "%.1f", self.translationFactor)
             }
         }
     }
+
+    /// The horizontal accuracy of the last location.
+    public var horizontalAccuracyMeasurement = Measurement(value: 1, unit: UnitLength.meters) {
+        didSet {
+            DispatchQueue.main.async{ [weak self] in
+                guard let self = self else { return }
+                self.horizontalAccuracyLabel?.text = self.measurementFormatter.string(from: self.horizontalAccuracyMeasurement)
+            }
+        }
+    }
+
+    /// The vertical accuracy of the last location.
+    public var verticalAccuracyMeasurement = Measurement(value: 1, unit: UnitLength.meters) {
+        didSet {
+            DispatchQueue.main.async{ [weak self] in
+                guard let self = self else { return }
+                self.verticalAccuracyLabel?.text = self.measurementFormatter.string(from: self.verticalAccuracyMeasurement)
+            }
+        }
+    }
+
+    /// The status of the location data source.
+    public var locationDataSourceStatus: AGSLocationDataSourceStatus = .stopped {
+        didSet {
+            DispatchQueue.main.async{ [weak self] in
+                guard let self = self else { return }
+                self.locationDataSourceStatusLabel?.text = self.locationDataSourceStatus.description
+            }
+        }
+    }
+
+    private let measurementFormatter: MeasurementFormatter = {
+        let formatter = MeasurementFormatter()
+        formatter.unitOptions = [.naturalScale, .providedUnit]
+        return formatter
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()

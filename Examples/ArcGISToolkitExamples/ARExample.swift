@@ -19,7 +19,7 @@ import ArcGIS
 class ARExample: UIViewController {
     
     typealias SceneInitFunction = () -> AGSScene
-    typealias SceneInfoType = (sceneFunction: SceneInitFunction, label: String, tableTop: Bool, useLocationDataSourceOnce: Bool)
+    typealias SceneInfoType = (sceneFunction: SceneInitFunction, label: String, tableTop: Bool, trackingMode: ARLocationTrackingMode)
     
     /// The scene creation functions plus labels and whether it represents a table top experience.  The functions create a new scene and perform any necessary `ArcGISARView` initialization.  This allows for changing the scene and AR "mode" (table top or full-scale).
     private var sceneInfo: [SceneInfoType] = []
@@ -33,7 +33,7 @@ class ARExample: UIViewController {
     }
     
     /// The `ArcGISARView` that displays the camera feed and handles ARKit functionality.
-    private let arView = ArcGISARView(renderVideoFeed: true, tryUsingARKit: true)
+    private let arView = ArcGISARView(renderVideoFeed: true)
     
     /// Denotes whether we've placed the scene in table top experiences.
     private var didPlaceScene: Bool = false
@@ -54,19 +54,25 @@ class ARExample: UIViewController {
         overlay.sceneProperties = AGSLayerSceneProperties(surfacePlacement: .absolute)
         return overlay
     }()
-        
+    
     /// View for displaying directions to the user.
     private let userDirectionsView = UserDirectionsView(effect: UIBlurEffect(style: .light))
     
     /// The observation for the `SceneView`'s `translationFactor` property.
     private var translationFactorObservation: NSKeyValueObservation?
-
+    
     /// View for displaying calibration controls to the user.
     private var calibrationView: CalibrationView?
-
+    
     /// The toolbar used to display controls for calibration, changing scenes, and status.
     private var toolbar = UIToolbar(frame: .zero)
-
+    
+    /// Button used to display the `CalibrationView`.
+    private let calibrationItem = UIBarButtonItem(title: "Calibration", style: .plain, target: self, action: #selector(displayCalibration(_:)))
+    
+    /// Button used to change the current scene.
+    private let sceneItem = UIBarButtonItem(title: "Change Scene", style: .plain, target: self, action: #selector(changeScene(_:)))
+    
     // MARK: Initialization
     
     override func viewDidLoad() {
@@ -77,6 +83,9 @@ class ARExample: UIViewController {
         
         // Set ourself as touch delegate so we can get touch events.
         arView.sceneView.touchDelegate = self
+        
+        // Set ourself as location change delegate so we can get location data source events.
+        arView.locationChangeHandlerDelegate = self
         
         // Disble user interactions on the sceneView.
         arView.sceneView.interactionOptions.isEnabled = false
@@ -110,27 +119,31 @@ class ARExample: UIViewController {
         
         // Add the UserDirectionsView.
         addUserDirectionsView()
-
+        
         // Create the CalibrationView.
-        calibrationView = CalibrationView(sceneView: arView.sceneView, cameraController: arView.cameraController)
+        calibrationView = CalibrationView(arView)
         calibrationView?.alpha = 0.0
-
+        
         // Set up the `sceneInfo` array with our scene init functions and labels.
-        sceneInfo.append(contentsOf: [(sceneFunction: streetsScene, label: "Streets - Full Scale", tableTop: false, useLocationDataSourceOnce: false),
-                                      (sceneFunction: imageryScene, label: "Imagery - Full Scale", tableTop: false, useLocationDataSourceOnce: false),
-                                      (sceneFunction: pointCloudScene, label: "Point Cloud - Tabletop", tableTop: true, useLocationDataSourceOnce: true),
-                                      (sceneFunction: yosemiteScene, label: "Yosemite - Tabletop", tableTop: true, useLocationDataSourceOnce: true),
-                                      (sceneFunction: borderScene, label: "US - Mexico Border - Tabletop", tableTop: true, useLocationDataSourceOnce: true),
-                                      (sceneFunction: emptyScene, label: "Empty - Full Scale", tableTop: false, useLocationDataSourceOnce: true)])
-
+        sceneInfo.append(contentsOf: [(sceneFunction: streetsScene, label: "Streets - Full Scale", tableTop: false, trackingMode: .continuous),
+                                      (sceneFunction: imageryScene, label: "Imagery - Full Scale", tableTop: false, trackingMode: .initial),
+                                      (sceneFunction: pointCloudScene, label: "Point Cloud - Tabletop", tableTop: true, trackingMode: .ignore),
+                                      (sceneFunction: yosemiteScene, label: "Yosemite - Tabletop", tableTop: true, trackingMode: .ignore),
+                                      (sceneFunction: borderScene, label: "US - Mexico Border - Tabletop", tableTop: true, trackingMode: .ignore),
+                                      (sceneFunction: emptyScene, label: "Empty - Full Scale", tableTop: false, trackingMode: .initial)])
+        
         // Use the first sceneInfo to create and set the scene.
-        currentSceneInfo = sceneInfo.first
-        arView.sceneView.scene = currentSceneInfo?.sceneFunction()
+        if let info = sceneInfo.first {
+            selectSceneInfo(info)
+        }
+        
+        // Debug options for showing world origin and point cloud scene analysis points.
+//        arView.arSCNView.debugOptions = [.showWorldOrigin, .showFeaturePoints]
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        arView.startTracking(useLocationDataSourceOnce: currentSceneInfo?.useLocationDataSourceOnce ?? false, completion: { [weak self] (error) in
+        arView.startTracking(currentSceneInfo?.trackingMode ?? .ignore, completion: { [weak self] (error) in
             self?.statusViewController?.errorMessage = error?.localizedDescription
         })
     }
@@ -139,7 +152,7 @@ class ARExample: UIViewController {
         super.viewDidDisappear(animated)
         arView.stopTracking()
     }
-
+    
     // MARK: Toolbar button actions
     
     /// Initialize scene location/heading/elevation calibration.
@@ -149,7 +162,7 @@ class ARExample: UIViewController {
         
         // If the sceneView's alpha is 0.0, that means we are not in calibration mode and we need to start calibrating.
         let startCalibrating = (calibrationView?.alpha == 0.0)
-
+        
         // Enable/disable sceneView touch interactions.
         arView.sceneView.interactionOptions.isEnabled = startCalibrating
         userDirectionsView.updateUserDirections(nil)
@@ -175,8 +188,43 @@ class ARExample: UIViewController {
         
         // Hide directions view if we're calibrating.
         userDirectionsView.isHidden = startCalibrating
+        
+        // Disable changing scenes if we're calibrating.
+        sceneItem.isEnabled = !startCalibrating
     }
-
+    
+    /// Sets up the required functionality in order to display the scene and AR experience represented by `sceneInfo`.
+    ///
+    /// - Parameter sceneInfo: The sceneInfo used to set up the scene and AR experience.
+    fileprivate func selectSceneInfo(_ sceneInfo: SceneInfoType) {
+        
+        // Set currentSceneInfo to the selected scene info.
+        currentSceneInfo = sceneInfo
+        
+        // Stop tracking, update the scene with the selected Scene and reset tracking.
+        arView.stopTracking()
+        arView.sceneView.scene = sceneInfo.sceneFunction()
+        if sceneInfo.tableTop {
+            // Dim the SceneView until the user taps on a surface.
+            arView.sceneView.alpha = 0.5
+        }
+        
+        // Reset AR tracking and then start tracking.
+        arView.resetTracking()
+        arView.startTracking(sceneInfo.trackingMode, completion: { [weak self] (error) in
+            self?.statusViewController?.errorMessage = error?.localizedDescription
+        })
+        
+        // Disable elevation control if we're using continuous GPS.
+        calibrationView?.elevationControlVisibility = (sceneInfo.trackingMode != .continuous)
+        
+        // Disable calibration if we're in table top
+        calibrationItem.isEnabled = !sceneInfo.tableTop
+        
+        // Reset didPlaceScene variable
+        didPlaceScene = false
+    }
+    
     /// Allow users to change the current scene.
     ///
     /// - Parameter sender: The bar button item tapped on.
@@ -187,35 +235,19 @@ class ARExample: UIViewController {
         
         // Loop through all sceneInfos and add `UIAlertActions` for each.
         sceneInfo.forEach { info in
-            let action = UIAlertAction(title: info.label, style: .default, handler: { (action) in
-                // Set currentSceneInfo to the selected scene.
-                self.currentSceneInfo = info
-                
-                // Stop tracking, update the scene with the selected Scene and reset tracking.
-                self.arView.stopTracking()
-                self.arView.sceneView.scene = info.sceneFunction()
-                if info.tableTop {
-                    // Dim the SceneView until the user taps on a surface.
-                    self.arView.sceneView.alpha = 0.5
-                }
-                // Reset AR tracking and then start tracking.
-                self.arView.resetTracking()
-                self.arView.startTracking(useLocationDataSourceOnce: info.useLocationDataSourceOnce, completion: { [weak self] (error) in
-                        self?.statusViewController?.errorMessage = error?.localizedDescription
-                })
-                
-                // Reset didPlaceScene variable
-                self.didPlaceScene = false
+            let action = UIAlertAction(title: info.label, style: .default, handler: { [weak self] (action) in
+                self?.selectSceneInfo(info)
             })
+            
             // Display current scene as disabled.
             action.isEnabled = (info.label != currentSceneInfo?.label)
             alertController.addAction(action)
         }
-
+        
         // Add "cancel" action.
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         alertController.addAction(cancelAction)
-
+        
         present(alertController, animated: true)
     }
     
@@ -239,22 +271,16 @@ class ARExample: UIViewController {
             toolbar.bottomAnchor.constraint(equalTo: arView.sceneView.attributionTopAnchor)
             ])
         
-        // Create a toolbar button for calibration.
-        let calibrationItem = UIBarButtonItem(title: "Calibration", style: .plain, target: self, action: #selector(displayCalibration(_:)))
-
-        // Create a toolbar button to change the current scene.
-        let sceneItem = UIBarButtonItem(title: "Change Scene", style: .plain, target: self, action: #selector(changeScene(_:)))
-        
         // Create a toolbar button to display the status.
         let statusItem = UIBarButtonItem(title: "Status", style: .plain, target: self, action: #selector(showStatus(_:)))
-
+        
         toolbar.setItems([calibrationItem,
                           UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
                           sceneItem,
                           UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
                           statusItem], animated: false)
     }
-
+    
     /// Set up the status view controller and adds it to the view.
     private func addStatusViewController() {
         if let statusVC = statusViewController {
@@ -263,7 +289,7 @@ class ARExample: UIViewController {
             statusVC.didMove(toParent: self)
             statusVC.view.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate([
-                statusVC.view.heightAnchor.constraint(equalToConstant: 110),
+                statusVC.view.heightAnchor.constraint(equalToConstant: 176),
                 statusVC.view.widthAnchor.constraint(equalToConstant: 350),
                 statusVC.view.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -8),
                 statusVC.view.bottomAnchor.constraint(equalTo: toolbar.topAnchor, constant: -8)
@@ -323,7 +349,7 @@ extension ARExample: ARSCNViewDelegate {
             // Present an alert describing the error.
             let alertController = UIAlertController(title: "Could not start tracking.", message: errorMessage, preferredStyle: .alert)
             let restartAction = UIAlertAction(title: "Restart Tracking", style: .default) { _ in
-                self?.arView.startTracking(useLocationDataSourceOnce: self?.currentSceneInfo?.useLocationDataSourceOnce ?? false, completion: { (error) in
+                self?.arView.startTracking(self?.currentSceneInfo?.trackingMode ?? .ignore, completion: { (error) in
                     self?.statusViewController?.errorMessage = error?.localizedDescription
                 })
             }
@@ -363,7 +389,7 @@ extension ARExample: ARSessionDelegate {
 // MARK: AGSGeoViewTouchDelegate
 extension ARExample: AGSGeoViewTouchDelegate {
     public func geoView(_ geoView: AGSGeoView, didTapAtScreenPoint screenPoint: CGPoint, mapPoint: AGSPoint) {
-        if let sceneInfo = currentSceneInfo, sceneInfo.tableTop, !didPlaceScene {
+        if let sceneInfo = currentSceneInfo, sceneInfo.tableTop {
             // We're in table-top mode and haven't placed the scene yet.  Place the scene at the given point by setting the initial transformation.
             if arView.setInitialTransformation(using: screenPoint) {
                 // Show the SceneView now that the user has tapped on the surface.
@@ -379,13 +405,13 @@ extension ARExample: AGSGeoViewTouchDelegate {
         else {
             // We're in full-scale AR mode or have already placed the scene. Get the real world location for screen point from arView.
             guard let point = arView.arScreenToLocation(screenPoint: screenPoint) else { return }
-
+            
             // Create and place a graphic and shadown at the real world location.
             let shadowColor = UIColor.lightGray.withAlphaComponent(0.5)
             let shadow = AGSSimpleMarkerSceneSymbol(style: .sphere, color: shadowColor, height: 0.01, width: 0.25, depth: 0.25, anchorPosition: .center)
             let shadowGraphic = AGSGraphic(geometry: point, symbol: shadow)
             graphicsOverlay.graphics.add(shadowGraphic)
-
+            
             let sphere = AGSSimpleMarkerSceneSymbol(style: .sphere, color: .red, height: 0.25, width: 0.25, depth: 0.25, anchorPosition: .bottom)
             let sphereGraphic = AGSGraphic(geometry: point, symbol: sphere)
             graphicsOverlay.graphics.add(sphereGraphic)
@@ -430,7 +456,13 @@ extension ARExample {
             case .excessiveMotion:
                 message = "Try moving your device more slowly."
             case .initializing:
-                message = "Keep moving your device."
+                // Because ARKit gets reset often when using continuous GPS, only dipslay initializing message if we're not in continuous tracking mode.
+                if let sceneInfo = currentSceneInfo, sceneInfo.trackingMode != .continuous {
+                    message = "Keep moving your device."
+                }
+                else {
+                    message = ""
+                }
             case .insufficientFeatures:
                 message = "Try turning on more lights and moving around."
             default:
@@ -483,7 +515,6 @@ extension ARExample {
         
         // Set the location data source so we use our GPS location as the originCamera.
         arView.locationDataSource = AGSCLLocationDataSource()
-        arView.originCamera = nil
         arView.translationFactor = 1
         return scene
     }
@@ -500,7 +531,6 @@ extension ARExample {
         
         // Set the location data source so we use our GPS location as the originCamera.
         arView.locationDataSource = AGSCLLocationDataSource()
-        arView.originCamera = nil
         arView.translationFactor = 1
         return scene
     }
@@ -630,7 +660,7 @@ extension ARExample {
         arView.locationDataSource = nil
         return scene
     }
-
+    
     /// Creates an empty scene with an elevation source.
     /// Mode:  Full-Scale AR
     ///
@@ -641,12 +671,11 @@ extension ARExample {
         
         // Set the location data source so we use our GPS location as the originCamera.
         arView.locationDataSource = AGSCLLocationDataSource()
-        arView.originCamera = nil
         arView.translationFactor = 1
         return scene
     }
 }
-    
+
 // MARK: AGSScene extension.
 extension AGSScene {
     /// Adds an elevation source to the given `scene`.
@@ -661,6 +690,20 @@ extension AGSScene {
         surface.backgroundGrid.isVisible = false
         surface.navigationConstraint = .none
         baseSurface = surface
+    }
+}
+
+// MARK: AGSLocationChangeHandlerDelegate methods
+extension ARExample: AGSLocationChangeHandlerDelegate {
+    public func locationDataSource(_ locationDataSource: AGSLocationDataSource, locationDidChange location: AGSLocation) {
+        // When we get a new location, update the status view controller with the new horizontal and vertical accuracy.
+        statusViewController?.horizontalAccuracyMeasurement.value = location.horizontalAccuracy
+        statusViewController?.verticalAccuracyMeasurement.value = location.verticalAccuracy
+    }
+    
+    func locationDataSource(_ locationDataSource: AGSLocationDataSource, statusDidChange status: AGSLocationDataSourceStatus) {
+        // Update the data source status.
+        statusViewController?.locationDataSourceStatus = status
     }
 }
 

@@ -14,15 +14,21 @@
 
 import UIKit
 import ArcGIS
+import ArcGISToolkit
 
 /// A view displaying controls for adjusting a scene view's location, heading, and elevation. Used to calibrate an AR session.
 class CalibrationView: UIView {
-    
-    // The scene view displaying the scene.
-    private let sceneView: AGSSceneView
 
-    /// The camera controller used to adjust user interactions.
-    private let cameraController: AGSTransformationMatrixCameraController
+    /// Denotes whether to show the elevation control and label; defaults to `true`.
+    public var elevationControlVisibility: Bool = true {
+        didSet {
+            elevationSlider.isHidden = !elevationControlVisibility
+            elevationLabel.isHidden = !elevationControlVisibility
+        }
+    }
+    
+    /// The `ArcGISARView` containing the origin camera we will be updating.
+    private var arcgisARView: ArcGISARView!
 
     /// The label displaying calibration directions.
     private let calibrationDirectionsLabel: UILabel = {
@@ -51,23 +57,17 @@ class CalibrationView: UIView {
         return slider
     }()
     
-    /// The last elevation slider value.
-    var lastElevationValue: Float = 0
-    
-    // The last heading slider value.
-    var lastHeadingValue: Float = 0
+    /// The elevation label..
+    private let elevationLabel = UILabel(frame: .zero)
 
-    /// Initialized a new calibration view with the given scene view and camera controller.
+    /// Initialized a new calibration view with the `ArcGISARView`.
     ///
     /// - Parameters:
-    ///   - sceneView: The scene view displaying the scene.
-    ///   - cameraController: The camera controller used to adjust user interactions.
-    init(sceneView: AGSSceneView, cameraController: AGSTransformationMatrixCameraController) {
-        self.cameraController = cameraController
-        self.sceneView = sceneView
+    ///   - arcgisARView: The `ArcGISARView` containing the originCamera we're updating.
+    init(_ arcgisARView: ArcGISARView) {
+        self.arcgisARView = arcgisARView
 
         super.init(frame: .zero)
-        
         
         // Create visual effects view to show the label on a blurred background.
         let labelView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
@@ -112,7 +112,6 @@ class CalibrationView: UIView {
             ])
 
         // Add the elevation label and slider.
-        let elevationLabel = UILabel(frame: .zero)
         elevationLabel.text = "Elevation"
         elevationLabel.textColor = .yellow
         addSubview(elevationLabel)
@@ -140,6 +139,8 @@ class CalibrationView: UIView {
         elevationSlider.addTarget(self, action: #selector(elevationChanged(_:)), for: .valueChanged)
         elevationSlider.addTarget(self, action: #selector(touchUpElevation(_:)), for: [.touchUpInside, .touchUpOutside])
 
+        elevationSlider.isHidden = !elevationControlVisibility
+        elevationLabel.isHidden = !elevationControlVisibility
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -220,17 +221,16 @@ class CalibrationView: UIView {
     ///
     /// - Parameter deltaHeading: The amount to rotate the camera.
     private func rotate(_ deltaHeading: Double) {
-        let camera = cameraController.originCamera
+        let camera = arcgisARView.originCamera
         let newHeading = camera.heading + deltaHeading
-        cameraController.originCamera = camera.rotate(toHeading: newHeading, pitch: camera.pitch, roll: camera.roll)
+        arcgisARView.originCamera = camera.rotate(toHeading: newHeading, pitch: camera.pitch, roll: camera.roll)
     }
     
     /// Change the cameras altitude by `deltaAltitude`.
     ///
     /// - Parameter deltaAltitude: The amount to elevate the camera.
     private func elevate(_ deltaAltitude: Double) {
-        let camera = cameraController.originCamera
-        cameraController.originCamera = camera.elevate(withDeltaAltitude: deltaAltitude)
+        arcgisARView.originCamera = arcgisARView.originCamera.elevate(withDeltaAltitude: deltaAltitude)
     }
     
     /// Calculates the elevation delta amount based on the elevation slider value.
