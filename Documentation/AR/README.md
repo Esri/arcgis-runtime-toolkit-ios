@@ -43,7 +43,7 @@ arView.startTracking(.initial)
 
 ```
 
-To see it in action, try out the [Examples](../../Examples) and refer to [ARExample.swift](../../Examples/ArcGISToolkitExamples/AR/ArExample.swift) in the project.
+To see it in action, try out the [Examples](../../Examples) and refer to [ARExample.swift](../../Examples/ArcGISToolkitExamples/ArExample.swift) in the project.
 
 
 
