@@ -145,9 +145,9 @@ public class ArcGISARView: UIView {
         self.init(frame: .zero)
         
         if !isUsingARKit || !renderVideoFeed {
-            // User is not using ARKit, or they don't want to see video, so remove the arSCNView from the superView (it was added in sharedInitialization()).
-            // This overrides the `sharedInitialization()` arSCNView code
-            arSCNView.removeFromSuperview()
+            // User is not using ARKit, or they don't want to see video,
+            // set the arSCNView.alpha to 0.0 so it doesn't display.
+            arSCNView.alpha = 0.0
         }
         
         // Tell the sceneView we will be calling `renderFrame()` manually if we're using ARKit.
