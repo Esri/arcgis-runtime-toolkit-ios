@@ -47,8 +47,8 @@ arView.startTracking(.initial) { (error) in
 
 You must also add the following entries to your application's Info.plist file to support use of the camera (for the live video feed) and, when using the `AGSCLLocationDataSource`, the GPS (for determining your device's location):
 
-Privacy – Camera Usage Description 
-Privacy – Location When In Use Usage Description 
+* Privacy – Camera Usage Description 
+* Privacy – Location When In Use Usage Description 
 
 To see it in action, try out the [Examples](../../Examples) and refer to [ARExample.swift](../../Examples/ArcGISToolkitExamples/ARExample.swift) in the project.
 
