@@ -1,6 +1,6 @@
 # AR
 
-Augmented reality experiences are designed to "augment" the physical world with virtual content that respects real world scale, position, and orientation of a device. In the case of Runtime, a SceneView contains 3D geographic data as virtual content on top of a camera feed which represents the real, physical world.
+Augmented reality experiences are designed to "augment" the physical world with virtual content that respects real world scale, position, and orientation of a device. In the case of Runtime, a SceneView displays 3D geographic data as virtual content on top of a camera feed which represents the real, physical world.
 
 The Augmented Reality (AR) toolkit component allows quick and easy integration of AR into your application for a wide variety of scenarios.  The toolkit recognizes the following common patterns for AR: 
 * **Flyover**: Flyover AR allows you to explore a scene using your device as a window into the virtual world. A typical flyover AR scenario will start with the scene’s virtual camera positioned over an area of interest. You can walk around and reorient the device to focus on specific content in the scene. 
