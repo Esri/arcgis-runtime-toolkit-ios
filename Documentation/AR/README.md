@@ -39,9 +39,16 @@ arView.sceneView.scene = AGSScene(basemapType: .imagery)
 arView.locationDataSource = AGSCLLocationDataSource()
 
 // Start tracking our location and device orientation
-arView.startTracking(.initial)
+arView.startTracking(.initial) { (error) in
+    print("Start tracking error: \(String(describing: error))")
+}
 
 ```
+
+You must also add the following entries to your application's Info.plist file to support use of the camera (for the live video feed) and, when using the `AGSCLLocationDataSource`, the GPS (for determining your device's location):
+
+Privacy – Camera Usage Description 
+Privacy – Location When In Use Usage Description 
 
 To see it in action, try out the [Examples](../../Examples) and refer to [ARExample.swift](../../Examples/ArcGISToolkitExamples/ARExample.swift) in the project.
 
