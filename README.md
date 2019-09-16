@@ -14,7 +14,7 @@ Toolkit components that will simplify your iOS app development with ArcGIS Runti
 * [TemplatePickerViewController](Documentation/TemplatePicker)
 
 ## Requirements
-* [ArcGIS Runtime SDK for iOS](https://developers.arcgis.com/en/ios/) 100.5.0 (or higher)
+* [ArcGIS Runtime SDK for iOS](https://developers.arcgis.com/en/ios/) 100.6.0 (or higher)
 * Xcode 10.1 (or higher)
 
 The *ArcGIS Runtime Toolkit for iOS* has a *Target SDK* version of *11.0*, meaning that it can run on devices with *iOS 11.0* or newer.
@@ -32,11 +32,15 @@ The *ArcGIS Runtime Toolkit for iOS* has a *Target SDK* version of *11.0*, meani
 
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
-Carthage is a decentralized dependency manager that builds your dependencies and provides you with binary frameworks. To integrate ArcGIS Runtime Toolkit for iOS into your Xcode project using Carthage, Add into your `Cartfile` or create a `Cartfile`, specify it in your Cartfile:
+Carthage is a decentralized dependency manager that builds your dependencies and provides you with binary frameworks. To integrate ArcGIS Runtime Toolkit for iOS into your Xcode project using Carthage, add into your `Cartfile` or create a new `Cartfile` with the following:
 
 `github "esri/ArcGISToolkit"`
 
 Run `carthage update`
+
+Finally, drag the `ArcGISToolkit.framework ` from the `Carthage/Build ` folder to the "TARGETS" settings for your application and drop it in the "Embedded Binaries" section in the "General" tab
+
+Note that you must also have the __ArcGIS Runtime SDK for iOS__ installed and your project set up as per the instructions [here](#manual).
 
 ### Manual
  1. Ensure you have downloaded and installed __ArcGIS Runtime SDK for iOS__ as described [here](https://developers.arcgis.com/ios/latest/swift/guide/install.htm#ESRI_SECTION1_D57435A2BEBC4D29AFA3A4CAA722506A)
@@ -61,7 +65,7 @@ Find a bug or want to request a new feature?  Please let us know by submitting a
 Esri welcomes contributions from anyone and everyone. Please see our [guidelines for contributing](https://github.com/esri/contributing).
 
 ## Licensing
-Copyright 2017 Esri
+Copyright 2017 - 2019 Esri
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
