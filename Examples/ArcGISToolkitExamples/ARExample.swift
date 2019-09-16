@@ -198,6 +198,8 @@ class ARExample: UIViewController {
     /// - Parameter sceneInfo: The sceneInfo used to set up the scene and AR experience.
     fileprivate func selectSceneInfo(_ sceneInfo: SceneInfoType) {
         
+        title = sceneInfo.label
+        
         // Set currentSceneInfo to the selected scene info.
         currentSceneInfo = sceneInfo
         

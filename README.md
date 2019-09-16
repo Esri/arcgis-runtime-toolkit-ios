@@ -12,9 +12,10 @@ Toolkit components that will simplify your iOS app development with ArcGIS Runti
 * [TimeSlider](Documentation/TimeSlider)
 * [PopupController](Documentation/PopupController)
 * [TemplatePickerViewController](Documentation/TemplatePicker)
+* [AR](Documentation/AR)
 
 ## Requirements
-* [ArcGIS Runtime SDK for iOS](https://developers.arcgis.com/en/ios/) 100.5.0 (or higher)
+* [ArcGIS Runtime SDK for iOS](https://developers.arcgis.com/en/ios/) 100.6.0 (or higher)
 * Xcode 10.1 (or higher)
 
 The *ArcGIS Runtime Toolkit for iOS* has a *Target SDK* version of *11.0*, meaning that it can run on devices with *iOS 11.0* or newer.
