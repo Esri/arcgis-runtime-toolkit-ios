@@ -34,7 +34,7 @@ The *ArcGIS Runtime Toolkit for iOS* has a *Target SDK* version of *11.0*, meani
 
 Carthage is a decentralized dependency manager that builds your dependencies and provides you with binary frameworks. To integrate ArcGIS Runtime Toolkit for iOS into your Xcode project using Carthage, add into your `Cartfile` or create a new `Cartfile` with the following:
 
-`github "esri/ArcGISToolkit"`
+`github "esri/arcgis-runtime-toolkit-ios"`
 
 Run `carthage update`
 
