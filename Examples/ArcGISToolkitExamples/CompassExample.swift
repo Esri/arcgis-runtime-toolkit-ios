@@ -16,7 +16,6 @@ import ArcGISToolkit
 import ArcGIS
 
 class CompassExample: MapViewController {
-    
     var map: AGSMap?
 
     override func viewDidLoad() {
@@ -39,5 +38,4 @@ class CompassExample: MapViewController {
         compass.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 12.0).isActive = true
         compass.trailingAnchor.constraint(equalTo: margins.trailingAnchor).isActive = true
     }
-    
 }

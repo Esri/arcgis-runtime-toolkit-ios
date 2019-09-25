@@ -16,7 +16,6 @@ import ArcGISToolkit
 import ArcGIS
 
 class LegendExample: MapViewController {
-
     let portal = AGSPortal.arcGISOnline(withLoginRequired: false)
     var portalItem: AGSPortalItem?
     var map: AGSMap?
@@ -37,11 +36,10 @@ class LegendExample: MapViewController {
         navigationItem.rightBarButtonItem = bbi
     }
     
-    @objc func showLegendAction(){
-        if let legendVC = legendVC{
+    @objc
+    func showLegendAction() {
+        if let legendVC = legendVC {
             navigationController?.pushViewController(legendVC, animated: true)
         }
     }
-
 }
-

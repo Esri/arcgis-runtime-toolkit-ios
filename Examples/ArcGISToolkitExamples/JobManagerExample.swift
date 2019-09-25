@@ -30,8 +30,7 @@ import UserNotifications
 // We forward that call to the shared JobManager so that it can perform the background fetch.
 //
 
-class JobTableViewCell: UITableViewCell{
-    
+class JobTableViewCell: UITableViewCell {
     var job: AGSJob?
     var statusObservation: NSKeyValueObservation?
     
@@ -43,8 +42,7 @@ class JobTableViewCell: UITableViewCell{
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configureWithJob(job: AGSJob?){
-        
+    func configureWithJob(job: AGSJob?) {
         // invalidate previous observation
         statusObservation?.invalidate()
         statusObservation = nil
@@ -54,16 +52,15 @@ class JobTableViewCell: UITableViewCell{
         self.updateUI()
         
         // observe job status
-        statusObservation = self.job?.observe(\.status, options: .new) { [weak self] (job, changes) in
+        statusObservation = self.job?.observe(\.status, options: .new) { [weak self] (_, _) in
             DispatchQueue.main.async {
                 self?.updateUI()
             }
         }
     }
     
-    func updateUI(){
-        
-        guard let job = job else{
+    func updateUI() {
+        guard let job = job else {
             return
         }
         
@@ -74,46 +71,36 @@ class JobTableViewCell: UITableViewCell{
     }
     
     override func prepareForReuse() {
+        super.prepareForReuse()
         self.textLabel?.text = ""
         self.detailTextLabel?.text = ""
     }
     
-    
-    class func jobTypeString(_ job: AGSJob)->String{
-        if job is AGSGenerateGeodatabaseJob{
+    class func jobTypeString(_ job: AGSJob) -> String {
+        if job is AGSGenerateGeodatabaseJob {
             return "Generate GDB"
-        }
-        else if job is AGSSyncGeodatabaseJob{
+        } else if job is AGSSyncGeodatabaseJob {
             return "Sync GDB"
-        }
-        else if job is AGSExportTileCacheJob{
+        } else if job is AGSExportTileCacheJob {
             return "Export Tiles"
-        }
-        else if job is AGSEstimateTileCacheSizeJob{
+        } else if job is AGSEstimateTileCacheSizeJob {
             return "Estimate Tile Cache Size"
-        }
-        else if job is AGSGenerateOfflineMapJob{
+        } else if job is AGSGenerateOfflineMapJob {
             return "Offline Map"
-        }
-        else if job is AGSOfflineMapSyncJob{
+        } else if job is AGSOfflineMapSyncJob {
             return "Offline Map Sync"
-        }
-        else if job is AGSGeoprocessingJob{
+        } else if job is AGSGeoprocessingJob {
             return "Geoprocessing"
-        }
-        else if job is AGSExportVectorTilesJob{
+        } else if job is AGSExportVectorTilesJob {
             return "Export Vector Tiles"
-        }
-        else if job is AGSDownloadPreplannedOfflineMapJob{
+        } else if job is AGSDownloadPreplannedOfflineMapJob {
             return "Download Preplanned Offline Map"
         }
         return "Other"
     }
-    
 }
 
 class JobManagerExample: TableViewController {
-    
     // array to hold onto tasks while they are loading
     var tasks = [AGSGeodatabaseSyncTask]()
     
@@ -123,7 +110,7 @@ class JobManagerExample: TableViewController {
     
     var toolbar: UIToolbar?
     
-    override open func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
         
         // create a Toolbar and add it to the view controller
@@ -158,7 +145,7 @@ class JobManagerExample: TableViewController {
         // request authorization for user notifications, this way we can notify user in bg when job complete
         let center = UNUserNotificationCenter.current()
         center.requestAuthorization(options: [.alert, .badge, .sound]) { (granted, _) in
-            if !granted{
+            if !granted {
                 print("You must grant access for user notifications for all the features of this sample to work")
             }
         }
@@ -167,26 +154,26 @@ class JobManagerExample: TableViewController {
         tableView.register(JobTableViewCell.self, forCellReuseIdentifier: "JobCell")
     }
     
-    @objc func resumeAllPausedJobs(){
+    @objc
+    func resumeAllPausedJobs() {
         JobManager.shared.resumeAllPausedJobs(statusHandler: self.jobStatusHandler, completion: self.jobCompletionHandler)
     }
     
-    @objc func clearFinishedJobs(){
+    @objc
+    func clearFinishedJobs() {
         JobManager.shared.clearFinishedJobs()
         tableView.reloadData()
     }
     
     var i = 0
     
-    @objc func kickOffJob(){
-        
-        if (i % 2) == 0{
+    @objc
+    func kickOffJob() {
+        if (i % 2) == 0 {
             let url = URL(string: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Sync/WildfireSync/FeatureServer")!
             generateGDB(URL: url, syncModel: .layer, extent: nil)
-        }
-        else{
-
-            let portalItem = AGSPortalItem(url: URL(string:"https://www.arcgis.com/home/item.html?id=acc027394bc84c2fb04d1ed317aac674")!)!
+        } else {
+            let portalItem = AGSPortalItem(url: URL(string: "https://www.arcgis.com/home/item.html?id=acc027394bc84c2fb04d1ed317aac674")!)!
             let map = AGSMap(item: portalItem)
             // naperville
             let env = AGSEnvelope(xMin: -9825684.031125, yMin: 5102237.935062, xMax: -9798254.961608, yMax: 5151000.725314, spatialReference: AGSSpatialReference.webMercator())
@@ -196,7 +183,7 @@ class JobManagerExample: TableViewController {
         i += 1
     }
     
-    required public init?(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
     
@@ -204,11 +191,11 @@ class JobManagerExample: TableViewController {
         super.init(nibName: nil, bundle: nil)
     }
     
-    override open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return jobs.count
     }
     
-    override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "JobCell") as! JobTableViewCell
         let job = jobs[indexPath.row]
         cell.configureWithJob(job: job)
@@ -219,58 +206,55 @@ class JobManagerExample: TableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
-    var documentsPath: String{
+    var documentsPath: String {
         return NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
     }
     
-    func generateGDB(URL: URL, syncModel: AGSSyncModel, extent: AGSEnvelope?){
-        
+    func generateGDB(URL: URL, syncModel: AGSSyncModel, extent: AGSEnvelope?) {
         let task = AGSGeodatabaseSyncTask(url: URL)
         
         // hold on to task so that it stays retained while it's loading
         self.tasks.append(task)
         
-        task.load{ [weak self, weak task] error in
-
+        task.load { [weak self, weak task] error in
             // make sure we are still around...
             guard let self = self else {
                 return
             }
             
-            guard let strongTask = task else{
+            guard let strongTask = task else {
                 return
             }
             
             // remove task from array now that it's loaded
-            if let index = self.tasks.index(where: {return $0 === strongTask}){
+            if let index = self.tasks.index(where: { return $0 === strongTask }) {
                 self.tasks.remove(at: index)
             }
             
             // return if error or no featureServiceInfo
-            guard error == nil else{
+            guard error == nil else {
                 return
             }
             
-            guard let fsi = strongTask.featureServiceInfo else{
+            guard let fsi = strongTask.featureServiceInfo else {
                 return
             }
             
             let params = AGSGenerateGeodatabaseParameters()
             
             params.extent = extent
-            if params.extent == nil{
+            if params.extent == nil {
                 params.extent = fsi.fullExtent
             }
             
             params.outSpatialReference = AGSSpatialReference.webMercator()
             
-            if syncModel == .geodatabase{
+            if syncModel == .geodatabase {
                 params.syncModel = .geodatabase
-            }
-            else{
+            } else {
                 params.syncModel = .layer
                 var options = [AGSGenerateLayerOption]()
-                for li in fsi.layerInfos{
+                for li in fsi.layerInfos {
                     let option = AGSGenerateLayerOption(layerID: li.id)
                     options.append(option)
                 }
@@ -294,21 +278,19 @@ class JobManagerExample: TableViewController {
         }
     }
     
-    func takeOffline(map: AGSMap, extent: AGSEnvelope){
-        
+    func takeOffline(map: AGSMap, extent: AGSEnvelope) {
         let task = AGSOfflineMapTask(onlineMap: map)
         
         let uuid = NSUUID()
         let offlineMapURL = URL(fileURLWithPath: "\(self.documentsPath)/\(uuid.uuidString)") as URL
         
-        task.defaultGenerateOfflineMapParameters(withAreaOfInterest: extent){ [weak self] params, error in
-            
+        task.defaultGenerateOfflineMapParameters(withAreaOfInterest: extent) { [weak self] params, error in
             // make sure we are still around...
             guard let self = self else {
                 return
             }
             
-            if let params = params{
+            if let params = params {
                 let job = task.generateOfflineMapJob(with: params, downloadDirectory: offlineMapURL)
                 
                 // register the job with our JobManager shared instance
@@ -319,25 +301,22 @@ class JobManagerExample: TableViewController {
                 
                 // refresh the tableview
                 self.tableView.reloadData()
-            }
-            else{
+            } else {
                 // if could not get default parameters, then fire completion with the error
                 self.jobCompletionHandler(result: nil, error: error)
             }
         }
-        
     }
-    func jobStatusHandler(status: AGSJobStatus){
+    func jobStatusHandler(status: AGSJobStatus) {
         print("status: \(status.asString())")
     }
     
-    func jobCompletionHandler(result: Any?, error: Error?){
+    func jobCompletionHandler(result: Any?, error: Error?) {
         print("job completed")
         
-        if let error = error{
+        if let error = error {
             print("  - error: \(error)")
-        }
-        else if let result = result{
+        } else if let result = result {
             print("  - result: \(result)")
         }
         
@@ -351,9 +330,8 @@ class JobManagerExample: TableViewController {
     }
 }
 
-
-extension AGSJobStatus{
-    func asString() -> String{
+extension AGSJobStatus {
+    func asString() -> String {
         switch self {
         case .failed:
             return "Failed"
@@ -368,4 +346,3 @@ extension AGSJobStatus{
         }
     }
 }
-

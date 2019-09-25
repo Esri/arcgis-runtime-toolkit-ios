@@ -79,7 +79,7 @@ public class JobManager: NSObject {
         return "com.esri.arcgis.runtime.toolkit.jobManager.\(jobManagerID).jobs"
     }
     
-    private var jobStatusObservation: NSKeyValueObservation?
+    private var jobStatusObservations = [String: NSKeyValueObservation]()
     
     /// Create a JobManager with an ID.
     ///
@@ -100,14 +100,17 @@ public class JobManager: NSObject {
     
     // Observing job status code
     private func observeJobStatus(job: AGSJob) {
-        jobStatusObservation = job.observe(\.status, options: [.new]) { [weak self] (_, _) in
+        let observer = job.observe(\.status, options: [.new]) { [weak self] (_, _) in
             self?.saveJobsToUserDefaults()
         }
+        jobStatusObservations[job.serverJobID] = observer
     }
     
     private func unObserveJobStatus(job: AGSJob) {
-        jobStatusObservation?.invalidate()
-        jobStatusObservation = nil
+        if let observer = jobStatusObservations[job.serverJobID] {
+            observer.invalidate()
+            jobStatusObservations.removeValue(forKey: job.serverJobID)
+        }
     }
 
     /// Register an `AGSJob` with the `JobManager`.
