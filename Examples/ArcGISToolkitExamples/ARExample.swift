@@ -17,7 +17,6 @@ import ArcGISToolkit
 import ArcGIS
 
 class ARExample: UIViewController {
-    
     typealias SceneInitFunction = () -> AGSScene
     typealias SceneInfoType = (sceneFunction: SceneInitFunction, label: String, tableTop: Bool, trackingMode: ARLocationTrackingMode)
     
@@ -97,7 +96,7 @@ class ARExample: UIViewController {
         arView.sceneView.graphicsOverlays.add(graphicsOverlay)
         
         // Observe the `arView.translationFactor` property and update status when it changes.
-        translationFactorObservation = arView.observe(\ArcGISARView.translationFactor, options: [.initial, .new]) { [weak self] arView, change in
+        translationFactorObservation = arView.observe(\ArcGISARView.translationFactor, options: [.initial, .new]) { [weak self] arView, _ in
             self?.statusViewController?.translationFactor = arView.translationFactor
         }
         
@@ -109,7 +108,7 @@ class ARExample: UIViewController {
             arView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             arView.topAnchor.constraint(equalTo: view.topAnchor),
             arView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-            ])
+        ])
         
         // Add a Toolbar for displaying user controls.
         addToolbar()
@@ -143,9 +142,9 @@ class ARExample: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        arView.startTracking(currentSceneInfo?.trackingMode ?? .ignore, completion: { [weak self] (error) in
+        arView.startTracking(currentSceneInfo?.trackingMode ?? .ignore) { [weak self] (error) in
             self?.statusViewController?.errorMessage = error?.localizedDescription
-        })
+        }
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -158,8 +157,8 @@ class ARExample: UIViewController {
     /// Initialize scene location/heading/elevation calibration.
     ///
     /// - Parameter sender: The bar button item tapped on.
-    @objc func displayCalibration(_ sender: UIBarButtonItem) {
-        
+    @objc
+    func displayCalibration(_ sender: UIBarButtonItem) {
         // If the sceneView's alpha is 0.0, that means we are not in calibration mode and we need to start calibrating.
         let startCalibrating = (calibrationView?.alpha == 0.0)
         
@@ -168,18 +167,19 @@ class ARExample: UIViewController {
         userDirectionsView.updateUserDirections(nil)
         
         // Display calibration view.
-        UIView.animate(withDuration: 0.25, animations: {
-            if startCalibrating {
-                self.arView.sceneView.isAttributionTextVisible = false
-                self.addCalibrationView()
-            }
-            self.calibrationView?.alpha = startCalibrating ? 1.0 : 0.0
-        }) { (_) in
-            if !startCalibrating {
-                self.removeCalibrationView()
-                self.arView.sceneView.isAttributionTextVisible = true
-            }
-        }
+        UIView.animate(withDuration: 0.25,
+                       animations: {
+                        if startCalibrating {
+                            self.arView.sceneView.isAttributionTextVisible = false
+                            self.addCalibrationView()
+                        }
+        },
+                       completion: { (_) in
+                        if !startCalibrating {
+                            self.removeCalibrationView()
+                            self.arView.sceneView.isAttributionTextVisible = true
+                        }
+        })
         
         // Dim the sceneView if we're calibrating.
         UIView.animate(withDuration: 0.25) { [weak self] in
@@ -197,7 +197,6 @@ class ARExample: UIViewController {
     ///
     /// - Parameter sceneInfo: The sceneInfo used to set up the scene and AR experience.
     fileprivate func selectSceneInfo(_ sceneInfo: SceneInfoType) {
-        
         title = sceneInfo.label
         
         // Set currentSceneInfo to the selected scene info.
@@ -213,9 +212,9 @@ class ARExample: UIViewController {
         
         // Reset AR tracking and then start tracking.
         arView.resetTracking()
-        arView.startTracking(sceneInfo.trackingMode, completion: { [weak self] (error) in
+        arView.startTracking(sceneInfo.trackingMode) { [weak self] (error) in
             self?.statusViewController?.errorMessage = error?.localizedDescription
-        })
+        }
         
         // Disable elevation control if we're using continuous GPS.
         calibrationView?.elevationControlVisibility = (sceneInfo.trackingMode != .continuous)
@@ -230,16 +229,17 @@ class ARExample: UIViewController {
     /// Allow users to change the current scene.
     ///
     /// - Parameter sender: The bar button item tapped on.
-    @objc func changeScene(_ sender: UIBarButtonItem) {
+    @objc
+    func changeScene(_ sender: UIBarButtonItem) {
         // Display an alert controller displaying the scenes to choose from.
         let alertController = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertController.Style.actionSheet)
         alertController.popoverPresentationController?.barButtonItem = sender
         
         // Loop through all sceneInfos and add `UIAlertActions` for each.
         sceneInfo.forEach { info in
-            let action = UIAlertAction(title: info.label, style: .default, handler: { [weak self] (action) in
+            let action = UIAlertAction(title: info.label, style: .default) { [weak self] (_) in
                 self?.selectSceneInfo(info)
-            })
+            }
             
             // Display current scene as disabled.
             action.isEnabled = (info.label != currentSceneInfo?.label)
@@ -256,7 +256,8 @@ class ARExample: UIViewController {
     /// Dislays the status view controller.
     ///
     /// - Parameter sender: The bar button item tapped on.
-    @objc func showStatus(_ sender: UIBarButtonItem) {
+    @objc
+    func showStatus(_ sender: UIBarButtonItem) {
         UIView.animate(withDuration: 0.25) { [weak self] in
             self?.statusViewController?.view.alpha = self?.statusViewController?.view.alpha == 1.0 ? 0.0 : 1.0
         }
@@ -271,7 +272,7 @@ class ARExample: UIViewController {
             toolbar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             toolbar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             toolbar.bottomAnchor.constraint(equalTo: arView.sceneView.attributionTopAnchor)
-            ])
+        ])
         
         // Create a toolbar button to display the status.
         let statusItem = UIBarButtonItem(title: "Status", style: .plain, target: self, action: #selector(showStatus(_:)))
@@ -295,7 +296,7 @@ class ARExample: UIViewController {
                 statusVC.view.widthAnchor.constraint(equalToConstant: 350),
                 statusVC.view.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -8),
                 statusVC.view.bottomAnchor.constraint(equalTo: toolbar.topAnchor, constant: -8)
-                ])
+            ])
             
             statusVC.view.alpha = 0.0
         }
@@ -304,7 +305,6 @@ class ARExample: UIViewController {
 
 // MARK: ARSCNViewDelegate
 extension ARExample: ARSCNViewDelegate {
-    
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
         // Place content only for anchors found by plane detection.
         guard let planeAnchor = anchor as? ARPlaneAnchor else { return }
@@ -342,7 +342,7 @@ extension ARExample: ARSCNViewDelegate {
         ]
         
         // Remove optional error messages.
-        let errorMessage = messages.compactMap({ $0 }).joined(separator: "\n")
+        let errorMessage = messages.compactMap { $0 }.joined(separator: "\n")
         
         // Set the error message on the status vc.
         statusViewController?.errorMessage = errorMessage
@@ -351,9 +351,9 @@ extension ARExample: ARSCNViewDelegate {
             // Present an alert describing the error.
             let alertController = UIAlertController(title: "Could not start tracking.", message: errorMessage, preferredStyle: .alert)
             let restartAction = UIAlertAction(title: "Restart Tracking", style: .default) { _ in
-                self?.arView.startTracking(self?.currentSceneInfo?.trackingMode ?? .ignore, completion: { (error) in
+                self?.arView.startTracking(self?.currentSceneInfo?.trackingMode ?? .ignore) { (error) in
                     self?.statusViewController?.errorMessage = error?.localizedDescription
-                })
+                }
             }
             alertController.addAction(restartAction)
             
@@ -403,8 +403,7 @@ extension ARExample: AGSGeoViewTouchDelegate {
                 userDirectionsView.updateUserDirections(nil)
                 didPlaceScene = true
             }
-        }
-        else {
+        } else {
             // We're in full-scale AR mode or have already placed the scene. Get the real world location for screen point from arView.
             guard let point = arView.arScreenToLocation(screenPoint: screenPoint) else { return }
             
@@ -423,7 +422,6 @@ extension ARExample: AGSGeoViewTouchDelegate {
 
 // MARK: User Directions View
 extension ARExample {
-    
     /// Add user directions view to view and setup constraints.
     func addUserDirectionsView() {
         view.addSubview(userDirectionsView)
@@ -431,7 +429,7 @@ extension ARExample {
         NSLayoutConstraint.activate([
             userDirectionsView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             userDirectionsView.topAnchor.constraint(equalToSystemSpacingBelow: view.safeAreaLayoutGuide.topAnchor, multiplier: 1)
-            ])
+        ])
     }
     
     /// Update the displayed message in the user directions view for the current frame and tracking state.
@@ -454,15 +452,14 @@ extension ARExample {
         case .notAvailable:
             message = "Location not available."
         case .limited(let reason):
-            switch(reason) {
+            switch reason {
             case .excessiveMotion:
                 message = "Try moving your device more slowly."
             case .initializing:
                 // Because ARKit gets reset often when using continuous GPS, only dipslay initializing message if we're not in continuous tracking mode.
                 if let sceneInfo = currentSceneInfo, sceneInfo.trackingMode != .continuous {
                     message = "Keep moving your device."
-                }
-                else {
+                } else {
                     message = ""
                 }
             case .insufficientFeatures:
@@ -478,7 +475,6 @@ extension ARExample {
 
 // MARK: Calibration View
 extension ARExample {
-    
     /// Add the calibration view to the view and setup constraints.
     func addCalibrationView() {
         guard let calibrationView = calibrationView else { return }
@@ -489,7 +485,7 @@ extension ARExample {
             calibrationView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             calibrationView.topAnchor.constraint(equalTo: view.topAnchor),
             calibrationView.bottomAnchor.constraint(equalTo: toolbar.topAnchor)
-            ])
+        ])
     }
     
     /// Add the calibration view to the view and setup constraints.
@@ -510,7 +506,6 @@ extension ARExample {
     ///
     /// - Returns: The new scene.
     private func streetsScene() -> AGSScene {
-        
         // Create scene with the streets basemap.
         let scene = AGSScene(basemapType: .streets)
         scene.addElevationSource()
@@ -526,7 +521,6 @@ extension ARExample {
     ///
     /// - Returns: The new scene.
     private func imageryScene() -> AGSScene {
-        
         // Create scene with the streets basemap.
         let scene = AGSScene(basemapType: .imageryWithLabels)
         scene.addElevationSource()
@@ -576,11 +570,11 @@ extension ARExample {
         scene.addElevationSource()
         
         // Create the Yosemite layer.
-        let layer = AGSIntegratedMeshLayer(url: URL(string:"https://tiles.arcgis.com/tiles/FQD0rKU8X5sAQfh8/arcgis/rest/services/VRICON_Yosemite_Sample_Integrated_Mesh_scene_layer/SceneServer")!)
+        let layer = AGSIntegratedMeshLayer(url: URL(string: "https://tiles.arcgis.com/tiles/FQD0rKU8X5sAQfh8/arcgis/rest/services/VRICON_Yosemite_Sample_Integrated_Mesh_scene_layer/SceneServer")!)
         scene.operationalLayers.add(layer)
         scene.load { [weak self, weak scene] (error) in
             self?.statusViewController?.errorMessage = error?.localizedDescription
-            if let _ = error {
+            if error != nil {
                 return
             }
             
@@ -591,14 +585,14 @@ extension ARExample {
             
             scene?.baseSurface?.elevationSources.first?.load { (error) in
                 self?.statusViewController?.errorMessage = error?.localizedDescription
-                if let _ = error {
+                if error != nil {
                     return
                 }
                 
                 // Find the elevation of the layer at the center point.
-                scene?.baseSurface?.elevation(for: center, completion: { (elevation, error) in
+                scene?.baseSurface?.elevation(for: center) { (elevation, error) in
                     self?.statusViewController?.errorMessage = error?.localizedDescription
-                    if let _ = error {
+                    if error != nil {
                         return
                     }
                     
@@ -606,7 +600,7 @@ extension ARExample {
                     let camera = AGSCamera(latitude: center.y, longitude: center.x, altitude: elevation, heading: 0, pitch: 90, roll: 0)
                     self?.arView.originCamera = camera
                     self?.arView.translationFactor = 18000
-                })
+                }
             }
         }
         
@@ -624,11 +618,11 @@ extension ARExample {
         scene.addElevationSource()
         
         // Create the border layer.
-        let layer = AGSIntegratedMeshLayer(url: URL(string:"https://tiles.arcgis.com/tiles/FQD0rKU8X5sAQfh8/arcgis/rest/services/VRICON_SW_US_Sample_Integrated_Mesh_scene_layer/SceneServer")!)
+        let layer = AGSIntegratedMeshLayer(url: URL(string: "https://tiles.arcgis.com/tiles/FQD0rKU8X5sAQfh8/arcgis/rest/services/VRICON_SW_US_Sample_Integrated_Mesh_scene_layer/SceneServer")!)
         scene.operationalLayers.add(layer)
         scene.load { [weak self, weak scene] (error) in
             self?.statusViewController?.errorMessage = error?.localizedDescription
-            if let _ = error {
+            if error != nil {
                 return
             }
             
@@ -639,14 +633,14 @@ extension ARExample {
             
             scene?.baseSurface?.elevationSources.first?.load { (error) in
                 self?.statusViewController?.errorMessage = error?.localizedDescription
-                if let _ = error {
+                if error != nil {
                     return
                 }
                 
                 // Find the elevation of the layer at the center point.
-                scene?.baseSurface?.elevation(for: center, completion: { (elevation, error) in
+                scene?.baseSurface?.elevation(for: center) { (elevation, error) in
                     self?.statusViewController?.errorMessage = error?.localizedDescription
-                    if let _ = error {
+                    if error != nil {
                         return
                     }
                     
@@ -654,7 +648,7 @@ extension ARExample {
                     let camera = AGSCamera(latitude: center.y, longitude: center.x, altitude: elevation, heading: 0, pitch: 90.0, roll: 0)
                     self?.arView.originCamera = camera
                     self?.arView.translationFactor = 1000
-                })
+                }
             }
         }
         
@@ -683,7 +677,7 @@ extension AGSScene {
     /// Adds an elevation source to the given `scene`.
     ///
     /// - Parameter scene: The scene to add the elevation source to.
-    public func addElevationSource() {
+    func addElevationSource() {
         let elevationSource = AGSArcGISTiledElevationSource(url: URL(string: "https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer")!)
         let surface = AGSSurface()
         surface.elevationSources = [elevationSource]
@@ -697,7 +691,7 @@ extension AGSScene {
 
 // MARK: AGSLocationChangeHandlerDelegate methods
 extension ARExample: AGSLocationChangeHandlerDelegate {
-    public func locationDataSource(_ locationDataSource: AGSLocationDataSource, locationDidChange location: AGSLocation) {
+    func locationDataSource(_ locationDataSource: AGSLocationDataSource, locationDidChange location: AGSLocation) {
         // When we get a new location, update the status view controller with the new horizontal and vertical accuracy.
         statusViewController?.horizontalAccuracyMeasurement.value = location.horizontalAccuracy
         statusViewController?.verticalAccuracyMeasurement.value = location.verticalAccuracy
@@ -708,4 +702,3 @@ extension ARExample: AGSLocationChangeHandlerDelegate {
         statusViewController?.locationDataSourceStatus = status
     }
 }
-
