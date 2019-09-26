@@ -6,3 +6,4 @@
 * [Measure Toolbar](MeasureToolbar)
 * [Scalebar](Scalebar)
 * [TimeSlider](TimeSlider)
+* [AR](AR)

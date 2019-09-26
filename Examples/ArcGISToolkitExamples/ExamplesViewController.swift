@@ -28,7 +28,8 @@ class ExamplesViewController: VCListViewController {
             ("Job Manager", JobManagerExample.self, nil),
             ("Time Slider", TimeSliderExample.self, nil),
             ("Popup Controller", PopupExample.self, nil),
-            ("Template Picker", TemplatePickerExample.self, nil)
+            ("Template Picker", TemplatePickerExample.self, nil),
+            ("AR", ARExample.self, nil)
         ]
     }
 }
