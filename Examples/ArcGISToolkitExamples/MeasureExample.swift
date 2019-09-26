@@ -15,8 +15,7 @@ import UIKit
 import ArcGISToolkit
 import ArcGIS
 
-class MeasureExample: MapViewController{
-    
+class MeasureExample: MapViewController {
     var measureToolbar: MeasureToolbar!
     
     override func viewDidLoad() {
@@ -35,7 +34,6 @@ class MeasureExample: MapViewController{
         measureToolbar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         measureToolbar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         measureToolbar.heightAnchor.constraint(equalToConstant: 44).isActive = true
-
     }
     
     override func viewDidLayoutSubviews() {
@@ -44,5 +42,4 @@ class MeasureExample: MapViewController{
         // update content inset for mapview
         mapView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: measureToolbar.frame.height, right: 0)
     }
-    
 }

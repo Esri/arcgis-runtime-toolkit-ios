@@ -21,7 +21,6 @@ public typealias JobCompletionHandler = (Any?, Error?) -> Void
 //
 // MARK: JobManager
 
-
 private let _jobManagerSharedInstance = JobManager(jobManagerID: "shared")
 
 /**
@@ -40,7 +39,6 @@ private let _jobManagerSharedInstance = JobManager(jobManagerID: "shared")
  method.
  */
 public class JobManager: NSObject {
-    
     /// Default shared instance of the JobManager.
     public class var shared: JobManager {
         return _jobManagerSharedInstance
@@ -81,6 +79,8 @@ public class JobManager: NSObject {
         return "com.esri.arcgis.runtime.toolkit.jobManager.\(jobManagerID).jobs"
     }
     
+    private var jobStatusObservations = [String: NSKeyValueObservation]()
+    
     /// Create a JobManager with an ID.
     ///
     /// - Parameter jobManagerID: An arbitrary identifier for this JobManager.
@@ -100,23 +100,16 @@ public class JobManager: NSObject {
     
     // Observing job status code
     private func observeJobStatus(job: AGSJob) {
-        job.addObserver(self, forKeyPath: #keyPath(AGSJob.status), context: &kvoContext)
+        let observer = job.observe(\.status, options: [.new]) { [weak self] (_, _) in
+            self?.saveJobsToUserDefaults()
+        }
+        jobStatusObservations[job.serverJobID] = observer
     }
     
     private func unObserveJobStatus(job: AGSJob) {
-        job.removeObserver(self, forKeyPath: #keyPath(AGSJob.status))
-    }
-    
-    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
-        if context == &kvoContext {
-            if keyPath == #keyPath(AGSJob.status) {
-                // when a job's status changes we need to save to user defaults again
-                // so that the correct job state is reflected in our saved state
-                saveJobsToUserDefaults()
-            }
-        }
-        else {
-            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+        if let observer = jobStatusObservations[job.serverJobID] {
+            observer.invalidate()
+            jobStatusObservations.removeValue(forKey: job.serverJobID)
         }
     }
 
@@ -124,7 +117,8 @@ public class JobManager: NSObject {
     ///
     /// - Parameter job: The AGSJob to register.
     /// - Returns: A unique ID for the AGSJob's registration which can be used to unregister the job.
-    @discardableResult public func register(job: AGSJob) -> String {
+    @discardableResult
+    public func register(job: AGSJob) -> String {
         let jobUniqueID = NSUUID().uuidString
         keyedJobs[jobUniqueID] = job
         return jobUniqueID
@@ -134,7 +128,8 @@ public class JobManager: NSObject {
     ///
     /// - Parameter job: The job to unregister.
     /// - Returns: `true` if the job was found, `false` otherwise.
-    @discardableResult public func unregister(job: AGSJob) -> Bool {
+    @discardableResult
+    public func unregister(job: AGSJob) -> Bool {
         if let jobUniqueID = keyedJobs.first(where: { $0.value === job })?.key {
             keyedJobs[jobUniqueID] = nil
             return true
@@ -146,7 +141,8 @@ public class JobManager: NSObject {
     ///
     /// - Parameter jobUniqueID: The job's unique ID, returned from calling `register()`.
     /// - Returns: `true` if the Job was found, `false` otherwise.
-    @discardableResult public func unregister(jobUniqueID: String) -> Bool {
+    @discardableResult
+    public func unregister(jobUniqueID: String) -> Bool {
         let removed = keyedJobs.removeValue(forKey: jobUniqueID) != nil
         return removed
     }
@@ -163,7 +159,8 @@ public class JobManager: NSObject {
     ///
     /// - Parameter completion: A completion block that is called when the status of all `AGSJob`s has been checked. Passed `true` if all statuses were retrieves successfully, or `false` otherwise.
     /// - Returns: An `AGSCancelable` group that can be used to cancel the status checks.
-    @discardableResult public func checkStatusForAllJobs(completion: @escaping (Bool)->Void) -> AGSCancelable {
+    @discardableResult
+    public func checkStatusForAllJobs(completion: @escaping (Bool) -> Void) -> AGSCancelable {
         let cancelGroup = CancelGroup()
         
         let group = DispatchGroup()
@@ -208,14 +205,12 @@ public class JobManager: NSObject {
             checkStatusForAllJobs { completedWithoutErrors in
                 if completedWithoutErrors {
                     completionHandler(.newData)
-                }
-                else{
+                } else {
                     completionHandler(.failed)
                 }
             }
         }
     }
-
     
     /// Resume all paused and not-started `AGSJob`s.
     ///
@@ -228,8 +223,8 @@ public class JobManager: NSObject {
     ///   - statusHandler: A callback block that is called by each active `AGSJob` when the `AGSJob`'s status changes or its messages array is updated.
     ///   - completion: A callback block that is called by each `AGSJob` when it has completed.
     public func resumeAllPausedJobs(statusHandler: @escaping JobStatusHandler, completion: @escaping JobCompletionHandler) {
-        keyedJobs.lazy.filter({ $0.value.status == .paused || $0.value.status == .notStarted }).forEach {
-            $0.value.start(statusHandler: statusHandler, completion:completion)
+        keyedJobs.lazy.filter { $0.value.status == .paused || $0.value.status == .notStarted }.forEach {
+            $0.value.start(statusHandler: statusHandler, completion: completion)
         }
     }
     

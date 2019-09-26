@@ -19,7 +19,6 @@ import ArcGIS
 // MARK: - Time Slider Control
 
 public class TimeSlider: UIControl {
-    
     // MARK: - Enumerations
     
     /**
@@ -106,7 +105,7 @@ public class TimeSlider: UIControl {
                     isRangeEnabled = (startTime != endTime)
                 }
             }
-            // This means there is only one thumb needs to be displayed and current extent start and end times are same.
+                // This means there is only one thumb needs to be displayed and current extent start and end times are same.
             else if let startTime = currentExtent?.startTime, currentExtent?.endTime == nil {
                 //
                 // Only one thumb should be displayed
@@ -119,7 +118,7 @@ public class TimeSlider: UIControl {
                 // Start and end time must be same.
                 currentExtentEndTime = currentExtentStartTime
             }
-            // This means there is only one thumb needs to be displayed and current extent start and end times are same.
+                // This means there is only one thumb needs to be displayed and current extent start and end times are same.
             else if let endTime = currentExtent?.endTime, currentExtent?.startTime == nil {
                 //
                 // Only one thumb should be displayed
@@ -132,8 +131,8 @@ public class TimeSlider: UIControl {
                 // Start and end time must be same.
                 currentExtentEndTime = currentExtentStartTime
             }
-            // Set start and end time to nil if current extent is nil
-            // or it's start and end times are nil
+                // Set start and end time to nil if current extent is nil
+                // or it's start and end times are nil
             else if currentExtent == nil || (currentExtent?.startTime == nil && currentExtent?.endTime == nil) {
                 currentExtentStartTime = nil
                 currentExtentEndTime = nil
@@ -202,8 +201,7 @@ public class TimeSlider: UIControl {
         didSet {
             if isRangeEnabled {
                 upperThumbLayer.isPinned = isEndTimePinned
-            }
-            else {
+            } else {
                 isStartTimePinned = isEndTimePinned
                 lowerThumbLayer.isPinned = isEndTimePinned
                 upperThumbLayer.isPinned = isEndTimePinned
@@ -222,14 +220,12 @@ public class TimeSlider: UIControl {
             // Set current extent if it's nil.
             if currentExtent == nil, let fullExtent = fullExtent {
                 currentExtent = fullExtent
-            }
-            else if fullExtent == nil {
+            } else if fullExtent == nil {
                 timeSteps?.removeAll()
                 tickMarks.removeAll()
                 removeTickMarkLabels()
                 currentExtent = fullExtent
-            }
-            else {
+            } else {
                 //
                 // It is possible that the current extent times are outside of the range of
                 // new full extent times. Adjust and sanp them to the tick marks.
@@ -526,8 +522,7 @@ public class TimeSlider: UIControl {
                 
                 // Start the timer with specified playback interval
                 timer = Timer.scheduledTimer(timeInterval: playbackInterval, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
-            }
-            else {
+            } else {
                 //
                 // Set the button state
                 playPauseButton.isSelected = false
@@ -553,8 +548,7 @@ public class TimeSlider: UIControl {
         didSet {
             if observeGeoView {
                 addObservers()
-            }
-            else {
+            } else {
                 removeObservers()
             }
         }
@@ -584,9 +578,9 @@ public class TimeSlider: UIControl {
             fullExtentEndTimeLabel.isHidden = !isSliderVisible
             currentExtentStartTimeLabel.isHidden = !isSliderVisible
             currentExtentEndTimeLabel.isHidden = !isSliderVisible
-            tickMarkLabels.forEach({ (tickMarkLabel) in
+            tickMarkLabels.forEach { (tickMarkLabel) in
                 tickMarkLabel.isHidden = !isSliderVisible
-            })
+            }
             invalidateIntrinsicContentSize()
             setNeedsLayout()
         }
@@ -669,10 +663,10 @@ public class TimeSlider: UIControl {
     private let tickMarkLayer = TimeSliderTickMarkLayer()
     private let lowerThumbLayer = TimeSliderThumbLayer()
     private let upperThumbLayer = TimeSliderThumbLayer()
-    private let fullExtentStartTimeLabel: CATextLayer = CATextLayer()
-    private let fullExtentEndTimeLabel: CATextLayer = CATextLayer()
-    private let currentExtentStartTimeLabel: CATextLayer = CATextLayer()
-    private let currentExtentEndTimeLabel: CATextLayer = CATextLayer()
+    private let fullExtentStartTimeLabel = CATextLayer()
+    private let fullExtentEndTimeLabel = CATextLayer()
+    private let currentExtentStartTimeLabel = CATextLayer()
+    private let currentExtentEndTimeLabel = CATextLayer()
     
     private let minimumFrameWidth: CGFloat = 250.0
     private let maximumThumbSize: CGFloat = 50.0
@@ -688,7 +682,7 @@ public class TimeSlider: UIControl {
     private let forwardButton = UIButton(type: .custom)
     private let backButton = UIButton(type: .custom)
     
-    fileprivate var pinnedThumbFillColor: UIColor = UIColor.black
+    fileprivate var pinnedThumbFillColor = UIColor.black
     
     // If set to True, it will show two thumbs, otherwise only one. Default is True.
     fileprivate var isRangeEnabled: Bool = true {
@@ -707,10 +701,10 @@ public class TimeSlider: UIControl {
     private var mapLayersObservation: NSKeyValueObservation?
     private var sceneLayersObservation: NSKeyValueObservation?
     private var timeExtentObservation: NSKeyValueObservation?
-
+    
     // MARK: - Override Functions
     
-    required public init?(coder: NSCoder) {
+    public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
@@ -759,7 +753,7 @@ public class TimeSlider: UIControl {
         return lowerThumbLayer.isHighlighted || upperThumbLayer.isHighlighted
     }
     
-    open override func continueTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
+    override public func continueTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
         //
         // Get the touch location
         let location = touch.location(in: self)
@@ -770,8 +764,7 @@ public class TimeSlider: UIControl {
         // Set values based on selected thumb
         if lowerThumbLayer.isHighlighted {
             updateCurrentExtentStartTime(Date(timeIntervalSince1970: selectedValue))
-        }
-        else if upperThumbLayer.isHighlighted {
+        } else if upperThumbLayer.isHighlighted {
             updateCurrentExtentEndTime(Date(timeIntervalSince1970: selectedValue))
         }
         
@@ -805,7 +798,7 @@ public class TimeSlider: UIControl {
     }
     
     // Refresh the slider when requried
-    public override func layoutSubviews() {
+    override public func layoutSubviews() {
         //
         // Calculate time steps
         if timeSteps == nil || timeSteps?.isEmpty == true {
@@ -821,7 +814,7 @@ public class TimeSlider: UIControl {
     }
     
     // Set intrinsic content size
-    public override var intrinsicContentSize: CGSize {
+    override public var intrinsicContentSize: CGSize {
         let intrinsicHeight: CGFloat
         if isSliderVisible {
             if playbackButtonsVisible {
@@ -847,7 +840,8 @@ public class TimeSlider: UIControl {
      to initialize slider's fullExtent, currentExtent and timeStepInterval properties. Setting observeGeoView
      to true will observe changes in operational layers and time extent of geoView.
      */
-    public func initializeTimeProperties(geoView: AGSGeoView, observeGeoView: Bool, completion: @escaping (Error?)->Void) {
+    // swiftlint:disable cyclomatic_complexity
+    public func initializeTimeProperties(geoView: AGSGeoView, observeGeoView: Bool, completion: @escaping (Error?) -> Void) {
         //
         // Set operational layers
         guard let operationalLayers = geoView.operationalLayers, !operationalLayers.isEmpty else {
@@ -862,8 +856,7 @@ public class TimeSlider: UIControl {
         // Set map/scene
         if let mapView = geoView as? AGSMapView {
             map = mapView.map
-        }
-        else if let sceneView = geoView as? AGSSceneView {
+        } else if let sceneView = geoView as? AGSSceneView {
             scene = sceneView.scene
         }
         
@@ -900,7 +893,7 @@ public class TimeSlider: UIControl {
             
             // Once, all layers are loaded,
             // loop through all of them.
-            operationalLayers.forEach({ (layer) in
+            operationalLayers.forEach { (layer) in
                 //
                 // The layer must be time aware, supports time filtering and time filtering is enabled.
                 guard let timeAwareLayer = layer as? AGSTimeAware, timeAwareLayer.supportsTimeFiltering, timeAwareLayer.isTimeFilteringEnabled else {
@@ -916,7 +909,7 @@ public class TimeSlider: UIControl {
                 // This is an async operation to find out time step interval and
                 // whether range time filtering is supported by the layer.
                 dispatchGroup.enter()
-                self.findTimeStepIntervalAndIsRangeTimeFilteringSupported(for: timeAwareLayer, completion: { (timeInterval, supportsRangeFiltering) in
+                self.findTimeStepIntervalAndIsRangeTimeFilteringSupported(for: timeAwareLayer) { (timeInterval, supportsRangeFiltering) in
                     //
                     // Set the range filtering value
                     supportsRangeTimeFiltering = supportsRangeFiltering
@@ -927,8 +920,7 @@ public class TimeSlider: UIControl {
                             if timeInterval > layersTimeInterval {
                                 timeAwareLayersStepInterval = timeInterval
                             }
-                        }
-                        else {
+                        } else {
                             timeAwareLayersStepInterval = timeInterval
                         }
                     }
@@ -937,10 +929,10 @@ public class TimeSlider: UIControl {
                     // Leave the group so we can set time
                     // properties and notify
                     dispatchGroup.leave()
-                })
-            })
+                }
+            }
             
-            dispatchGroup.notify(queue: DispatchQueue.main, execute: {
+            dispatchGroup.notify(queue: DispatchQueue.main) {
                 //
                 // If full extent or time step interval is not available then
                 // we cannot initialize the slider. Finish with error.
@@ -960,8 +952,7 @@ public class TimeSlider: UIControl {
                 // calculate using default timeStepCount
                 if let timeStepInterval = timeAwareLayersStepInterval {
                     self.timeStepInterval = timeStepInterval
-                }
-                else {
+                } else {
                     self.timeStepInterval = self.calculateTimeStepInterval(for: layersFullExtent, timeStepCount: 0)
                 }
                 
@@ -969,22 +960,22 @@ public class TimeSlider: UIControl {
                 // current extent to either the full extent's start (if range filtering is not supported), or to the entire full extent.
                 if let geoViewTimeExtent = self.geoView?.timeExtent, !self.reInitializeTimeProperties {
                     self.currentExtent = geoViewTimeExtent
-                }
-                else {
+                } else {
                     if let fullExtentStartTime = self.fullExtent?.startTime, let fullExtentEndTime = self.fullExtent?.endTime {
                         self.currentExtent = supportsRangeTimeFiltering ? AGSTimeExtent(startTime: fullExtentStartTime, endTime: fullExtentEndTime) : AGSTimeExtent(timeInstant: fullExtentStartTime)
                     }
                 }
                 completion(nil)
-            })
+            }
         }
     }
-    
+    // swiftlint:enable cyclomatic_complexity
+
     /**
      This will initialize slider's fullExtent, currentExtent and timeStepInterval properties
      if the layer is visible and participate in time based filtering.
      */
-    public func initializeTimeProperties(timeAwareLayer: AGSTimeAware, completion: @escaping (Error?)->Void) {
+    public func initializeTimeProperties(timeAwareLayer: AGSTimeAware, completion: @escaping (Error?) -> Void) {
         //
         // The layer must be loadable.
         guard let layer = timeAwareLayer as? AGSLoadable else {
@@ -992,7 +983,7 @@ public class TimeSlider: UIControl {
             return
         }
         
-        layer.load(completion: { [weak self] (error) in
+        layer.load { [weak self] (error) in
             //
             // If layer fails to load then
             // return with an error.
@@ -1016,7 +1007,7 @@ public class TimeSlider: UIControl {
             //
             // This is an async operation to find out time step interval and
             // whether range time filtering is supported by the layer.
-            self.findTimeStepIntervalAndIsRangeTimeFilteringSupported(for: timeAwareLayer, completion: { [weak self] (timeInterval, supportsRangeTimeFiltering) in
+            self.findTimeStepIntervalAndIsRangeTimeFilteringSupported(for: timeAwareLayer) { [weak self] (timeInterval, supportsRangeTimeFiltering) in
                 //
                 // Make sure self is around
                 guard let self = self else {
@@ -1041,8 +1032,7 @@ public class TimeSlider: UIControl {
                 // calculate using default timeStepCount
                 if let timeInterval = timeInterval {
                     self.timeStepInterval = timeInterval
-                }
-                else {
+                } else {
                     self.timeStepInterval = self.calculateTimeStepInterval(for: fullTimeExtent, timeStepCount: 0)
                 }
                 
@@ -1053,15 +1043,15 @@ public class TimeSlider: UIControl {
                 
                 // Slider is loaded successfully.
                 completion(nil)
-            })
-        })
+            }
+        }
     }
     
     /**
      This will initialize slider's fullExtent, currentExtent and timeStepInterval properties
      based on provided step count and full extent. The current extent will be set to a time instant.
      */
-    public func initializeTimeSteps(timeStepCount: Int, fullExtent: AGSTimeExtent, completion: @escaping (Error?)->Void) {
+    public func initializeTimeSteps(timeStepCount: Int, fullExtent: AGSTimeExtent, completion: @escaping (Error?) -> Void) {
         //
         // There should be at least two time steps
         // for time slider to work correctly.
@@ -1071,7 +1061,7 @@ public class TimeSlider: UIControl {
         }
         
         // Full extent's start and end time must be available for time slider to work correctly.
-        guard let fullExtentStartTime = fullExtent.startTime, let _ = fullExtent.endTime else {
+        guard let fullExtentStartTime = fullExtent.startTime, fullExtent.endTime != nil else {
             completion(NSError(domain: AGSErrorDomain, code: AGSErrorCode.commonNoData.rawValue, userInfo: [NSLocalizedDescriptionKey: "fullExtent is not available to calculate time steps."]))
             return
         }
@@ -1092,7 +1082,8 @@ public class TimeSlider: UIControl {
     /**
      Moves the slider thumbs forward with provided time steps.
      */
-    @discardableResult public func stepForward(timeSteps: Int) -> Bool {
+    @discardableResult
+    public func stepForward(timeSteps: Int) -> Bool {
         //
         // Time steps must be greater than 0
         if timeSteps > 0 {
@@ -1104,7 +1095,8 @@ public class TimeSlider: UIControl {
     /**
      Moves the slider thumbs back with provided time steps.
      */
-    @discardableResult public func stepBack(timeSteps: Int) -> Bool {
+    @discardableResult
+    public func stepBack(timeSteps: Int) -> Bool {
         //
         // Time steps must be greater than 0
         if timeSteps > 0 {
@@ -1115,21 +1107,25 @@ public class TimeSlider: UIControl {
     
     // MARK: - Actions
     
-    @objc private func forwardAction(_ sender: UIButton) {
+    @objc
+    private func forwardAction(_ sender: UIButton) {
         isPlaying = false
         stepForward(timeSteps: 1)
     }
     
-    @objc private func backAction(_ sender: UIButton) {
+    @objc
+    private func backAction(_ sender: UIButton) {
         isPlaying = false
         stepBack(timeSteps: 1)
     }
     
-    @objc private func playPauseAction(_ sender: UIButton) {
-        isPlaying = !isPlaying
+    @objc
+    private func playPauseAction(_ sender: UIButton) {
+        isPlaying.toggle()
     }
     
-    @discardableResult private func moveTimeStep(timeSteps: Int) -> Bool {
+    @discardableResult
+    private func moveTimeStep(timeSteps: Int) -> Bool {
         //
         // Time steps must be between 1 and count of calculated time steps
         if let ts = self.timeSteps, timeSteps < ts.count, let startTime = currentExtentStartTime, let endTime = currentExtentEndTime {
@@ -1142,7 +1138,7 @@ public class TimeSlider: UIControl {
             
             // Set the start time step index if it's not set
             if startTimeStepIndex <= 0 {
-                if let (index, date) =  closestTimeStep(for: startTime) {
+                if let (index, date) = closestTimeStep(for: startTime) {
                     currentExtentStartTime = date
                     startTimeStepIndex = index
                 }
@@ -1158,16 +1154,15 @@ public class TimeSlider: UIControl {
             
             // Get the minimum and maximum allowable time step indexes. This is not necessarily the end of the time slider since
             // the start and end times may be pinned.
-            let minTimeStepIndex = !isStartTimePinned ? 0 : startTimeStepIndex;
-            let maxTimeStepIndex = !isEndTimePinned ? ts.count - 1 : endTimeStepIndex;
+            let minTimeStepIndex = !isStartTimePinned ? 0 : startTimeStepIndex
+            let maxTimeStepIndex = !isEndTimePinned ? ts.count - 1 : endTimeStepIndex
             
             // Get the number of steps by which to move the current time.  If the number specified in the method call would move the current time extent
             // beyond the valid range, clamp the number of steps to the maximum number that the extent can move in the specified direction.
             var validTimeStepDelta = 0
             if timeSteps > 0 {
                 validTimeStepDelta = startTimeStepIndex + timeSteps <= maxTimeStepIndex ? timeSteps : maxTimeStepIndex - startTimeStepIndex
-            }
-            else {
+            } else {
                 validTimeStepDelta = endTimeStepIndex + timeSteps >= minTimeStepIndex ? timeSteps : minTimeStepIndex - endTimeStepIndex
             }
             
@@ -1184,16 +1179,15 @@ public class TimeSlider: UIControl {
                 endTimeStepIndex + validTimeStepDelta : endTimeStepIndex
             
             // Evaluate how many time steps the start and end were moved by and whether they were able to be moved by the requested number of steps
-            let startDelta = newStartTimeStepIndex - startTimeStepIndex;
-            let endDelta = newEndTimeStepIndex - endTimeStepIndex;
-            let canMoveStartAndEndByTimeSteps = startDelta == timeSteps && endDelta == timeSteps;
-            let canMoveStartOrEndByTimeSteps = startDelta == timeSteps || endDelta == timeSteps;
+            let startDelta = newStartTimeStepIndex - startTimeStepIndex
+            let endDelta = newEndTimeStepIndex - endTimeStepIndex
+            let canMoveStartAndEndByTimeSteps = startDelta == timeSteps && endDelta == timeSteps
+            let canMoveStartOrEndByTimeSteps = startDelta == timeSteps || endDelta == timeSteps
             
-            let isRequestedMoveValid = canMoveStartAndEndByTimeSteps || canMoveStartOrEndByTimeSteps;
+            let isRequestedMoveValid = canMoveStartAndEndByTimeSteps || canMoveStartOrEndByTimeSteps
             
             // Apply the new extent if the new time indexes represent a valid change
             if isRequestedMoveValid && newStartTimeStepIndex < ts.count && newEndTimeStepIndex < ts.count {
-                
                 // Set new times and time step indexes
                 currentExtentStartTime = ts[newStartTimeStepIndex]
                 startTimeStepIndex = newStartTimeStepIndex
@@ -1217,13 +1211,13 @@ public class TimeSlider: UIControl {
         return false
     }
     
-    @objc private func timerAction() {
+    @objc
+    private func timerAction() {
         if let geoView = self.geoView {
             if geoView.drawStatus == .completed {
                 handlePlaying()
             }
-        }
-        else {
+        } else {
             handlePlaying()
         }
     }
@@ -1403,21 +1397,19 @@ public class TimeSlider: UIControl {
                 lowerThumbLayer.isHidden = !isSliderVisible
                 lowerThumbLayer.frame = lowerThumbFrame
                 lowerThumbLayer.setNeedsDisplay()
-            }
-            else {
+            } else {
                 lowerThumbLayer.isHidden = true
             }
             
             // Set upper thumb layer frame
-            if let endTime = currentExtentEndTime, isRangeEnabled, fullExtent != nil  {
+            if let endTime = currentExtentEndTime, isRangeEnabled, fullExtent != nil {
                 let upperThumbCenter = CGFloat(position(for: endTime.timeIntervalSince1970))
                 let upperThumbOrigin = CGPoint(x: trackLayerSidePadding + upperThumbCenter - thumbSize.width / 2.0, y: trackLayerFrame.midY - thumbSize.height / 2.0)
                 let upperThumbFrame = CGRect(origin: upperThumbOrigin, size: thumbSize)
                 upperThumbLayer.isHidden = !isSliderVisible
                 upperThumbLayer.frame = upperThumbFrame
                 upperThumbLayer.setNeedsDisplay()
-            }
-            else {
+            } else {
                 upperThumbLayer.isHidden = true
             }
         }
@@ -1480,8 +1472,7 @@ public class TimeSlider: UIControl {
             let tickLayerStartTimeLabelY = tickMarkLayer.frame.maxY + labelPadding
             let startTimeLabelY = max(thumbStartTimeLabelY, tickLayerStartTimeLabelY)
             fullExtentStartTimeLabel.frame = CGRect(x: startTimeLabelX, y: startTimeLabelY, width: startTimeLabelSize.width, height: startTimeLabelSize.height)
-        }
-        else {
+        } else {
             fullExtentStartTimeLabel.string = ""
             fullExtentStartTimeLabel.isHidden = true
         }
@@ -1502,8 +1493,7 @@ public class TimeSlider: UIControl {
             let tickLayerEndTimeLabelY = tickMarkLayer.frame.maxY + labelPadding
             let endTimeLabelY = max(thumbEndTimeLabelY, tickLayerEndTimeLabelY)
             fullExtentEndTimeLabel.frame = CGRect(x: endTimeLabelX, y: endTimeLabelY, width: endTimeLabelSize.width, height: endTimeLabelSize.height)
-        }
-        else {
+        } else {
             fullExtentEndTimeLabel.string = ""
             fullExtentEndTimeLabel.isHidden = true
         }
@@ -1512,6 +1502,7 @@ public class TimeSlider: UIControl {
         CATransaction.commit()
     }
     
+    // swiftlint:disable cyclomatic_complexity
     private func updateCurrentExtentLabelFrames() {
         //
         // If label mode is not thumbs then
@@ -1530,7 +1521,7 @@ public class TimeSlider: UIControl {
         
         //
         // Update current extent start time label
-        if let startTime = currentExtentStartTime, fullExtent != nil  {
+        if let startTime = currentExtentStartTime, fullExtent != nil {
             let startTimeString = string(for: startTime, style: currentExtentLabelDateStyle)
             currentExtentStartTimeLabel.string = startTimeString
             let startTimeLabelSize: CGSize = startTimeString.size(withAttributes: [kCTFontAttributeName as NSAttributedString.Key: currentExtentLabelFont])
@@ -1541,14 +1532,12 @@ public class TimeSlider: UIControl {
                 if let fullExtentStartTime = fullExtent?.startTime, fullExtentStartTime == startTime {
                     currentExtentStartTimeLabel.isHidden = true
                 }
-            }
-            else if startTimeLabelX + startTimeLabelSize.width > bounds.maxX - labelSidePadding {
+            } else if startTimeLabelX + startTimeLabelSize.width > bounds.maxX - labelSidePadding {
                 startTimeLabelX = bounds.maxX - startTimeLabelSize.width - labelSidePadding
                 if let fullExtentEndTime = fullExtent?.endTime, fullExtentEndTime == startTime {
                     currentExtentStartTimeLabel.isHidden = true
                 }
-            }
-            else if !currentExtentEndTimeLabel.isHidden && currentExtentEndTimeLabel.frame.origin.x >= 0.0 && startTimeLabelX + startTimeLabelSize.width > currentExtentEndTimeLabel.frame.origin.x {
+            } else if !currentExtentEndTimeLabel.isHidden && currentExtentEndTimeLabel.frame.origin.x >= 0.0 && startTimeLabelX + startTimeLabelSize.width > currentExtentEndTimeLabel.frame.origin.x {
                 startTimeLabelX = currentExtentEndTimeLabel.frame.origin.x - startTimeLabelSize.width - paddingBetweenLabels
             }
             
@@ -1556,14 +1545,13 @@ public class TimeSlider: UIControl {
             let tickLayerStartTimeLabelY = tickMarkLayer.frame.minY - currentExtentStartTimeLabel.frame.height - labelPadding
             let startTimeLabelY = min(thumbStartTimeLabelY, tickLayerStartTimeLabelY)
             currentExtentStartTimeLabel.frame = CGRect(x: startTimeLabelX, y: startTimeLabelY, width: startTimeLabelSize.width, height: startTimeLabelSize.height)
-        }
-        else {
+        } else {
             currentExtentStartTimeLabel.string = ""
             currentExtentStartTimeLabel.isHidden = true
         }
         
         // Update current extent end time label
-        if let endTime = currentExtentEndTime, isRangeEnabled, fullExtent != nil  {
+        if let endTime = currentExtentEndTime, isRangeEnabled, fullExtent != nil {
             let endTimeString = string(for: endTime, style: currentExtentLabelDateStyle)
             currentExtentEndTimeLabel.string = endTimeString
             let endTimeLabelSize: CGSize = endTimeString.size(withAttributes: [kCTFontAttributeName as NSAttributedString.Key: currentExtentLabelFont])
@@ -1574,14 +1562,12 @@ public class TimeSlider: UIControl {
                 if let fullExtentStartTime = fullExtent?.startTime, fullExtentStartTime == endTime {
                     currentExtentEndTimeLabel.isHidden = true
                 }
-            }
-            else if endTimeLabelX + endTimeLabelSize.width > bounds.maxX - labelSidePadding {
+            } else if endTimeLabelX + endTimeLabelSize.width > bounds.maxX - labelSidePadding {
                 endTimeLabelX = bounds.maxX - endTimeLabelSize.width - labelSidePadding
                 if let fullExtentEndTime = fullExtent?.endTime, fullExtentEndTime == endTime {
                     currentExtentEndTimeLabel.isHidden = true
                 }
-            }
-            else if !currentExtentStartTimeLabel.isHidden && endTimeLabelX < currentExtentStartTimeLabel.frame.origin.x + currentExtentStartTimeLabel.frame.width {
+            } else if !currentExtentStartTimeLabel.isHidden && endTimeLabelX < currentExtentStartTimeLabel.frame.origin.x + currentExtentStartTimeLabel.frame.width {
                 endTimeLabelX = currentExtentStartTimeLabel.frame.origin.x + currentExtentStartTimeLabel.frame.width + paddingBetweenLabels
             }
             
@@ -1589,8 +1575,7 @@ public class TimeSlider: UIControl {
             let tickLayerEndTimeLabelY = tickMarkLayer.frame.minY - currentExtentEndTimeLabel.frame.height - labelPadding
             let endTimeLabelY = min(thumbEndTimeLabelY, tickLayerEndTimeLabelY)
             currentExtentEndTimeLabel.frame = CGRect(x: endTimeLabelX, y: endTimeLabelY, width: endTimeLabelSize.width, height: endTimeLabelSize.height)
-        }
-        else {
+        } else {
             currentExtentEndTimeLabel.string = ""
             currentExtentEndTimeLabel.isHidden = true
         }
@@ -1598,7 +1583,9 @@ public class TimeSlider: UIControl {
         // Commit the transaction
         CATransaction.commit()
     }
-    
+    // swiftlint:enable cyclomatic_complexity
+
+    // swiftlint:disable cyclomatic_complexity
     private func positionTickMarks() {
         //
         // Bail out if time steps are not available
@@ -1632,7 +1619,7 @@ public class TimeSlider: UIControl {
             if maxMajorTickInterval >= majorTickInterval {
                 //
                 // Calculate the number of ticks between each major tick and the index of the first major tick
-                for i in majorTickInterval..<maxMajorTickInterval  {
+                for i in majorTickInterval..<maxMajorTickInterval {
                     let prospectiveInterval = i
                     var allowsEqualNumberOfTicksOnEnds = false
                     
@@ -1646,7 +1633,7 @@ public class TimeSlider: UIControl {
                         // found the number of minor ticks that would be on the ends if we use this major tick interval.
                         // If that total is divisible by two, then the major tick interval under test allows for an
                         // equal number of minor ticks on the ends.
-                        if (totalNumberOfTicksOnEnds / 2 < prospectiveInterval && totalNumberOfTicksOnEnds % 2 == 0) {
+                        if totalNumberOfTicksOnEnds / 2 < prospectiveInterval && totalNumberOfTicksOnEnds % 2 == 0 {
                             allowsEqualNumberOfTicksOnEnds = true
                             break
                         }
@@ -1667,7 +1654,7 @@ public class TimeSlider: UIControl {
                         //
                         // Get the current tick and it's label
                         let currentTick = tms[j]
-                        var currentTickLabelFrame: CGRect? = nil
+                        var currentTickLabelFrame: CGRect?
                         if let currentTickDate = currentTick.value, let currentTickXPosition = currentTick.originX {
                             let currentTickLabelString = string(for: currentTickDate, style: timeStepIntervalLabelDateStyle)
                             let currentTickLabel = tickMarkLabel(with: currentTickLabelString, originX: currentTickXPosition)
@@ -1676,7 +1663,7 @@ public class TimeSlider: UIControl {
                         
                         // Get the next tick and it's label
                         let nextTick = tms[j + i]
-                        var nextTickLabelFrame: CGRect? = nil
+                        var nextTickLabelFrame: CGRect?
                         if let nextTickDate = nextTick.value, let nextTickXPosition = nextTick.originX {
                             let nextTickLabelString = string(for: nextTickDate, style: timeStepIntervalLabelDateStyle)
                             let nextTickLabel = tickMarkLabel(with: nextTickLabelString, originX: nextTickXPosition)
@@ -1692,7 +1679,7 @@ public class TimeSlider: UIControl {
                         }
                     }
                     
-                    if (!doMajorTickLabelsCollide) {
+                    if !doMajorTickLabelsCollide {
                         //
                         // The ticks don't at the given interval, so use that
                         majorTickInterval = prospectiveInterval
@@ -1700,7 +1687,7 @@ public class TimeSlider: UIControl {
                     }
                 }
                 
-                if (doMajorTickLabelsCollide) {
+                if doMajorTickLabelsCollide {
                     //
                     // Multiple major tick labels won't fit without overlapping.
                     // Display one major tick in the middle instead
@@ -1708,10 +1695,9 @@ public class TimeSlider: UIControl {
                     
                     // Calculate the index of the middle tick. Note that, if there are an even number of ticks, there
                     // is not one perfectly centered. This logic takes the one before the true center of the slider.
-                    if (tickCount % 2 == 0) {
+                    if tickCount % 2 == 0 {
                         firstMajorTickIndex = Int(trunc(Double(tickCount) / 2) - 1)
-                    }
-                    else {
+                    } else {
                         firstMajorTickIndex = Int(trunc(Double(tickCount) / 2))
                     }
                 }
@@ -1723,7 +1709,7 @@ public class TimeSlider: UIControl {
             
             // Add tick mark labels except
             // start and end tick marks.
-            for i in 1..<tickCount - 1  {
+            for i in 1..<tickCount - 1 {
                 //
                 // Get the tick mark
                 let tickMark = tms[i]
@@ -1744,7 +1730,8 @@ public class TimeSlider: UIControl {
         // Set tick marks array
         tickMarks = tms
     }
-    
+    // swiftlint:enable cyclomatic_complexity
+
     // MARK: - Observer
     
     private func addObservers() {
@@ -1753,20 +1740,20 @@ public class TimeSlider: UIControl {
         }
         
         // Observe operationalLayers of map
-        mapLayersObservation = map?.observe(\.operationalLayers, options: [.new, .old], changeHandler: { [weak self] (map, change) in
+        mapLayersObservation = map?.observe(\.operationalLayers, options: [.new, .old]) { [weak self] (_, change) in
             //
             // Handle the change in operationalLayers
             self?.handleOperationalLayers(change: change)
-        })
+        }
         
         // Observe operationalLayers of map
-        sceneLayersObservation = scene?.observe(\.operationalLayers, options: [.new, .old], changeHandler: { [weak self] (scene, change) in
+        sceneLayersObservation = scene?.observe(\.operationalLayers, options: [.new, .old]) { [weak self] (_, change) in
             //
             // Handle the change in operationalLayers
             self?.handleOperationalLayers(change: change)
-        })
+        }
         
-        timeExtentObservation = geoView?.observe(\.timeExtent, options: .new, changeHandler: { [weak self] (_, _) in
+        timeExtentObservation = geoView?.observe(\.timeExtent, options: .new) { [weak self] (_, _) in
             //
             // Make sure self is around
             guard let self = self else {
@@ -1779,13 +1766,11 @@ public class TimeSlider: UIControl {
                     self.currentExtent = geoViewTimeExtent
                 }
             }
-        })
+        }
         
         // Set the flag
         isObserving = true
     }
-    
-    
     
     private func removeObservers() {
         if isObserving {
@@ -1855,8 +1840,7 @@ public class TimeSlider: UIControl {
             
             // Get the result value
             resultValue = min(max(value, startTime.timeIntervalSince1970), endTime.timeIntervalSince1970)
-        }
-        else { // Else, the valid value needs to be between full extent start and end times.
+        } else { // Else, the valid value needs to be between full extent start and end times.
             //
             // Bail out if start and end times are not available
             guard let startTime = fullExtent?.startTime, let endTime = fullExtent?.endTime else {
@@ -1898,7 +1882,7 @@ public class TimeSlider: UIControl {
         
         // Get the date range from the start and end times.
         let calendar = Calendar(identifier: .gregorian)
-        let dateRange = calendar.dateRange(startDate: fullExtentStartTime, endDate: fullExtentEndTime, component: component , step: Int(duration))
+        let dateRange = calendar.dateRange(startDate: fullExtentStartTime, endDate: fullExtentEndTime, component: component, step: Int(duration))
         
         // Set time steps from the date range
         timeSteps = Array(dateRange)
@@ -1917,12 +1901,12 @@ public class TimeSlider: UIControl {
         tickMarkLabel.string = string
         
         // Calculate the size of the label based on the string and font
-        let tickMarkLabelSize: CGSize = string.size(withAttributes:[kCTFontAttributeName as NSAttributedString.Key: timeStepIntervalLabelFont])
+        let tickMarkLabelSize: CGSize = string.size(withAttributes: [kCTFontAttributeName as NSAttributedString.Key: timeStepIntervalLabelFont])
         
         // Calculate label's x position
         let tickMarkLayerOriginDifference = tickMarkLayer.frame.minX - layer.frame.minX
         let labelOriginX = (originX + tickMarkLayerOriginDifference + labelSidePadding) - (tickMarkLabelSize.width / 2.0)
-
+        
         // The tick mark labels are displayed on the top side of the slider track.
         // So, it's y position needs to be minimum value of calculated either based on
         // tick mark layer or thumb size.
@@ -1937,10 +1921,10 @@ public class TimeSlider: UIControl {
         return tickMarkLabel
     }
     
-    private func closestTimeStep(for date: Date) ->  (index: Int, date: Date)? {
+    private func closestTimeStep(for date: Date) -> (index: Int, date: Date)? {
         //
         // Return nil if not able to find the closest time step for the provided date.
-        guard let closest = timeSteps?.enumerated().min( by: { abs($0.1.timeIntervalSince1970 - date.timeIntervalSince1970) < abs($1.1.timeIntervalSince1970 - date.timeIntervalSince1970)} ) else {
+        guard let closest = timeSteps?.enumerated().min( by: { abs($0.1.timeIntervalSince1970 - date.timeIntervalSince1970) < abs($1.1.timeIntervalSince1970 - date.timeIntervalSince1970) }) else {
             return nil
         }
         
@@ -1951,9 +1935,9 @@ public class TimeSlider: UIControl {
     private func removeTickMarkLabels() {
         //
         // Remove layers from the view
-        tickMarkLabels.forEach({ (tickMarkLabel) in
+        tickMarkLabels.forEach { (tickMarkLabel) in
             tickMarkLabel.removeFromSuperlayer()
-        })
+        }
         
         // Clear the array
         tickMarkLabels.removeAll()
@@ -1963,7 +1947,7 @@ public class TimeSlider: UIControl {
     private func notifyChangeOfCurrentExtent() {
         //
         // Notify only if current date are different than previous dates.
-        if (previousCurrentExtentStartTime != currentExtentStartTime || previousCurrentExtentEndTime != currentExtentEndTime) {
+        if previousCurrentExtentStartTime != currentExtentStartTime || previousCurrentExtentEndTime != currentExtentEndTime {
             //
             // Update previous values
             previousCurrentExtentStartTime = currentExtentStartTime
@@ -1995,13 +1979,12 @@ public class TimeSlider: UIControl {
         let startTime = Date(timeIntervalSince1970: boundCurrentExtentStartTime(value: startTime.timeIntervalSince1970))
         
         // If time steps are available then snap it to the closest time step and set the index.
-        if let ts = timeSteps, ts.count > 0 {
+        if let ts = timeSteps, !ts.isEmpty {
             if let (index, date) = closestTimeStep(for: startTime) {
                 currentExtentStartTime = date
                 startTimeStepIndex = index
             }
-        }
-        else {
+        } else {
             currentExtentStartTime = startTime
             startTimeStepIndex = -1
         }
@@ -2013,20 +1996,20 @@ public class TimeSlider: UIControl {
         let endTime = Date(timeIntervalSince1970: boundCurrentExtentEndTime(value: endTime.timeIntervalSince1970))
         
         // If time steps are available then snap it to the closest time step and set the index.
-        if let ts = timeSteps, ts.count > 0 {
+        if let ts = timeSteps, !ts.isEmpty {
             if let (index, date) = closestTimeStep(for: endTime) {
                 currentExtentEndTime = date
                 endTimeStepIndex = index
             }
-        }
-        else {
+        } else {
             currentExtentEndTime = endTime
             endTimeStepIndex = -1
         }
     }
     
     // This function returns time step interval and whether given layer supports range time filtering or not.
-    private func findTimeStepIntervalAndIsRangeTimeFilteringSupported(for timeAwareLayer: AGSTimeAware, completion: @escaping ((timeStepInterval: AGSTimeValue?, supportsRangeTimeFiltering: Bool))->Void) {
+    // swiftlint:disable cyclomatic_complexity
+    private func findTimeStepIntervalAndIsRangeTimeFilteringSupported(for timeAwareLayer: AGSTimeAware, completion: @escaping ((timeStepInterval: AGSTimeValue?, supportsRangeTimeFiltering: Bool)) -> Void) {
         //
         // The default is false
         var supportsRangeTimeFiltering = false
@@ -2034,13 +2017,11 @@ public class TimeSlider: UIControl {
         // Get the time interval of the layer
         var timeStepInterval = timeAwareLayer.timeInterval
         
-        
         // If the layer is map image layer then we need to find out details from the
         // sublayers. Let's load all sublayers and check whether sub layers supports
         // range time filtering and largets time step interval.
         if let mapImageLayer = timeAwareLayer as? AGSArcGISMapImageLayer {
-            AGSLoadObjects(mapImageLayer.mapImageSublayers as! [AGSLoadable], { [weak self] (loaded) in
-                
+            AGSLoadObjects(mapImageLayer.mapImageSublayers as! [AGSLoadable]) { [weak self] (loaded) in
                 // Make sure self is around
                 guard let self = self else {
                     return
@@ -2053,7 +2034,7 @@ public class TimeSlider: UIControl {
                             //
                             // If either start or end time field name is not available then
                             // set supportsRangeTimeFiltering to false
-                            if timeInfo.startTimeField.count <= 0 || timeInfo.endTimeField.count <= 0 {
+                            if timeInfo.startTimeField.isEmpty || timeInfo.endTimeField.isEmpty {
                                 supportsRangeTimeFiltering = false
                             }
                             
@@ -2064,8 +2045,7 @@ public class TimeSlider: UIControl {
                                     if interval1 > interval2 {
                                         timeInterval = interval1
                                     }
-                                }
-                                else {
+                                } else {
                                     timeInterval = interval1
                                 }
                             }
@@ -2079,22 +2059,22 @@ public class TimeSlider: UIControl {
                     }
                 }
                 completion((timeStepInterval, supportsRangeTimeFiltering))
-            })
-        }
-        else {
+            }
+        } else {
             //
             // If layer is not map image layer then find layer supports
             // range time filtering or not and set time step interval
             // from timeInfo if not available on the layer.
             if let timeAwareLayer = timeAwareLayer as? AGSLoadable, let timeInfo = timeInfo(for: timeAwareLayer) {
-                if timeInfo.startTimeField.count <= 0 || timeInfo.endTimeField.count <= 0 {
+                if timeInfo.startTimeField.isEmpty || timeInfo.endTimeField.isEmpty {
                     supportsRangeTimeFiltering = false
                 }
             }
             completion((timeStepInterval, supportsRangeTimeFiltering))
         }
     }
-    
+    // swiftlint:enable cyclomatic_complexity
+
     // Returns layer's time info if available. The parameter cannot be of type AGSLayer because
     // ArcGISSublayer does not inherit from AGSLayer. It is expected that this function is
     // called on already loaded object
@@ -2107,11 +2087,9 @@ public class TimeSlider: UIControl {
         if layer.loadStatus == .loaded {
             if let sublayer = layer as? AGSArcGISSublayer {
                 return sublayer.mapServiceSublayerInfo?.timeInfo
-            }
-            else if let featureLayer = layer as? AGSFeatureLayer, let featureTable = featureLayer.featureTable as? AGSArcGISFeatureTable {
+            } else if let featureLayer = layer as? AGSFeatureLayer, let featureTable = featureLayer.featureTable as? AGSArcGISFeatureTable {
                 return featureTable.layerInfo?.timeInfo
-            }
-            else if let rasterLayer = layer as? AGSRasterLayer, let imageServiceRaster = rasterLayer.raster as? AGSImageServiceRaster {
+            } else if let rasterLayer = layer as? AGSRasterLayer, let imageServiceRaster = rasterLayer.raster as? AGSImageServiceRaster {
                 return imageServiceRaster.serviceInfo?.timeInfo
             }
         }
@@ -2129,7 +2107,7 @@ public class TimeSlider: UIControl {
         
         // Re initialize time slider
         reInitializeTimeProperties = true
-        initializeTimeProperties(geoView: geoView, observeGeoView: observeGeoView, completion: { [weak self] (error) in
+        initializeTimeProperties(geoView: geoView, observeGeoView: observeGeoView) { [weak self] (error) in
             //
             // Bail out if there is an error
             guard error == nil else {
@@ -2138,7 +2116,7 @@ public class TimeSlider: UIControl {
             
             // Set the flag
             self?.reInitializeTimeProperties = false
-        })
+        }
     }
     
     // This function checks whether the observed value of operationalLayers
@@ -2166,14 +2144,14 @@ public class TimeSlider: UIControl {
     }
     
     // This function returns a string for the given date and date style
+    // swiftlint:disable cyclomatic_complexity
     private func string(for date: Date, style: DateStyle) -> String {
         //
         // Create the date formatter to get the string for a date
-        let dateFormatter: DateFormatter = DateFormatter()
+        let dateFormatter = DateFormatter()
         dateFormatter.timeZone = timeZone
         
         switch style {
-            
         case .dayShortMonthYear:
             dateFormatter.setLocalizedDateFormatFromTemplate("d MMM y")
         case .longDate:
@@ -2202,7 +2180,8 @@ public class TimeSlider: UIControl {
         
         return dateFormatter.string(from: date)
     }
-    
+    // swiftlint:enable cyclomatic_complexity
+
     // Calculates time step interval based on provided time extent and time step count
     private func calculateTimeStepInterval(for timeExtent: AGSTimeExtent, timeStepCount: Int) -> AGSTimeValue? {
         if let startTime = timeExtent.startTime, let endTime = timeExtent.endTime {
@@ -2217,8 +2196,7 @@ public class TimeSlider: UIControl {
                 if let (duration, component) = timeIntervalDate.offset(from: startTime) {
                     return AGSTimeValue.fromCalenderComponents(duration: Double(duration), component: component)
                 }
-            }
-            else {
+            } else {
                 if let startTime = timeExtent.startTime, let endTime = timeExtent.endTime {
                     //
                     // Since the time step count is 0 we'll use default duration 1
@@ -2230,7 +2208,6 @@ public class TimeSlider: UIControl {
         }
         return nil
     }
-    
 }
 
 // MARK: - Time Slider Thumb Layer
@@ -2371,12 +2348,11 @@ private class TimeSliderTickMarkLayer: CALayer {
             // Render tick marks
             tickMarksOriginX.forEach { (tickX) in
                 ctx.beginPath()
-                ctx.move(to: CGPoint(x: CGFloat(tickX), y:bounds.midY - (slider.trackHeight / 2.0)))
+                ctx.move(to: CGPoint(x: CGFloat(tickX), y: bounds.midY - (slider.trackHeight / 2.0)))
                 ctx.addLine(to: CGPoint(x: CGFloat(tickX), y: bounds.midY + bounds.height / 2.0))
                 ctx.strokePath()
             }
-        }
-        else {
+        } else {
             // Loop through all tick marks
             // and render them.
             for i in 0..<tickMarksCount {
@@ -2386,14 +2362,13 @@ private class TimeSliderTickMarkLayer: CALayer {
                     
                     // First and last tick marks are
                     // rendered differently than others
-                    if i == 0 || i == tickMarksCount - 1  {
+                    if i == 0 || i == tickMarksCount - 1 {
                         ctx.setLineWidth(endTickLinWidth)
-                        ctx.move(to: CGPoint(x: CGFloat(tickX), y:bounds.midY - (slider.trackHeight / 2.0)))
+                        ctx.move(to: CGPoint(x: CGFloat(tickX), y: bounds.midY - (slider.trackHeight / 2.0)))
                         ctx.addLine(to: CGPoint(x: CGFloat(tickX), y: bounds.midY + bounds.height / 2.0))
-                    }
-                    else {
+                    } else {
                         ctx.setLineWidth(intermediateTickLinWidth)
-                        ctx.move(to: CGPoint(x: CGFloat(tickX), y:bounds.midY - (slider.trackHeight / 2.0)))
+                        ctx.move(to: CGPoint(x: CGFloat(tickX), y: bounds.midY - (slider.trackHeight / 2.0)))
                         let tickY = tickMark.isMajorTick ? bounds.midY - bounds.height / 2.0 : bounds.midY - bounds.height / 3.0
                         ctx.addLine(to: CGPoint(x: CGFloat(tickX), y: tickY))
                     }
@@ -2487,8 +2462,7 @@ private struct DateRange: Sequence, IteratorProtocol {
             if inclusive {
                 inclusive = false
                 return endDate
-            }
-            else {
+            } else {
                 return nil
             }
         } else {
@@ -2539,8 +2513,8 @@ fileprivate extension Date {
     
     // Returns the a custom time interval and calender component from another date
     func offset(from date: Date) -> (duration: Int, component: Calendar.Component)? {
-        if years(from: date)   > 0 { return (years(from: date), .year) }
-        if months(from: date)  > 0 { return (months(from: date), .month) }
+        if years(from: date) > 0 { return (years(from: date), .year) }
+        if months(from: date) > 0 { return (months(from: date), .month) }
         if seconds(from: date) > 0 { return (seconds(from: date), .second) }
         if nanoseconds(from: date) > 0 { return (nanoseconds(from: date), .nanosecond) }
         return nil
@@ -2550,23 +2524,16 @@ fileprivate extension Date {
 // MARK: - Color Extension
 
 extension UIColor {
-    
     class var oceanBlue: UIColor {
-        get {
-            return UIColor(red: 0.0, green: 0.475, blue: 0.757, alpha: 1)
-        }
+        return UIColor(red: 0.0, green: 0.475, blue: 0.757, alpha: 1)
     }
     
     class var customBlue: UIColor {
-        get {
-            return UIColor(red: 0.0, green: 0.45, blue: 0.94, alpha: 1.0)
-        }
+        return UIColor(red: 0.0, green: 0.45, blue: 0.94, alpha: 1.0)
     }
     
     class var lightSkyBlue: UIColor {
-        get {
-            return UIColor(red: 0.529, green: 0.807, blue: 0.980, alpha: 1.0)
-        }
+        return UIColor(red: 0.529, green: 0.807, blue: 0.980, alpha: 1.0)
     }
 }
 
@@ -2619,6 +2586,7 @@ extension AGSTimeValue: Comparable {
     }
     
     // Converts time value to the calender component values.
+    // swiftlint:disable cyclomatic_complexity
     public func toCalenderComponents() -> (duration: Double, component: Calendar.Component)? {
         switch unit {
         case .unknown:
@@ -2645,7 +2613,8 @@ extension AGSTimeValue: Comparable {
             return (duration, Calendar.Component.year)
         }
     }
-    
+    // swiftlint:enable cyclomatic_complexity
+
     // Returns time value generated from calender component and duration
     class func fromCalenderComponents(duration: Double, component: Calendar.Component) -> AGSTimeValue? {
         switch component {
@@ -2697,21 +2666,17 @@ extension AGSTimeValue: Comparable {
 
 // MARK: - GeoView Extension
 
-extension AGSGeoView {
-    
-    fileprivate var operationalLayers: [AGSLayer]? {
-        get {
-            if let mapView = self as? AGSMapView {
-                if let layers = mapView.map?.operationalLayers as AnyObject as? [AGSLayer] {
-                    return layers
-                }
+fileprivate extension AGSGeoView {
+    var operationalLayers: [AGSLayer]? {
+        if let mapView = self as? AGSMapView {
+            if let layers = mapView.map?.operationalLayers as AnyObject as? [AGSLayer] {
+                return layers
             }
-            else if let sceneView = self as? AGSSceneView {
-                if let layers = sceneView.scene?.operationalLayers as AnyObject as? [AGSLayer] {
-                    return layers
-                }
+        } else if let sceneView = self as? AGSSceneView {
+            if let layers = sceneView.scene?.operationalLayers as AnyObject as? [AGSLayer] {
+                return layers
             }
-            return nil
         }
+        return nil
     }
 }

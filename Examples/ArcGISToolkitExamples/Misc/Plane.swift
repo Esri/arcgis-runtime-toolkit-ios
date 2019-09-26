@@ -16,11 +16,11 @@ import ARKit
 
 /// Helper class to visualize a plane found by ARKit
 class Plane: SCNNode {
-    
     let node: SCNNode
+    
     init(anchor: ARPlaneAnchor, in sceneView: ARSCNView) {
         // Create a node to visualize the plane's bounding rectangle.
-        let extent: SCNPlane = SCNPlane(width: CGFloat(anchor.extent.x), height: CGFloat(anchor.extent.z))
+        let extent = SCNPlane(width: CGFloat(anchor.extent.x), height: CGFloat(anchor.extent.z))
         node = SCNNode(geometry: extent)
         node.simdPosition = anchor.center
         

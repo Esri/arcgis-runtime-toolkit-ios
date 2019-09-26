@@ -16,7 +16,7 @@ import class ArcGIS.AGSUnit
 
 /// The protocol you implement to respond as the user interacts with the units
 /// view controller.
-public protocol UnitsViewControllerDelegate: class {
+public protocol UnitsViewControllerDelegate: AnyObject {
     /// Tells the delegate that the user has cancelled selecting a unit.
     ///
     /// - Parameter unitsViewController: The current units view controller.
@@ -59,14 +59,15 @@ public class UnitsViewController: TableViewController {
     }
     
     /// Called in response to the Cancel button being tapped.
-    @objc private func cancel() {
+    @objc
+    private func cancel() {
         // If the search controller is still active, the delegate will not be
         // able to dismiss this if they showed this modally.
         // (or wrapped it in a navigation controller and showed that modally)
         // Only do this if not being presented from a nav controller
         // as in that case, it causes problems when the delegate that pushed this VC
         // tries to pop it off the stack.
-        if presentingViewController != nil{
+        if presentingViewController != nil {
             navigationItem.searchController?.isActive = false
         }
         delegate?.unitsViewControllerDidCancel(self)
@@ -88,12 +89,12 @@ public class UnitsViewController: TableViewController {
         tableView.reloadRows(at: indexPaths, with: .automatic)
     }
     
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?)   {
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         sharedInitialization()
     }
     
-    required public init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         sharedInitialization()
     }
@@ -141,7 +142,7 @@ public class UnitsViewController: TableViewController {
         // Only do this if not being presented from a nav controller
         // as in that case, it causes problems when the delegate that pushed this VC
         // tries to pop it off the stack.
-        if presentingViewController != nil{
+        if presentingViewController != nil {
             navigationItem.searchController?.isActive = false
         }
         delegate?.unitsViewControllerDidSelectUnit(self)

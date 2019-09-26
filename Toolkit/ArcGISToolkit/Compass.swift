@@ -15,7 +15,6 @@ import UIKit
 import ArcGIS
 
 public class Compass: UIImageView {
-    
     public var heading: Double = 0.0 { // Rotation - bound to MapView.MapRotation
         didSet {
             mapView.setViewpointRotation(heading, completion: nil)
@@ -67,16 +66,14 @@ public class Compass: UIImageView {
         animateCompass()
         
         // Add Compass as an observer of the mapView's rotation.
-        rotationObservation = mapView.observe(\.rotation, options: .new) {[weak self] (mapView, change) in
-            
-            guard let rotation = change.newValue else{
+        rotationObservation = mapView.observe(\.rotation, options: .new) {[weak self] (_, change) in
+            guard let rotation = change.newValue else {
                 return
             }
             
             // make sure that UI changes are made on the main thread
-            DispatchQueue.main.async{
-                
-                guard let self = self else{
+            DispatchQueue.main.async {
+                guard let self = self else {
                     return
                 }
                 
@@ -87,14 +84,14 @@ public class Compass: UIImageView {
                 self.animateCompass()
             }
         }
-        
     }
     
-    required public init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    @objc func compassTapped(){
+    @objc
+    func compassTapped() {
         mapView.setViewpointRotation(0, completion: nil)
     }
     

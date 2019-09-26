@@ -16,7 +16,6 @@ import UIKit
 
 /// A custom view for dislaying directions to the user.
 class UserDirectionsView: UIVisualEffectView {
-    
     private let userDirectionsLabel: UILabel = {
         let label = UILabel(frame: .zero)
         label.textAlignment = .center
@@ -41,7 +40,7 @@ class UserDirectionsView: UIVisualEffectView {
             userDirectionsLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
             userDirectionsLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
             userDirectionsLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)
-            ])
+        ])
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -51,7 +50,7 @@ class UserDirectionsView: UIVisualEffectView {
     /// Updates the displayed user directions string.  If `message` is nil or empty, this will hide the view.  If `message` is not empty, it will display the view.
     ///
     /// - Parameter message: the new string to display.
-    public func updateUserDirections(_ message: String?) {
+    func updateUserDirections(_ message: String?) {
         UIView.animate(withDuration: 0.25) { [weak self] in
             self?.alpha = (message?.isEmpty ?? true) ? 0.0 : 1.0
             self?.userDirectionsLabel.text = message

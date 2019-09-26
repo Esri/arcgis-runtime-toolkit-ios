@@ -14,7 +14,7 @@
 import ArcGIS
 
 /// An object that encapsulates information related to a feature template
-public class FeatureTemplateInfo{
+public class FeatureTemplateInfo {
     /// The feature layer that the template is from
     public let featureLayer: AGSFeatureLayer
     /// The feature table that the template is from
@@ -24,7 +24,7 @@ public class FeatureTemplateInfo{
     /// The swatch for the feature template
     public var swatch: UIImage?
     
-    fileprivate init(featureLayer: AGSFeatureLayer, featureTable: AGSArcGISFeatureTable, featureTemplate: AGSFeatureTemplate, swatch: UIImage? = nil){
+    fileprivate init(featureLayer: AGSFeatureLayer, featureTable: AGSArcGISFeatureTable, featureTemplate: AGSFeatureTemplate, swatch: UIImage? = nil) {
         self.featureLayer = featureLayer
         self.featureTable = featureTable
         self.featureTemplate = featureTemplate
@@ -51,7 +51,6 @@ public protocol TemplatePickerViewControllerDelegate: AnyObject {
 /// and allowing them to choose one.
 /// This view controller is meant to be embedded in a navigation controller.
 public class TemplatePickerViewController: TableViewController {
-    
     /// The map which this view controller will display the feature templates from
     public let map: AGSMap?
     
@@ -59,21 +58,21 @@ public class TemplatePickerViewController: TableViewController {
     private var currentDatasource = [String: [FeatureTemplateInfo]]()
     private var isFiltering: Bool = false
     private var unfilteredInfos = [FeatureTemplateInfo]()
-    private var currentInfos = [FeatureTemplateInfo](){
-        didSet{
-            tables = Set(self.currentInfos.map { $0.featureTable }).sorted(by: {$0.tableName < $1.tableName})
-            currentDatasource = Dictionary(grouping: currentInfos, by: { $0.featureTable.tableName })
+    private var currentInfos = [FeatureTemplateInfo]() {
+        didSet {
+            tables = Set(self.currentInfos.map { $0.featureTable }).sorted { $0.tableName < $1.tableName }
+            currentDatasource = Dictionary(grouping: currentInfos) { $0.featureTable.tableName }
             self.tableView.reloadData()
         }
     }
     
     /// Initializes a `TemplatePickerViewController` with a map.
-    public init(map: AGSMap){
+    public init(map: AGSMap) {
         self.map = map
         super.init(nibName: nil, bundle: nil)
     }
     
-    required public init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
@@ -92,7 +91,7 @@ public class TemplatePickerViewController: TableViewController {
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(TemplatePickerViewController.cancelAction))
         
         // get the templates from the map and load them as the datasource
-        if let map = map{
+        if let map = map {
             getTemplateInfos(map: map, completion: loadInfosAndCreateSwatches)
         }
     }
@@ -112,58 +111,53 @@ public class TemplatePickerViewController: TableViewController {
     }
     
     /// Gets the templates out of a map.
-    private func getTemplateInfos(map: AGSMap, completion: @escaping (([FeatureTemplateInfo])->Void) ){
-        
-        map.load{ [weak self] error in
-            
+    private func getTemplateInfos(map: AGSMap, completion: @escaping (([FeatureTemplateInfo]) -> Void) ) {
+        map.load { [weak self] error in
             guard let self = self else { return }
-            guard error == nil else{ return }
+            guard error == nil else { return }
             
-            let allLayers : [AGSLayer] = (map.operationalLayers as Array + map.basemap.baseLayers as Array + map.basemap.referenceLayers as Array) as! [AGSLayer]
+            let allLayers: [AGSLayer] = (map.operationalLayers as Array + map.basemap.baseLayers as Array + map.basemap.referenceLayers as Array) as! [AGSLayer]
             
             let featureLayers = allLayers
-                .compactMap({ $0 as? AGSFeatureLayer })
-                .filter({ $0.featureTable is AGSArcGISFeatureTable })
+                .compactMap { $0 as? AGSFeatureLayer }
+                .filter { $0.featureTable is AGSArcGISFeatureTable }
             
-            AGSLoadObjects(featureLayers){ [weak self] _ in
+            AGSLoadObjects(featureLayers) { [weak self] _ in
                 guard let self = self else { return }
-                let templates = featureLayers.flatMap({ return self.getTemplateInfos(featureLayer: $0) })
+                let templates = featureLayers.flatMap { return self.getTemplateInfos(featureLayer: $0) }
                 completion(templates)
             }
         }
-        
     }
     
     /// Gets the templates out of a feature layer and associated table.
     /// This should only be called once the feature layer is loaded.
-    private func getTemplateInfos(featureLayer: AGSFeatureLayer) -> [FeatureTemplateInfo]{
-        
-        guard let table = featureLayer.featureTable as? AGSArcGISFeatureTable else{
+    private func getTemplateInfos(featureLayer: AGSFeatureLayer) -> [FeatureTemplateInfo] {
+        guard let table = featureLayer.featureTable as? AGSArcGISFeatureTable else {
             return []
         }
         
-        guard let popupDef = featureLayer.popupDefinition, popupDef.allowEdit || table.canAddFeature else{
+        guard let popupDef = featureLayer.popupDefinition, popupDef.allowEdit || table.canAddFeature else {
             return []
         }
         
-        let tableTemplates = table.featureTemplates.map({
-            FeatureTemplateInfo(featureLayer:featureLayer, featureTable:table, featureTemplate:$0)
-        })
+        let tableTemplates = table.featureTemplates.map {
+            FeatureTemplateInfo(featureLayer: featureLayer, featureTable: table, featureTemplate: $0)
+        }
         
         let typeTemplates = table.featureTypes
             .lazy
-            .flatMap({ $0.templates })
-            .map({ FeatureTemplateInfo(featureLayer:featureLayer, featureTable:table, featureTemplate:$0) })
+            .flatMap { $0.templates }
+            .map { FeatureTemplateInfo(featureLayer: featureLayer, featureTable: table, featureTemplate: $0) }
         
         return tableTemplates + typeTemplates
     }
     
     /// Loads the template infos as the current datasource
     /// and creates swatches for them
-    private func loadInfosAndCreateSwatches(infos: [FeatureTemplateInfo]){
-        
+    private func loadInfosAndCreateSwatches(infos: [FeatureTemplateInfo]) {
         // if filtering, need to disable it
-        if isFiltering{
+        if isFiltering {
             navigationItem.searchController?.isActive = false
         }
         
@@ -174,14 +168,13 @@ public class TemplatePickerViewController: TableViewController {
         currentInfos = unfilteredInfos
         
         // generate swatches for the layer infos
-        for index in infos.indices{
+        for index in infos.indices {
             let info = infos[index]
-            if let feature = info.featureTable.createFeature(with: info.featureTemplate){
+            if let feature = info.featureTable.createFeature(with: info.featureTemplate) {
                 let sym = info.featureLayer.renderer?.symbol(for: feature)
-                sym?.createSwatch{ [weak self] image, error in
-                    
+                sym?.createSwatch { [weak self] image, error in
                     guard let self = self else { return }
-                    guard error == nil else{ return }
+                    guard error == nil else { return }
                     
                     // update info with swatch
                     infos[index].swatch = image
@@ -196,7 +189,7 @@ public class TemplatePickerViewController: TableViewController {
     
     // MARK: TableView delegate/datasource methods
     
-    public func numberOfSectionsInTableView(_ tableView: UITableView) -> Int{
+    public func numberOfSectionsInTableView(_ tableView: UITableView) -> Int {
         return tables.count
     }
     
@@ -206,7 +199,6 @@ public class TemplatePickerViewController: TableViewController {
     }
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
         // when the user taps on a feature type
         
         // first get the selected object
@@ -221,7 +213,7 @@ public class TemplatePickerViewController: TableViewController {
         // Only do this if not being presented from a nav controller
         // as in that case, it causes problems when the delegate that pushed this VC
         // tries to pop it off the stack.
-        if presentingViewController != nil{
+        if presentingViewController != nil {
             navigationItem.searchController?.isActive = false
         }
         
@@ -244,14 +236,15 @@ public class TemplatePickerViewController: TableViewController {
     
     // MARK: go back, cancel methods
     
-    @objc private func cancelAction(){
+    @objc
+    private func cancelAction() {
         // If the search controller is still active, the delegate will not be
         // able to dismiss this if they showed this modally.
         // (or wrapped it in a navigation controller and showed that modally)
         // Only do this if not being presented from a nav controller
         // as in that case, it causes problems when the delegate that pushed this VC
         // tries to pop it off the stack.
-        if presentingViewController != nil{
+        if presentingViewController != nil {
             navigationItem.searchController?.isActive = false
         }
         delegate?.templatePickerViewControllerDidCancel(self)
@@ -259,14 +252,13 @@ public class TemplatePickerViewController: TableViewController {
     
     // MARK: IndexPath -> Info
     
-    private func info(for indexPath: IndexPath) -> FeatureTemplateInfo{
+    private func info(for indexPath: IndexPath) -> FeatureTemplateInfo {
         let tableName = tables[indexPath.section].tableName
         let infos = self.currentDatasource[tableName]!
         return infos[indexPath.row]
     }
     
-    private func indexPath(for info: FeatureTemplateInfo) -> IndexPath{
-        
+    private func indexPath(for info: FeatureTemplateInfo) -> IndexPath {
         let tableIndex = tables.index { $0.tableName == info.featureTable.tableName }!
         let infos = self.currentDatasource[info.featureTable.tableName]!
         let infoIndex = infos.index { $0 === info }!
@@ -282,19 +274,18 @@ extension TemplatePickerViewController: UISearchResultsUpdating {
             isFiltering = true
             DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).async { [weak self] in
                 guard let self = self else { return }
-                let filtered = self.unfilteredInfos.filter{
+                let filtered = self.unfilteredInfos.filter {
                     $0.featureTemplate.name.range(of: text, options: .caseInsensitive) != nil
                 }
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
                     // Make sure we are still filtering
-                    if self.isFiltering{
+                    if self.isFiltering {
                         self.currentInfos = filtered
                     }
                 }
             }
-        }
-        else {
+        } else {
             isFiltering = false
             self.currentInfos = self.unfilteredInfos
         }

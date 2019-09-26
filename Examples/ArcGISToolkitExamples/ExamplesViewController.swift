@@ -15,7 +15,6 @@ import UIKit
 import ArcGISToolkit
 
 class ExamplesViewController: VCListViewController {
-
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -32,7 +31,5 @@ class ExamplesViewController: VCListViewController {
             ("Template Picker", TemplatePickerExample.self, nil),
             ("AR", ARExample.self, nil)
         ]
-        
     }
-
 }
