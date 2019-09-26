@@ -17,8 +17,7 @@ import ArcGISToolkit
 open class VCListViewController: UITableViewController {
     public var storyboardName: String?
     
-    public var viewControllerInfos: [(vcName: String, viewControllerType: UIViewController.Type, nibName: String?)] = [
-        ] {
+    public var viewControllerInfos: [(vcName: String, viewControllerType: UIViewController.Type, nibName: String?)] = [] {
         didSet {
             self.tableView.reloadData()
         }

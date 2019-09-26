@@ -1,4 +1,3 @@
-included:
 opt_in_rules:
   - anyobject_protocol
   - array_init
@@ -62,8 +61,3 @@ disabled_rules:
   - todo
   - trailing_whitespace
   - type_body_length
-custom_rules:
-  assert_equal_to_nil:
-    name: Assert Equal to Nil
-    regex: XCTAssertEqual\([^\n]+,\s*nil\)
-    message: Use 'XCTAssertNil' instead.

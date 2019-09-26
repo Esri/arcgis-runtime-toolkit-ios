@@ -51,7 +51,7 @@ Note that you must also have the __ArcGIS Runtime SDK for iOS__ installed and yo
  5. Add `import ArcGISToolkit` in your source code and start using the toolkit components 
 
 ## SwiftLint
-New in the 100.6.0 release is SwiftLint support for both the Toolkit and Examples app.  You will need to install SwiftLint from [here](https://github.com/realm/SwiftLint) in order to build.  The specific rules the linter uses can be found in the `swiftlint.yml` files in the `Toolkit` and `Examples` directories.
+New in the 100.6.0 release is SwiftLint support for both the Toolkit and Examples app.  You can install SwiftLint from [here](https://github.com/realm/SwiftLint).  It is not necessary to have it installed in order to build, but you will get a warning without it.  The specific rules the linter uses can be found in the `swiftlint.yml` files in the `Toolkit` and `Examples` directories.
 
 
 ## Additional Resources
