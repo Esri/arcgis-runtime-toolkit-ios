@@ -18,9 +18,8 @@ import ArcGISToolkit
 
 /// A view displaying controls for adjusting a scene view's location, heading, and elevation. Used to calibrate an AR session.
 class CalibrationView: UIView {
-
     /// Denotes whether to show the elevation control and label; defaults to `true`.
-    public var elevationControlVisibility: Bool = true {
+    var elevationControlVisibility: Bool = true {
         didSet {
             elevationSlider.isHidden = !elevationControlVisibility
             elevationLabel.isHidden = !elevationControlVisibility
@@ -82,7 +81,7 @@ class CalibrationView: UIView {
             calibrationDirectionsLabel.trailingAnchor.constraint(equalTo: labelView.trailingAnchor, constant: -8),
             calibrationDirectionsLabel.topAnchor.constraint(equalTo: labelView.topAnchor, constant: 8),
             calibrationDirectionsLabel.bottomAnchor.constraint(equalTo: labelView.bottomAnchor, constant: -8)
-            ])
+        ])
         
         // Add the label view to our view and set up constraints.
         addSubview(labelView)
@@ -90,7 +89,7 @@ class CalibrationView: UIView {
         NSLayoutConstraint.activate([
             labelView.centerXAnchor.constraint(equalTo: centerXAnchor),
             labelView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 8.0)
-            ])
+        ])
         
         // Add the heading label and slider.
         let headingLabel = UILabel(frame: .zero)
@@ -101,7 +100,7 @@ class CalibrationView: UIView {
         NSLayoutConstraint.activate([
             headingLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 16),
             headingLabel.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -16)
-            ])
+        ])
         
         addSubview(headingSlider)
         headingSlider.translatesAutoresizingMaskIntoConstraints = false
@@ -109,7 +108,7 @@ class CalibrationView: UIView {
             headingSlider.leadingAnchor.constraint(equalTo: headingLabel.trailingAnchor, constant: 16),
             headingSlider.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -16),
             headingSlider.centerYAnchor.constraint(equalTo: headingLabel.centerYAnchor)
-            ])
+        ])
 
         // Add the elevation label and slider.
         elevationLabel.text = "Elevation"
@@ -119,7 +118,7 @@ class CalibrationView: UIView {
         NSLayoutConstraint.activate([
             elevationLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 16),
             elevationLabel.bottomAnchor.constraint(equalTo: headingLabel.topAnchor, constant: -24)
-            ])
+        ])
 
         addSubview(elevationSlider)
         elevationSlider.translatesAutoresizingMaskIntoConstraints = false
@@ -127,7 +126,7 @@ class CalibrationView: UIView {
             elevationSlider.leadingAnchor.constraint(equalTo: elevationLabel.trailingAnchor, constant: 16),
             elevationSlider.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -16),
             elevationSlider.centerYAnchor.constraint(equalTo: elevationLabel.centerYAnchor)
-            ])
+        ])
 
         // Setup actions for the two sliders. The sliders operate as "joysticks", where moving the slider thumb will start a timer
         // which roates or elevates the current camera when the timer fires.  The elevation and heading delta
@@ -166,14 +165,15 @@ class CalibrationView: UIView {
     /// Handle an elevation slider value-changed event.
     ///
     /// - Parameter sender: The slider tapped on.
-    @objc func elevationChanged(_ sender: UISlider) {
+    @objc
+    func elevationChanged(_ sender: UISlider) {
         if elevationTimer == nil {
             // Create a timer which elevates the camera when fired.
-            elevationTimer = Timer(timeInterval: 0.25, repeats: true, block: { [weak self] (timer) in
+            elevationTimer = Timer(timeInterval: 0.25, repeats: true) { [weak self] (_) in
                 let delta = self?.joystickElevation() ?? 0.0
 //                print("elevate delta = \(delta)")
                 self?.elevate(delta)
-            })
+            }
             
             // Add the timer to the main run loop.
             guard let timer = elevationTimer else { return }
@@ -184,14 +184,15 @@ class CalibrationView: UIView {
     /// Handle an heading slider value-changed event.
     ///
     /// - Parameter sender: The slider tapped on.
-    @objc func headingChanged(_ sender: UISlider) {
+    @objc
+    func headingChanged(_ sender: UISlider) {
         if headingTimer == nil {
             // Create a timer which rotates the camera when fired.
-            headingTimer = Timer(timeInterval: 0.1, repeats: true, block: { [weak self] (timer) in
+            headingTimer = Timer(timeInterval: 0.1, repeats: true) { [weak self] (_) in
                 let delta = self?.joystickHeading() ?? 0.0
 //                print("rotate delta = \(delta)")
                 self?.rotate(delta)
-            })
+            }
             
             // Add the timer to the main run loop.
             guard let timer = headingTimer else { return }
@@ -202,7 +203,8 @@ class CalibrationView: UIView {
     /// Handle an elevation slider touchUp event.  This will stop the timer.
     ///
     /// - Parameter sender: The slider tapped on.
-    @objc func touchUpElevation(_ sender: UISlider) {
+    @objc
+    func touchUpElevation(_ sender: UISlider) {
         elevationTimer?.invalidate()
         elevationTimer = nil
         sender.value = 0.0
@@ -211,7 +213,8 @@ class CalibrationView: UIView {
     /// Handle a heading slider touchUp event.  This will stop the timer.
     ///
     /// - Parameter sender: The slider tapped on.
-    @objc func touchUpHeading(_ sender: UISlider) {
+    @objc
+    func touchUpHeading(_ sender: UISlider) {
         headingTimer?.invalidate()
         headingTimer = nil
         sender.value = 0.0

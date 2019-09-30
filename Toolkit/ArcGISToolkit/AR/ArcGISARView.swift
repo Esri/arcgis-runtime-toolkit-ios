@@ -28,7 +28,6 @@ public enum ARLocationTrackingMode {
 }
 
 public class ArcGISARView: UIView {
-
     // MARK: public properties
     
     /// The view used to display the `ARKit` camera image and 3D `SceneKit` content.
@@ -57,7 +56,7 @@ public class ArcGISARView: UIView {
 
     /// The viewpoint camera used to set the initial view of the sceneView instead of the device's GPS location via the location data source.  You can use Key-Value Observing to track changes to the origin camera.
     /// - Since: 100.6.0
-    @objc dynamic public var originCamera: AGSCamera {
+    @objc public dynamic var originCamera: AGSCamera {
         get {
             return cameraController.originCamera
         }
@@ -72,7 +71,7 @@ public class ArcGISARView: UIView {
     
     /// The translation factor used to support a table top AR experience.
     /// - Since: 100.6.0
-    @objc dynamic public var translationFactor: Double {
+    @objc public dynamic var translationFactor: Double {
         get {
             return cameraController.translationFactor
         }
@@ -99,11 +98,11 @@ public class ArcGISARView: UIView {
 
     /// We implement `ARSCNViewDelegate` methods, but will use `arSCNViewDelegate` to forward them to clients.
     /// - Since: 100.6.0
-    weak public var arSCNViewDelegate: ARSCNViewDelegate?
+    public weak var arSCNViewDelegate: ARSCNViewDelegate?
 
     /// We implement `AGSLocationChangeHandlerDelegate` methods, but will use `locationChangeHandlerDelegate` to forward them to clients.
     /// - Since: 100.6.0
-    weak public var locationChangeHandlerDelegate: AGSLocationChangeHandlerDelegate?
+    public weak var locationChangeHandlerDelegate: AGSLocationChangeHandlerDelegate?
 
     // MARK: Private properties
         
@@ -126,12 +125,12 @@ public class ArcGISARView: UIView {
 
     // MARK: Initializers
     
-    public override init(frame: CGRect) {
+    override public init(frame: CGRect) {
         super.init(frame: frame)
         sharedInitialization()
     }
     
-    required public init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         sharedInitialization()
     }
@@ -141,7 +140,7 @@ public class ArcGISARView: UIView {
     /// - Parameters:
     ///   - renderVideoFeed: Whether to display the live camera image.
     /// - Since: 100.6.0
-    public convenience init(renderVideoFeed: Bool){
+    public convenience init(renderVideoFeed: Bool) {
         self.init(frame: .zero)
         
         if !isUsingARKit || !renderVideoFeed {
@@ -160,7 +159,7 @@ public class ArcGISARView: UIView {
     }
     
     /// Initialization code shared between all initializers.
-    private func sharedInitialization(){
+    private func sharedInitialization() {
         // Add the ARSCNView to our view.
         if deviceSupportsARKit {
             addSubviewWithConstraints(arSCNView)
@@ -188,13 +187,11 @@ public class ArcGISARView: UIView {
     ///
     /// - Parameter key: The key we want to observe.
     /// - Returns: A set of key paths for properties whose values affect the value of the specified key.
-    public override class func keyPathsForValuesAffectingValue(forKey key: String) -> Set<String>
-    {
+    override public class func keyPathsForValuesAffectingValue(forKey key: String) -> Set<String> {
         var set = super.keyPathsForValuesAffectingValue(forKey: key)
         if key == #keyPath(translationFactor) {
             set.insert(#keyPath(cameraController.translationFactor))
-        }
-        else if key == #keyPath(originCamera) {
+        } else if key == #keyPath(originCamera) {
             set.insert(#keyPath(cameraController.originCamera))
         }
 
@@ -270,8 +267,7 @@ public class ArcGISARView: UIView {
                 }
                 completion?(error)
             }
-        }
-        else {
+        } else {
             // We're either ignoring the data source or there is no data source so continue with defaults.
             finalizeStart()
             completion?(nil)
@@ -313,7 +309,7 @@ public class ArcGISARView: UIView {
             subview.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             subview.topAnchor.constraint(equalTo: self.topAnchor),
             subview.bottomAnchor.constraint(equalTo: self.bottomAnchor)
-            ])
+        ])
     }
     
     /// Internal method to perform a hit test operation to get the transformation matrix representing the corresponding real-world point for `screenPoint`.
@@ -345,7 +341,6 @@ public class ArcGISARView: UIView {
 
 // MARK: - ARSCNViewDelegate
 extension ArcGISARView: ARSCNViewDelegate {
-
     // This is not implemented as we are letting ARKit create and manage nodes.
     // If you want to manage your own nodes, uncomment this and implement it in your code.
 //    public func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
@@ -371,7 +366,6 @@ extension ArcGISARView: ARSCNViewDelegate {
 
 // MARK: - ARSessionObserver (via ARSCNViewDelegate)
 extension ArcGISARView: ARSessionObserver {
-    
     public func session(_ session: ARSession, didFailWithError error: Error) {
         arSCNViewDelegate?.session?(session, didFailWithError: error)
     }
@@ -400,7 +394,6 @@ extension ArcGISARView: ARSessionObserver {
 
 // MARK: - SCNSceneRendererDelegate (via ARSCNViewDelegate)
 extension ArcGISARView: SCNSceneRendererDelegate {
-
     public  func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         arSCNViewDelegate?.renderer?(renderer, updateAtTime: time)
     }
@@ -425,7 +418,7 @@ extension ArcGISARView: SCNSceneRendererDelegate {
         guard let transform = arSCNView.pointOfView?.transform else { return }
         let cameraTransform = simd_double4x4(transform)
         
-        let cameraQuat:simd_quatd = simd_quatd(cameraTransform)
+        let cameraQuat = simd_quatd(cameraTransform)
         let transformationMatrix = AGSTransformationMatrix(quaternionX: cameraQuat.vector.x,
                                                            quaternionY: cameraQuat.vector.y,
                                                            quaternionZ: cameraQuat.vector.z,
@@ -470,7 +463,6 @@ extension ArcGISARView: SCNSceneRendererDelegate {
 
 // MARK: - AGSLocationChangeHandlerDelegate
 extension ArcGISARView: AGSLocationChangeHandlerDelegate {
-    
     public func locationDataSource(_ locationDataSource: AGSLocationDataSource, headingDidChange heading: Double) {
         // Heading changed.
         if !isUsingARKit {
@@ -494,8 +486,7 @@ extension ArcGISARView: AGSLocationChangeHandlerDelegate {
                 location.verticalAccuracy >= 0 {
                 let altitude = location.altitude
                 locationPoint = AGSPoint(x: locationPoint.x, y: locationPoint.y, z: altitude, spatialReference: locationPoint.spatialReference)
-            }
-            else {
+            } else {
                 // We don't have a valid altitude, so use the old altitude.
                 let oldLocationPoint = originCamera.location
                 locationPoint = AGSPoint(x: locationPoint.x, y: locationPoint.y, z: oldLocationPoint.z, spatialReference: locationPoint.spatialReference)
@@ -511,8 +502,7 @@ extension ArcGISARView: AGSLocationChangeHandlerDelegate {
             let newCamera = AGSCamera(location: locationPoint, heading: 0.0, pitch: 90.0, roll: 0.0)
             originCamera = newCamera
             didSetInitialLocation = true
-        }
-        else if locationTrackingMode == .continuous {
+        } else if locationTrackingMode == .continuous {
             originCamera = AGSCamera(location: locationPoint, heading: originCamera.heading, pitch: originCamera.pitch, roll: originCamera.roll)
         }
         
@@ -524,7 +514,7 @@ extension ArcGISARView: AGSLocationChangeHandlerDelegate {
         // Reset the camera controller's transformationMatrix to its initial state, the Idenity matrix.
         cameraController.transformationMatrix = .identity
 
-        if (locationTrackingMode != .continuous) {
+        if locationTrackingMode != .continuous {
             // Stop the data source if the tracking mode is not continuous.
             locationDataSource.stop()
         }
@@ -537,4 +527,3 @@ extension ArcGISARView: AGSLocationChangeHandlerDelegate {
         locationChangeHandlerDelegate?.locationDataSource?(locationDataSource, statusDidChange: status)
     }
 }
-

@@ -15,12 +15,10 @@ import UIKit
 import ArcGISToolkit
 
 open class VCListViewController: UITableViewController {
-    
     public var storyboardName: String?
     
-    public var viewControllerInfos: [(vcName: String, viewControllerType: UIViewController.Type, nibName: String?)] = [
-        ]{
-        didSet{
+    public var viewControllerInfos: [(vcName: String, viewControllerType: UIViewController.Type, nibName: String?)] = [] {
+        didSet {
             self.tableView.reloadData()
         }
     }
@@ -38,28 +36,27 @@ open class VCListViewController: UITableViewController {
     override open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let t = viewControllerInfos[indexPath.row].viewControllerType
         let nibName = viewControllerInfos[indexPath.row].nibName
-        var vcOpt: UIViewController? = nil
+        var vcOpt: UIViewController?
         
         // first check storyboard
-        if let storyboardName = self.storyboardName{
+        if let storyboardName = self.storyboardName {
             let sb = UIStoryboard(name: storyboardName, bundle: nil)
-            if let nibName = nibName{
+            if let nibName = nibName {
                 // this is how you can check to see if that identifier is in the nib, based on http://stackoverflow.com/a/34650505/1687195
-                if let dictionary = sb.value(forKey: "identifierToNibNameMap") as? NSDictionary{
-                    if dictionary.value(forKey: nibName) != nil{
+                if let dictionary = sb.value(forKey: "identifierToNibNameMap") as? NSDictionary {
+                    if dictionary.value(forKey: nibName) != nil {
                         vcOpt = sb.instantiateViewController(withIdentifier: nibName)
                     }
                 }
             }
         }
         
-        if vcOpt == nil{
+        if vcOpt == nil {
             vcOpt = t.init(nibName: nibName, bundle: nil)
         }
         
-        if let vc = vcOpt{
+        if let vc = vcOpt {
             navigationController?.pushViewController(vc, animated: true)
         }
     }
-    
 }

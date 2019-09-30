@@ -17,7 +17,6 @@ import ArcGISToolkit
 import ArcGIS
 
 class TimeSliderExample: MapViewController {
-    
     private var map = AGSMap(basemap: AGSBasemap.topographic())
     private var timeSlider = TimeSlider()
     
@@ -44,8 +43,7 @@ class TimeSliderExample: MapViewController {
         // Add layer
         let mapImageLayer = AGSArcGISMapImageLayer(url: URL(string: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/911CallsHotspot/MapServer")!)
         mapView.map?.operationalLayers.add(mapImageLayer)
-        mapImageLayer.load(completion: { [weak self] (error) in
-            
+        mapImageLayer.load { [weak self] (error) in
             // Make sure self is around
             guard let self = self else {
                 return
@@ -63,8 +61,7 @@ class TimeSliderExample: MapViewController {
                 self.mapView.setViewpoint(AGSViewpoint(targetExtent: fullExtent), completion: nil)
             }
             
-            self.timeSlider.initializeTimeProperties(geoView: self.mapView, observeGeoView: true, completion: { [weak self] (error) in
-                
+            self.timeSlider.initializeTimeProperties(geoView: self.mapView, observeGeoView: true) { [weak self] (error) in
                 // Make sure self is around
                 guard let self = self else {
                     return
@@ -79,17 +76,18 @@ class TimeSliderExample: MapViewController {
                 
                 // Show the time slider
                 self.timeSlider.isHidden = false
-            })
-        })
+            }
+        }
     }
     
-    @objc func timeSliderValueChanged(timeSlider: TimeSlider) {
+    @objc
+    func timeSliderValueChanged(timeSlider: TimeSlider) {
         if mapView.timeExtent != timeSlider.currentExtent {
             mapView.timeExtent = timeSlider.currentExtent
         }
     }
     
-    //MARK: - Show Error
+    // MARK: - Show Error
     
     private func showError(_ error: Error) {
         let alertController = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
@@ -97,5 +95,3 @@ class TimeSliderExample: MapViewController {
         present(alertController, animated: true)
     }
 }
-
-

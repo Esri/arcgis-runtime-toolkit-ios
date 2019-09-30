@@ -14,15 +14,15 @@
 import UIKit
 import ArcGIS
 
-public enum ScalebarUnits{
+public enum ScalebarUnits {
     case imperial
     case metric
     
-    internal func baseUnits()->AGSLinearUnit{
+    internal func baseUnits() -> AGSLinearUnit {
         return self == .imperial ? AGSLinearUnit.feet() : AGSLinearUnit.meters()
     }
     
-    private static func multiplierAndMagnitudeForDistance(distance: Double) -> (multiplier: Double, magnitude: Double){
+    private static func multiplierAndMagnitudeForDistance(distance: Double) -> (multiplier: Double, magnitude: Double) {
         // get multiplier
         
         let magnitude = pow(10, floor(log10(distance)))
@@ -31,8 +31,7 @@ public enum ScalebarUnits{
         return (multiplier, magnitude)
     }
     
-    internal func closestDistanceWithoutGoingOver(to distance: Double, units: AGSLinearUnit) -> Double{
-        
+    internal func closestDistanceWithoutGoingOver(to distance: Double, units: AGSLinearUnit) -> Double {
         let mm = ScalebarUnits.multiplierAndMagnitudeForDistance(distance: distance)
         let roundNumber = mm.multiplier * mm.magnitude
         
@@ -51,7 +50,9 @@ public enum ScalebarUnits{
     
     // this table must begin with 1 and end with 10
     private static let roundNumberMultipliers: [Double] = [1, 1.2, 1.25, 1.5, 1.75, 2, 2.4, 2.5, 3, 3.75, 4, 5, 6, 7.5, 8, 9, 10]
-    private static func segmentOptionsForMultiplier(multiplier: Double) -> [Int]{
+    
+    // swiftlint:disable cyclomatic_complexity
+    private static func segmentOptionsForMultiplier(multiplier: Double) -> [Int] {
         switch multiplier {
         case 1:
             return [1, 2, 4, 5]
@@ -91,9 +92,9 @@ public enum ScalebarUnits{
             return [1]
         }
     }
-    
-    internal static func numSegmentsForDistance(distance: Double, maxNumSegments: Int) -> Int{
-        
+    // swiftlint:enable cyclomatic_complexity
+
+    internal static func numSegmentsForDistance(distance: Double, maxNumSegments: Int) -> Int {
         // this function returns the best number of segments so that we get relatively round
         // numbers when the distance is divided up.
         
@@ -103,36 +104,33 @@ public enum ScalebarUnits{
         return num
     }
     
-    internal func linearUnitsForDistance(distance: Double) -> AGSLinearUnit{
-        
+    internal func linearUnitsForDistance(distance: Double) -> AGSLinearUnit {
         switch self {
         case .imperial:
             
-            if distance >= 2640{
+            if distance >= 2640 {
                 return AGSLinearUnit.miles()
             }
             return AGSLinearUnit.feet()
             
         case .metric:
             
-            if distance >= 1000{
+            if distance >= 1000 {
                 return AGSLinearUnit.kilometers()
             }
             return AGSLinearUnit.meters()
         }
-        
     }
-    
 }
 
-public enum ScalebarStyle{
+public enum ScalebarStyle {
     case line
     case bar
     case graduatedLine
     case alternatingBar
     case dualUnitLine
     
-    fileprivate func rendererForScalebar(scalebar: Scalebar) -> ScalebarRenderer{
+    fileprivate func rendererForScalebar(scalebar: Scalebar) -> ScalebarRenderer {
         switch self {
         case .line:
             return ScalebarLineStyleRenderer(scalebar: scalebar)
@@ -148,85 +146,76 @@ public enum ScalebarStyle{
     }
 }
 
-public enum ScalebarAlignment{
+public enum ScalebarAlignment {
     case left
     case right
     case center
 }
 
-
 public class Scalebar: UIView {
-    
     //
     // public properties
     
-    public var units: ScalebarUnits = .imperial{
-        didSet{
+    public var units: ScalebarUnits = .imperial {
+        didSet {
             updateScaleDisplay(forceRedraw: true)
         }
     }
     
-    public var style: ScalebarStyle = .line{
-        didSet{
+    public var style: ScalebarStyle = .line {
+        didSet {
             renderer = style.rendererForScalebar(scalebar: self)
             updateScaleDisplay(forceRedraw: true)
         }
     }
     
-    @IBInspectable
-    public var fillColor: UIColor? = UIColor.lightGray.withAlphaComponent(0.5){
-        didSet{
+    @IBInspectable public var fillColor: UIColor? = UIColor.lightGray.withAlphaComponent(0.5) {
+        didSet {
             setNeedsDisplay()
         }
     }
     
-    @IBInspectable
-    public var alternateFillColor: UIColor? = UIColor.black{
-        didSet{
+    @IBInspectable public var alternateFillColor: UIColor? = UIColor.black {
+        didSet {
             setNeedsDisplay()
         }
     }
     
-    @IBInspectable
-    public var lineColor: UIColor = UIColor.white{
-        didSet{
+    @IBInspectable public var lineColor: UIColor = UIColor.white {
+        didSet {
             setNeedsDisplay()
         }
     }
     
-    @IBInspectable
-    public var shadowColor: UIColor? = UIColor.black.withAlphaComponent(0.65){
-        didSet{
+    @IBInspectable public var shadowColor: UIColor? = UIColor.black.withAlphaComponent(0.65) {
+        didSet {
             setNeedsDisplay()
         }
     }
     
-    @IBInspectable
-    public var textColor: UIColor? = UIColor.black{
-        didSet{
+    @IBInspectable public var textColor: UIColor? = UIColor.black {
+        didSet {
             setNeedsDisplay()
         }
     }
     
-    @IBInspectable
-    public var textShadowColor: UIColor? = UIColor.white{
-        didSet{
+    @IBInspectable  public var textShadowColor: UIColor? = UIColor.white {
+        didSet {
             setNeedsDisplay()
         }
     }
     
     // Set this to a value greater than 0 if you don't specify constraints for width and want to rely
     // on intrinsic content size for the width when using autolayout. Only applicable for autolayout.
-    @IBInspectable
-    public var maximumIntrinsicWidth: CGFloat = 0 {
-        didSet{
+    @IBInspectable public var maximumIntrinsicWidth: CGFloat = 0 {
+        didSet {
             // this will invalidate the intrinsicContentSize and also redraw
             updateScaleDisplay(forceRedraw: true)
         }
     }
     
-    public var alignment: ScalebarAlignment = .left{
-        didSet{
+    public var alignment: ScalebarAlignment = .left {
+        didSet {
             updateScaleDisplay(forceRedraw: true)
         }
     }
@@ -235,15 +224,15 @@ public class Scalebar: UIView {
     public var useGeodeticCalculations = true
     
     public var mapView: AGSMapView? {
-        didSet{
+        didSet {
             unbindFromMapView(mapView: oldValue)
             bindToMapView(mapView: mapView)
             updateScaleDisplay(forceRedraw: true)
         }
     }
     
-    public var font: UIFont = UIFont.systemFont(ofSize: 9.0, weight: UIFont.Weight.semibold){
-        didSet{
+    public var font = UIFont.systemFont(ofSize: 9.0, weight: UIFont.Weight.semibold) {
+        didSet {
             recalculateFontProperties()
             updateScaleDisplay(forceRedraw: true)
         }
@@ -259,9 +248,9 @@ public class Scalebar: UIView {
     
     internal static let labelYPad: CGFloat = 2.0
     internal static let labelXPad: CGFloat = 4.0
-    internal static let tickHeight: CGFloat  = 6.0
-    internal static let tick2Height: CGFloat  = 4.5
-    internal static let notchHeight: CGFloat  = 6.0
+    internal static let tickHeight: CGFloat = 6.0
+    internal static let tick2Height: CGFloat = 4.5
+    internal static let notchHeight: CGFloat = 6.0
     internal static var numberFormatter: NumberFormatter = {
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .decimal
@@ -271,16 +260,14 @@ public class Scalebar: UIView {
         return numberFormatter
     }()
     
-    
     internal static let showFrameDebugColors = false
-    internal static let lineCap: CGLineCap = CGLineCap.round
+    internal static let lineCap = CGLineCap.round
     
     internal var fontHeight: CGFloat = 0
     internal var zeroStringWidth: CGFloat = 0
     internal var maxRightUnitsPad: CGFloat = 0
     
-    private func recalculateFontProperties(){
-        
+    private func recalculateFontProperties() {
         let attributes: [NSAttributedString.Key: Any] = [.font: font]
         
         let zeroText = "0"
@@ -298,7 +285,7 @@ public class Scalebar: UIView {
     // accurate for the center of the map on smaller scales (when zoomed way out).
     // A minScale of 0 means it will always be visible
     private let minScale: Double = 0
-    private var updateCoalescer: Coalescer? = nil
+    private var updateCoalescer: Coalescer?
 
     private var renderer: ScalebarRenderer?
     
@@ -311,12 +298,12 @@ public class Scalebar: UIView {
         sharedInitialization()
     }
     
-    required public init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         sharedInitialization()
     }
     
-    required public init(mapView: AGSMapView){
+    public required init(mapView: AGSMapView) {
         super.init(frame: CGRect.zero)
         sharedInitialization()
         self.mapView = mapView
@@ -324,8 +311,7 @@ public class Scalebar: UIView {
         bindToMapView(mapView: mapView)
     }
     
-    private func sharedInitialization(){
-        
+    private func sharedInitialization() {
         self.updateCoalescer = Coalescer(dispatchQueue: DispatchQueue.main, interval: DispatchTimeInterval.milliseconds(500), action: updateScaleDisplayIfNecessary)
         
         self.isUserInteractionEnabled = false
@@ -340,18 +326,18 @@ public class Scalebar: UIView {
     private var mapObservation: NSKeyValueObservation?
     private var visibleAreaObservation: NSKeyValueObservation?
     
-    private func bindToMapView(mapView: AGSMapView?){
-        mapObservation = mapView?.observe(\.map, options: .new){[weak self] mapView, change in
+    private func bindToMapView(mapView: AGSMapView?) {
+        mapObservation = mapView?.observe(\.map, options: .new) {[weak self] _, _ in
             self?.updateScaleDisplay(forceRedraw: false)
         }
-        visibleAreaObservation = mapView?.observe(\.visibleArea, options: .new){ [weak self] mapView, change in
+        visibleAreaObservation = mapView?.observe(\.visibleArea, options: .new) { [weak self] _, _ in
             // since we get updates so often, we don't need to redraw that often
             // so use the coalescer to filter the events on a time interval
             self?.updateCoalescer?.ping()
         }
     }
     
-    private func unbindFromMapView(mapView: AGSMapView?){
+    private func unbindFromMapView(mapView: AGSMapView?) {
         // invalidate observations and set to nil
         mapObservation?.invalidate()
         mapObservation = nil
@@ -359,37 +345,37 @@ public class Scalebar: UIView {
         visibleAreaObservation = nil
     }
     
-    private func updateScaleDisplayIfNecessary(){
+    private func updateScaleDisplayIfNecessary() {
         updateScaleDisplay(forceRedraw: false)
     }
     
-    private func updateScaleDisplay(forceRedraw: Bool){
-        
-        guard var renderer = renderer else{
+    // swiftlint:disable cyclomatic_complexity
+    private func updateScaleDisplay(forceRedraw: Bool) {
+        guard var renderer = renderer else {
             // this should never happen, should always have a renderer
             setNeedsDisplay()
             return
         }
         
-        guard let mapView = mapView else{
+        guard let mapView = mapView else {
             renderer.currentScaleDisplay = nil
             setNeedsDisplay()
             return
         }
         
-        guard mapView.map != nil else{
+        guard mapView.map != nil else {
             renderer.currentScaleDisplay = nil
             setNeedsDisplay()
             return
         }
         
-        guard let sr = mapView.spatialReference else{
+        guard let sr = mapView.spatialReference else {
             renderer.currentScaleDisplay = nil
             setNeedsDisplay()
             return
         }
         
-        guard let visibleArea = mapView.visibleArea else{
+        guard let visibleArea = mapView.visibleArea else {
             renderer.currentScaleDisplay = nil
             setNeedsDisplay()
             return
@@ -397,7 +383,7 @@ public class Scalebar: UIView {
         
         //print("current scale: \(mapView.mapScale)")
         
-        guard minScale <= 0 || mapView.mapScale < minScale else{
+        guard minScale <= 0 || mapView.mapScale < minScale else {
             //print("current scale: \(mapView.mapScale), minScale \(minScale)")
             renderer.currentScaleDisplay = nil
             setNeedsDisplay()
@@ -416,19 +402,18 @@ public class Scalebar: UIView {
         let lineDisplayLength: CGFloat
         
         // bail early if we can because the last time we drew was good
-        if let csd = renderer.currentScaleDisplay, forceRedraw == false{
+        if let csd = renderer.currentScaleDisplay, forceRedraw == false {
             var needsRedraw = false
-            if csd.mapScale != mapScale{ needsRedraw = true }
+            if csd.mapScale != mapScale { needsRedraw = true }
             let dependsOnMapCenter = sr.unit is AGSAngularUnit || useGeodeticCalculations
-            if dependsOnMapCenter && !mapCenter.isEqual(to: csd.mapCenter){ needsRedraw = true }
-            if !needsRedraw{
+            if dependsOnMapCenter && !mapCenter.isEqual(to: csd.mapCenter) { needsRedraw = true }
+            if !needsRedraw {
                 // no need to redraw - nothing significant changed
                 return
             }
         }
         
         if useGeodeticCalculations || sr.unit is AGSAngularUnit {
-            
             let maxLengthPlanar = unitsPerPoint * Double(maxLength)
             let p1 = AGSPoint(x: mapCenter.x - (maxLengthPlanar * 0.5), y: mapCenter.y, spatialReference: sr)
             let p2 = AGSPoint(x: mapCenter.x + (maxLengthPlanar * 0.5), y: mapCenter.y, spatialReference: sr)
@@ -440,10 +425,8 @@ public class Scalebar: UIView {
             lineDisplayLength = CGFloat( (roundNumberDistance * planarToGeodeticFactor) / unitsPerPoint )
             displayUnit = units.linearUnitsForDistance(distance: roundNumberDistance)
             lineMapLength = baseUnits.convert(roundNumberDistance, to: displayUnit)
-        }
-        else {
-            
-            guard let srUnit = sr.unit as? AGSLinearUnit else{
+        } else {
+            guard let srUnit = sr.unit as? AGSLinearUnit else {
                 renderer.currentScaleDisplay = nil
                 setNeedsDisplay()
                 return
@@ -458,7 +441,7 @@ public class Scalebar: UIView {
             lineMapLength = baseUnits.convert(closestLen, to: displayUnit)
         }
         
-        guard lineDisplayLength.isFinite, !lineDisplayLength.isNaN else{
+        guard lineDisplayLength.isFinite, !lineDisplayLength.isNaN else {
             renderer.currentScaleDisplay = nil
             setNeedsDisplay()
             return
@@ -475,25 +458,21 @@ public class Scalebar: UIView {
         // tell view we need to redraw
         setNeedsDisplay()
     }
-    
-    public override var intrinsicContentSize: CGSize{
-        get{
-            if let renderer = renderer {
-                if maximumIntrinsicWidth > 0{
-                    return CGSize(width: renderer.currentMaxDisplayWidth, height: renderer.displayHeight)
-                }
-                else{
-                    return CGSize(width: UIView.noIntrinsicMetric, height: renderer.displayHeight)
-                }
+    // swiftlint:enable cyclomatic_complexity
+
+    override public var intrinsicContentSize: CGSize {
+        if let renderer = renderer {
+            if maximumIntrinsicWidth > 0 {
+                return CGSize(width: renderer.currentMaxDisplayWidth, height: renderer.displayHeight)
+            } else {
+                return CGSize(width: UIView.noIntrinsicMetric, height: renderer.displayHeight)
             }
-            else{
-                return CGSize(width: UIView.noIntrinsicMetric, height: UIView.noIntrinsicMetric)
-            }
+        } else {
+            return CGSize(width: UIView.noIntrinsicMetric, height: UIView.noIntrinsicMetric)
         }
     }
     
-    private func offsetRectForDisplaySize(displaySize: CGSize) -> CGRect{
-        
+    private func offsetRectForDisplaySize(displaySize: CGSize) -> CGRect {
         // center on y axis
         let offsetY = (bounds.height - displaySize.height) / 2
         
@@ -512,10 +491,9 @@ public class Scalebar: UIView {
     }
     
     override public func draw(_ rect: CGRect) {
-        
         super.draw(rect)
         
-        guard let renderer = self.renderer, renderer.currentScaleDisplay != nil else{
+        guard let renderer = self.renderer, renderer.currentScaleDisplay != nil else {
             return
         }
         
@@ -523,11 +501,11 @@ public class Scalebar: UIView {
         
         let odr = offsetRectForDisplaySize(displaySize: displaySize)
         
-        guard !odr.isEmpty else{
+        guard !odr.isEmpty else {
             return
         }
         
-        if Scalebar.showFrameDebugColors, let context = UIGraphicsGetCurrentContext(){
+        if Scalebar.showFrameDebugColors, let context = UIGraphicsGetCurrentContext() {
             context.saveGState()
             
             context.setFillColor(UIColor.yellow.cgColor)
@@ -543,19 +521,17 @@ public class Scalebar: UIView {
         renderer.draw(rect: odr)
     }
     
-    private func calculateDisplaySize() -> CGSize{
+    private func calculateDisplaySize() -> CGSize {
         if let renderer = renderer {
             let displaySize = CGSize(width: renderer.currentMaxDisplayWidth, height: renderer.displayHeight)
             return displaySize
-        }
-        else{
+        } else {
             return CGSize(width: UIView.noIntrinsicMetric, height: UIView.noIntrinsicMetric)
         }
     }
 }
 
-
-internal struct ScaleDisplay{
+internal struct ScaleDisplay {
     var mapScale: Double = 0
     var unitsPerPoint: Double = 0
     var lineMapLength: Double = 0
@@ -565,7 +541,7 @@ internal struct ScaleDisplay{
     var mapLengthString: String
 }
 
-internal struct SegmentInfo{
+internal struct SegmentInfo {
     var index: Int
     var segmentScreenLength: CGFloat
     var xOffset: CGFloat
@@ -574,11 +550,10 @@ internal struct SegmentInfo{
     var textWidth: CGFloat
 }
 
-internal protocol ScalebarRenderer{
-    
-    var scalebar: Scalebar? {get}
+internal protocol ScalebarRenderer {
+    var scalebar: Scalebar? { get }
     var currentScaleDisplay: ScaleDisplay? { get set }
-    var displayHeight: CGFloat {get}
+    var displayHeight: CGFloat { get }
     var currentMaxDisplayWidth: CGFloat { get }
     
     init(scalebar: Scalebar)
@@ -587,27 +562,21 @@ internal protocol ScalebarRenderer{
     func draw(rect: CGRect)
 }
 
-internal extension ScalebarRenderer{
-    
-    var shadowOffset: CGPoint{
+internal extension ScalebarRenderer {
+    var shadowOffset: CGPoint {
         return CGPoint(x: 0.5, y: 0.5)
     }
     
     var lineWidth: CGFloat {
-        get {
-            return 2
-        }
+        return 2
     }
     
     var halfLineWidth: CGFloat {
-        get{
-            return 1
-        }
+        return 1
     }
-
-    func calculateSegmentInfos() -> [SegmentInfo]?{
-        
-        guard let scaleDisplay = currentScaleDisplay, let scalebar = scalebar else{
+    
+    func calculateSegmentInfos() -> [SegmentInfo]? {
+        guard let scaleDisplay = currentScaleDisplay, let scalebar = scalebar else {
             return nil
         }
         
@@ -619,7 +588,7 @@ internal extension ScalebarRenderer{
         let minSegmentTestString = (scaleDisplay.mapLengthString.count > 3) ? scaleDisplay.mapLengthString : "9.9"
         // use 1.5 because the last segment, the text is right justified insted of center, which makes it harder to squeeze text in
         let minSegmentWidth = (minSegmentTestString.size(withAttributes: [.font: scalebar.font]).width * 1.5) + (Scalebar.labelXPad * 2)
-        var maxNumSegments: Int = Int(lineDisplayLength / minSegmentWidth)
+        var maxNumSegments = Int(lineDisplayLength / minSegmentWidth)
         maxNumSegments = min(maxNumSegments, 4) // cap it at 4
         let numSegments: Int = ScalebarUnits.numSegmentsForDistance(distance: scaleDisplay.lineMapLength, maxNumSegments: maxNumSegments)
         
@@ -630,7 +599,6 @@ internal extension ScalebarRenderer{
         var segmentInfos = [SegmentInfo]()
         
         for index in 0..<numSegments {
-            
             currSegmentX += segmentScreenLength
             let segmentMapLength = Double((segmentScreenLength * CGFloat(index + 1)) / lineDisplayLength) * scaleDisplay.lineMapLength
             let segmentText = Scalebar.numberFormatter.string(from: NSNumber(value: segmentMapLength)) ?? ""
@@ -644,9 +612,8 @@ internal extension ScalebarRenderer{
         return segmentInfos
     }
     
-    func drawText(text: String, frame: CGRect, alignment: NSTextAlignment){
-        
-        guard let scalebar = scalebar, let textColor = scalebar.textColor else{
+    func drawText(text: String, frame: CGRect, alignment: NSTextAlignment) {
+        guard let scalebar = scalebar, let textColor = scalebar.textColor else {
             return
         }
         
@@ -654,8 +621,7 @@ internal extension ScalebarRenderer{
         paragraphStyle.alignment = alignment
         
         // draw text shadow
-        if let shadowColor = scalebar.textShadowColor{
-            
+        if let shadowColor = scalebar.textShadowColor {
             let shadowAttrs: [NSAttributedString.Key: Any] = [
                 .font: scalebar.font,
                 .paragraphStyle: paragraphStyle,
@@ -668,7 +634,7 @@ internal extension ScalebarRenderer{
         }
         
         // draw text
-        let attrs : [NSAttributedString.Key: Any] = [
+        let attrs: [NSAttributedString.Key: Any] = [
             .font: scalebar.font,
             .paragraphStyle: paragraphStyle,
             .foregroundColor: textColor
@@ -677,9 +643,8 @@ internal extension ScalebarRenderer{
         text.draw(with: frame, options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
     }
     
-    func drawSegmentsText(segmentInfos: [SegmentInfo], scaleDisplay: ScaleDisplay, startingX: CGFloat, textY: CGFloat){
-        
-        guard let scalebar = scalebar else{
+    func drawSegmentsText(segmentInfos: [SegmentInfo], scaleDisplay: ScaleDisplay, startingX: CGFloat, textY: CGFloat) {
+        guard let scalebar = scalebar else {
             return
         }
         
@@ -694,11 +659,9 @@ internal extension ScalebarRenderer{
         
         self.drawText(text: "0", frame: zeroTextFrame, alignment: .left)
         
-        
         // draw segment text
-        for si in segmentInfos{
-            if si.index == segmentInfos.last?.index{
-                
+        for si in segmentInfos {
+            if si.index == segmentInfos.last?.index {
                 // last segment text
                 
                 let segmentX = startingX + si.xOffset - si.textWidth + endOffset
@@ -715,14 +678,12 @@ internal extension ScalebarRenderer{
                 let unitsTextWidth = unitsText.size(withAttributes: [.font: scalebar.font]).width
                 
                 let unitsTextFrame = CGRect(x: segmentTextFrame.maxX,
-                                              y: textY,
-                                              width: unitsTextWidth,
-                                              height: scalebar.fontHeight)
+                                            y: textY,
+                                            width: unitsTextWidth,
+                                            height: scalebar.fontHeight)
                 
                 self.drawText(text: unitsText, frame: unitsTextFrame, alignment: .right)
-                
-            }
-            else{
+            } else {
                 // all but last segment text
                 
                 let segmentX = startingX + si.xOffset
@@ -737,8 +698,7 @@ internal extension ScalebarRenderer{
     }
 }
 
-internal class ScalebarLineStyleRenderer: ScalebarRenderer{
-    
+internal class ScalebarLineStyleRenderer: ScalebarRenderer {
     weak var scalebar: Scalebar?
     
     required init(scalebar: Scalebar) {
@@ -748,36 +708,31 @@ internal class ScalebarLineStyleRenderer: ScalebarRenderer{
     var currentScaleDisplay: ScaleDisplay?
     
     var displayHeight: CGFloat {
-        get{
-            guard let scalebar = scalebar else { return 0 }
-            return halfLineWidth + Scalebar.tickHeight + Scalebar.labelYPad + scalebar.fontHeight + shadowOffset.y
-        }
+        guard let scalebar = scalebar else { return 0 }
+        return halfLineWidth + Scalebar.tickHeight + Scalebar.labelYPad + scalebar.fontHeight + shadowOffset.y
     }
     
     var currentMaxDisplayWidth: CGFloat {
-        get{
-            guard let scaleDisplay = currentScaleDisplay else {
-                return 0
-            }
-            return halfLineWidth + scaleDisplay.lineDisplayLength + halfLineWidth + shadowOffset.x
+        guard let scaleDisplay = currentScaleDisplay else {
+            return 0
         }
+        return halfLineWidth + scaleDisplay.lineDisplayLength + halfLineWidth + shadowOffset.x
     }
     
-    func availableLineDisplayLength(totalDisplayWidth: CGFloat) -> CGFloat{
+    func availableLineDisplayLength(totalDisplayWidth: CGFloat) -> CGFloat {
         return totalDisplayWidth - lineWidth
     }
     
-    func draw(rect: CGRect){
-        
-        guard let scaleDisplay = currentScaleDisplay else{
+    func draw(rect: CGRect) {
+        guard let scaleDisplay = currentScaleDisplay else {
             return
         }
         
-        guard let scalebar = self.scalebar else{
+        guard let scalebar = self.scalebar else {
             return
         }
         
-        guard let context = UIGraphicsGetCurrentContext() else{
+        guard let context = UIGraphicsGetCurrentContext() else {
             return
         }
         
@@ -803,10 +758,9 @@ internal class ScalebarLineStyleRenderer: ScalebarRenderer{
         let lineBottom = lineTop + Scalebar.tickHeight
         
         path.move(to: CGPoint(x: lineX, y: lineTop))
-        path.addLine(to: CGPoint(x: lineX, y:lineBottom))
+        path.addLine(to: CGPoint(x: lineX, y: lineBottom))
         path.addLine(to: CGPoint(x: lineX + lineScreenLength, y: lineBottom))
         path.addLine(to: CGPoint(x: lineX + lineScreenLength, y: lineTop))
-        
         
         //
         // draw paths
@@ -814,9 +768,9 @@ internal class ScalebarLineStyleRenderer: ScalebarRenderer{
         context.setLineCap(Scalebar.lineCap)
         context.setLineJoin(CGLineJoin.bevel)
         
-        if let shadowColor = scalebar.shadowColor{
+        if let shadowColor = scalebar.shadowColor {
             var t = CGAffineTransform(translationX: shadowOffset.x, y: shadowOffset.y)
-            if let shadowPath = path.copy(using: &t){
+            if let shadowPath = path.copy(using: &t) {
                 context.setLineWidth(lineWidth)
                 context.setStrokeColor(shadowColor.cgColor)
                 context.addPath(shadowPath)
@@ -845,8 +799,7 @@ internal class ScalebarLineStyleRenderer: ScalebarRenderer{
     }
 }
 
-internal class ScalebarGraduatedLineStyleRenderer: ScalebarRenderer{
-    
+internal class ScalebarGraduatedLineStyleRenderer: ScalebarRenderer {
     weak var scalebar: Scalebar?
     
     required init(scalebar: Scalebar) {
@@ -856,41 +809,36 @@ internal class ScalebarGraduatedLineStyleRenderer: ScalebarRenderer{
     var currentScaleDisplay: ScaleDisplay?
     
     var displayHeight: CGFloat {
-        get{
-            guard let scalebar = scalebar else { return 0 }
-            return halfLineWidth + Scalebar.tickHeight + Scalebar.labelYPad + scalebar.fontHeight + shadowOffset.y
-        }
+        guard let scalebar = scalebar else { return 0 }
+        return halfLineWidth + Scalebar.tickHeight + Scalebar.labelYPad + scalebar.fontHeight + shadowOffset.y
     }
     
     var currentMaxDisplayWidth: CGFloat {
-        get{
-            guard let scalebar = scalebar, let scaleDisplay = currentScaleDisplay else {
-                return 0
-            }
-            return halfLineWidth + scaleDisplay.lineDisplayLength + halfLineWidth + scalebar.maxRightUnitsPad + shadowOffset.x
+        guard let scalebar = scalebar, let scaleDisplay = currentScaleDisplay else {
+            return 0
         }
+        return halfLineWidth + scaleDisplay.lineDisplayLength + halfLineWidth + scalebar.maxRightUnitsPad + shadowOffset.x
     }
     
-    func availableLineDisplayLength(totalDisplayWidth: CGFloat) -> CGFloat{
+    func availableLineDisplayLength(totalDisplayWidth: CGFloat) -> CGFloat {
         guard let scalebar = scalebar else { return 0 }
         return totalDisplayWidth - halfLineWidth - scalebar.maxRightUnitsPad
     }
     
-    func draw(rect: CGRect){
-        
-        guard let scaleDisplay = currentScaleDisplay else{
+    func draw(rect: CGRect) {
+        guard let scaleDisplay = currentScaleDisplay else {
             return
         }
         
-        guard let scalebar = self.scalebar else{
+        guard let scalebar = self.scalebar else {
             return
         }
         
-        guard let segmentInfos = calculateSegmentInfos() else{
+        guard let segmentInfos = calculateSegmentInfos() else {
             return
         }
         
-        guard let context = UIGraphicsGetCurrentContext() else{
+        guard let context = UIGraphicsGetCurrentContext() else {
             return
         }
         
@@ -916,14 +864,13 @@ internal class ScalebarGraduatedLineStyleRenderer: ScalebarRenderer{
         let lineX = x + halfLineWidth
         
         path.move(to: CGPoint(x: lineX, y: lineTop))
-        path.addLine(to: CGPoint(x: lineX, y:lineBottom))
+        path.addLine(to: CGPoint(x: lineX, y: lineBottom))
         path.addLine(to: CGPoint(x: lineX + lineScreenLength, y: lineBottom))
         path.addLine(to: CGPoint(x: lineX + lineScreenLength, y: lineTop))
         
-        
         // draw segment ticks
-        for si in segmentInfos{
-            if si.index == segmentInfos.last?.index{
+        for si in segmentInfos {
+            if si.index == segmentInfos.last?.index {
                 // skip last segment
                 continue
             }
@@ -938,9 +885,9 @@ internal class ScalebarGraduatedLineStyleRenderer: ScalebarRenderer{
         context.setLineCap(Scalebar.lineCap)
         context.setLineJoin(CGLineJoin.bevel)
         
-        if let shadowColor = scalebar.shadowColor{
+        if let shadowColor = scalebar.shadowColor {
             var t = CGAffineTransform(translationX: shadowOffset.x, y: shadowOffset.y)
-            if let shadowPath = path.copy(using: &t){
+            if let shadowPath = path.copy(using: &t) {
                 context.setLineWidth(lineWidth)
                 context.setStrokeColor(shadowColor.cgColor)
                 context.addPath(shadowPath)
@@ -960,14 +907,12 @@ internal class ScalebarGraduatedLineStyleRenderer: ScalebarRenderer{
         let textY = lineBottom + Scalebar.labelYPad
         drawSegmentsText(segmentInfos: segmentInfos, scaleDisplay: scaleDisplay, startingX: lineX, textY: textY)
         
-        
         // reset the state
         context.restoreGState()
     }
 }
 
-internal class ScalebarBarStyleRenderer: ScalebarRenderer{
-    
+internal class ScalebarBarStyleRenderer: ScalebarRenderer {
     weak var scalebar: Scalebar?
     
     required init(scalebar: Scalebar) {
@@ -977,36 +922,31 @@ internal class ScalebarBarStyleRenderer: ScalebarRenderer{
     var currentScaleDisplay: ScaleDisplay?
     
     var displayHeight: CGFloat {
-        get{
-            guard let scalebar = scalebar else { return 0 }
-            return Scalebar.notchHeight + Scalebar.labelYPad + scalebar.fontHeight + shadowOffset.y
-        }
+        guard let scalebar = scalebar else { return 0 }
+        return Scalebar.notchHeight + Scalebar.labelYPad + scalebar.fontHeight + shadowOffset.y
     }
     
     var currentMaxDisplayWidth: CGFloat {
-        get{
-            guard let scaleDisplay = currentScaleDisplay else{
-                return 0
-            }
-            return halfLineWidth + scaleDisplay.lineDisplayLength + halfLineWidth + shadowOffset.x
+        guard let scaleDisplay = currentScaleDisplay else {
+            return 0
         }
+        return halfLineWidth + scaleDisplay.lineDisplayLength + halfLineWidth + shadowOffset.x
     }
     
-    func availableLineDisplayLength(totalDisplayWidth: CGFloat) -> CGFloat{
+    func availableLineDisplayLength(totalDisplayWidth: CGFloat) -> CGFloat {
         return totalDisplayWidth - lineWidth
     }
     
-    func draw(rect: CGRect){
-        
-        guard let scaleDisplay = currentScaleDisplay else{
+    func draw(rect: CGRect) {
+        guard let scaleDisplay = currentScaleDisplay else {
             return
         }
         
-        guard let scalebar = self.scalebar else{
+        guard let scalebar = self.scalebar else {
             return
         }
         
-        guard let context = UIGraphicsGetCurrentContext() else{
+        guard let context = UIGraphicsGetCurrentContext() else {
             return
         }
         
@@ -1019,7 +959,6 @@ internal class ScalebarBarStyleRenderer: ScalebarRenderer{
         let lineScreenLength = scaleDisplay.lineDisplayLength
         
         let path = CGMutablePath()
-        
         
         // set path for bar style
         /*
@@ -1043,9 +982,9 @@ internal class ScalebarBarStyleRenderer: ScalebarRenderer{
         context.setLineCap(Scalebar.lineCap)
         context.setLineJoin(CGLineJoin.bevel)
         
-        if let shadowColor = scalebar.shadowColor{
+        if let shadowColor = scalebar.shadowColor {
             var t = CGAffineTransform(translationX: shadowOffset.x, y: shadowOffset.y)
-            if let shadowPath = path.copy(using: &t){
+            if let shadowPath = path.copy(using: &t) {
                 context.setLineWidth(lineWidth)
                 context.setStrokeColor(shadowColor.cgColor)
                 context.addPath(shadowPath)
@@ -1053,7 +992,7 @@ internal class ScalebarBarStyleRenderer: ScalebarRenderer{
             }
         }
         
-        if let fillColor = scalebar.fillColor{
+        if let fillColor = scalebar.fillColor {
             context.setFillColor(fillColor.cgColor)
             context.addPath(path)
             context.drawPath(using: .fill)
@@ -1080,8 +1019,7 @@ internal class ScalebarBarStyleRenderer: ScalebarRenderer{
     }
 }
 
-internal class ScalebarAlternatingBarStyleRenderer: ScalebarRenderer{
-    
+internal class ScalebarAlternatingBarStyleRenderer: ScalebarRenderer {
     weak var scalebar: Scalebar?
     
     required init(scalebar: Scalebar) {
@@ -1091,44 +1029,40 @@ internal class ScalebarAlternatingBarStyleRenderer: ScalebarRenderer{
     var currentScaleDisplay: ScaleDisplay?
     
     var displayHeight: CGFloat {
-        get{
-            guard let scalebar = scalebar else { return 0 }
-            return halfLineWidth + Scalebar.notchHeight + Scalebar.labelYPad + scalebar.fontHeight + shadowOffset.y
-        }
+        guard let scalebar = scalebar else { return 0 }
+        return halfLineWidth + Scalebar.notchHeight + Scalebar.labelYPad + scalebar.fontHeight + shadowOffset.y
     }
     
     var currentMaxDisplayWidth: CGFloat {
-        get{
-            guard let scalebar = scalebar, let scaleDisplay = currentScaleDisplay else {
-                return 0
-            }
-            return halfLineWidth + scaleDisplay.lineDisplayLength + halfLineWidth + scalebar.maxRightUnitsPad + shadowOffset.x
+        guard let scalebar = scalebar, let scaleDisplay = currentScaleDisplay else {
+            return 0
         }
+        return halfLineWidth + scaleDisplay.lineDisplayLength + halfLineWidth + scalebar.maxRightUnitsPad + shadowOffset.x
     }
     
     // can change this if you want to see quarter graduation
     private let showQuarters = false
     
-    func availableLineDisplayLength(totalDisplayWidth: CGFloat) -> CGFloat{
+    func availableLineDisplayLength(totalDisplayWidth: CGFloat) -> CGFloat {
         guard let scalebar = scalebar else { return 0 }
         return totalDisplayWidth - halfLineWidth - scalebar.maxRightUnitsPad
     }
     
-    func draw(rect: CGRect){
-        
-        guard let scaleDisplay = currentScaleDisplay else{
+    // swiftlint:disable cyclomatic_complexity
+    func draw(rect: CGRect) {
+        guard let scaleDisplay = currentScaleDisplay else {
             return
         }
         
-        guard let scalebar = self.scalebar else{
+        guard let scalebar = self.scalebar else {
             return
         }
         
-        guard let segmentInfos = calculateSegmentInfos() else{
+        guard let segmentInfos = calculateSegmentInfos() else {
             return
         }
         
-        guard let context = UIGraphicsGetCurrentContext() else{
+        guard let context = UIGraphicsGetCurrentContext() else {
             return
         }
         
@@ -1142,13 +1076,11 @@ internal class ScalebarAlternatingBarStyleRenderer: ScalebarRenderer{
         
         let pathStroke = CGMutablePath()
         
-        
         // set path for bar style
         /*
          =========~~~~~~~~~~
          0      100      200km
          */
-        
         
         let lineTop = y + halfLineWidth
         let lineBottom = lineTop + Scalebar.notchHeight
@@ -1164,8 +1096,8 @@ internal class ScalebarAlternatingBarStyleRenderer: ScalebarRenderer{
         pathStroke.closeSubpath()
         
         // add all segment ticks
-        for si in segmentInfos{
-            if si.index == segmentInfos.last?.index{
+        for si in segmentInfos {
+            if si.index == segmentInfos.last?.index {
                 // skip last segment
                 continue
             }
@@ -1181,8 +1113,7 @@ internal class ScalebarAlternatingBarStyleRenderer: ScalebarRenderer{
         
         var lastPathX = lineX
         
-        for si in segmentInfos{
-            
+        for si in segmentInfos {
             let fillPath = (si.index % 2) == 0 ? fillPath2 : fillPath1
             
             let pathX = lineX + si.xOffset
@@ -1196,7 +1127,6 @@ internal class ScalebarAlternatingBarStyleRenderer: ScalebarRenderer{
             lastPathX = pathX
         }
         
-        
         //
         // draw paths
         
@@ -1204,9 +1134,9 @@ internal class ScalebarAlternatingBarStyleRenderer: ScalebarRenderer{
         context.setLineJoin(CGLineJoin.bevel)
         
         // stroke shadow
-        if let shadowColor = scalebar.shadowColor{
+        if let shadowColor = scalebar.shadowColor {
             var t = CGAffineTransform(translationX: shadowOffset.x, y: shadowOffset.y)
-            if let shadowPath = pathStroke.copy(using: &t){
+            if let shadowPath = pathStroke.copy(using: &t) {
                 context.setLineWidth(lineWidth)
                 context.setStrokeColor(shadowColor.cgColor)
                 context.addPath(shadowPath)
@@ -1215,14 +1145,14 @@ internal class ScalebarAlternatingBarStyleRenderer: ScalebarRenderer{
         }
         
         // fill in odd segments
-        if let fillColor = scalebar.fillColor{
+        if let fillColor = scalebar.fillColor {
             context.setFillColor(fillColor.cgColor)
             context.addPath(fillPath1)
             context.drawPath(using: .fill)
         }
         
         // fill in even segments
-        if let alternateFillColor = scalebar.alternateFillColor{
+        if let alternateFillColor = scalebar.alternateFillColor {
             context.setFillColor(alternateFillColor.cgColor)
             context.addPath(fillPath2)
             context.drawPath(using: .fill)
@@ -1243,12 +1173,10 @@ internal class ScalebarAlternatingBarStyleRenderer: ScalebarRenderer{
         // reset the state
         context.restoreGState()
     }
-    
+    // swiftlint:enable cyclomatic_complexity
 }
 
-
-internal class ScalebarDualUnitLineStyleRenderer: ScalebarRenderer{
-    
+internal class ScalebarDualUnitLineStyleRenderer: ScalebarRenderer {
     weak var scalebar: Scalebar?
     
     required init(scalebar: Scalebar) {
@@ -1258,37 +1186,32 @@ internal class ScalebarDualUnitLineStyleRenderer: ScalebarRenderer{
     var currentScaleDisplay: ScaleDisplay?
     
     var displayHeight: CGFloat {
-        get{
-            guard let scalebar = scalebar else { return 0 }
-            return scalebar.fontHeight + Scalebar.labelYPad + Scalebar.tick2Height + Scalebar.tick2Height + Scalebar.labelYPad + scalebar.fontHeight + shadowOffset.y
-        }
+        guard let scalebar = scalebar else { return 0 }
+        return scalebar.fontHeight + Scalebar.labelYPad + Scalebar.tick2Height + Scalebar.tick2Height + Scalebar.labelYPad + scalebar.fontHeight + shadowOffset.y
     }
     
     var currentMaxDisplayWidth: CGFloat {
-        get{
-            guard let scalebar = scalebar, let scaleDisplay = currentScaleDisplay else {
-                return 0
-            }
-            return halfLineWidth + scaleDisplay.lineDisplayLength + halfLineWidth + scalebar.maxRightUnitsPad + shadowOffset.x
+        guard let scalebar = scalebar, let scaleDisplay = currentScaleDisplay else {
+            return 0
         }
+        return halfLineWidth + scaleDisplay.lineDisplayLength + halfLineWidth + scalebar.maxRightUnitsPad + shadowOffset.x
     }
     
-    func availableLineDisplayLength(totalDisplayWidth: CGFloat) -> CGFloat{
+    func availableLineDisplayLength(totalDisplayWidth: CGFloat) -> CGFloat {
         guard let scalebar = scalebar else { return 0 }
         return totalDisplayWidth - halfLineWidth - scalebar.maxRightUnitsPad
     }
     
-    func draw(rect: CGRect){
-        
-        guard let scaleDisplay = currentScaleDisplay else{
+    func draw(rect: CGRect) {
+        guard let scaleDisplay = currentScaleDisplay else {
             return
         }
         
-        guard let scalebar = self.scalebar else{
+        guard let scalebar = self.scalebar else {
             return
         }
         
-        guard let context = UIGraphicsGetCurrentContext() else{
+        guard let context = UIGraphicsGetCurrentContext() else {
             return
         }
         
@@ -1319,7 +1242,7 @@ internal class ScalebarDualUnitLineStyleRenderer: ScalebarRenderer{
         // top unit line
         path.move(to: CGPoint(x: lineX, y: lineTop))
         path.addLine(to: CGPoint(x: lineX, y: lineBottom))
-        path.move(to: CGPoint(x: lineX, y:lineY))
+        path.move(to: CGPoint(x: lineX, y: lineY))
         path.addLine(to: CGPoint(x: lineX + lineScreenLength, y: lineY))
         path.addLine(to: CGPoint(x: lineX + lineScreenLength, y: lineTop))
         
@@ -1343,9 +1266,9 @@ internal class ScalebarDualUnitLineStyleRenderer: ScalebarRenderer{
         context.setLineCap(Scalebar.lineCap)
         context.setLineJoin(CGLineJoin.bevel)
         
-        if let shadowColor = scalebar.shadowColor{
+        if let shadowColor = scalebar.shadowColor {
             var t = CGAffineTransform(translationX: shadowOffset.x, y: shadowOffset.y)
-            if let shadowPath = path.copy(using: &t){
+            if let shadowPath = path.copy(using: &t) {
                 context.setLineWidth(lineWidth)
                 context.setStrokeColor(shadowColor.cgColor)
                 context.addPath(shadowPath)
@@ -1376,8 +1299,7 @@ internal class ScalebarDualUnitLineStyleRenderer: ScalebarRenderer{
         self.drawText(text: topText, frame: topTextFrame, alignment: .right)
         
         // draw bottom text
-        if let numberString = Scalebar.numberFormatter.string(from: NSNumber(value: otherLineMapLength)){
-            
+        if let numberString = Scalebar.numberFormatter.string(from: NSNumber(value: otherLineMapLength)) {
             let bottomUnitsText = " \(otherDisplayUnits.abbreviation)"
             let bottomUnitsTextWidth = bottomUnitsText.size(withAttributes: [.font: scalebar.font]).width
             
@@ -1397,9 +1319,3 @@ internal class ScalebarDualUnitLineStyleRenderer: ScalebarRenderer{
         context.restoreGState()
     }
 }
-
-
-
-
-
-

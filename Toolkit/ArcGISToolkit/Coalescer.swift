@@ -12,7 +12,6 @@
 // limitations under the License.
 
 internal class Coalescer {
-    
     // Class to coalesce actions into intervals.
     // This is helpful for the Scalebar because we get updates to the visibleArea up to 60hz and we
     // don't need to redraw the Scalebar that often
@@ -21,7 +20,7 @@ internal class Coalescer {
     var interval: DispatchTimeInterval
     var action: (() -> Void)
     
-    init (dispatchQueue: DispatchQueue, interval: DispatchTimeInterval, action: @escaping (()->Void)){
+    init (dispatchQueue: DispatchQueue, interval: DispatchTimeInterval, action: @escaping (() -> Void)) {
         self.dispatchQueue = dispatchQueue
         self.interval = interval
         self.action = action
@@ -29,11 +28,10 @@ internal class Coalescer {
     
     private var count = 0
     
-    func ping(){
-        
+    func ping() {
         // synchronize to a serial queue, in this case main thread
-        if !Thread.isMainThread{
-            DispatchQueue.main.async{ self.ping() }
+        if !Thread.isMainThread {
+            DispatchQueue.main.async { self.ping() }
             return
         }
         
@@ -41,9 +39,8 @@ internal class Coalescer {
         count += 1
         
         // the first time the count is incremented, it dispatches the action
-        if count == 1{
-            dispatchQueue.asyncAfter(deadline: DispatchTime.now() + interval){
-                
+        if count == 1 {
+            dispatchQueue.asyncAfter(deadline: DispatchTime.now() + interval) {
                 // call the action
                 self.action()
                 
@@ -51,19 +48,14 @@ internal class Coalescer {
                 self.resetCount()
             }
         }
-        
     }
     
-    private func resetCount(){
-        
+    private func resetCount() {
         // synchronize to a serial queue, in this case main thread
-        if !Thread.isMainThread{
-            DispatchQueue.main.async{ self.count = 0 }
-        }
-        else{
+        if !Thread.isMainThread {
+            DispatchQueue.main.async { self.count = 0 }
+        } else {
             self.count = 0
         }
     }
-    
 }
-

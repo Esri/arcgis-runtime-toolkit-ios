@@ -15,7 +15,6 @@ import UIKit
 import ArcGIS
 
 open class MapViewController: UIViewController {
-    
     public let mapView = AGSMapView(frame: CGRect.zero)
     
     override open func viewDidLoad() {
@@ -25,6 +24,4 @@ open class MapViewController: UIViewController {
         mapView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         view.addSubview(mapView)
     }
-    
 }
-

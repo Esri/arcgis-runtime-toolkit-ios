@@ -16,7 +16,6 @@ import ArcGISToolkit
 import ArcGIS
 
 class PopupExample: MapViewController {
-    
     var map: AGSMap?
     
     var popupController: PopupController?
@@ -34,7 +33,7 @@ class PopupExample: MapViewController {
         // We have to load it first to create a default popup definition.
         // If you create the map from a portal item, you can define the popup definition
         // in the webmap and avoid this step.
-        featureLayer.load{ _ in
+        featureLayer.load { _ in
             featureLayer.popupDefinition = AGSPopupDefinition(popupSource: featureLayer)
         }
         
@@ -47,8 +46,8 @@ class PopupExample: MapViewController {
         mapView.map = map
         
         // Log if there is any error loading the map
-        map?.load{ error in
-            if let error = error{
+        map?.load { error in
+            if let error = error {
                 print("error loading map: \(error)")
             }
         }
@@ -56,6 +55,4 @@ class PopupExample: MapViewController {
         // instantiate the popup controller
         popupController = PopupController(geoViewController: self, geoView: mapView)
     }
-    
 }
-
