@@ -173,6 +173,7 @@ class ARExample: UIViewController {
                             self.arView.sceneView.isAttributionTextVisible = false
                             self.addCalibrationView()
                         }
+            self.calibrationView?.alpha = startCalibrating ? 1.0 : 0.0
         },
                        completion: { (_) in
                         if !startCalibrating {
