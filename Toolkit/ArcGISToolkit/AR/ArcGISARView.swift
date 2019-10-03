@@ -287,13 +287,13 @@ public class ArcGISARView: UIView {
     /// Operations that happen after device tracking has started.
     fileprivate func finalizeStart() {
         DispatchQueue.main.async { [weak self] in
-            guard let strongSelf = self else { return }
+            guard let self = self else { return }
             // Run the ARSession.
-            if strongSelf.isUsingARKit {
-                strongSelf.arSCNView.session.run(strongSelf.arConfiguration, options: .resetTracking)
+            if self.isUsingARKit {
+                self.arSCNView.session.run(self.arConfiguration, options: .resetTracking)
             }
             
-            strongSelf.isTracking = true
+            self.isTracking = true
         }
     }
 
