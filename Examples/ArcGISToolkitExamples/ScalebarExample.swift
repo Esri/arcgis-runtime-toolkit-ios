@@ -16,7 +16,6 @@ import ArcGISToolkit
 import ArcGIS
 
 class ScalebarExample: MapViewController, AGSGeoViewTouchDelegate {
-    
     var map: AGSMap?
     var scalebar: Scalebar?
     
@@ -44,6 +43,4 @@ class ScalebarExample: MapViewController, AGSGeoViewTouchDelegate {
         sb.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: xMargin).isActive = true
         scalebar = sb
     }
-    
 }
-

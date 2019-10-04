@@ -18,7 +18,6 @@ import ArcGIS
 /// Through its use of the `AGSPopupsViewController`, it provides a complete
 /// feature editing and collecting experience.
 public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoViewTouchDelegate {
-    
     private var lastPopupQueries = [AGSCancelable]()
     private var popupsViewController: AGSPopupsViewController?
     private let sketchEditor = AGSSketchEditor()
@@ -42,8 +41,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
     ///   - takeOverTouchDelegate: Whether or not the `PopupController` will take over the `AGSGeoView's` `touchDelegate`.
     ///     If `false` then you must forward calls from the `AGSGeoViewTouchDelegate` to the `PopupController`. Defaults to `true`.
     ///   - showAddFeatureButton: If `true` then a `UIBarButtonItem` will be added to the `navigationItem` as a right-hand button.
-    public init(geoViewController: UIViewController, geoView: AGSGeoView, takeOverTouchDelegate: Bool = true, showAddFeatureButton: Bool = true){
-        
+    public init(geoViewController: UIViewController, geoView: AGSGeoView, takeOverTouchDelegate: Bool = true, showAddFeatureButton: Bool = true) {
         self.geoViewController = geoViewController
         self.geoView = geoView
         self.addNewFeatureButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: nil, action: nil)
@@ -53,33 +51,32 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         self.addNewFeatureButtonItem.target = self
         self.addNewFeatureButtonItem.action = #selector(addNewFeatureTap)
         
-        if showAddFeatureButton{
-            if let items = geoViewController.navigationItem.rightBarButtonItems{
+        if showAddFeatureButton {
+            if let items = geoViewController.navigationItem.rightBarButtonItems {
                 geoViewController.navigationItem.rightBarButtonItems = [self.addNewFeatureButtonItem] + items
-            }
-            else{
+            } else {
                 geoViewController.navigationItem.rightBarButtonItem = self.addNewFeatureButtonItem
             }
         }
         
-        if takeOverTouchDelegate{
+        if takeOverTouchDelegate {
             self.geoView.touchDelegate = self
         }
         
         sketchEditor.isVisible = true
-        if let mapView = geoView as? AGSMapView{
+        if let mapView = geoView as? AGSMapView {
             mapView.sketchEditor = sketchEditor
         }
     }
     
     private var addingNewFeature: Bool = false
     
-    @objc private func addNewFeatureTap(){
-        
+    @objc
+    private func addNewFeatureTap() {
         // if old pvc is being shown still for some reason, dismiss it
         self.cleanupLastPopupsViewController()
         
-        guard let map = (geoView as? AGSMapView)?.map else{
+        guard let map = (geoView as? AGSMapView)?.map else {
             return
         }
         
@@ -91,54 +88,48 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         geoViewController?.present(navigationController, animated: true)
     }
     
-    
-    private func cleanupLastPopupsViewController(){
+    private func cleanupLastPopupsViewController() {
         unselectLastSelectedFeature()
         
         // if old pvc is being shown still for some reason, dismiss it
         if popupsViewController?.view?.window != nil {
-            if popupsViewController == geoViewController?.navigationController?.topViewController{
+            if popupsViewController == geoViewController?.navigationController?.topViewController {
                 geoViewController?.navigationController?.popToViewController(geoViewController!, animated: true)
-            }
-            else if popupsViewController == geoViewController?.presentedViewController{
+            } else if popupsViewController == geoViewController?.presentedViewController {
                 popupsViewController?.dismiss(animated: true)
             }
         }
         
         // cleanup last time
-        lastPopupQueries.forEach{ $0.cancel() }
-        popupsViewController = nil;
+        lastPopupQueries.forEach { $0.cancel() }
+        popupsViewController = nil
         lastPopupQueries.removeAll()
     }
     
     public func geoView(_ geoView: AGSGeoView, didTapAtScreenPoint screenPoint: CGPoint, mapPoint: AGSPoint) {
-        
         self.cleanupLastPopupsViewController()
         
-        guard let mapView = geoView as? AGSMapView , mapView.map != nil else{
+        guard let mapView = geoView as? AGSMapView, mapView.map != nil else {
             return
         }
         
         let c = mapView.identifyLayers(atScreenPoint: screenPoint, tolerance: 10, returnPopupsOnly: true, maximumResultsPerLayer: 12) { [weak self] (identifyResults, error) -> Void in
-            
             if let identifyResults = identifyResults {
-                let popups = identifyResults.flatMap({ $0.allPopups })
+                let popups = identifyResults.flatMap { $0.allPopups }
                 self?.showPopups(popups)
-            }
-            else if let error = error {
+            } else if let error = error {
                 print("error identifying popups \(error)")
             }
         }
         lastPopupQueries.append(c)
     }
     
-    private func showPopups(_ popups: [AGSPopup]){
-        
-        guard !popups.isEmpty else{
+    private func showPopups(_ popups: [AGSPopup]) {
+        guard !popups.isEmpty else {
             return
         }
         
-        if let popupsViewController = self.popupsViewController{
+        if let popupsViewController = self.popupsViewController {
             // If we already have a popupsViewController, then show additional
             popupsViewController.showAdditionalPopups(popups)
             return
@@ -154,7 +145,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         popupsViewController.customDoneButton = nil
         popupsViewController.delegate = self
         
-        if containerStyle == .navigationController{
+        if containerStyle == .navigationController {
             // set a back button for the pvc in the nav controller, showing modally, this is handled for us
             // need to do this so we can clean up (unselect feature, etc) when `back` is tapped
             let doneViewingBbi = UIBarButtonItem(title: "Back", style: .plain, target: self, action: #selector(doneViewingInNavController))
@@ -162,24 +153,22 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
             popupsViewController.navigationItem.leftBarButtonItem = doneViewingBbi
             
             geoViewController?.navigationController?.pushViewController(popupsViewController, animated: true)
-        }
-        else{
+        } else {
             geoViewController?.present(popupsViewController, animated: true)
         }
-        
     }
     
-    @objc private func doneViewingInNavController(){
+    @objc
+    private func doneViewingInNavController() {
         guard let popupsViewController = popupsViewController else {
             return
         }
         popupsViewControllerDidFinishViewingPopups(popupsViewController)
     }
     
-    private func unselectLastSelectedFeature(){
-        
+    private func unselectLastSelectedFeature() {
         guard let feature = lastSelectedFeature,
-            let layer = lastSelectedFeatureLayer else{
+            let layer = lastSelectedFeatureLayer else {
                 return
         }
         
@@ -192,65 +181,56 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
     private var editingGeometry: Bool = false
     
     private func navigateToMapActionForGeometryEditing() {
-        
         editingGeometry = true
         
-        if let geoViewController = geoViewController, let nc = geoViewController.navigationController{
+        if let geoViewController = geoViewController, let nc = geoViewController.navigationController {
             // if there is a navigationController available add button to go back to popups when done editing geometry
             geoViewControllerOriginalRightBarButtonItems = geoViewController.navigationItem.rightBarButtonItems
             let backToPvcButton = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(navigateBackToPopupsFromGeometryEditing))
             geoViewController.navigationItem.rightBarButtonItem = backToPvcButton
             
-            if useNavigationControllerIfAvailable{
+            if useNavigationControllerIfAvailable {
                 nc.popToViewController(geoViewController, animated: true)
-            }
-            else{
+            } else {
                 popupsViewController?.dismiss(animated: true)
             }
-        }
-        else{
+        } else {
             // in this case developer needs to have a button that calls `navigateBackToPopupsFromGeometryEditing`
             popupsViewController?.dismiss(animated: true)
         }
-        
     }
     
-    @objc private func navigateBackToPopupsFromGeometryEditing(){
-        
-        guard let popupsViewController = popupsViewController else{
+    @objc
+    private func navigateBackToPopupsFromGeometryEditing() {
+        guard let popupsViewController = popupsViewController else {
             return
         }
         
         editingGeometry = false
         
-        if let geoViewController = geoViewController, let nc = geoViewController.navigationController{
+        if let geoViewController = geoViewController, let nc = geoViewController.navigationController {
             // if there is a navigationController available reset to original buttons
             geoViewController.navigationItem.rightBarButtonItems = geoViewControllerOriginalRightBarButtonItems
             geoViewControllerOriginalRightBarButtonItems = nil
             
-            if useNavigationControllerIfAvailable{
+            if useNavigationControllerIfAvailable {
                 nc.pushViewController(popupsViewController, animated: true)
-            }
-            else{
+            } else {
                 geoViewController.present(popupsViewController, animated: true)
             }
-        }
-        else{
+        } else {
             geoViewController?.present(popupsViewController, animated: true)
         }
     }
     
     public func popupsViewController(_ popupsViewController: AGSPopupsViewController, sketchEditorFor popup: AGSPopup) -> AGSSketchEditor? {
-        
         // give the popupsViewController the sketchEditor
         
-        if let g = popup.geoElement.geometry{
+        if let g = popup.geoElement.geometry {
             self.sketchEditor.start(with: g)
-        }
-        else if let f = popup.geoElement as? AGSFeature, let ft = f.featureTable as? AGSArcGISFeatureTable{
+        } else if let f = popup.geoElement as? AGSFeature, let ft = f.featureTable as? AGSArcGISFeatureTable {
             self.sketchEditor.start(with: ft.geometryType)
-        }
-        else{
+        } else {
             self.sketchEditor.start(with: AGSSketchCreationMode.polygon)
         }
         
@@ -263,10 +243,9 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
     }
     
     public func popupsViewController(_ popupsViewController: AGSPopupsViewController, didChangeToCurrentPopup popup: AGSPopup) {
-        
         guard let f = popup.geoElement as? AGSArcGISFeature,
             let ft = f.featureTable as? AGSServiceFeatureTable,
-            let fl = ft.featureLayer else{
+            let fl = ft.featureLayer else {
                 return
         }
         
@@ -278,30 +257,25 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
     }
     
     public func popupsViewController(_ popupsViewController: AGSPopupsViewController, didFinishEditingFor popup: AGSPopup) {
-        
         // geometry editing has ended
         self.sketchEditor.stop()
         
         // apply edits for service feature table
-        if let f = popup.geoElement as? AGSArcGISFeature, let ft = f.featureTable as? AGSServiceFeatureTable{
+        if let f = popup.geoElement as? AGSArcGISFeature, let ft = f.featureTable as? AGSServiceFeatureTable {
             ft.applyEdits { (results, error) in
-                
-                if let error = error{
+                if let error = error {
                     // In this case it is a service level error
                     print("error applying edits: \(error)")
                 }
                 
-                if let results = results{
-                    
-                    let editErrors = results.flatMap({ self.checkFeatureEditResult($0) })
-                    if editErrors.isEmpty{
+                if let results = results {
+                    let editErrors = results.flatMap { self.checkFeatureEditResult($0) }
+                    if editErrors.isEmpty {
                         print("applied all edits successfully")
-                    }
-                    else{
+                    } else {
                         // These would be feature level edit errors
                         print("apply edits failed: \(editErrors)")
                     }
-                    
                 }
             }
         }
@@ -311,12 +285,12 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
     }
     
     /// This pulls out any nested errors from a feature edit result
-    private func checkFeatureEditResult(_ featureEditResult: AGSFeatureEditResult) -> [Error]{
+    private func checkFeatureEditResult(_ featureEditResult: AGSFeatureEditResult) -> [Error] {
         var errors = [Error]()
-        if let error = featureEditResult.error{
+        if let error = featureEditResult.error {
             errors.append(error)
         }
-        errors.append(contentsOf: featureEditResult.attachmentResults.compactMap({ $0.error }))
+        errors.append(contentsOf: featureEditResult.attachmentResults.compactMap { $0.error })
         return errors
     }
     
@@ -324,7 +298,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
         // geometry editing has ended
         self.sketchEditor.stop()
         
-        if addingNewFeature{
+        if addingNewFeature {
             // if was adding new feature, then hide the popup, don't show viewing mode
             self.cleanupLastPopupsViewController()
         }
@@ -336,19 +310,16 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
     public func popupsViewControllerDidFinishViewingPopups(_ popupsViewController: AGSPopupsViewController) {
         self.cleanupLastPopupsViewController()
     }
-    
 }
 
 extension PopupController: TemplatePickerViewControllerDelegate {
-    
     public func templatePickerViewControllerDidCancel(_ templatePickerViewController: TemplatePickerViewController) {
         templatePickerViewController.dismiss(animated: true)
     }
     
-    public func templatePickerViewController(_ templatePickerViewController: TemplatePickerViewController, didSelect featureTemplateInfo: FeatureTemplateInfo){
-        templatePickerViewController.dismiss(animated: true){
-            
-            guard let feature = featureTemplateInfo.featureTable.createFeature(with: featureTemplateInfo.featureTemplate) else{
+    public func templatePickerViewController(_ templatePickerViewController: TemplatePickerViewController, didSelect featureTemplateInfo: FeatureTemplateInfo) {
+        templatePickerViewController.dismiss(animated: true) {
+            guard let feature = featureTemplateInfo.featureTable.createFeature(with: featureTemplateInfo.featureTemplate) else {
                 return
             }
             

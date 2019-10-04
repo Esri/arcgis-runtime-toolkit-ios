@@ -16,7 +16,6 @@ import ArcGISToolkit
 import ArcGIS
 
 class TemplatePickerExample: MapViewController {
-    
     var map: AGSMap?
     
     override func viewDidLoad() {
@@ -33,7 +32,7 @@ class TemplatePickerExample: MapViewController {
         // We have to load it first to create a default popup definition.
         // If you create the map from a portal item, you can define the popup definition
         // in the webmap and avoid this step.
-        featureLayer.load{ _ in
+        featureLayer.load { _ in
             featureLayer.popupDefinition = AGSPopupDefinition(popupSource: featureLayer)
         }
         
@@ -41,8 +40,8 @@ class TemplatePickerExample: MapViewController {
         mapView.map = map
         
         // Log if there is any error loading the map
-        map?.load{ error in
-            if let error = error{
+        map?.load { error in
+            if let error = error {
                 print("error loading map: \(error)")
             }
         }
@@ -52,8 +51,8 @@ class TemplatePickerExample: MapViewController {
         navigationItem.rightBarButtonItem = bbi
     }
     
-    @objc private func showTemplates(){
-        
+    @objc
+    private func showTemplates() {
         guard let map = map else { return }
         
         // Instantiate the TemplatePickerViewController
@@ -65,13 +64,10 @@ class TemplatePickerExample: MapViewController {
         // Present the template picker
         self.navigationController?.pushViewController(templatePicker, animated: true)
     }
-    
 }
 
 extension TemplatePickerExample: TemplatePickerViewControllerDelegate {
-    
     public func templatePickerViewControllerDidCancel(_ templatePickerViewController: TemplatePickerViewController) {
-        
         // This is where you handle the user canceling the template picker
         
         // dismiss the template picker
@@ -85,7 +81,6 @@ extension TemplatePickerExample: TemplatePickerViewControllerDelegate {
     }
     
     public func templatePickerViewController(_ templatePickerViewController: TemplatePickerViewController, didSelect featureTemplateInfo: FeatureTemplateInfo) {
-        
         // This is where you handle the user making a selection with the template picker
         
         // dismiss the template picker
@@ -98,6 +93,3 @@ extension TemplatePickerExample: TemplatePickerViewControllerDelegate {
         present(alert, animated: true)
     }
 }
-
-
-

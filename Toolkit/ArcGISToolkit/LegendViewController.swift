@@ -15,24 +15,21 @@ import UIKit
 import ArcGIS
 
 public class LegendViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-    
-    public var geoView: AGSGeoView?{
-        didSet
-        {
+    public var geoView: AGSGeoView? {
+        didSet {
             if geoView != nil {
                 if let mapView = geoView as? AGSMapView {
-                    mapView.map?.load(completion: { [weak self] (error) in
+                    mapView.map?.load { [weak self] (_) in
                         if let basemap = mapView.map?.basemap {
-                            basemap.load(completion: { (error) in
+                            basemap.load { (_) in
                                 self?.updateLayerData()
-                            })
+                            }
                         }
-                    })
-                }
-                else if let sceneView = geoView as? AGSSceneView {
-                    sceneView.scene?.load(completion: {[weak self] (error) in
+                    }
+                } else if let sceneView = geoView as? AGSSceneView {
+                    sceneView.scene?.load(completion: {[weak self] (_) in
                         if let basemap = sceneView.scene?.basemap {
-                            basemap.load(completion: { (error) in
+                            basemap.load(completion: { (_) in
                                 self?.updateLayerData()
                             })
                         }
@@ -42,7 +39,7 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
                 //set layerViewStateChangedHandler
                 if let geoView = geoView {
                     geoView.layerViewStateChangedHandler = { [weak self] (layer: AGSLayer, layerViewState: AGSLayerViewState) in
-                        DispatchQueue.main.async{
+                        DispatchQueue.main.async {
                             self?.updateLegendArray()
                         }
                     }
@@ -52,14 +49,12 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
     }
     
     public var respectScaleRange: Bool = true {
-        didSet
-        {
+        didSet {
             updateLayerData()
         }
     }
     public var reverseLayerOrder: Bool = false {
-        didSet
-        {
+        didSet {
             updateLayerData()
         }
     }
@@ -68,10 +63,10 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
     @IBOutlet private var tableView: UITableView?
     
     // dictionary of legend infos; keys are AGSLayerContent objectIdentifier values
-    private var legendInfos = [UInt:[AGSLegendInfo]]()
+    private var legendInfos = [UInt: [AGSLegendInfo]]()
     
     // dictionary of symbol swatches (images); keys are the symbol used to create the swatch
-    private var symbolSwatches = [AGSSymbol:UIImage]()
+    private var symbolSwatches = [AGSSymbol: UIImage]()
     
     // the array of all layers in the map, including basemap layers
     private var layerArray = [AGSLayer]()
@@ -93,14 +88,14 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
         fatalError("use the method `makeLegendViewController` instead")
     }
     
-    required public init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
     
     // use this static method to instantiate the view controller from our storyboard
-    static public func makeLegendViewController(geoView: AGSGeoView? = nil) -> LegendViewController? {
+    public static func makeLegendViewController(geoView: AGSGeoView? = nil) -> LegendViewController? {
         // get the bundle and then the storyboard
-        let bundle = Bundle.init(for: LegendViewController.self)
+        let bundle = Bundle(for: LegendViewController.self)
         let storyboard = UIStoryboard(name: "Legend", bundle: bundle)
         
         // create the legend VC from the storyboard
@@ -124,21 +119,19 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
         var cell: UITableViewCell!
         
         // configure the cell...
-        let rowItem:AnyObject = legendArray[indexPath.row]
+        let rowItem: AnyObject = legendArray[indexPath.row]
         if let layer = rowItem as? AGSLayer {
             // item is a layer
             cell = tableView.dequeueReusableCell(withIdentifier: LegendViewController.layerTitleCellID)!
             let textLabel = cell.viewWithTag(LegendViewController.labelTag) as? UILabel
             textLabel?.text = layer.name
-        }
-        else if let layerContent = rowItem as? AGSLayerContent {
+        } else if let layerContent = rowItem as? AGSLayerContent {
             // item is not a layer, but still implements AGSLayerContent
             // so it's a sublayer
             cell = tableView.dequeueReusableCell(withIdentifier: LegendViewController.sublayerTitleCellID)!
             let textLabel = cell.viewWithTag(LegendViewController.labelTag) as? UILabel
             textLabel?.text = layerContent.name
-        }
-        else if let legendInfo = rowItem as? AGSLegendInfo {
+        } else if let legendInfo = rowItem as? AGSLegendInfo {
             // item is a legendInfo
             cell = tableView.dequeueReusableCell(withIdentifier: LegendViewController.legendInfoCellID)!
             let textLabel = cell.viewWithTag(LegendViewController.labelTag) as? UILabel
@@ -152,18 +145,17 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
                     // we have a swatch, so set it into the imageView and stop the activity indicator
                     imageview?.image = swatch
                     activityIndicator.stopAnimating()
-                }
-                else {
+                } else {
                     // tag the cell so we know what index path it's being used for
                     cell.tag = indexPath.hashValue
 
                     // we don't have a swatch for the given symbol, start the activity indicator
                     // and create the swatch
                     activityIndicator.startAnimating()
-                    symbol.createSwatch(completion: { [weak self] (image, error) -> Void in
+                    symbol.createSwatch(completion: { [weak self] (image, _) -> Void in
                         // make sure this is the cell we still care about and that it
                         // wasn't already recycled by the time we get the swatch
-                        if cell.tag != indexPath.hashValue{
+                        if cell.tag != indexPath.hashValue {
                             return
                         }
 
@@ -182,7 +174,6 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
     
     // update the legend data for all layers and sublayers
     private func updateLayerData() {
-        
         // remove all saved data
         legendInfos.removeAll()
         symbolSwatches.removeAll()
@@ -196,7 +187,7 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
     private func populateLayerArray() {
         layerArray.removeAll()
         
-        var basemap:AGSBasemap?
+        var basemap: AGSBasemap?
         
         // Because the layers in the map's operationalLayers property
         // are drawn from the bottom up (the first layer in the array is
@@ -208,8 +199,7 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
             if let layers = mapView.map?.operationalLayers as AnyObject as? [AGSLayer] {
                 reversedLayerArray.append(contentsOf: layers)
             }
-        }
-        else if let sceneView = geoView as? AGSSceneView {
+        } else if let sceneView = geoView as? AGSSceneView {
             basemap = sceneView.scene?.basemap
             if let layers = sceneView.scene?.operationalLayers as AnyObject as? [AGSLayer] {
                 reversedLayerArray.append(contentsOf: layers)
@@ -236,10 +226,9 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
         
         // This is "!reverseLayerOrder" because the layers are by default reversed
         // and will only NOT be reversed here if reverseLayerOrder == true.
-        if !reverseLayerOrder && reversedLayerArray.count > 0 {
+        if !reverseLayerOrder && !reversedLayerArray.isEmpty {
             layerArray.append(contentsOf: reversedLayerArray.reversed())
-        }
-        else {
+        } else {
             // we are reversing the order, so just use the original reversedLayerArray
             layerArray.append(contentsOf: reversedLayerArray)
         }
@@ -257,11 +246,10 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
     private func loadIndividualLayer(_ layerContent: AGSLayerContent) {
         if let layer = layerContent as? AGSLayer {
             // we have an AGSLayer, so make sure it's loaded
-            layer.load { [weak self] (error) in
+            layer.load { [weak self] (_) in
                 self?.loadSublayersOrLegendInfos(layerContent)
             }
-        }
-        else {
+        } else {
             self.loadSublayersOrLegendInfos(layerContent)
         }
     }
@@ -271,22 +259,21 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
         // the AGSLayer is loaded for this layer/sublayer, so
         // set the contents changed handler.
         layerContent.subLayerContentsChangedHandler = { [weak self] () in
-            DispatchQueue.main.async{
+            DispatchQueue.main.async {
                 self?.updateLegendArray()
             }
         }
 
         // if we have sublayer contents, load those as well
-        if layerContent.subLayerContents.count > 0 {
+        if !layerContent.subLayerContents.isEmpty {
             layerContent.subLayerContents.forEach { self.loadIndividualLayer($0) }
-        }
-        else {
+        } else {
             // fetch the legend infos
-            layerContent.fetchLegendInfos(completion: { [weak self] (legendInfos, error) in
+            layerContent.fetchLegendInfos { [weak self] (legendInfos, _) in
                 //handle legendInfos
                 self?.legendInfos[LegendViewController.objectIdentifierFor(layerContent)] = legendInfos
                 self?.updateLegendArray()
-            })
+            }
         }
     }
     
@@ -295,7 +282,6 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
     // items once layers load.  Updating everything here will make
     // implementing the table view data source methods much easier.
     private func updateLegendArray() {
-
         legendArray.removeAll()
         
         // filter any layers which are not visible or not showInLegend
@@ -320,8 +306,7 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
                     if featureCollectionLayer.layers.count > 1 {
                         legendArray.append(layerContent)
                     }
-                }
-                else {
+                } else {
                     legendArray.append(layerContent)
                 }
                 updateLayerLegend(layerContent)
@@ -334,17 +319,16 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
     // Handle subLayerContents and legend infos; this method assumes that
     // the incoming layerContent argument is visible and showInLegend == true.
     private func updateLayerLegend(_ layerContent: AGSLayerContent) {
-        if layerContent.subLayerContents.count > 0 {
+        if !layerContent.subLayerContents.isEmpty {
             // filter any sublayers which are not visible or not showInLegend
             let sublayerContents = layerContent.subLayerContents.filter { $0.isVisible && $0.showInLegend }
-            sublayerContents.forEach({ (layerContent) in
+            sublayerContents.forEach { (layerContent) in
                 legendArray.append(layerContent)
                 updateLayerLegend(layerContent)
-            })
-        }
-        else {
-            if let internalLegendInfos:[AGSLegendInfo] = legendInfos[LegendViewController.objectIdentifierFor(layerContent as AnyObject)] {
-                legendArray = legendArray + internalLegendInfos
+            }
+        } else {
+            if let internalLegendInfos: [AGSLegendInfo] = legendInfos[LegendViewController.objectIdentifierFor(layerContent as AnyObject)] {
+                legendArray += internalLegendInfos
             }
         }
     }

@@ -14,7 +14,6 @@
 import UIKit
 
 open class TableViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
-    
     public var cellReuseIdentifier = "cell"
     public var tableView = UITableView(frame: .zero)
     
@@ -29,7 +28,7 @@ open class TableViewController: UIViewController, UITableViewDataSource, UITable
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.topAnchor.constraint(equalTo: view.topAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-            ])
+        ])
         
         tableView.delegate = self
         tableView.dataSource = self
@@ -44,13 +43,12 @@ open class TableViewController: UIViewController, UITableViewDataSource, UITable
         return UITableViewCell()
     }
     
-    public func goBack(_ completion: (()->Void)? ){
-        if let nc = navigationController{
+    public func goBack(_ completion: (() -> Void)? ) {
+        if let nc = navigationController {
             nc.popViewController(animated: true)
             completion?()
-        }
-        else{
-            self.dismiss(animated: true){
+        } else {
+            self.dismiss(animated: true) {
                 completion?()
             }
         }

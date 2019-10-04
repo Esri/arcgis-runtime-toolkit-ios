@@ -16,9 +16,7 @@ import ArcGISToolkit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
     var window: UIWindow?
-
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         // Override point for customization after application launch.
@@ -50,9 +48,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // Here is where we forward background fetch to the JobManager
     // so that jobs can be updated in the background
     func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        
         JobManager.shared.application(application: application, performFetchWithCompletionHandler: completionHandler)
     }
-
 }
-

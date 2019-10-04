@@ -12,9 +12,10 @@ Toolkit components that will simplify your iOS app development with ArcGIS Runti
 * [TimeSlider](Documentation/TimeSlider)
 * [PopupController](Documentation/PopupController)
 * [TemplatePickerViewController](Documentation/TemplatePicker)
+* [AR](Documentation/AR)
 
 ## Requirements
-* [ArcGIS Runtime SDK for iOS](https://developers.arcgis.com/en/ios/) 100.5.0 (or higher)
+* [ArcGIS Runtime SDK for iOS](https://developers.arcgis.com/en/ios/) 100.6.0 (or higher)
 * Xcode 10.1 (or higher)
 
 The *ArcGIS Runtime Toolkit for iOS* has a *Target SDK* version of *11.0*, meaning that it can run on devices with *iOS 11.0* or newer.
@@ -28,6 +29,21 @@ The *ArcGIS Runtime Toolkit for iOS* has a *Target SDK* version of *11.0*, meani
 
  New to cocoapods? Visit [cocoapods.org](https://cocoapods.org/)
 
+### Carthage
+
+[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
+
+Carthage is a decentralized dependency manager that builds your dependencies and provides you with binary frameworks.
+
+ 1. Add `github "esri/arcgis-runtime-toolkit-ios"` to your Cartfile
+ 2. Run `carthage update`
+ 3. Drag the `ArcGISToolkit.framework ` from the `Carthage/Build ` folder to the "TARGETS" settings for your application and drop it in the "Embedded Binaries" section in the "General" tab
+ 4. Add `import ArcGISToolkit` in your source code and start using the toolkit components 
+
+New to Carthage? Visit the Carthage [GitHub](https://github.com/Carthage/Carthage) page.
+
+Note that you must also have the __ArcGIS Runtime SDK for iOS__ installed and your project set up as per the instructions [here](https://developers.arcgis.com/ios/latest/swift/guide/install.htm#ESRI_SECTION1_D57435A2BEBC4D29AFA3A4CAA722506A).
+
 ### Manual
  1. Ensure you have downloaded and installed __ArcGIS Runtime SDK for iOS__ as described [here](https://developers.arcgis.com/ios/latest/swift/guide/install.htm#ESRI_SECTION1_D57435A2BEBC4D29AFA3A4CAA722506A)
  2. Clone or download this repo. 
@@ -35,6 +51,8 @@ The *ArcGIS Runtime Toolkit for iOS* has a *Target SDK* version of *11.0*, meani
  4. Drag the `ArcGISToolkit.framework` from the `ArcGISToolkit.xcodeproj/ArcGISToolkit/Products` folder to the "TARGETS" settings for your application and drop it in the "Embedded Binaries" section in the "General" tab
  5. Add `import ArcGISToolkit` in your source code and start using the toolkit components 
 
+## SwiftLint
+New in the 100.6.0 release is SwiftLint support for both the Toolkit and Examples app.  You can install SwiftLint from [here](https://github.com/realm/SwiftLint).  It is not necessary to have it installed in order to build, but you will get a warning without it.  The specific rules the linter uses can be found in the `swiftlint.yml` files in the `Toolkit` and `Examples` directories.
 
 
 ## Additional Resources
@@ -51,7 +69,7 @@ Find a bug or want to request a new feature?  Please let us know by submitting a
 Esri welcomes contributions from anyone and everyone. Please see our [guidelines for contributing](https://github.com/esri/contributing).
 
 ## Licensing
-Copyright 2017 Esri
+Copyright 2017 - 2019 Esri
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
