@@ -13,6 +13,7 @@ Toolkit components that will simplify your iOS app development with ArcGIS Runti
 * [PopupController](Documentation/PopupController)
 * [TemplatePickerViewController](Documentation/TemplatePicker)
 * [AR](Documentation/AR)
+* [Bookmarks](Documentation/Bookmarks)
 
 ## Requirements
 * [ArcGIS Runtime SDK for iOS](https://developers.arcgis.com/en/ios/) 100.6.0 (or higher)
