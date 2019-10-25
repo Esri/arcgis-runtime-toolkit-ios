@@ -2,7 +2,7 @@
 
 The Bookmarks component will display a list of bookmarks in a table view and allows the user to select a bookmark and perform some action. 
 
-### Bookmarks Behavior:
+## Bookmarks Behavior:
 
 The `BookmarksTableViewController` can be created using either an `AGSGeoView` or an array of `AGSBookmark`s.
 
@@ -10,7 +10,7 @@ When created using an `AGSGeoView`, selecting a bookmark from the list will pan/
 
 When created using an array of `AGSBookmarks`, there is no default `selectAction` and the user must provide their own.
 
-### Usage
+## Usage
 
 ```swift
 let bookmarksVC = BookmarksTableViewController.makeBookmarksTableViewController(geoView: mapView)
@@ -30,7 +30,3 @@ present(bookmarksVC, animated: true, completion: nil)
 ```
 
 To see it in action, try out the [Examples](../../Examples) and refer to [BookmarksExample.swift](../../Examples/ArcGISToolkitExamples/BookmarksExample.swift) in the project.
-
-
-
-
