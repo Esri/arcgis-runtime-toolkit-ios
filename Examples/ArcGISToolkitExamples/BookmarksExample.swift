@@ -53,8 +53,8 @@ class BookmarksExample: MapViewController {
             bookmarksVC.modalPresentationStyle = .popover
             bookmarksVC.popoverPresentationController?.barButtonItem = bookmarksButton
             
-            // Present the BookmarksTableViewController.
-            present(bookmarksVC, animated: true, completion: nil)
+            // Push the BookmarksTableViewController onto the navigation controller stack.
+            navigationController?.pushViewController(bookmarksVC, animated: true)
         }
     }
 }

@@ -124,6 +124,12 @@ public class BookmarksTableViewController: UITableViewController {
         }
 
         tableView.deselectRow(at: indexPath, animated: true)
-        dismiss(animated: true)
+        
+        // If we have a navigation controller, pop us off the stack; otherwise just dismiss.
+        if let navigationController = navigationController {
+            navigationController.popViewController(animated: true)
+        } else {
+            dismiss(animated: true)
+        }
     }
 }
