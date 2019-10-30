@@ -17,21 +17,20 @@ import ArcGISToolkit
 import ArcGIS
 
 class BookmarksExample: MapViewController {
-    let portal = AGSPortal.arcGISOnline(withLoginRequired: false)
-    var portalItem: AGSPortalItem?
     var bookmarksVC: BookmarksTableViewController?
     var bookmarksButton = UIBarButtonItem()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         // Add Bookmark button that will display the BookmarksTableViewController.
         bookmarksButton = UIBarButtonItem(barButtonSystemItem: .bookmarks, target: self, action: #selector(showBookmarks))
         navigationItem.rightBarButtonItem = bookmarksButton
 
         // Create the map from a portal item and assign to the mapView.
-        portalItem = AGSPortalItem(portal: portal, itemID: "4e4a4c5753f5401d85d42eb50b12243c")
-        mapView.map = AGSMap(item: portalItem!)
+        let portal = AGSPortal.arcGISOnline(withLoginRequired: false)
+        let portalItem = AGSPortalItem(portal: portal, itemID: "4e4a4c5753f5401d85d42eb50b12243c")
+        mapView.map = AGSMap(item: portalItem)
         
         // Create the BookmarksTableViewController.
         bookmarksVC = BookmarksTableViewController.makeBookmarksTableViewController(geoView: mapView)
@@ -42,16 +41,14 @@ class BookmarksExample: MapViewController {
         if let bookmarksVC = self.bookmarksVC {
             // If bookmarksVC.selectAction is not set, the default behavior when a user clicks a new bookmark is to
             // call `mapView.setViewpoint(viewpoint)`.  This will pan/zoom the map immediately to the viewpoint.
-            // Here we're setting a custom `selectAction` that will perform the pan/zoom with a duration (i.e. animation).
-            bookmarksVC.selectAction  = { [weak self] (bookmark: AGSBookmark) in
+            // Here we're setting a custom `bookmarkSelectedHandler` that will perform the pan/zoom with a duration (i.e. animation)
+            // and then pop the bookmarksVC off the navigation controller stack.
+            bookmarksVC.bookmarkSelectedHandler  = { [weak self] (bookmark: AGSBookmark) in
                 if let viewpoint = bookmark.viewpoint {
                     self?.mapView.setViewpoint(viewpoint, duration: 2.0)
+                    self?.navigationController?.popViewController(animated: true)
                 }
             }
-
-            // Set the bookmarksVC to display as a popover.
-            bookmarksVC.modalPresentationStyle = .popover
-            bookmarksVC.popoverPresentationController?.barButtonItem = bookmarksButton
             
             // Push the BookmarksTableViewController onto the navigation controller stack.
             navigationController?.pushViewController(bookmarksVC, animated: true)

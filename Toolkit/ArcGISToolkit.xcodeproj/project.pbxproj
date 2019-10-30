@@ -115,6 +115,7 @@
 				88B68A731E9D7F6300B67FAB /* Coalescer.swift */,
 				88DBC2A21FE83DB800255921 /* CancelGroup.swift */,
 				883EA74E20741B9C006D6F72 /* TemplatePickerViewController.swift */,
+				E4B22095235633920061EB7F /* BookmarksTableViewController.storyboard */,
 			);
 			name = Misc;
 			sourceTree = "<group>";
@@ -131,7 +132,6 @@
 				88DBC29E1FE83D4400255921 /* JobManager.swift */,
 				883EA74820741A4C006D6F72 /* PopupController.swift */,
 				2140781B209B628200FBFDCC /* TimeSlider.swift */,
-				E4B22095235633920061EB7F /* BookmarksTableViewController.storyboard */,
 				E4B22097235633C00061EB7F /* BookmarksTableViewController.swift */,
 			);
 			name = Components;
