@@ -75,7 +75,7 @@ public class BookmarksTableViewController: UITableViewController {
     }
     
     /// The code block to be executed when the user selects a new bookmark.
-    /// If `nil`, the `geoView.setViewpoint` method will be called with the viewpoint of the selected bookmark.
+    /// If `nil`, the `AGSGeoView.setViewpoint(_:)` method will be called with the viewpoint of the selected bookmark.
     /// If both `bookmarkSelectedHandler` and `geoView` are nil, no action is taken when the user selects a bookmark.
     /// - Since: 100.7.0
     public var bookmarkSelectedHandler: BookmarkSelectedFunction?
