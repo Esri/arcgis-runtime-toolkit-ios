@@ -124,8 +124,6 @@ public class BookmarksTableViewController: UITableViewController {
 
     override public func viewDidLoad() {
         super.viewDidLoad()
-
-        tableView.reloadData()
     }
 
     // MARK: - Table view data source
@@ -148,8 +146,8 @@ public class BookmarksTableViewController: UITableViewController {
     override public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         // If we have a bookmarkSelectedHandler, then call it; otherwise set the geoView's viewpoint if available.
         // The client is responsible for dismissing the bookmarks VC, if desired, when a `bookmarkSelectedHandler` is supplied.
-        if bookmarkSelectedHandler != nil {
-            bookmarkSelectedHandler?(bookmarks[indexPath.row])
+        if let handler = bookmarkSelectedHandler {
+            handler(bookmarks[indexPath.row])
         } else if let geoView = geoView, let viewpoint = bookmarks[indexPath.row].viewpoint {
             // If no `bookmarkSelectedHandler` is supplied, then set the viewpoint on the geoView.
             geoView.setViewpoint(viewpoint)
