@@ -39,7 +39,7 @@ class BookmarksExample: MapViewController {
     @objc
     func showBookmarks() {
         if let bookmarksVC = self.bookmarksVC {
-            // If bookmarksVC.selectAction is not set, the default behavior when a user clicks a new bookmark is to
+            // If bookmarksVC.bookmarkSelectedHandler is not set, the default behavior when a user clicks a new bookmark is to
             // call `mapView.setViewpoint(viewpoint)`.  This will pan/zoom the map immediately to the viewpoint.
             // Here we're setting a custom `bookmarkSelectedHandler` that will perform the pan/zoom with a duration (i.e. animation)
             // and then pop the bookmarksVC off the navigation controller stack.
