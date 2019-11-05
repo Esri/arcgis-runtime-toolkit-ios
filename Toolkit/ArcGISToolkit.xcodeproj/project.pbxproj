@@ -24,10 +24,10 @@
 		88ECCC931DF92F22000C967E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 88ECCC921DF92F22000C967E /* Assets.xcassets */; };
 		E447A1262266629600578C0B /* ArcGISARView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E447A1252266629600578C0B /* ArcGISARView.swift */; };
 		E46893291FEDAE36008ADA79 /* Compass.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46893281FEDAE36008ADA79 /* Compass.swift */; };
+		E46EF2C1236C8A8600A8C50B /* BookmarksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46EF2BF236C8A8600A8C50B /* BookmarksViewController.swift */; };
+		E46EF2C7236CA16800A8C50B /* BookmarksTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46EF2C5236CA16800A8C50B /* BookmarksTableViewController.swift */; };
 		E48405731E9BE7B700927208 /* LegendViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48405721E9BE7B700927208 /* LegendViewController.swift */; };
 		E484057A1E9C262D00927208 /* Legend.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E48405791E9C262D00927208 /* Legend.storyboard */; };
-		E4B22096235633920061EB7F /* BookmarksTableViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E4B22095235633920061EB7F /* BookmarksTableViewController.storyboard */; };
-		E4B22098235633C00061EB7F /* BookmarksTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B22097235633C00061EB7F /* BookmarksTableViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,10 +50,10 @@
 		88ECCC921DF92F22000C967E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ArcGISToolkit/Assets.xcassets; sourceTree = "<group>"; };
 		E447A1252266629600578C0B /* ArcGISARView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArcGISARView.swift; sourceTree = "<group>"; };
 		E46893281FEDAE36008ADA79 /* Compass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compass.swift; sourceTree = "<group>"; };
+		E46EF2BF236C8A8600A8C50B /* BookmarksViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksViewController.swift; sourceTree = "<group>"; };
+		E46EF2C5236CA16800A8C50B /* BookmarksTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksTableViewController.swift; sourceTree = "<group>"; };
 		E48405721E9BE7B700927208 /* LegendViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegendViewController.swift; sourceTree = "<group>"; };
 		E48405791E9C262D00927208 /* Legend.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Legend.storyboard; sourceTree = "<group>"; };
-		E4B22095235633920061EB7F /* BookmarksTableViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = BookmarksTableViewController.storyboard; sourceTree = "<group>"; };
-		E4B22097235633C00061EB7F /* BookmarksTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksTableViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,7 +115,6 @@
 				88B68A731E9D7F6300B67FAB /* Coalescer.swift */,
 				88DBC2A21FE83DB800255921 /* CancelGroup.swift */,
 				883EA74E20741B9C006D6F72 /* TemplatePickerViewController.swift */,
-				E4B22095235633920061EB7F /* BookmarksTableViewController.storyboard */,
 			);
 			name = Misc;
 			sourceTree = "<group>";
@@ -132,7 +131,8 @@
 				88DBC29E1FE83D4400255921 /* JobManager.swift */,
 				883EA74820741A4C006D6F72 /* PopupController.swift */,
 				2140781B209B628200FBFDCC /* TimeSlider.swift */,
-				E4B22097235633C00061EB7F /* BookmarksTableViewController.swift */,
+				E46EF2BF236C8A8600A8C50B /* BookmarksViewController.swift */,
+				E46EF2C5236CA16800A8C50B /* BookmarksTableViewController.swift */,
 			);
 			name = Components;
 			sourceTree = "<group>";
@@ -219,7 +219,6 @@
 			files = (
 				88ECCC931DF92F22000C967E /* Assets.xcassets in Resources */,
 				E484057A1E9C262D00927208 /* Legend.storyboard in Resources */,
-				E4B22096235633920061EB7F /* BookmarksTableViewController.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -252,10 +251,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				88DBC29F1FE83D4400255921 /* JobManager.swift in Sources */,
-				E4B22098235633C00061EB7F /* BookmarksTableViewController.swift in Sources */,
 				88B68A041E96EFD700B67FAB /* Scalebar.swift in Sources */,
 				88B68A081E96EFD700B67FAB /* UnitsViewController.swift in Sources */,
 				E48405731E9BE7B700927208 /* LegendViewController.swift in Sources */,
+				E46EF2C7236CA16800A8C50B /* BookmarksTableViewController.swift in Sources */,
 				E447A1262266629600578C0B /* ArcGISARView.swift in Sources */,
 				883EA74F20741B9C006D6F72 /* TemplatePickerViewController.swift in Sources */,
 				883EA74920741A4C006D6F72 /* PopupController.swift in Sources */,
@@ -266,6 +265,7 @@
 				88B689FD1E96EFD700B67FAB /* Extensions.swift in Sources */,
 				88B68A741E9D7F6300B67FAB /* Coalescer.swift in Sources */,
 				88B68A001E96EFD700B67FAB /* MapViewController.swift in Sources */,
+				E46EF2C1236C8A8600A8C50B /* BookmarksViewController.swift in Sources */,
 				E46893291FEDAE36008ADA79 /* Compass.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

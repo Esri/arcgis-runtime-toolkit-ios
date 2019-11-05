@@ -16,8 +16,8 @@ import UIKit
 import ArcGISToolkit
 import ArcGIS
 
-class BookmarksExample: MapViewController {
-    var bookmarksVC: BookmarksTableViewController?
+class BookmarksExample: MapViewController, BookmarksViewControllerDelegate {
+    var bookmarksVC: BookmarksViewController?
     var bookmarksButton = UIBarButtonItem()
 
     override func viewDidLoad() {
@@ -33,25 +33,23 @@ class BookmarksExample: MapViewController {
         mapView.map = AGSMap(item: portalItem)
         
         // Create the BookmarksTableViewController.
-        bookmarksVC = BookmarksTableViewController.makeBookmarksTableViewController(geoView: mapView)
+        bookmarksVC = BookmarksViewController(geoView: mapView)
+        bookmarksVC?.view.backgroundColor = .white
+        bookmarksVC?.delegate = self
     }
     
     @objc
     func showBookmarks() {
         if let bookmarksVC = self.bookmarksVC {
-            // If bookmarksVC.bookmarkSelectedHandler is not set, the default behavior when a user clicks a new bookmark is to
-            // call `mapView.setViewpoint(viewpoint)`.  This will pan/zoom the map immediately to the viewpoint.
-            // Here we're setting a custom `bookmarkSelectedHandler` that will perform the pan/zoom with a duration (i.e. animation)
-            // and then pop the bookmarksVC off the navigation controller stack.
-            bookmarksVC.bookmarkSelectedHandler  = { [weak self] (bookmark: AGSBookmark) in
-                if let viewpoint = bookmark.viewpoint {
-                    self?.mapView.setViewpoint(viewpoint, duration: 2.0)
-                    self?.navigationController?.popViewController(animated: true)
-                }
-            }
-            
             // Push the BookmarksTableViewController onto the navigation controller stack.
             navigationController?.pushViewController(bookmarksVC, animated: true)
+        }
+    }
+    
+    func bookmarkSelectionDidChange(_ bookmark: AGSBookmark) {
+        if let viewpoint = bookmark.viewpoint {
+            mapView.setViewpoint(viewpoint, duration: 2.0)
+            navigationController?.popViewController(animated: true)
         }
     }
 }
