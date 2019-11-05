@@ -118,16 +118,16 @@ public class BookmarksViewController: UIViewController {
                 if let error = error {
                     print("Error loading map: \(error)")
                 }
-                self?.bookmarks = mapView.map?.bookmarks as? [AGSBookmark] ?? []
+                self?.bookmarks = (self?.geoView as? AGSMapView)?.map?.bookmarks as? [AGSBookmark] ?? []
             }
             
             // Add an observer to handle changes to the map.bookmarks array.
-            bookmarksObservation = mapView.map?.observe(\.bookmarks, options: [.new, .old]) { [weak self] (_, _) in
-                self?.bookmarks = mapView.map?.bookmarks as? [AGSBookmark] ?? []
+            bookmarksObservation = mapView.map?.observe(\.bookmarks) { [weak self] (map, _) in
+                self?.bookmarks = map.bookmarks as? [AGSBookmark] ?? []
             }
             
             // Add an observer to handle changes to the mapView.map.
-            mapOrSceneObservation = mapView.observe(\.map, options: [.new, .old]) { [weak self] (_, _) in
+            mapOrSceneObservation = mapView.observe(\.map) { [weak self] (_, _) in
                 self?.bookmarks = mapView.map?.bookmarks as? [AGSBookmark] ?? []
             }
         } else if let sceneView = geoView as? AGSSceneView {
@@ -135,16 +135,16 @@ public class BookmarksViewController: UIViewController {
                 if let error = error {
                     print("Error loading scene: \(error)")
                 }
-                self?.bookmarks = sceneView.scene?.bookmarks as? [AGSBookmark] ?? []
+                self?.bookmarks = (self?.geoView as? AGSSceneView)?.scene?.bookmarks as? [AGSBookmark] ?? []
             }
             
             // Add an observer to handle changesto the scene.bookmarks array.
-            bookmarksObservation = sceneView.scene?.observe(\.bookmarks, options: [.new, .old]) { [weak self] (_, _) in
-                self?.bookmarks = sceneView.scene?.bookmarks as? [AGSBookmark] ?? []
+            bookmarksObservation = sceneView.scene?.observe(\.bookmarks) { [weak self] (scene, _) in
+                self?.bookmarks = scene.bookmarks as? [AGSBookmark] ?? []
             }
             
             // Add an observer to handle changes to the sceneView.scene.
-            mapOrSceneObservation = sceneView.observe(\.scene, options: [.new, .old]) { [weak self] (_, _) in
+            mapOrSceneObservation = sceneView.observe(\.scene) { [weak self] (_, _) in
                 self?.bookmarks = sceneView.scene?.bookmarks as? [AGSBookmark] ?? []
             }
         }
