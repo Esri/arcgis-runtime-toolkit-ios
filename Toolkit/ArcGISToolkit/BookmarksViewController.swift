@@ -68,7 +68,7 @@ public class BookmarksViewController: UIViewController {
     private lazy var tableViewController = BookmarksTableViewController()
 
     /// Returns a BookmarksViewController which will display the `AGSBookmark`s in the `bookmarks` array.
-    /// - Parameter bookmarks: The array of `AGSBookmark`s to display.
+    /// - Parameter bookmarks: A sequence of `AGSBookmark`s to display.
     /// - Since: 100.7.0
     public init<S: Sequence>(bookmarks: S) where S.Element == AGSBookmark {
         super.init(nibName: nil, bundle: nil)
