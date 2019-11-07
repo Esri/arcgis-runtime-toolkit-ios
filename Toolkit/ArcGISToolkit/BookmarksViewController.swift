@@ -64,6 +64,7 @@ public class BookmarksViewController: UIViewController {
     public init<S: Sequence>(bookmarks: S) where S.Element == AGSBookmark {
         super.init(nibName: nil, bundle: nil)
         self.bookmarks.append(contentsOf: bookmarks)
+        sharedInit()
     }
     
     /// Returns a BookmarksViewController which will display the array of `AGSBookmark` found in the `AGSGeoView`s `AGSMap` or `AGSScene`.
@@ -73,11 +74,16 @@ public class BookmarksViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
         self.geoView = geoView
         geoViewDidChange(nil)
+        sharedInit()
     }
 
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func sharedInit() {
+        title = "Bookmarks"
     }
 
     override public func viewDidLoad() {

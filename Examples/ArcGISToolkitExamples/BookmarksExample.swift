@@ -19,7 +19,7 @@ import ArcGIS
 class BookmarksExample: MapViewController, BookmarksViewControllerDelegate {
     var bookmarksVC: BookmarksViewController?
     var bookmarksButton = UIBarButtonItem()
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -34,18 +34,29 @@ class BookmarksExample: MapViewController, BookmarksViewControllerDelegate {
         
         // Create the BookmarksTableViewController.
         bookmarksVC = BookmarksViewController(geoView: mapView)
-        bookmarksVC?.title = "Bookmarks"
+        
+        // Add a cancel button.
+        let cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+        bookmarksVC?.navigationItem.rightBarButtonItem = cancelButton
         bookmarksVC?.delegate = self
     }
     
     @objc
     func showBookmarks() {
-        if let bookmarksVC = self.bookmarksVC {
-            // Push the BookmarksTableViewController onto the navigation controller stack.
-            present(bookmarksVC, animated: true)
+        if let bookmarksVC = bookmarksVC {
+            // Display the bookmarksVC as a popover controller.
+            let navController = UINavigationController(rootViewController: bookmarksVC)
+            navController.modalPresentationStyle = .popover
+            navController.popoverPresentationController?.barButtonItem = bookmarksButton
+            present(navController, animated: true)
         }
     }
     
+    @objc
+    func cancel() {
+        dismiss(animated: true)
+    }
+
     func bookmarksViewController(_ controller: BookmarksViewController, didSelect bookmark: AGSBookmark) {
         if let viewpoint = bookmark.viewpoint {
             mapView.setViewpoint(viewpoint, duration: 2.0)
