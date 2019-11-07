@@ -26,13 +26,20 @@ class BookmarksTableViewController: UITableViewController {
     }
     
     weak var delegate: BookmarksViewControllerDelegate?
-
+    
     private var cellReuseIdentifier = "cell"
+    
+    // Private property to store selection action for table cell.
+    private var selectAction: ((AGSBookmark) -> Void)?
+    
+    // Executed for tableview row selection.
+    func setSelectAction(_ action : @escaping ((AGSBookmark) -> Void)) {
+        self.selectAction = action
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellReuseIdentifier)
-        tableView.backgroundColor = .clear
     }
 
     // MARK: - Table view data source
@@ -53,7 +60,7 @@ class BookmarksTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        delegate?.bookmarkSelectionDidChange(bookmarks[indexPath.row])
+        selectAction?(bookmarks[indexPath.row])
         tableView.deselectRow(at: indexPath, animated: true)
     }
 }

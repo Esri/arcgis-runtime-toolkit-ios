@@ -29,12 +29,12 @@ class BookmarksExample: MapViewController, BookmarksViewControllerDelegate {
 
         // Create the map from a portal item and assign to the mapView.
         let portal = AGSPortal.arcGISOnline(withLoginRequired: false)
-        let portalItem = AGSPortalItem(portal: portal, itemID: "4e4a4c5753f5401d85d42eb50b12243c")
+        let portalItem = AGSPortalItem(portal: portal, itemID: "16f1b8ba37b44dc3884afc8d5f454dd2")
         mapView.map = AGSMap(item: portalItem)
         
         // Create the BookmarksTableViewController.
         bookmarksVC = BookmarksViewController(geoView: mapView)
-        bookmarksVC?.view.backgroundColor = .white
+        bookmarksVC?.title = "Bookmarks"
         bookmarksVC?.delegate = self
     }
     
@@ -42,14 +42,14 @@ class BookmarksExample: MapViewController, BookmarksViewControllerDelegate {
     func showBookmarks() {
         if let bookmarksVC = self.bookmarksVC {
             // Push the BookmarksTableViewController onto the navigation controller stack.
-            navigationController?.pushViewController(bookmarksVC, animated: true)
+            present(bookmarksVC, animated: true)
         }
     }
     
-    func bookmarkSelectionDidChange(_ bookmark: AGSBookmark) {
+    func bookmarksViewController(_ controller: BookmarksViewController, didSelect bookmark: AGSBookmark) {
         if let viewpoint = bookmark.viewpoint {
             mapView.setViewpoint(viewpoint, duration: 2.0)
-            navigationController?.popViewController(animated: true)
+            dismiss(animated: true)
         }
     }
 }

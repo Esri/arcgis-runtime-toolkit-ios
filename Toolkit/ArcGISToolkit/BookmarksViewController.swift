@@ -15,34 +15,27 @@
 import UIKit
 import ArcGIS
 
-/// The protocol you implement to respond to user bookmark selection.
-/// view controller.
+/// The protocol you implement to respond to user bookmark selections.
 /// - Since: 100.7.0
 public protocol BookmarksViewControllerDelegate: AnyObject {
     /// Tells the delegate that the user has selected a bookmark.
     ///
     /// - Parameters:
+    ///   - controller: The view controller calling the delegate method.
     ///   - bookmark: The new bookmark selected.
     /// - Since: 100.7.0
-    func bookmarkSelectionDidChange(_ bookmark: AGSBookmark)
+    func bookmarksViewController(_ controller: BookmarksViewController, didSelect bookmark: AGSBookmark)
 }
 
 /// The `BookmarksViewController` will display a list of bookmarks in a table view and allows the user to select a bookmark and perform some action.
-/// It can be created using either an `AGSGeoView` or an array of `AGSBookmark`s.  When created using an `AGSGeoView`, selecting a bookmark from the list will
-/// pan/zoom the geoView to the bookmark's viewpoint.  Users can change this default behavior by supplying a custom handler to the `bookmarkSelectedHandler` property.
-/// When created using an array of `AGSBookmarks`, there is no default `bookmarkSelectedHandler` and the user must provide their own.
+/// It can be created using either an `AGSGeoView` or an array of `AGSBookmark`s.
 /// - Since: 100.7.0
 public class BookmarksViewController: UIViewController {
-    public typealias BookmarkSelectedFunction = (AGSBookmark) -> Void
-
     /// The array of `AGSBookmark`s to display.
     /// - Since: 100.7.0
     public var bookmarks = [AGSBookmark]() {
         didSet {
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                self.tableViewController.bookmarks = self.bookmarks
-            }
+            tableViewController.bookmarks = bookmarks
         }
     }
     
@@ -54,9 +47,7 @@ public class BookmarksViewController: UIViewController {
         }
     }
     
-    /// The delegate of the bookmarks view controller.  Clients must supply a delegate if they want to be notified when a bookmark is selected so they can perform some action.
-    /// If no delegate is supplied, the default behavior is to zoom to the bookmark's viewpoint and dismiss the controller.
-    /// If a delegate is supplied, the delegate is responsible for dismissing the controller.
+    /// The delegate of the bookmarks view controller.  Clients must set the `delegate` property and implement the `bookmarksViewController:didSelect` delegate method in order to be notified when a bookmark is selected.
     /// - Since: 100.7.0
     public weak var delegate: BookmarksViewControllerDelegate?
 
@@ -89,11 +80,6 @@ public class BookmarksViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    @available(*, unavailable)
-    override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        fatalError("use the methods `init(bookmarks:)` or `init(geoView:)` instead")
-    }
-
     override public func viewDidLoad() {
         super.viewDidLoad()
         
@@ -109,62 +95,69 @@ public class BookmarksViewController: UIViewController {
         ])
         tableViewController.didMove(toParent: self)
         
-        tableViewController.delegate = self
+        // Set the closure to be executed when the user selects a bookmark.
+        tableViewController.setSelectAction { [weak self] (bookmark: AGSBookmark) in
+            guard let self = self, let delegate = self.delegate else { return }
+            delegate.bookmarksViewController(self, didSelect: bookmark)
+        }
     }
 
     private func geoViewDidChange(_ previousGeoView: AGSGeoView?) {
         if let mapView = geoView as? AGSMapView {
             mapView.map?.load { [weak self] (error) in
+                guard let self = self, let mapView = self.geoView as? AGSMapView else { return }
                 if let error = error {
                     print("Error loading map: \(error)")
+                } else {
+                    self.bookmarks = mapView.map?.bookmarks as? [AGSBookmark] ?? []
                 }
-                self?.bookmarks = (self?.geoView as? AGSMapView)?.map?.bookmarks as? [AGSBookmark] ?? []
             }
             
             // Add an observer to handle changes to the map.bookmarks array.
-            bookmarksObservation = mapView.map?.observe(\.bookmarks) { [weak self] (map, _) in
-                self?.bookmarks = map.bookmarks as? [AGSBookmark] ?? []
-            }
-            
+            addBookmarksObserver(map: mapView.map)
+
             // Add an observer to handle changes to the mapView.map.
             mapOrSceneObservation = mapView.observe(\.map) { [weak self] (_, _) in
                 self?.bookmarks = mapView.map?.bookmarks as? [AGSBookmark] ?? []
+                
+                // When the map changes, we again need to add an observer to handle changes to the map.bookmarks array.
+                self?.addBookmarksObserver(map: mapView.map)
             }
         } else if let sceneView = geoView as? AGSSceneView {
             sceneView.scene?.load { [weak self] (error) in
+                guard let self = self, let sceneView = self.geoView as? AGSSceneView else { return }
                 if let error = error {
-                    print("Error loading scene: \(error)")
+                    print("Error loading map: \(error)")
+                } else {
+                    self.bookmarks = sceneView.scene?.bookmarks as? [AGSBookmark] ?? []
                 }
-                self?.bookmarks = (self?.geoView as? AGSSceneView)?.scene?.bookmarks as? [AGSBookmark] ?? []
             }
             
             // Add an observer to handle changesto the scene.bookmarks array.
-            bookmarksObservation = sceneView.scene?.observe(\.bookmarks) { [weak self] (scene, _) in
-                self?.bookmarks = scene.bookmarks as? [AGSBookmark] ?? []
-            }
+            addBookmarksObserver(scene: sceneView.scene)
             
             // Add an observer to handle changes to the sceneView.scene.
             mapOrSceneObservation = sceneView.observe(\.scene) { [weak self] (_, _) in
                 self?.bookmarks = sceneView.scene?.bookmarks as? [AGSBookmark] ?? []
+                
+                // When the scene changes, we again need to add an observer to handle changes to the scene.bookmarks array.
+                self?.addBookmarksObserver(scene: sceneView.scene)
             }
         }
     }
-}
-
-// MARK: BookmarksViewControllerDelegate
-extension BookmarksViewController: BookmarksViewControllerDelegate {
-    public func bookmarkSelectionDidChange(_ bookmark: AGSBookmark) {
-        if let delegate = delegate {
-            delegate.bookmarkSelectionDidChange(bookmark)
-        } else if let geoView = geoView, let viewpoint = bookmark.viewpoint {
-            // If no `delegate` is supplied and we have a viewpoint, then set the viewpoint on the geoView.
-            geoView.setViewpoint(viewpoint)
-            
-            // If we have a navigation controller, pop us off the stack; otherwise just dismiss.
-            if let navigationController = navigationController {
-                navigationController.popViewController(animated: true)
-            } else {
-                dismiss(animated: true)
+    
+    private func addBookmarksObserver(map: AGSMap?) {
+        bookmarksObservation = map?.observe(\.bookmarks) { [weak self] (map, _) in
+            DispatchQueue.main.async {
+                self?.bookmarks = map.bookmarks as? [AGSBookmark] ?? []
+            }
+        }
+    }
+    
+    private func addBookmarksObserver(scene: AGSScene?) {
+        bookmarksObservation = scene?.observe(\.bookmarks) { [weak self] (scene, _) in
+            DispatchQueue.main.async {
+                self?.bookmarks = scene.bookmarks as? [AGSBookmark] ?? []
             }
         }
     }
