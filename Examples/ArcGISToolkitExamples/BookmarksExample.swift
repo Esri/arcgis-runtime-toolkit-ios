@@ -45,10 +45,12 @@ class BookmarksExample: MapViewController, BookmarksViewControllerDelegate {
     func showBookmarks() {
         if let bookmarksVC = bookmarksVC {
             // Display the bookmarksVC as a popover controller.
-            let navController = UINavigationController(rootViewController: bookmarksVC)
-            navController.modalPresentationStyle = .popover
-            navController.popoverPresentationController?.barButtonItem = bookmarksButton
-            present(navController, animated: true)
+            bookmarksVC.modalPresentationStyle = .popover
+            if let popoverPresentationController = bookmarksVC.popoverPresentationController {
+                popoverPresentationController.delegate = self
+                popoverPresentationController.barButtonItem = bookmarksButton
+            }
+            present(bookmarksVC, animated: true)
         }
     }
     
@@ -62,5 +64,11 @@ class BookmarksExample: MapViewController, BookmarksViewControllerDelegate {
             mapView.setViewpoint(viewpoint, duration: 2.0)
             dismiss(animated: true)
         }
+    }
+}
+
+extension BookmarksExample: UIPopoverPresentationControllerDelegate {
+    func presentationController(_ controller: UIPresentationController, viewControllerForAdaptivePresentationStyle style: UIModalPresentationStyle) -> UIViewController? {
+        return UINavigationController(rootViewController: controller.presentedViewController)
     }
 }
