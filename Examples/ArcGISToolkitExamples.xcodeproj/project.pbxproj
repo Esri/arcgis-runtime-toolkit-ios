@@ -25,6 +25,7 @@
 		88DBC2A11FE83D6000255921 /* JobManagerExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88DBC2A01FE83D6000255921 /* JobManagerExample.swift */; };
 		E447A12B2267BB9500578C0B /* ARExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = E447A12A2267BB9500578C0B /* ARExample.swift */; };
 		E464AA9122E62DC600969DBA /* Plane.swift in Sources */ = {isa = PBXBuildFile; fileRef = E464AA9022E62DC600969DBA /* Plane.swift */; };
+		E46859D6237A0B7800F168CF /* LayerContentsExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46859D5237A0B7800F168CF /* LayerContentsExample.swift */; };
 		E46893271FEDAE29008ADA79 /* CompassExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46893261FEDAE29008ADA79 /* CompassExample.swift */; };
 		E47B16FA22F8DECC000C9C8B /* ARStatusViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47B16F822F8DECC000C9C8B /* ARStatusViewController.swift */; };
 		E47B16FB22F8DECC000C9C8B /* ARStatusViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E47B16F922F8DECC000C9C8B /* ARStatusViewController.storyboard */; };
@@ -92,6 +93,7 @@
 		88DBC2A01FE83D6000255921 /* JobManagerExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobManagerExample.swift; sourceTree = "<group>"; };
 		E447A12A2267BB9500578C0B /* ARExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARExample.swift; sourceTree = "<group>"; };
 		E464AA9022E62DC600969DBA /* Plane.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Plane.swift; sourceTree = "<group>"; };
+		E46859D5237A0B7800F168CF /* LayerContentsExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayerContentsExample.swift; sourceTree = "<group>"; };
 		E46893261FEDAE29008ADA79 /* CompassExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassExample.swift; sourceTree = "<group>"; };
 		E47B16F822F8DECC000C9C8B /* ARStatusViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ARStatusViewController.swift; sourceTree = "<group>"; };
 		E47B16F922F8DECC000C9C8B /* ARStatusViewController.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ARStatusViewController.storyboard; sourceTree = "<group>"; };
@@ -169,6 +171,7 @@
 				8800656D2228577A00F76945 /* TemplatePickerExample.swift */,
 				E447A12A2267BB9500578C0B /* ARExample.swift */,
 				E48ADDB923563E17005A53AF /* BookmarksExample.swift */,
+				E46859D5237A0B7800F168CF /* LayerContentsExample.swift */,
 			);
 			name = Examples;
 			sourceTree = "<group>";
@@ -321,6 +324,7 @@
 			files = (
 				883EA74B20741A56006D6F72 /* PopupExample.swift in Sources */,
 				88B689C81E96EDF400B67FAB /* AppDelegate.swift in Sources */,
+				E46859D6237A0B7800F168CF /* LayerContentsExample.swift in Sources */,
 				2140781E209B629000FBFDCC /* TimeSliderExample.swift in Sources */,
 				E47B17372304AB7D000C9C8B /* CalibrationView.swift in Sources */,
 				E464AA9122E62DC600969DBA /* Plane.swift in Sources */,

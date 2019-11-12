@@ -23,6 +23,8 @@
 		88DBC2A31FE83DB800255921 /* CancelGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88DBC2A21FE83DB800255921 /* CancelGroup.swift */; };
 		88ECCC931DF92F22000C967E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 88ECCC921DF92F22000C967E /* Assets.xcassets */; };
 		E447A1262266629600578C0B /* ArcGISARView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E447A1252266629600578C0B /* ArcGISARView.swift */; };
+		E46859D4237A0B5A00F168CF /* LayerContentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46859D3237A0B5A00F168CF /* LayerContentsViewController.swift */; };
+		E46859D8237A0BEB00F168CF /* DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46859D7237A0BEB00F168CF /* DataSource.swift */; };
 		E46893291FEDAE36008ADA79 /* Compass.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46893281FEDAE36008ADA79 /* Compass.swift */; };
 		E46EF2C1236C8A8600A8C50B /* BookmarksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46EF2BF236C8A8600A8C50B /* BookmarksViewController.swift */; };
 		E46EF2C7236CA16800A8C50B /* BookmarksTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46EF2C5236CA16800A8C50B /* BookmarksTableViewController.swift */; };
@@ -49,6 +51,8 @@
 		88DBC2A21FE83DB800255921 /* CancelGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CancelGroup.swift; sourceTree = "<group>"; };
 		88ECCC921DF92F22000C967E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ArcGISToolkit/Assets.xcassets; sourceTree = "<group>"; };
 		E447A1252266629600578C0B /* ArcGISARView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArcGISARView.swift; sourceTree = "<group>"; };
+		E46859D3237A0B5A00F168CF /* LayerContentsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayerContentsViewController.swift; sourceTree = "<group>"; };
+		E46859D7237A0BEB00F168CF /* DataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSource.swift; sourceTree = "<group>"; };
 		E46893281FEDAE36008ADA79 /* Compass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compass.swift; sourceTree = "<group>"; };
 		E46EF2BF236C8A8600A8C50B /* BookmarksViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksViewController.swift; sourceTree = "<group>"; };
 		E46EF2C5236CA16800A8C50B /* BookmarksTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksTableViewController.swift; sourceTree = "<group>"; };
@@ -115,6 +119,7 @@
 				88B68A731E9D7F6300B67FAB /* Coalescer.swift */,
 				88DBC2A21FE83DB800255921 /* CancelGroup.swift */,
 				883EA74E20741B9C006D6F72 /* TemplatePickerViewController.swift */,
+				E46859D7237A0BEB00F168CF /* DataSource.swift */,
 			);
 			name = Misc;
 			sourceTree = "<group>";
@@ -133,6 +138,7 @@
 				2140781B209B628200FBFDCC /* TimeSlider.swift */,
 				E46EF2BF236C8A8600A8C50B /* BookmarksViewController.swift */,
 				E46EF2C5236CA16800A8C50B /* BookmarksTableViewController.swift */,
+				E46859D3237A0B5A00F168CF /* LayerContentsViewController.swift */,
 			);
 			name = Components;
 			sourceTree = "<group>";
@@ -250,11 +256,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E46859D4237A0B5A00F168CF /* LayerContentsViewController.swift in Sources */,
 				88DBC29F1FE83D4400255921 /* JobManager.swift in Sources */,
 				88B68A041E96EFD700B67FAB /* Scalebar.swift in Sources */,
 				88B68A081E96EFD700B67FAB /* UnitsViewController.swift in Sources */,
 				E48405731E9BE7B700927208 /* LegendViewController.swift in Sources */,
 				E46EF2C7236CA16800A8C50B /* BookmarksTableViewController.swift in Sources */,
+				E46859D8237A0BEB00F168CF /* DataSource.swift in Sources */,
 				E447A1262266629600578C0B /* ArcGISARView.swift in Sources */,
 				883EA74F20741B9C006D6F72 /* TemplatePickerViewController.swift in Sources */,
 				883EA74920741A4C006D6F72 /* PopupController.swift in Sources */,
