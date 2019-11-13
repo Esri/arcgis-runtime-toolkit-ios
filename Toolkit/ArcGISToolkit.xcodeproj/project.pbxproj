@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2140781C209B628200FBFDCC /* TimeSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2140781B209B628200FBFDCC /* TimeSlider.swift */; };
+		4C881756237CB90F00DF4165 /* ArcGIS.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 881233831DF601E900B2EA8E /* ArcGIS.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		881233751DF601A700B2EA8E /* ArcGISToolkit.h in Headers */ = {isa = PBXBuildFile; fileRef = 881233731DF601A700B2EA8E /* ArcGISToolkit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		881233841DF601E900B2EA8E /* ArcGIS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 881233831DF601E900B2EA8E /* ArcGIS.framework */; };
 		883EA74920741A4C006D6F72 /* PopupController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 883EA74820741A4C006D6F72 /* PopupController.swift */; };
@@ -41,6 +42,20 @@
 			remoteInfo = ArcGISToolkit;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		4C881755237CB8FE00DF4165 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				4C881756237CB90F00DF4165 /* ArcGIS.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		2140781B209B628200FBFDCC /* TimeSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeSlider.swift; sourceTree = "<group>"; };
@@ -219,6 +234,7 @@
 				E4685AFF237CA3C400F168CF /* Sources */,
 				E4685B00237CA3C400F168CF /* Frameworks */,
 				E4685B01237CA3C400F168CF /* Resources */,
+				4C881755237CB8FE00DF4165 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
