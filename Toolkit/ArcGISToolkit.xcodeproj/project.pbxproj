@@ -23,6 +23,8 @@
 		88DBC2A31FE83DB800255921 /* CancelGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88DBC2A21FE83DB800255921 /* CancelGroup.swift */; };
 		88ECCC931DF92F22000C967E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 88ECCC921DF92F22000C967E /* Assets.xcassets */; };
 		E447A1262266629600578C0B /* ArcGISARView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E447A1252266629600578C0B /* ArcGISARView.swift */; };
+		E4685B06237CA3C400F168CF /* ArcGISToolkitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4685B05237CA3C400F168CF /* ArcGISToolkitTests.swift */; };
+		E4685B08237CA3C400F168CF /* ArcGISToolkit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 881233701DF601A700B2EA8E /* ArcGISToolkit.framework */; };
 		E46893291FEDAE36008ADA79 /* Compass.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46893281FEDAE36008ADA79 /* Compass.swift */; };
 		E46EF2C1236C8A8600A8C50B /* BookmarksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46EF2BF236C8A8600A8C50B /* BookmarksViewController.swift */; };
 		E46EF2C7236CA16800A8C50B /* BookmarksTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46EF2C5236CA16800A8C50B /* BookmarksTableViewController.swift */; };
@@ -30,12 +32,22 @@
 		E484057A1E9C262D00927208 /* Legend.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E48405791E9C262D00927208 /* Legend.storyboard */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		E4685B09237CA3C400F168CF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 881233671DF601A700B2EA8E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8812336F1DF601A700B2EA8E;
+			remoteInfo = ArcGISToolkit;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		2140781B209B628200FBFDCC /* TimeSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeSlider.swift; sourceTree = "<group>"; };
 		881233701DF601A700B2EA8E /* ArcGISToolkit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ArcGISToolkit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		881233731DF601A700B2EA8E /* ArcGISToolkit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ArcGISToolkit.h; sourceTree = "<group>"; };
 		881233741DF601A700B2EA8E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		881233831DF601E900B2EA8E /* ArcGIS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ArcGIS.framework; path = "~/Library/SDKs/ArcGIS/iOS/Frameworks/Dynamic/ArcGIS.framework"; sourceTree = "<absolute>"; };
+		881233831DF601E900B2EA8E /* ArcGIS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ArcGIS.framework; path = $HOME/Library/SDKs/ArcGIS/iOS/Frameworks/Dynamic/ArcGIS.framework; sourceTree = "<absolute>"; };
 		883EA74820741A4C006D6F72 /* PopupController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopupController.swift; sourceTree = "<group>"; };
 		883EA74E20741B9C006D6F72 /* TemplatePickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemplatePickerViewController.swift; sourceTree = "<group>"; };
 		88B689F01E96EFD700B67FAB /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
@@ -49,6 +61,9 @@
 		88DBC2A21FE83DB800255921 /* CancelGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CancelGroup.swift; sourceTree = "<group>"; };
 		88ECCC921DF92F22000C967E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ArcGISToolkit/Assets.xcassets; sourceTree = "<group>"; };
 		E447A1252266629600578C0B /* ArcGISARView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArcGISARView.swift; sourceTree = "<group>"; };
+		E4685B03237CA3C400F168CF /* ArcGISToolkitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ArcGISToolkitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E4685B05237CA3C400F168CF /* ArcGISToolkitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArcGISToolkitTests.swift; sourceTree = "<group>"; };
+		E4685B07237CA3C400F168CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E46893281FEDAE36008ADA79 /* Compass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compass.swift; sourceTree = "<group>"; };
 		E46EF2BF236C8A8600A8C50B /* BookmarksViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksViewController.swift; sourceTree = "<group>"; };
 		E46EF2C5236CA16800A8C50B /* BookmarksTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksTableViewController.swift; sourceTree = "<group>"; };
@@ -65,6 +80,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E4685B00237CA3C400F168CF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E4685B08237CA3C400F168CF /* ArcGISToolkit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -73,6 +96,7 @@
 			children = (
 				88ECCC921DF92F22000C967E /* Assets.xcassets */,
 				881233721DF601A700B2EA8E /* ArcGISToolkit */,
+				E4685B04237CA3C400F168CF /* ArcGISToolkitTests */,
 				881233711DF601A700B2EA8E /* Products */,
 				881233821DF601E900B2EA8E /* Frameworks */,
 			);
@@ -82,6 +106,7 @@
 			isa = PBXGroup;
 			children = (
 				881233701DF601A700B2EA8E /* ArcGISToolkit.framework */,
+				E4685B03237CA3C400F168CF /* ArcGISToolkitTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -145,6 +170,15 @@
 			path = AR;
 			sourceTree = "<group>";
 		};
+		E4685B04237CA3C400F168CF /* ArcGISToolkitTests */ = {
+			isa = PBXGroup;
+			children = (
+				E4685B05237CA3C400F168CF /* ArcGISToolkitTests.swift */,
+				E4685B07237CA3C400F168CF /* Info.plist */,
+			);
+			path = ArcGISToolkitTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -178,18 +212,42 @@
 			productReference = 881233701DF601A700B2EA8E /* ArcGISToolkit.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		E4685B02237CA3C400F168CF /* ArcGISToolkitTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E4685B0D237CA3C400F168CF /* Build configuration list for PBXNativeTarget "ArcGISToolkitTests" */;
+			buildPhases = (
+				E4685AFF237CA3C400F168CF /* Sources */,
+				E4685B00237CA3C400F168CF /* Frameworks */,
+				E4685B01237CA3C400F168CF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E4685B0A237CA3C400F168CF /* PBXTargetDependency */,
+			);
+			name = ArcGISToolkitTests;
+			productName = ArcGISToolkitTests;
+			productReference = E4685B03237CA3C400F168CF /* ArcGISToolkitTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		881233671DF601A700B2EA8E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 1110;
 				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = Esri;
 				TargetAttributes = {
 					8812336F1DF601A700B2EA8E = {
 						CreatedOnToolsVersion = 8.0;
 						LastSwiftMigration = 1010;
+						ProvisioningStyle = Automatic;
+					};
+					E4685B02237CA3C400F168CF = {
+						CreatedOnToolsVersion = 11.1;
+						DevelopmentTeam = P8HGHS7JQ8;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -208,6 +266,7 @@
 			projectRoot = "";
 			targets = (
 				8812336F1DF601A700B2EA8E /* ArcGISToolkit */,
+				E4685B02237CA3C400F168CF /* ArcGISToolkitTests */,
 			);
 		};
 /* End PBXProject section */
@@ -219,6 +278,13 @@
 			files = (
 				88ECCC931DF92F22000C967E /* Assets.xcassets in Resources */,
 				E484057A1E9C262D00927208 /* Legend.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E4685B01237CA3C400F168CF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -270,7 +336,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E4685AFF237CA3C400F168CF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E4685B06237CA3C400F168CF /* ArcGISToolkitTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E4685B0A237CA3C400F168CF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8812336F1DF601A700B2EA8E /* ArcGISToolkit */;
+			targetProxy = E4685B09237CA3C400F168CF /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		881233761DF601A700B2EA8E /* Debug */ = {
@@ -439,6 +521,51 @@
 			};
 			name = Release;
 		};
+		E4685B0B237CA3C400F168CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = P8HGHS7JQ8;
+				FRAMEWORK_SEARCH_PATHS = "$(USER_LIBRARY_DIR)/SDKs/ArcGIS/iOS/Frameworks/Dynamic";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = ArcGISToolkitTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.esri.ArcGISToolkitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E4685B0C237CA3C400F168CF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = P8HGHS7JQ8;
+				FRAMEWORK_SEARCH_PATHS = "$(USER_LIBRARY_DIR)/SDKs/ArcGIS/iOS/Frameworks/Dynamic";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = ArcGISToolkitTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.esri.ArcGISToolkitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -456,6 +583,15 @@
 			buildConfigurations = (
 				881233791DF601A700B2EA8E /* Debug */,
 				8812337A1DF601A700B2EA8E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E4685B0D237CA3C400F168CF /* Build configuration list for PBXNativeTarget "ArcGISToolkitTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E4685B0B237CA3C400F168CF /* Debug */,
+				E4685B0C237CA3C400F168CF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
