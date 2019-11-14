@@ -58,32 +58,8 @@ class ArcGISToolkitTests: XCTestCase {
         var bookmarksVC = BookmarksViewController(geoView: AGSMapView(frame: .zero))
         XCTAssertNotNil(bookmarksVC)
 
-        bookmarksVC = BookmarksViewController(bookmarks: bookmarks())
+        let bookmark = AGSBookmark(name: "Barcelona", viewpoint: AGSViewpoint(latitude: 41.385063, longitude: 2.173404, scale: 6e5))
+        bookmarksVC = BookmarksViewController(bookmarks: [bookmark])
         XCTAssertNotNil(bookmarksVC)
-    }
-
-    private func bookmarks() -> [AGSBookmark] {
-        var bookmarks = [AGSBookmark]()
-        //create a few bookmarks and add them to the map
-        var viewpoint: AGSViewpoint
-        var bookmark: AGSBookmark
-        
-        viewpoint = AGSViewpoint(latitude: 41.385063, longitude: 2.173404, scale: 6e5)
-        bookmark = AGSBookmark(name: "Barcelona", viewpoint: viewpoint)
-        bookmarks.append(bookmark)
-        
-        viewpoint = AGSViewpoint(latitude: 45.512230, longitude: -122.658722, scale: 6e5)
-        bookmark = AGSBookmark(name: "Portland", viewpoint: viewpoint)
-        bookmarks.append(bookmark)
-        
-        viewpoint = AGSViewpoint(latitude: 44.977753, longitude: -93.265015, scale: 6e5)
-        bookmark = AGSBookmark(name: "Minneapolis", viewpoint: viewpoint)
-        bookmarks.append(bookmark)
-        
-        viewpoint = AGSViewpoint(latitude: 55.953251, longitude: -3.188267, scale: 6e5)
-        bookmark = AGSBookmark(name: "Edinburgh", viewpoint: viewpoint)
-        bookmarks.append(bookmark)
-
-        return bookmarks
     }
 }
