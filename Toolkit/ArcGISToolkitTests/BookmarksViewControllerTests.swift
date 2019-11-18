@@ -132,6 +132,82 @@ class BookmarksViewControllerTests: XCTestCase {
         XCTAssertEqual(newScene.bookmarks.count, bookmarksVC.bookmarks.count)
     }
     
+    /// Tests changing the mapView and ensuring the `bookmarks` property is updated.
+    func testChangeMapView() {
+        let mapView = AGSMapView()
+        let map = AGSMap(basemap: .streets())
+        mapView.map = map
+
+        let bookmarks = generateBookmarks()
+        map.bookmarks.addObjects(from: bookmarks)
+        
+        // Wait for the map to load.  This allows the observers to be set up.
+        XCTLoad(map)
+
+        // Create the BookmarksViewController.
+        let bookmarksVC = BookmarksViewController(geoView: mapView)
+        
+        // Verify the bookmarks are set, so we know when we change them.
+        XCTAssertEqual(map.bookmarks.count, bookmarksVC.bookmarks.count)
+
+        // Change the mapView.
+        let newMapView = AGSMapView()
+        let newMap = AGSMap(basemap: .imagery())
+        newMapView.map = newMap
+
+        // Create a new array of `AGSBookmark` and add to map.
+        var newBookmarks = [AGSBookmark(name: "Mysterious Desert Pattern", viewpoint: AGSViewpoint(latitude: 27.3805833, longitude: 33.6321389, scale: 6e3))]
+        newBookmarks.append(contentsOf: generateBookmarks())
+        newMap.bookmarks.addObjects(from: newBookmarks)
+        
+        // Set the new map view on the bookmarks view controller.
+        bookmarksVC.geoView = newMapView
+        
+        // Wait for the map to load.  This allows the observers to be set up.
+        XCTLoad(newMap)
+        
+        // Check if bookmarks property is updated.
+        XCTAssertEqual(newMap.bookmarks.count, bookmarksVC.bookmarks.count)
+    }
+    
+    /// Tests changing the sceneView and ensuring the `bookmarks` property is updated.
+    func testChangeSceneView() {
+        let sceneView = AGSSceneView()
+        let scene = AGSScene(basemap: .streets())
+        sceneView.scene = scene
+        
+        let bookmarks = generateBookmarks()
+        scene.bookmarks.addObjects(from: bookmarks)
+        
+        // Wait for the scene to load.  This allows the observers to be set up.
+        XCTLoad(scene)
+
+        // Create the BookmarksViewController.
+        let bookmarksVC = BookmarksViewController(geoView: sceneView)
+        
+        // Verify the bookmarks are set, so we know when we change them.
+        XCTAssertEqual(scene.bookmarks.count, bookmarksVC.bookmarks.count)
+
+        // Change the sceneView.
+        let newSceneView = AGSSceneView()
+        let newScene = AGSScene(basemap: .imagery())
+        newSceneView.scene = newScene
+
+        // Create a new array of `AGSBookmark` and add to map.
+        var newBookmarks = [AGSBookmark(name: "Mysterious Desert Pattern", viewpoint: AGSViewpoint(latitude: 27.3805833, longitude: 33.6321389, scale: 6e3))]
+        newBookmarks.append(contentsOf: generateBookmarks())
+        newScene.bookmarks.addObjects(from: newBookmarks)
+        
+        // Set the new scene view on the bookmarks view controller.
+        bookmarksVC.geoView = newSceneView
+
+        // Wait for the scene to load.  This allows the observers to be set up.
+        XCTLoad(newScene)
+        
+        // Check if bookmarks property is updated.
+        XCTAssertEqual(newScene.bookmarks.count, bookmarksVC.bookmarks.count)
+    }
+    
     /// Generates a list of predefined bookmarks for testing.
     func generateBookmarks() -> [AGSBookmark] {
         return [AGSBookmark(name: "Barcelona", viewpoint: AGSViewpoint(latitude: 41.385063, longitude: 2.173404, scale: 6e5)),
