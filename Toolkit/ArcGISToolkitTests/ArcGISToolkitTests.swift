@@ -70,7 +70,7 @@ public func XCTLoad(_ object: AGSLoadable, file: StaticString = #file, line: UIn
     // Wait for the object to load.
     let loadExp = XCTestExpectation(description: "expectation for `object.load`")
     object.load { (error) in
-        XCTAssertNil(error)
+        XCTAssertNil(error, file: file, line: line)
         loadExp.fulfill()
     }
     let waitResult = XCTWaiter().wait(for: [loadExp], timeout: 5.0)
