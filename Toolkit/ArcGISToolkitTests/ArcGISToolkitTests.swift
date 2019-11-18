@@ -66,11 +66,11 @@ class ArcGISToolkitTests: XCTestCase {
 
 /// Helper function to load an `AGSLoadable` object, waiting until it's loaded to return.
 /// - Parameter object: The loadable object.
-public func XCTLoad(_ object: AGSLoadable) {
+public func XCTLoad(_ object: AGSLoadable, file: StaticString = #file, line: UInt = #line) {
     // Wait for the object to load.
     let loadExp = XCTestExpectation(description: "expectation for `object.load`")
     object.load { (error) in
-        XCTAssertNil(error)
+        XCTAssertNil(error, file: file, line: line)
         loadExp.fulfill()
     }
     let waitResult = XCTWaiter().wait(for: [loadExp], timeout: 5.0)
