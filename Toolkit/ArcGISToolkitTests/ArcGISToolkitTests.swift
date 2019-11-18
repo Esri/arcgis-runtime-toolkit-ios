@@ -75,7 +75,7 @@ public func XCTLoad(_ object: AGSLoadable, file: StaticString = #file, line: UIn
     }
     let waitResult = XCTWaiter().wait(for: [loadExp], timeout: 5.0)
     guard waitResult == .completed else {
-        XCTFail("Timed out waiting for object.load")
+        XCTFail("Timed out waiting for object.load", file: file, line: line)
         return
     }
 }
