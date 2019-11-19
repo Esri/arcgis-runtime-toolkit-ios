@@ -31,6 +31,8 @@
 		E46893291FEDAE36008ADA79 /* Compass.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46893281FEDAE36008ADA79 /* Compass.swift */; };
 		E46EF2C1236C8A8600A8C50B /* BookmarksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46EF2BF236C8A8600A8C50B /* BookmarksViewController.swift */; };
 		E46EF2C7236CA16800A8C50B /* BookmarksTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46EF2C5236CA16800A8C50B /* BookmarksTableViewController.swift */; };
+		E47DDD1823845EA6000414D1 /* LayerContentsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47DDD1723845EA6000414D1 /* LayerContentsTableViewController.swift */; };
+		E47DDD1A23845FA4000414D1 /* LayerContentsTableViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E47DDD1923845FA4000414D1 /* LayerContentsTableViewController.storyboard */; };
 		E48405731E9BE7B700927208 /* LegendViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48405721E9BE7B700927208 /* LegendViewController.swift */; };
 		E484057A1E9C262D00927208 /* Legend.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E48405791E9C262D00927208 /* Legend.storyboard */; };
 /* End PBXBuildFile section */
@@ -86,6 +88,8 @@
 		E46893281FEDAE36008ADA79 /* Compass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compass.swift; sourceTree = "<group>"; };
 		E46EF2BF236C8A8600A8C50B /* BookmarksViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksViewController.swift; sourceTree = "<group>"; };
 		E46EF2C5236CA16800A8C50B /* BookmarksTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksTableViewController.swift; sourceTree = "<group>"; };
+		E47DDD1723845EA6000414D1 /* LayerContentsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayerContentsTableViewController.swift; sourceTree = "<group>"; };
+		E47DDD1923845FA4000414D1 /* LayerContentsTableViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LayerContentsTableViewController.storyboard; sourceTree = "<group>"; };
 		E48405721E9BE7B700927208 /* LegendViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegendViewController.swift; sourceTree = "<group>"; };
 		E48405791E9C262D00927208 /* Legend.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Legend.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -159,7 +163,10 @@
 				88B68A731E9D7F6300B67FAB /* Coalescer.swift */,
 				88DBC2A21FE83DB800255921 /* CancelGroup.swift */,
 				883EA74E20741B9C006D6F72 /* TemplatePickerViewController.swift */,
+				E46EF2C5236CA16800A8C50B /* BookmarksTableViewController.swift */,
 				E46859D7237A0BEB00F168CF /* DataSource.swift */,
+				E47DDD1723845EA6000414D1 /* LayerContentsTableViewController.swift */,
+				E47DDD1923845FA4000414D1 /* LayerContentsTableViewController.storyboard */,
 			);
 			name = Misc;
 			sourceTree = "<group>";
@@ -177,7 +184,6 @@
 				883EA74820741A4C006D6F72 /* PopupController.swift */,
 				2140781B209B628200FBFDCC /* TimeSlider.swift */,
 				E46EF2BF236C8A8600A8C50B /* BookmarksViewController.swift */,
-				E46EF2C5236CA16800A8C50B /* BookmarksTableViewController.swift */,
 				E46859D3237A0B5A00F168CF /* LayerContentsViewController.swift */,
 			);
 			name = Components;
@@ -299,6 +305,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				88ECCC931DF92F22000C967E /* Assets.xcassets in Resources */,
+				E47DDD1A23845FA4000414D1 /* LayerContentsTableViewController.storyboard in Resources */,
 				E484057A1E9C262D00927208 /* Legend.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -353,6 +360,7 @@
 				88DBC2A31FE83DB800255921 /* CancelGroup.swift in Sources */,
 				88B68A071E96EFD700B67FAB /* TableViewController.swift in Sources */,
 				88B689FD1E96EFD700B67FAB /* Extensions.swift in Sources */,
+				E47DDD1823845EA6000414D1 /* LayerContentsTableViewController.swift in Sources */,
 				88B68A741E9D7F6300B67FAB /* Coalescer.swift in Sources */,
 				88B68A001E96EFD700B67FAB /* MapViewController.swift in Sources */,
 				E46EF2C1236C8A8600A8C50B /* BookmarksViewController.swift in Sources */,

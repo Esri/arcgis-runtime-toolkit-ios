@@ -17,19 +17,51 @@ import ArcGISToolkit
 import ArcGIS
 
 class LayerContentsExample: MapViewController {
+    var layerContentsVC: LayerContentsViewController?
+    var layerContentsButton = UIBarButtonItem()
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
-    }
+        // Add Bookmark button that will display the LayerContentsViewController.
+        layerContentsButton = UIBarButtonItem(title: "Legend", style: .plain, target: self, action: #selector(showLayerContents))
+        navigationItem.rightBarButtonItem = layerContentsButton
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+        // Create the map from a portal item and assign to the mapView.
+        let portal = AGSPortal.arcGISOnline(withLoginRequired: false)
+        let portalItem = AGSPortalItem(portal: portal, itemID: "16f1b8ba37b44dc3884afc8d5f454dd2")
+        mapView.map = AGSMap(item: portalItem)
+        
+        // Create the LayerContentsViewController.
+        layerContentsVC = LayerContentsViewController()
+        layerContentsVC?.dataSource = DataSource(geoView: mapView)
+        
+        // Add a cancel button.
+        let cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+        layerContentsVC?.navigationItem.leftBarButtonItem = cancelButton
     }
-    */
+    
+    @objc
+    func showLayerContents() {
+        if let layerContentsVC = layerContentsVC {
+            // Display the layerContentsVC as a popover controller.
+            layerContentsVC.modalPresentationStyle = .popover
+            if let popoverPresentationController = layerContentsVC.popoverPresentationController {
+                popoverPresentationController.delegate = self
+                popoverPresentationController.barButtonItem = layerContentsButton
+            }
+            present(layerContentsVC, animated: true)
+        }
+    }
+    
+    @objc
+    func cancel() {
+        dismiss(animated: true)
+    }
+}
+
+extension LayerContentsExample: UIPopoverPresentationControllerDelegate {
+    func presentationController(_ controller: UIPresentationController, viewControllerForAdaptivePresentationStyle style: UIModalPresentationStyle) -> UIViewController? {
+        return UINavigationController(rootViewController: controller.presentedViewController)
+    }
 }
