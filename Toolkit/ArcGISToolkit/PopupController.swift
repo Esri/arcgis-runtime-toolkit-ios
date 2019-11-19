@@ -245,7 +245,7 @@ public class PopupController: NSObject, AGSPopupsViewControllerDelegate, AGSGeoV
     public func popupsViewController(_ popupsViewController: AGSPopupsViewController, didChangeToCurrentPopup popup: AGSPopup) {
         guard let f = popup.geoElement as? AGSArcGISFeature,
             let ft = f.featureTable as? AGSServiceFeatureTable,
-            let fl = ft.featureLayer else {
+            let fl = ft.layer as? AGSFeatureLayer else {
                 return
         }
         

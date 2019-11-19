@@ -15,10 +15,11 @@
 import UIKit
 import ArcGIS
 
-/// The data source is initialized with either an array of `AGSLayerContents` or an `AGSGeoView` of which the operational and base map layers (`AGSLayerConents`) are identified.
+/// The data source is used to represent an array of `AGSLayerContent` for use in a variety of implementations.  It is iinitialized with either an array of `AGSLayerContent`
+/// or an `AGSGeoView` of which the operational and base map layers (`AGSLayerContent`) are identified.
 public class DataSource: NSObject {
     /// Returns a `DataSource` initialized with the given `AGSLayerContent` array..
-    /// - Parameter layers: <#layers description#>
+    /// - Parameter layers: The array of `AGSLayerContent`.
     /// - Since: 100.7.0
     public init(layers: [AGSLayerContent]) {
         super.init()
@@ -33,9 +34,10 @@ public class DataSource: NSObject {
         geoViewDidChange(nil)
     }
     
-    /// The `AGSGeoView` containing either an `AGSMap` or `AGSScene` with the `AGSBookmark`s to display.
+    /// The `AGSGeoView` containing either an `AGSMap` or `AGSScene` with the operational and base map layers to use as data.
+    /// If the `DataSource` was initialized with an array of `AGSLayerContent`, `goeView` will be nil.
     /// - Since: 100.7.0
-    public var geoView: AGSGeoView? {
+    public private(set) var geoView: AGSGeoView? {
         didSet {
             geoViewDidChange(oldValue)
         }
