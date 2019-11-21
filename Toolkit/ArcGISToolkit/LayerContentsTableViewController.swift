@@ -10,17 +10,17 @@ import UIKit
 import ArcGIS
 
 class LegendInfoCell: UITableViewCell {
-    @IBOutlet var name : UILabel?
-    @IBOutlet var legendImageView : UIImageView?
-    @IBOutlet var activityIndicatorView : UIActivityIndicatorView?
+    @IBOutlet var name: UILabel?
+    @IBOutlet var legendImageView: UIImageView?
+    @IBOutlet var activityIndicatorView: UIActivityIndicatorView?
 }
 
 class LayerTitleCell: UITableViewCell {
-    @IBOutlet var name : UILabel?
+    @IBOutlet var name: UILabel?
 }
 
 class SublayerTitleCell: UITableViewCell {
-    @IBOutlet var name : UILabel?
+    @IBOutlet var name: UILabel?
 }
 
 class LayerContentsTableViewController: UITableViewController {

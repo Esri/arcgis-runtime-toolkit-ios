@@ -33,6 +33,7 @@
 		E46EF2C7236CA16800A8C50B /* BookmarksTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46EF2C5236CA16800A8C50B /* BookmarksTableViewController.swift */; };
 		E47DDD1823845EA6000414D1 /* LayerContentsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47DDD1723845EA6000414D1 /* LayerContentsTableViewController.swift */; };
 		E47DDD1A23845FA4000414D1 /* LayerContentsTableViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E47DDD1923845FA4000414D1 /* LayerContentsTableViewController.storyboard */; };
+		E47DDD222386F454000414D1 /* DataSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47DDD212386F454000414D1 /* DataSourceTests.swift */; };
 		E48405731E9BE7B700927208 /* LegendViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48405721E9BE7B700927208 /* LegendViewController.swift */; };
 		E484057A1E9C262D00927208 /* Legend.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E48405791E9C262D00927208 /* Legend.storyboard */; };
 		E4ED3D8E237F19B800D835F6 /* BookmarksViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4ED3D8D237F19B800D835F6 /* BookmarksViewControllerTests.swift */; };
@@ -91,6 +92,7 @@
 		E46EF2C5236CA16800A8C50B /* BookmarksTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksTableViewController.swift; sourceTree = "<group>"; };
 		E47DDD1723845EA6000414D1 /* LayerContentsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayerContentsTableViewController.swift; sourceTree = "<group>"; };
 		E47DDD1923845FA4000414D1 /* LayerContentsTableViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LayerContentsTableViewController.storyboard; sourceTree = "<group>"; };
+		E47DDD212386F454000414D1 /* DataSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSourceTests.swift; sourceTree = "<group>"; };
 		E48405721E9BE7B700927208 /* LegendViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegendViewController.swift; sourceTree = "<group>"; };
 		E48405791E9C262D00927208 /* Legend.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Legend.storyboard; sourceTree = "<group>"; };
 		E4ED3D8D237F19B800D835F6 /* BookmarksViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksViewControllerTests.swift; sourceTree = "<group>"; };
@@ -205,6 +207,7 @@
 				E4685B05237CA3C400F168CF /* ArcGISToolkitTests.swift */,
 				E4685B07237CA3C400F168CF /* Info.plist */,
 				E4ED3D8D237F19B800D835F6 /* BookmarksViewControllerTests.swift */,
+				E47DDD212386F454000414D1 /* DataSourceTests.swift */,
 			);
 			path = ArcGISToolkitTests;
 			sourceTree = "<group>";
@@ -375,6 +378,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E47DDD222386F454000414D1 /* DataSourceTests.swift in Sources */,
 				E4ED3D8E237F19B800D835F6 /* BookmarksViewControllerTests.swift in Sources */,
 				E4685B06237CA3C400F168CF /* ArcGISToolkitTests.swift in Sources */,
 			);
