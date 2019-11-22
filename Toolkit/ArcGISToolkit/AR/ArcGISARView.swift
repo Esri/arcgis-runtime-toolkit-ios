@@ -64,7 +64,19 @@ public class ArcGISARView: UIView {
             cameraController.originCamera = newValue
         }
     }
-
+    
+    /// Determines the clipping distance around the originCamera. The units are meters; the default is 0.0. When the value is set to 0.0 there is no enforced clipping distance.
+    /// Setting the value to 10.0 will only render data 10 meters around the originCamera.
+    /// - Since: 100.7.0
+    public var clippingDistance: Double {
+        get {
+            return cameraController.clippingDistance
+        }
+        set {
+            cameraController.clippingDistance = newValue
+        }
+    }
+    
     /// The view used to display ArcGIS 3D content.
     /// - Since: 100.6.0
     public let sceneView = AGSSceneView(frame: .zero)
