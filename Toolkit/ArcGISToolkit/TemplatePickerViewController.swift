@@ -259,9 +259,9 @@ public class TemplatePickerViewController: TableViewController {
     }
     
     private func indexPath(for info: FeatureTemplateInfo) -> IndexPath {
-        let tableIndex = tables.index { $0.tableName == info.featureTable.tableName }!
+        let tableIndex = tables.firstIndex { $0.tableName == info.featureTable.tableName }!
         let infos = self.currentDatasource[info.featureTable.tableName]!
-        let infoIndex = infos.index { $0 === info }!
+        let infoIndex = infos.firstIndex { $0 === info }!
         
         return IndexPath(row: infoIndex, section: tableIndex)
     }

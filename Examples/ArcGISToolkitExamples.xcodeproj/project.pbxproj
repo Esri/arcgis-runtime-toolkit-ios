@@ -31,6 +31,7 @@
 		E47B17362304AB7D000C9C8B /* UserDirectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47B17342304AB7D000C9C8B /* UserDirectionsView.swift */; };
 		E47B17372304AB7D000C9C8B /* CalibrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47B17352304AB7D000C9C8B /* CalibrationView.swift */; };
 		E48405751E9BE7E600927208 /* LegendExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48405741E9BE7E600927208 /* LegendExample.swift */; };
+		E48ADDBA23563E17005A53AF /* BookmarksExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48ADDB923563E17005A53AF /* BookmarksExample.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +55,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 8812336F1DF601A700B2EA8E;
 			remoteInfo = ArcGISToolkit;
+		};
+		E4CD706023A8436F000A3B1C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 88B6899F1E96E9AB00B67FAB /* ArcGISToolkit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E4685B03237CA3C400F168CF;
+			remoteInfo = ArcGISToolkitTests;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -97,6 +105,7 @@
 		E47B17342304AB7D000C9C8B /* UserDirectionsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDirectionsView.swift; sourceTree = "<group>"; };
 		E47B17352304AB7D000C9C8B /* CalibrationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalibrationView.swift; sourceTree = "<group>"; };
 		E48405741E9BE7E600927208 /* LegendExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegendExample.swift; sourceTree = "<group>"; };
+		E48ADDB923563E17005A53AF /* BookmarksExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksExample.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -150,6 +159,7 @@
 			isa = PBXGroup;
 			children = (
 				88B689A41E96E9AC00B67FAB /* ArcGISToolkit.framework */,
+				E4CD706123A8436F000A3B1C /* ArcGISToolkitTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -166,6 +176,7 @@
 				883EA74A20741A56006D6F72 /* PopupExample.swift */,
 				8800656D2228577A00F76945 /* TemplatePickerExample.swift */,
 				E447A12A2267BB9500578C0B /* ARExample.swift */,
+				E48ADDB923563E17005A53AF /* BookmarksExample.swift */,
 			);
 			name = Examples;
 			sourceTree = "<group>";
@@ -219,7 +230,7 @@
 				TargetAttributes = {
 					8839043A1DF6022A001F3188 = {
 						CreatedOnToolsVersion = 8.0;
-						LastSwiftMigration = 1010;
+						LastSwiftMigration = 1110;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
@@ -259,6 +270,13 @@
 			fileType = wrapper.framework;
 			path = ArcGISToolkit.framework;
 			remoteRef = 88B689A31E96E9AC00B67FAB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		E4CD706123A8436F000A3B1C /* ArcGISToolkitTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = ArcGISToolkitTests.xctest;
+			remoteRef = E4CD706023A8436F000A3B1C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -325,6 +343,7 @@
 				88DBC2A11FE83D6000255921 /* JobManagerExample.swift in Sources */,
 				88B689D11E96EDF400B67FAB /* VCListViewController.swift in Sources */,
 				E47B16FA22F8DECC000C9C8B /* ARStatusViewController.swift in Sources */,
+				E48ADDBA23563E17005A53AF /* BookmarksExample.swift in Sources */,
 				8800656E2228577A00F76945 /* TemplatePickerExample.swift in Sources */,
 				E47B17362304AB7D000C9C8B /* UserDirectionsView.swift in Sources */,
 				88B689CE1E96EDF400B67FAB /* ScalebarExample.swift in Sources */,
@@ -499,7 +518,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.esri.${PRODUCT_NAME}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -518,7 +537,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.esri.${PRODUCT_NAME}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};

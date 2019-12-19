@@ -29,7 +29,8 @@ class ExamplesViewController: VCListViewController {
             ("Time Slider", TimeSliderExample.self, nil),
             ("Popup Controller", PopupExample.self, nil),
             ("Template Picker", TemplatePickerExample.self, nil),
-            ("AR", ARExample.self, nil)
+            ("AR", ARExample.self, nil),
+            ("Bookmarks", BookmarksExample.self, nil)
         ]
     }
 }

@@ -45,6 +45,8 @@ extension AGSLocationDataSourceStatus {
             return "Started"
         case .failedToStart:
             return "Failed to start"
+        @unknown default:
+            fatalError("Unknown AGSLocationDataSourceStatus")
         }
     }
 }

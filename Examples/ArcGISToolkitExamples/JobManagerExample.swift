@@ -227,7 +227,7 @@ class JobManagerExample: TableViewController {
             }
             
             // remove task from array now that it's loaded
-            if let index = self.tasks.index(where: { return $0 === strongTask }) {
+            if let index = self.tasks.firstIndex(where: { return $0 === strongTask }) {
                 self.tasks.remove(at: index)
             }
             
@@ -343,6 +343,8 @@ extension AGSJobStatus {
             return "Succeeded"
         case .started:
             return "Started"
+        @unknown default:
+            fatalError("Unknown AGSJobStatus")
         }
     }
 }

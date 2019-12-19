@@ -169,12 +169,12 @@ public class UnitsViewController: TableViewController {
     /// the given unit.
     private func indexPath(for unit: AGSUnit) -> IndexPath? {
         if let filteredUnits = filteredUnits {
-            if let row = filteredUnits.index(of: unit) {
+            if let row = filteredUnits.firstIndex(of: unit) {
                 return IndexPath(row: row, section: 0)
             } else {
                 return nil
             }
-        } else if let row = units.index(of: unit) {
+        } else if let row = units.firstIndex(of: unit) {
             return IndexPath(row: row, section: 0)
         } else {
             return nil
