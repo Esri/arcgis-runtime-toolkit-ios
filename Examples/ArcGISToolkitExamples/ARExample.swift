@@ -604,6 +604,9 @@ extension ARExample {
                     let camera = AGSCamera(latitude: center.y, longitude: center.x, altitude: elevation, heading: 0, pitch: 90, roll: 0)
                     self?.arView.originCamera = camera
                     self?.arView.translationFactor = 18000
+                    
+                    // Reset the clipping distance so we view the full scene.
+                    self?.arView.clippingDistance = 0
                 }
             }
         }
