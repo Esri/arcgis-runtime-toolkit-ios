@@ -129,19 +129,6 @@ class JobManagerExample: TableViewController {
         // now anchor toolbar below new safe area
         toolbar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         
-        // button to kick off a new job
-        let kickOffJobItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(kickOffJob))
-        
-        // button to resume all paused jobs
-        // use this to resume the paused jobs you have after restarting your app
-        let resumeAllPausedJobsItem = UIBarButtonItem(barButtonSystemItem: .play, target: self, action: #selector(resumeAllPausedJobs))
-        
-        // button to clear the finished jobs
-        let clearFinishedJobsItem = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(clearFinishedJobs))
-        
-        let flex = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        toolbar.items = [kickOffJobItem, flex, resumeAllPausedJobsItem, flex, clearFinishedJobsItem]
-        
         // request authorization for user notifications, this way we can notify user in bg when job complete
         let center = UNUserNotificationCenter.current()
         center.requestAuthorization(options: [.alert, .badge, .sound]) { (granted, _) in
@@ -152,6 +139,25 @@ class JobManagerExample: TableViewController {
         
         // job cell registration
         tableView.register(JobTableViewCell.self, forCellReuseIdentifier: "JobCell")
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if let toolbar = toolbar, toolbar.items == nil {
+            // button to kick off a new job
+            let kickOffJobItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(kickOffJob))
+            
+            // button to resume all paused jobs
+            // use this to resume the paused jobs you have after restarting your app
+            let resumeAllPausedJobsItem = UIBarButtonItem(barButtonSystemItem: .play, target: self, action: #selector(resumeAllPausedJobs))
+            
+            // button to clear the finished jobs
+            let clearFinishedJobsItem = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(clearFinishedJobs))
+            
+            let flexibleSpace1 = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+            let flexibleSpace2 = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+            toolbar.items = [kickOffJobItem, flexibleSpace1, resumeAllPausedJobsItem, flexibleSpace2, clearFinishedJobsItem]
+        }
     }
     
     @objc
