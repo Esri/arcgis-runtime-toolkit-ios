@@ -359,13 +359,16 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
             return
         }
         
-        mode = .length
         selectionOverlay?.isVisible = false
         mapView?.sketchEditor = lineSketchEditor
         
         if !lineSketchEditor.isStarted {
             lineSketchEditor.start(with: AGSSketchCreationMode.polyline)
         }
+        
+        // update mode after sketch editor is updated,
+        // otherwise calculations will be incorrect
+        mode = .length
     }
     
     private func startAreaMode() {
@@ -373,13 +376,16 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
             return
         }
         
-        mode = .area
         selectionOverlay?.isVisible = false
         mapView?.sketchEditor = areaSketchEditor
         
         if !areaSketchEditor.isStarted {
             areaSketchEditor.start(with: AGSSketchCreationMode.polygon)
         }
+        
+        // update mode after sketch editor is updated,
+        // otherwise calculations will be incorrect
+        mode = .area
     }
     
     private func startFeatureMode() {
@@ -387,9 +393,9 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
             return
         }
         
-        mode = .feature
         selectionOverlay?.isVisible = true
         mapView?.sketchEditor = nil
+        mode = .feature
     }
     
     @objc
