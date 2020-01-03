@@ -139,6 +139,9 @@ class JobManagerExample: TableViewController {
         
         // job cell registration
         tableView.register(JobTableViewCell.self, forCellReuseIdentifier: "JobCell")
+        
+        // resume any paused jobs
+        JobManager.shared.resumeAllPausedJobs(statusHandler: self.jobStatusHandler, completion: self.jobCompletionHandler)
     }
     
     override func viewDidLayoutSubviews() {
@@ -147,22 +150,12 @@ class JobManagerExample: TableViewController {
             // button to kick off a new job
             let kickOffJobItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(kickOffJob))
             
-            // button to resume all paused jobs
-            // use this to resume the paused jobs you have after restarting your app
-            let resumeAllPausedJobsItem = UIBarButtonItem(barButtonSystemItem: .play, target: self, action: #selector(resumeAllPausedJobs))
-            
             // button to clear the finished jobs
             let clearFinishedJobsItem = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(clearFinishedJobs))
             
-            let flexibleSpace1 = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-            let flexibleSpace2 = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-            toolbar.items = [kickOffJobItem, flexibleSpace1, resumeAllPausedJobsItem, flexibleSpace2, clearFinishedJobsItem]
+            let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+            toolbar.items = [kickOffJobItem, flexibleSpace, clearFinishedJobsItem]
         }
-    }
-    
-    @objc
-    func resumeAllPausedJobs() {
-        JobManager.shared.resumeAllPausedJobs(statusHandler: self.jobStatusHandler, completion: self.jobCompletionHandler)
     }
     
     @objc
