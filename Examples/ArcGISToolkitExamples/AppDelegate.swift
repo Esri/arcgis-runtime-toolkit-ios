@@ -23,7 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         if #available(iOS 13.0, *) {
             let result = JobManager.shared.registerForBackgroundUpdates()
-            print("background registration result: \(result)")
+            print("-- background registration result: \(result)")
         }
         
         return true
