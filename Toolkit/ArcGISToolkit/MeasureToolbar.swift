@@ -407,27 +407,49 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         mapView?.sketchEditor?.clearGeometry()
     }
     
+    private var linearUnits: [AGSLinearUnit] {
+        let linearUnitIDs: [AGSLinearUnitID] = [.centimeters, .feet, .inches, .kilometers, .meters, .miles, .millimeters, .nauticalMiles, .yards]
+        return linearUnitIDs
+            .compactMap { AGSLinearUnit(unitID: $0) }
+            .sorted { $0.pluralDisplayName < $1.pluralDisplayName }
+    }
+    
+    private var areaUnits: [AGSAreaUnit] {
+        let areaUnitIDs: [AGSAreaUnitID] = [.acres, .hectares, .squareCentimeters, .squareDecimeters, .squareFeet, .squareKilometers, .squareMeters, .squareMillimeters, .squareMiles, .squareYards]
+        return areaUnitIDs
+            .compactMap { AGSAreaUnit(unitID: $0) }
+            .sorted { $0.pluralDisplayName < $1.pluralDisplayName }
+    }
+    
     private func unitsButtonTap() {
         let units: [AGSUnit]
         let selectedUnit: AGSUnit
-        if mapView?.sketchEditor == lineSketchEditor ||
-            selectedGeometry?.geometryType == .polyline {
-            let linearUnitIDs: [AGSLinearUnitID] = [.centimeters, .feet, .inches, .kilometers, .meters, .miles, .millimeters, .nauticalMiles, .yards]
-            units = linearUnitIDs.compactMap { AGSLinearUnit(unitID: $0) }
+        
+        guard let mode = mode else { return }
+        
+        switch mode {
+        case .length:
+            units = linearUnits
             selectedUnit = selectedLinearUnit
-        } else if mapView?.sketchEditor == areaSketchEditor ||
-            selectedGeometry?.geometryType == .envelope ||
-            selectedGeometry?.geometryType == .polygon {
-            let areaUnitIDs: [AGSAreaUnitID] = [.acres, .hectares, .squareCentimeters, .squareDecimeters, .squareFeet, .squareKilometers, .squareMeters, .squareMillimeters, .squareMiles, .squareYards]
-            units = areaUnitIDs.compactMap { AGSAreaUnit(unitID: $0) }
+        case .area:
+            units = areaUnits
             selectedUnit = selectedAreaUnit
-        } else {
-            return
+        case .feature:
+            if selectedGeometry?.geometryType == .polyline {
+                units = linearUnits
+                selectedUnit = selectedLinearUnit
+            } else if selectedGeometry?.geometryType == .envelope ||
+                selectedGeometry?.geometryType == .polygon {
+                units = areaUnits
+                selectedUnit = selectedAreaUnit
+            } else {
+                return
+            }
         }
         
         let unitsViewController = UnitsViewController()
         unitsViewController.delegate = self
-        unitsViewController.units = units.sorted { $0.pluralDisplayName < $1.pluralDisplayName }
+        unitsViewController.units = units
         unitsViewController.selectedUnit = selectedUnit
         
         let navigationController = UINavigationController(rootViewController: unitsViewController)
