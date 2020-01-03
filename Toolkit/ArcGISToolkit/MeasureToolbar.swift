@@ -424,7 +424,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
     private lazy var areaUnits: [AGSAreaUnit] = {
         let areaUnitIDs: [AGSAreaUnitID] = [.acres, .hectares, .squareCentimeters, .squareDecimeters, .squareFeet, .squareKilometers, .squareMeters, .squareMillimeters, .squareMiles, .squareYards]
         return areaUnitIDs
-            .compactMap (AGSAreaUnit.init)
+            .compactMap(AGSAreaUnit.init)
             .sorted { $0.pluralDisplayName < $1.pluralDisplayName }
     }()
     
