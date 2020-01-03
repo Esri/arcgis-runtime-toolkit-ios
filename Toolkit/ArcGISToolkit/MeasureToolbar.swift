@@ -417,7 +417,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
     private lazy var linearUnits: [AGSLinearUnit] = {
         let linearUnitIDs: [AGSLinearUnitID] = [.centimeters, .feet, .inches, .kilometers, .meters, .miles, .millimeters, .nauticalMiles, .yards]
         return linearUnitIDs
-            .compactMap (AGSLinearUnit.init)
+            .compactMap(AGSLinearUnit.init)
             .sorted { $0.pluralDisplayName < $1.pluralDisplayName }
     }()
     
