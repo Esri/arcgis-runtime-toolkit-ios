@@ -223,12 +223,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
     private var clearButton: UIBarButtonItem!
     private var segControl: UISegmentedControl!
     private var segControlItem: UIBarButtonItem!
-    private var mode: MeasureToolbarMode? = nil {
-        didSet {
-            guard mode != oldValue else { return }
-            updateMeasurement()
-        }
-    }
+    private var mode: MeasureToolbarMode?
     
     private let geodeticCurveType: AGSGeodeticCurveType = .geodesic
     // This is the threshold for which when the planar measurements are above,
@@ -359,6 +354,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
             return
         }
         
+        mode = .length
         selectionOverlay?.isVisible = false
         mapView?.sketchEditor = lineSketchEditor
         
@@ -366,9 +362,9 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
             lineSketchEditor.start(with: AGSSketchCreationMode.polyline)
         }
         
-        // update mode after sketch editor is updated,
-        // otherwise calculations will be incorrect
-        mode = .length
+        // updateMeasurement() requires mode property and sketch editor
+        // properties to be current, so we do this last when changing modes
+        updateMeasurement()
     }
     
     private func startAreaMode() {
@@ -376,6 +372,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
             return
         }
         
+        mode = .area
         selectionOverlay?.isVisible = false
         mapView?.sketchEditor = areaSketchEditor
         
@@ -383,9 +380,9 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
             areaSketchEditor.start(with: AGSSketchCreationMode.polygon)
         }
         
-        // update mode after sketch editor is updated,
-        // otherwise calculations will be incorrect
-        mode = .area
+        // updateMeasurement() requires mode property and sketch editor
+        // properties to be current, so we do this last when changing modes
+        updateMeasurement()
     }
     
     private func startFeatureMode() {
@@ -393,9 +390,13 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
             return
         }
         
+        mode = .feature
         selectionOverlay?.isVisible = true
         mapView?.sketchEditor = nil
-        mode = .feature
+        
+        // updateMeasurement() requires mode property and sketch editor
+        // properties to be current, so we do this last when changing modes
+        updateMeasurement()
     }
     
     @objc
@@ -413,19 +414,19 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         mapView?.sketchEditor?.clearGeometry()
     }
     
-    private var linearUnits: [AGSLinearUnit] {
+    private lazy var linearUnits: [AGSLinearUnit] = {
         let linearUnitIDs: [AGSLinearUnitID] = [.centimeters, .feet, .inches, .kilometers, .meters, .miles, .millimeters, .nauticalMiles, .yards]
         return linearUnitIDs
-            .compactMap { AGSLinearUnit(unitID: $0) }
+            .compactMap (AGSLinearUnit.init)
             .sorted { $0.pluralDisplayName < $1.pluralDisplayName }
-    }
+    }()
     
-    private var areaUnits: [AGSAreaUnit] {
+    private lazy var areaUnits: [AGSAreaUnit] = {
         let areaUnitIDs: [AGSAreaUnitID] = [.acres, .hectares, .squareCentimeters, .squareDecimeters, .squareFeet, .squareKilometers, .squareMeters, .squareMillimeters, .squareMiles, .squareYards]
         return areaUnitIDs
-            .compactMap { AGSAreaUnit(unitID: $0) }
+            .compactMap (AGSAreaUnit.init)
             .sorted { $0.pluralDisplayName < $1.pluralDisplayName }
-    }
+    }()
     
     private func unitsButtonTap() {
         let units: [AGSUnit]
