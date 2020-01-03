@@ -13,6 +13,7 @@
 
 import ArcGIS
 import Foundation
+import BackgroundTasks
 
 internal typealias JSONDictionary = [String: Any]
 public typealias JobStatusHandler = (AGSJobStatus) -> Void
@@ -62,14 +63,14 @@ public class JobManager: NSObject {
         }
         didSet {
             keyedJobs.values.forEach { observeJobStatus(job: $0) }
-
+            
             // If there was a change, then re-store the serialized AGSJobs in UserDefaults
             if keyedJobs != oldValue {
                 saveJobsToUserDefaults()
             }
         }
     }
-
+    
     /// A convenience accessor to the `AGSJob`s that the `JobManager` is managing.
     public var jobs: [AGSJob] {
         return Array(keyedJobs.values)
@@ -112,7 +113,7 @@ public class JobManager: NSObject {
             jobStatusObservations.removeValue(forKey: job.serverJobID)
         }
     }
-
+    
     /// Register an `AGSJob` with the `JobManager`.
     ///
     /// - Parameter job: The AGSJob to register.
@@ -123,7 +124,7 @@ public class JobManager: NSObject {
         keyedJobs[jobUniqueID] = job
         return jobUniqueID
     }
-
+    
     /// Unregister an `AGSJob` from the `JobManager`.
     ///
     /// - Parameter job: The job to unregister.
@@ -198,6 +199,7 @@ public class JobManager: NSObject {
     /// - Parameters:
     ///   - application:  See [Apple's documentation](https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1623125-application)
     ///   - completionHandler:  See [Apple's documentation](https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1623125-application)
+    @available(*, deprecated, message: "Please use `registerBackgroundTask` instead")
     public func application(application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         if keyedJobs.isEmpty {
             return completionHandler(.noData)
@@ -209,6 +211,45 @@ public class JobManager: NSObject {
                     completionHandler(.failed)
                 }
             }
+        }
+    }
+    
+    private let bgTaskIdentifier = "com.esri.arcgis.toolkit.jobmanager.refresh"
+    
+    /// Registers a task for updating job status in the background.
+    /// You must add an entry in the app plist for com.esri.arcgis.toolkit.jobmanager.refresh under BGTaskSchedulerPermittedIdentifiers.
+    /// This must be called before the end of the app launch sequence. This must be tested on device, does not work on the simulator.
+    @available(iOS 13.0, *)
+    @discardableResult
+    public func registerForBackgroundUpdates() -> Bool {
+        return BGTaskScheduler.shared.register(forTaskWithIdentifier: bgTaskIdentifier, using: nil, launchHandler: handleBackgroundRefresh)
+    }
+    
+    @available(iOS 13.0, *)
+    private func handleBackgroundRefresh(task: BGTask) {
+        print("handleBackgroundRefresh")
+        guard let task = task as? BGAppRefreshTask else { return }
+        
+        // Schedule next
+        scheduleNextBackgroundRefresh()
+        
+        JobManager.shared.checkStatusForAllJobs { success in
+            print("status check done: \(success)")
+            task.setTaskCompleted(success: success)
+        }
+    }
+    
+    @available(iOS 13.0, *)
+    private func scheduleNextBackgroundRefresh() {
+        print("scheduleNextBackgroundRefresh")
+        let request = BGAppRefreshTaskRequest(identifier: bgTaskIdentifier)
+        // Fetch no earlier than 15 seconds from now
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 15)
+        
+        do {
+            try BGTaskScheduler.shared.submit(request)
+        } catch {
+            print("Could not schedule app refresh: \(error)")
         }
     }
     
