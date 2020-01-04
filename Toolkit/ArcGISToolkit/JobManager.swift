@@ -226,18 +226,24 @@ public class JobManager: NSObject {
     @available(iOS 13.0, *)
     @discardableResult
     public func registerForBackgroundUpdates() -> Bool {
-        // schedule a notification when application enters background
-        bgObserver = NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: nil) { [weak self] _ in
-            self?.scheduleNextBackgroundRefresh()
-        }
         // register the bg task
-        return BGTaskScheduler.shared.register(forTaskWithIdentifier: bgTaskIdentifier, using: nil, launchHandler: handleBackgroundRefresh)
+        let result = BGTaskScheduler.shared.register(forTaskWithIdentifier: bgTaskIdentifier, using: nil) { task in
+            self.handleBackgroundRefresh(task: task as! BGAppRefreshTask)
+        }
+        
+        // schedule a notification when application enters background
+        if bgObserver == nil {
+            bgObserver = NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: .main) { [weak self] _ in
+                self?.scheduleNextBackgroundRefresh()
+            }
+        }
+        
+        return result
     }
     
     @available(iOS 13.0, *)
-    private func handleBackgroundRefresh(task: BGTask) {
+    private func handleBackgroundRefresh(task: BGAppRefreshTask) {
         print("-- handleBackgroundRefresh")
-        guard let task = task as? BGAppRefreshTask else { return }
         
         // Schedule next
         scheduleNextBackgroundRefresh()
@@ -258,7 +264,7 @@ public class JobManager: NSObject {
         print("-- scheduleNextBackgroundRefresh")
         let request = BGAppRefreshTaskRequest(identifier: bgTaskIdentifier)
         // Fetch no earlier than 15 seconds from now
-        request.earliestBeginDate = Date(timeIntervalSinceNow: 15)
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 60)
         
         do {
             try BGTaskScheduler.shared.submit(request)
