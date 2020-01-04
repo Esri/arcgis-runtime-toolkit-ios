@@ -244,14 +244,11 @@ public class JobManager: NSObject {
     
     @available(iOS 13.0, *)
     private func handleBackgroundRefresh(task: BGAppRefreshTask) {
-        print("-- handleBackgroundRefresh")
-        
-        // Schedule next
+        // Schedule next refresh
         scheduleNextBackgroundRefresh()
         
         // check job status
         let operation = JobManager.shared.checkStatusForAllJobs { success in
-            print("-- status check done: \(success)")
             task.setTaskCompleted(success: success)
         }
         
@@ -262,7 +259,6 @@ public class JobManager: NSObject {
     
     @available(iOS 13.0, *)
     private func scheduleNextBackgroundRefresh() {
-        print("-- scheduleNextBackgroundRefresh")
         let request = BGAppRefreshTaskRequest(identifier: bgTaskIdentifier)
         // Fetch no earlier than 15 seconds from now
         request.earliestBeginDate = Date(timeIntervalSinceNow: 60)
@@ -270,7 +266,7 @@ public class JobManager: NSObject {
         do {
             try BGTaskScheduler.shared.submit(request)
         } catch {
-            print("-- Could not schedule app refresh: \(error)")
+            print("Could not schedule app refresh: \(error)")
         }
     }
     

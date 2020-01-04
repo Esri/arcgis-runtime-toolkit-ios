@@ -22,8 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         
         if #available(iOS 13.0, *) {
-            let result = JobManager.shared.registerForBackgroundUpdates()
-            print("-- background registration result: \(result)")
+            JobManager.shared.registerForBackgroundUpdates()
         }
         
         return true
