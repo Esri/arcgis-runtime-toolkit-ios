@@ -291,10 +291,6 @@ class JobManagerExample: TableViewController {
         }
     }
     
-    deinit {
-        print("-- job manager example deinit")
-    }
-    
     func takeOffline(map: AGSMap, extent: AGSEnvelope) {
         let task = AGSOfflineMapTask(onlineMap: map)
         
