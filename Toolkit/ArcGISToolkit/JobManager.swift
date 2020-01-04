@@ -222,7 +222,8 @@ public class JobManager: NSObject {
     
     /// Registers a task for updating job status in the background.
     /// You must add an entry in the app plist for com.esri.arcgis.toolkit.jobmanager.refresh under BGTaskSchedulerPermittedIdentifiers.
-    /// This must be called before the end of the app launch sequence. This must be tested on device, does not work on the simulator.
+    /// This must be called before the end of the app launch sequence.
+    /// This must be tested on device, does not work on the simulator. For debugging this, see documentation here: https://developer.apple.com/documentation/backgroundtasks/starting_and_terminating_tasks_during_development?language=objc
     @available(iOS 13.0, *)
     @discardableResult
     public func registerForBackgroundUpdates() -> Bool {
