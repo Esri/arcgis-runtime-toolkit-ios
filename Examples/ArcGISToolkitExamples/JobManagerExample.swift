@@ -141,7 +141,14 @@ class JobManagerExample: TableViewController {
         tableView.register(JobTableViewCell.self, forCellReuseIdentifier: "JobCell")
         
         // resume any paused jobs
-        JobManager.shared.resumeAllPausedJobs(statusHandler: self.jobStatusHandler, completion: self.jobCompletionHandler)
+        JobManager.shared.resumeAllPausedJobs(
+            statusHandler: { [weak self] in
+                self?.jobStatusHandler(status: $0)
+            },
+            completion: { [weak self] in
+                self?.jobCompletionHandler(result: $0, error: $1)
+            }
+        )
     }
     
     override func viewDidLayoutSubviews() {
@@ -270,11 +277,22 @@ class JobManagerExample: TableViewController {
             JobManager.shared.register(job: job)
             
             // start the job
-            job.start(statusHandler: self.jobStatusHandler, completion: self.jobCompletionHandler)
+            job.start(
+                statusHandler: { [weak self] in
+                    self?.jobStatusHandler(status: $0)
+                },
+                completion: { [weak self] in
+                    self?.jobCompletionHandler(result: $0, error: $1)
+                }
+            )
             
             // refresh the tableview
             self.tableView.reloadData()
         }
+    }
+    
+    deinit {
+        print("-- job manager example deinit")
     }
     
     func takeOffline(map: AGSMap, extent: AGSEnvelope) {
@@ -296,7 +314,14 @@ class JobManagerExample: TableViewController {
                 JobManager.shared.register(job: job)
                 
                 // start the job
-                job.start(statusHandler: self.jobStatusHandler, completion: self.jobCompletionHandler)
+                job.start(
+                    statusHandler: { [weak self] in
+                        self?.jobStatusHandler(status: $0)
+                    },
+                    completion: { [weak self] in
+                        self?.jobCompletionHandler(result: $0, error: $1)
+                    }
+                )
                 
                 // refresh the tableview
                 self.tableView.reloadData()
