@@ -262,7 +262,7 @@ public class JobManager: NSObject {
     @available(iOS 13.0, *)
     private func scheduleNextBackgroundRefresh() {
         let request = BGAppRefreshTaskRequest(identifier: bgTaskIdentifier)
-        request.earliestBeginDate = Date(timeIntervalSinceNow: 60)
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 30)
         
         do {
             try BGTaskScheduler.shared.submit(request)
