@@ -202,7 +202,7 @@ public class JobManager: NSObject {
     /// - Parameters:
     ///   - application:  See [Apple's documentation](https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1623125-application)
     ///   - completionHandler:  See [Apple's documentation](https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1623125-application)
-    @available(*, deprecated, message: "Please use `registerForBackgroundUpdates` instead")
+    @available(iOS, deprecated: 13.0, message: "Please use 'registerForBackgroundUpdates()' instead")
     public func application(application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         if keyedJobs.isEmpty {
             return completionHandler(.noData)
