@@ -151,6 +151,18 @@ class JobManagerExample: TableViewController {
         )
     }
     
+    deinit {
+        // When we are deinited we pause all running jobs.
+        // In a normal app you would not need to do this, but this view controller
+        // is acting as an app example. Thus when it goes out of scope, we pause
+        // the jobs so that when the view controller is re-shown we can resume and rewire
+        // the handlers up to them. Otherwise we would have no way to hook into the status
+        // of any currently running jobs. A normal app would not likely need this as it would
+        // have an object globally wiring up status and completion handlers to jobs.
+        // But since this sample view controller can be pushed/pop, we need this.
+        JobManager.shared.pauseAllJobs()
+    }
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         if let toolbar = toolbar, toolbar.items == nil {
