@@ -129,19 +129,6 @@ class JobManagerExample: TableViewController {
         // now anchor toolbar below new safe area
         toolbar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         
-        // button to kick off a new job
-        let kickOffJobItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(kickOffJob))
-        
-        // button to resume all paused jobs
-        // use this to resume the paused jobs you have after restarting your app
-        let resumeAllPausedJobsItem = UIBarButtonItem(barButtonSystemItem: .play, target: self, action: #selector(resumeAllPausedJobs))
-        
-        // button to clear the finished jobs
-        let clearFinishedJobsItem = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(clearFinishedJobs))
-        
-        let flex = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        toolbar.items = [kickOffJobItem, flex, resumeAllPausedJobsItem, flex, clearFinishedJobsItem]
-        
         // request authorization for user notifications, this way we can notify user in bg when job complete
         let center = UNUserNotificationCenter.current()
         center.requestAuthorization(options: [.alert, .badge, .sound]) { (granted, _) in
@@ -152,11 +139,30 @@ class JobManagerExample: TableViewController {
         
         // job cell registration
         tableView.register(JobTableViewCell.self, forCellReuseIdentifier: "JobCell")
+        
+        // resume any paused jobs
+        JobManager.shared.resumeAllPausedJobs(
+            statusHandler: { [weak self] in
+                self?.jobStatusHandler(status: $0)
+            },
+            completion: { [weak self] in
+                self?.jobCompletionHandler(result: $0, error: $1)
+            }
+        )
     }
     
-    @objc
-    func resumeAllPausedJobs() {
-        JobManager.shared.resumeAllPausedJobs(statusHandler: self.jobStatusHandler, completion: self.jobCompletionHandler)
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if let toolbar = toolbar, toolbar.items == nil {
+            // button to kick off a new job
+            let kickOffJobItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(kickOffJob))
+            
+            // button to clear the finished jobs
+            let clearFinishedJobsItem = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(clearFinishedJobs))
+            
+            let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+            toolbar.items = [kickOffJobItem, flexibleSpace, clearFinishedJobsItem]
+        }
     }
     
     @objc
@@ -271,7 +277,14 @@ class JobManagerExample: TableViewController {
             JobManager.shared.register(job: job)
             
             // start the job
-            job.start(statusHandler: self.jobStatusHandler, completion: self.jobCompletionHandler)
+            job.start(
+                statusHandler: { [weak self] in
+                    self?.jobStatusHandler(status: $0)
+                },
+                completion: { [weak self] in
+                    self?.jobCompletionHandler(result: $0, error: $1)
+                }
+            )
             
             // refresh the tableview
             self.tableView.reloadData()
@@ -297,7 +310,14 @@ class JobManagerExample: TableViewController {
                 JobManager.shared.register(job: job)
                 
                 // start the job
-                job.start(statusHandler: self.jobStatusHandler, completion: self.jobCompletionHandler)
+                job.start(
+                    statusHandler: { [weak self] in
+                        self?.jobStatusHandler(status: $0)
+                    },
+                    completion: { [weak self] in
+                        self?.jobCompletionHandler(result: $0, error: $1)
+                    }
+                )
                 
                 // refresh the tableview
                 self.tableView.reloadData()
