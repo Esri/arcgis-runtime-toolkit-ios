@@ -139,8 +139,10 @@ class JobManagerExample: TableViewController {
         
         // job cell registration
         tableView.register(JobTableViewCell.self, forCellReuseIdentifier: "JobCell")
-        
-        // resume any paused jobs
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        // resume any paused jobs when this view controller is shown
         JobManager.shared.resumeAllPausedJobs(
             statusHandler: { [weak self] in
                 self?.jobStatusHandler(status: $0)
@@ -149,6 +151,22 @@ class JobManagerExample: TableViewController {
                 self?.jobCompletionHandler(result: $0, error: $1)
             }
         )
+        
+        super.viewDidAppear(animated)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        // When the view controller is popped, we pause all running jobs.
+        // In a normal app you would not need to do this, but this view controller
+        // is acting as an app example. Thus when it is not being shown, we pause
+        // the jobs so that when the view controller is re-shown we can resume and rewire
+        // the handlers up to them. Otherwise we would have no way to hook into the status
+        // of any currently running jobs. A normal app would not likely need this as it would
+        // have an object globally wiring up status and completion handlers to jobs.
+        // But since this sample view controller can be pushed/pop, we need this.
+        JobManager.shared.pauseAllJobs()
+        
+        super.viewWillDisappear(animated)
     }
     
     override func viewDidLayoutSubviews() {

@@ -20,6 +20,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         // Override point for customization after application launch.
+        
+        if #available(iOS 13.0, *) {
+            JobManager.shared.registerForBackgroundUpdates()
+        }
+        
         return true
     }
 
@@ -48,6 +53,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // Here is where we forward background fetch to the JobManager
     // so that jobs can be updated in the background
     func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        JobManager.shared.application(application: application, performFetchWithCompletionHandler: completionHandler)
+        // We only do it this way for pre-iOS 13. Otherwise we use BGTask above.
+        // This method doesn't get called for iOS 13 or later because we have an entry
+        // in the plist for BGTaskSchedulerPermittedIdentifiers.
+        if #available(iOS 13.0, *) {
+            // Nothing to do here.
+        } else {
+            JobManager.shared.application(application: application, performFetchWithCompletionHandler: completionHandler)
+        }
     }
 }
