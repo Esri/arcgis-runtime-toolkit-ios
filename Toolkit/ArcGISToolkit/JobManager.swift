@@ -224,12 +224,14 @@ public class JobManager: NSObject {
     /// You must add an entry in the app plist for com.esri.arcgis.toolkit.jobmanager.refresh under BGTaskSchedulerPermittedIdentifiers.
     /// This must be called before the end of the app launch sequence.
     /// This must be tested on device, does not work on the simulator. For debugging this, see documentation here: https://developer.apple.com/documentation/backgroundtasks/starting_and_terminating_tasks_during_development?language=objc
+    /// Returns whether or not the registration was successful. If the registration was not successful, please check your application's plist for the appropriately entry
+    /// as mentioned above.
     @available(iOS 13.0, *)
     @discardableResult
     public func registerForBackgroundUpdates() -> Bool {
         // register the bg task
-        let result = BGTaskScheduler.shared.register(forTaskWithIdentifier: bgTaskIdentifier, using: nil) { task in
-            self.handleBackgroundRefresh(task: task as! BGAppRefreshTask)
+        let result = BGTaskScheduler.shared.register(forTaskWithIdentifier: bgTaskIdentifier, using: nil) { [weak self] task in
+            self?.handleBackgroundRefresh(task: task as! BGAppRefreshTask)
         }
         
         // schedule a notification when application enters background
