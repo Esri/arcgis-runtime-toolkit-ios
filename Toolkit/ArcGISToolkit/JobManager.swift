@@ -289,8 +289,9 @@ public class JobManager: NSObject {
     
     /// Pauses any currently running job.
     public func pauseAllJobs() {
-        keyedJobs.lazy.filter { $0.value.status == AGSJobStatus.started }.forEach {
-            $0.value.progress.pause()
+        keyedJobs.values.forEach {
+            guard $0.status == .started else { return }
+            $0.progress.pause()
         }
     }
     
