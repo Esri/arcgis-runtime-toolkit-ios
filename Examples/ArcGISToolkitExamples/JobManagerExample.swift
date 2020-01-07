@@ -108,6 +108,8 @@ class JobManagerExample: TableViewController {
         return JobManager.shared.jobs
     }
     
+    var backgroundTaskIdentifiers = Set<UIBackgroundTaskIdentifier>()
+    
     var toolbar: UIToolbar?
     
     override func viewDidLoad() {
@@ -165,6 +167,10 @@ class JobManagerExample: TableViewController {
         // have an object globally wiring up status and completion handlers to jobs.
         // But since this sample view controller can be pushed/pop, we need this.
         JobManager.shared.pauseAllJobs()
+        
+        // clear out background tasks that we started for the jobs
+        backgroundTaskIdentifiers.forEach { UIApplication.shared.endBackgroundTask($0) }
+        backgroundTaskIdentifiers.removeAll()
         
         super.viewWillDisappear(animated)
     }
@@ -293,6 +299,9 @@ class JobManagerExample: TableViewController {
             
             // register the job with our JobManager shared instance
             JobManager.shared.register(job: job)
+
+            // try to keep the app running in the background for this job if possible
+            let backgroundTaskIdentifier = self.startBackgroundTask()
             
             // start the job
             job.start(
@@ -300,6 +309,7 @@ class JobManagerExample: TableViewController {
                     self?.jobStatusHandler(status: $0)
                 },
                 completion: { [weak self] in
+                    self?.endBackgroundTask(backgroundTaskIdentifier)
                     self?.jobCompletionHandler(result: $0, error: $1)
                 }
             )
@@ -307,6 +317,20 @@ class JobManagerExample: TableViewController {
             // refresh the tableview
             self.tableView.reloadData()
         }
+    }
+    
+    func startBackgroundTask() -> UIBackgroundTaskIdentifier {
+        var backgroundTaskIdentifier: UIBackgroundTaskIdentifier = .invalid
+        backgroundTaskIdentifier = UIApplication.shared.beginBackgroundTask {
+            UIApplication.shared.endBackgroundTask(backgroundTaskIdentifier)
+        }
+        backgroundTaskIdentifiers.insert(backgroundTaskIdentifier)
+        return backgroundTaskIdentifier
+    }
+    
+    func endBackgroundTask(_ identifier: UIBackgroundTaskIdentifier) {
+        UIApplication.shared.endBackgroundTask(identifier)
+        backgroundTaskIdentifiers.remove(identifier)
     }
     
     func takeOffline(map: AGSMap, extent: AGSEnvelope) {
@@ -326,6 +350,9 @@ class JobManagerExample: TableViewController {
                 
                 // register the job with our JobManager shared instance
                 JobManager.shared.register(job: job)
+
+                // try to keep the app running in the background for this job if possible
+                let backgroundTaskIdentifier = self.startBackgroundTask()
                 
                 // start the job
                 job.start(
@@ -333,6 +360,7 @@ class JobManagerExample: TableViewController {
                         self?.jobStatusHandler(status: $0)
                     },
                     completion: { [weak self] in
+                        self?.endBackgroundTask(backgroundTaskIdentifier)
                         self?.jobCompletionHandler(result: $0, error: $1)
                     }
                 )
