@@ -13,7 +13,6 @@
 
 import ArcGIS
 import Foundation
-import BackgroundTasks
 
 internal typealias JSONDictionary = [String: Any]
 public typealias JobStatusHandler = (AGSJobStatus) -> Void
@@ -93,9 +92,6 @@ public class JobManager: NSObject {
     
     deinit {
         keyedJobs.values.forEach { unObserveJobStatus(job: $0) }
-        if let observer = bgObserver {
-            NotificationCenter.default.removeObserver(observer)
-        }
     }
     
     private func toJSON() -> JSONDictionary {
@@ -202,7 +198,7 @@ public class JobManager: NSObject {
     /// - Parameters:
     ///   - application:  See [Apple's documentation](https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1623125-application)
     ///   - completionHandler:  See [Apple's documentation](https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1623125-application)
-    @available(iOS, deprecated: 13.0, message: "Please use 'registerForBackgroundUpdates()' instead")
+    @available(iOS, deprecated: 13.0, message: "Please use 'UIApplication.shared.beginBackgroundTask(expirationHandler:)' when kicking off your job instead")
     public func application(application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         if keyedJobs.isEmpty {
             return completionHandler(.noData)
@@ -214,60 +210,6 @@ public class JobManager: NSObject {
                     completionHandler(.failed)
                 }
             }
-        }
-    }
-    
-    private let bgTaskIdentifier = "com.esri.arcgis.toolkit.jobmanager.refresh"
-    private var bgObserver: AnyObject?
-    
-    /// Registers a task for updating job status in the background.
-    /// You must add an entry in the app plist for com.esri.arcgis.toolkit.jobmanager.refresh under BGTaskSchedulerPermittedIdentifiers.
-    /// This must be called before the end of the app launch sequence.
-    /// This must be tested on device, does not work on the simulator. For debugging this, see documentation here: https://developer.apple.com/documentation/backgroundtasks/starting_and_terminating_tasks_during_development?language=objc
-    /// Returns whether or not the registration was successful. If the registration was not successful, please check your application's plist for the appropriately entry
-    /// as mentioned above.
-    @available(iOS 13.0, *)
-    @discardableResult
-    public func registerForBackgroundUpdates() -> Bool {
-        // register the bg task
-        let result = BGTaskScheduler.shared.register(forTaskWithIdentifier: bgTaskIdentifier, using: nil) { [weak self] task in
-            self?.handleBackgroundRefresh(task: task as! BGAppRefreshTask)
-        }
-        
-        // schedule a notification when application enters background
-        if bgObserver == nil {
-            bgObserver = NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: .main) { [weak self] _ in
-                self?.scheduleNextBackgroundRefresh()
-            }
-        }
-        
-        return result
-    }
-    
-    @available(iOS 13.0, *)
-    private func handleBackgroundRefresh(task: BGAppRefreshTask) {
-        // Schedule next refresh
-        scheduleNextBackgroundRefresh()
-        
-        // check job status
-        let operation = JobManager.shared.checkStatusForAllJobs { success in
-            task.setTaskCompleted(success: success)
-        }
-        
-        task.expirationHandler = {
-            operation.cancel()
-        }
-    }
-    
-    @available(iOS 13.0, *)
-    private func scheduleNextBackgroundRefresh() {
-        let request = BGAppRefreshTaskRequest(identifier: bgTaskIdentifier)
-        request.earliestBeginDate = Date(timeIntervalSinceNow: 30)
-        
-        do {
-            try BGTaskScheduler.shared.submit(request)
-        } catch {
-            print("Could not schedule app refresh: \(error)")
         }
     }
     
