@@ -181,6 +181,20 @@ class JobManagerExample: TableViewController {
         backgroundTaskIdentifiers.removeAll()
     }
     
+    func startBackgroundTask() -> UIBackgroundTaskIdentifier {
+        var backgroundTaskIdentifier: UIBackgroundTaskIdentifier = .invalid
+        backgroundTaskIdentifier = UIApplication.shared.beginBackgroundTask {
+            UIApplication.shared.endBackgroundTask(backgroundTaskIdentifier)
+        }
+        backgroundTaskIdentifiers.insert(backgroundTaskIdentifier)
+        return backgroundTaskIdentifier
+    }
+    
+    func endBackgroundTask(_ identifier: UIBackgroundTaskIdentifier) {
+        UIApplication.shared.endBackgroundTask(identifier)
+        backgroundTaskIdentifiers.remove(identifier)
+    }
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         if let toolbar = toolbar, toolbar.items == nil {
@@ -318,20 +332,6 @@ class JobManagerExample: TableViewController {
             // refresh the tableview
             self.tableView.reloadData()
         }
-    }
-    
-    func startBackgroundTask() -> UIBackgroundTaskIdentifier {
-        var backgroundTaskIdentifier: UIBackgroundTaskIdentifier = .invalid
-        backgroundTaskIdentifier = UIApplication.shared.beginBackgroundTask {
-            UIApplication.shared.endBackgroundTask(backgroundTaskIdentifier)
-        }
-        backgroundTaskIdentifiers.insert(backgroundTaskIdentifier)
-        return backgroundTaskIdentifier
-    }
-    
-    func endBackgroundTask(_ identifier: UIBackgroundTaskIdentifier) {
-        UIApplication.shared.endBackgroundTask(identifier)
-        backgroundTaskIdentifiers.remove(identifier)
     }
     
     func takeOffline(map: AGSMap, extent: AGSEnvelope) {
