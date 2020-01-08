@@ -175,6 +175,12 @@ class JobManagerExample: TableViewController {
         super.viewWillDisappear(animated)
     }
     
+    deinit {
+        // clear out background tasks that we started for the jobs
+        backgroundTaskIdentifiers.forEach { UIApplication.shared.endBackgroundTask($0) }
+        backgroundTaskIdentifiers.removeAll()
+    }
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         if let toolbar = toolbar, toolbar.items == nil {
@@ -253,7 +259,7 @@ class JobManagerExample: TableViewController {
             // make sure we are still around...
             guard let self = self, let strongTask = task else {
                 // don't need to end the background task here as that
-                // would have been done in dealloc
+                // would have been done in deinit
                 return
             }
             
@@ -341,7 +347,7 @@ class JobManagerExample: TableViewController {
             // make sure we are still around...
             guard let self = self else {
                 // don't need to end the background task here as that
-                // would have been done in dealloc
+                // would have been done in deinit
                 return
             }
             
