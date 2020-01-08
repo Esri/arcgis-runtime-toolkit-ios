@@ -241,6 +241,9 @@ class JobManagerExample: TableViewController {
     }
     
     func generateGDB(URL: URL, syncModel: AGSSyncModel, extent: AGSEnvelope?) {
+        // try to keep the app running in the background for this job if possible
+        let backgroundTaskIdentifier = self.startBackgroundTask()
+        
         let task = AGSGeodatabaseSyncTask(url: URL)
         
         // hold on to task so that it stays retained while it's loading
@@ -248,11 +251,9 @@ class JobManagerExample: TableViewController {
         
         task.load { [weak self, weak task] error in
             // make sure we are still around...
-            guard let self = self else {
-                return
-            }
-            
-            guard let strongTask = task else {
+            guard let self = self, let strongTask = task else {
+                // don't need to end the background task here as that
+                // would have been done in dealloc
                 return
             }
             
@@ -262,11 +263,8 @@ class JobManagerExample: TableViewController {
             }
             
             // return if error or no featureServiceInfo
-            guard error == nil else {
-                return
-            }
-            
-            guard let fsi = strongTask.featureServiceInfo else {
+            guard error == nil, let fsi = strongTask.featureServiceInfo else {
+                self.endBackgroundTask(backgroundTaskIdentifier)
                 return
             }
             
@@ -299,9 +297,6 @@ class JobManagerExample: TableViewController {
             
             // register the job with our JobManager shared instance
             JobManager.shared.register(job: job)
-
-            // try to keep the app running in the background for this job if possible
-            let backgroundTaskIdentifier = self.startBackgroundTask()
             
             // start the job
             job.start(
@@ -334,6 +329,9 @@ class JobManagerExample: TableViewController {
     }
     
     func takeOffline(map: AGSMap, extent: AGSEnvelope) {
+        // try to keep the app running in the background for this job if possible
+        let backgroundTaskIdentifier = self.startBackgroundTask()
+        
         let task = AGSOfflineMapTask(onlineMap: map)
         
         let uuid = NSUUID()
@@ -342,6 +340,8 @@ class JobManagerExample: TableViewController {
         task.defaultGenerateOfflineMapParameters(withAreaOfInterest: extent) { [weak self] params, error in
             // make sure we are still around...
             guard let self = self else {
+                // don't need to end the background task here as that
+                // would have been done in dealloc
                 return
             }
             
@@ -350,9 +350,6 @@ class JobManagerExample: TableViewController {
                 
                 // register the job with our JobManager shared instance
                 JobManager.shared.register(job: job)
-
-                // try to keep the app running in the background for this job if possible
-                let backgroundTaskIdentifier = self.startBackgroundTask()
                 
                 // start the job
                 job.start(
@@ -370,6 +367,7 @@ class JobManagerExample: TableViewController {
             } else {
                 // if could not get default parameters, then fire completion with the error
                 self.jobCompletionHandler(result: nil, error: error)
+                self.endBackgroundTask(backgroundTaskIdentifier)
             }
         }
     }
