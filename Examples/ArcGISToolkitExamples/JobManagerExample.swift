@@ -309,8 +309,8 @@ class JobManagerExample: TableViewController {
                     self?.jobStatusHandler(status: $0)
                 },
                 completion: { [weak self] in
-                    self?.endBackgroundTask(backgroundTaskIdentifier)
                     self?.jobCompletionHandler(result: $0, error: $1)
+                    self?.endBackgroundTask(backgroundTaskIdentifier)
                 }
             )
             
@@ -360,8 +360,8 @@ class JobManagerExample: TableViewController {
                         self?.jobStatusHandler(status: $0)
                     },
                     completion: { [weak self] in
-                        self?.endBackgroundTask(backgroundTaskIdentifier)
                         self?.jobCompletionHandler(result: $0, error: $1)
+                        self?.endBackgroundTask(backgroundTaskIdentifier)
                     }
                 )
                 
