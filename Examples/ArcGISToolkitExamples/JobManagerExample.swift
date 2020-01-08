@@ -22,17 +22,10 @@ import UserNotifications
 // restart the application, and find out what jobs were running and have the ability to
 // resume them.
 //
-// The other aspect of this sample is that if you just background the app then it will
-// provide a helper method that helps with background fetch.
-//
-// See the AppDelegate.swift for implementation of the function:
-// `func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void)`
-// We forward that call to the shared JobManager so that it can perform the background fetch.
-//
 
 class JobTableViewCell: UITableViewCell {
     var job: AGSJob?
-    var statusObservation: NSKeyValueObservation?
+    var observation: NSKeyValueObservation?
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
@@ -44,15 +37,15 @@ class JobTableViewCell: UITableViewCell {
     
     func configureWithJob(job: AGSJob?) {
         // invalidate previous observation
-        statusObservation?.invalidate()
-        statusObservation = nil
+        observation?.invalidate()
+        observation = nil
         
         self.job = job
         
         self.updateUI()
         
-        // observe job status
-        statusObservation = self.job?.observe(\.status, options: .new) { [weak self] (_, _) in
+        // observe job
+        observation = self.job?.progress.observe(\.fractionCompleted) { [weak self] (_, _) in
             DispatchQueue.main.async {
                 self?.updateUI()
             }
@@ -178,7 +171,6 @@ class JobManagerExample: TableViewController {
     deinit {
         // clear out background tasks that we started for the jobs
         backgroundTaskIdentifiers.forEach { UIApplication.shared.endBackgroundTask($0) }
-        backgroundTaskIdentifiers.removeAll()
     }
     
     func startBackgroundTask() -> UIBackgroundTaskIdentifier {
