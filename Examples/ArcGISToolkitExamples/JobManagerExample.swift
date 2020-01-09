@@ -22,17 +22,10 @@ import UserNotifications
 // restart the application, and find out what jobs were running and have the ability to
 // resume them.
 //
-// The other aspect of this sample is that if you just background the app then it will
-// provide a helper method that helps with background fetch.
-//
-// See the AppDelegate.swift for implementation of the function:
-// `func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void)`
-// We forward that call to the shared JobManager so that it can perform the background fetch.
-//
 
 class JobTableViewCell: UITableViewCell {
     var job: AGSJob?
-    var statusObservation: NSKeyValueObservation?
+    var observation: NSKeyValueObservation?
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
@@ -44,15 +37,15 @@ class JobTableViewCell: UITableViewCell {
     
     func configureWithJob(job: AGSJob?) {
         // invalidate previous observation
-        statusObservation?.invalidate()
-        statusObservation = nil
+        observation?.invalidate()
+        observation = nil
         
         self.job = job
         
         self.updateUI()
         
-        // observe job status
-        statusObservation = self.job?.observe(\.status, options: .new) { [weak self] (_, _) in
+        // observe job
+        observation = self.job?.progress.observe(\.fractionCompleted) { [weak self] (_, _) in
             DispatchQueue.main.async {
                 self?.updateUI()
             }
@@ -107,6 +100,8 @@ class JobManagerExample: TableViewController {
     var jobs: [AGSJob] {
         return JobManager.shared.jobs
     }
+    
+    var backgroundTaskIdentifiers = Set<UIBackgroundTaskIdentifier>()
     
     var toolbar: UIToolbar?
     
@@ -166,7 +161,30 @@ class JobManagerExample: TableViewController {
         // But since this sample view controller can be pushed/pop, we need this.
         JobManager.shared.pauseAllJobs()
         
+        // clear out background tasks that we started for the jobs
+        backgroundTaskIdentifiers.forEach { UIApplication.shared.endBackgroundTask($0) }
+        backgroundTaskIdentifiers.removeAll()
+        
         super.viewWillDisappear(animated)
+    }
+    
+    deinit {
+        // clear out background tasks that we started for the jobs
+        backgroundTaskIdentifiers.forEach { UIApplication.shared.endBackgroundTask($0) }
+    }
+    
+    func startBackgroundTask() -> UIBackgroundTaskIdentifier {
+        var backgroundTaskIdentifier: UIBackgroundTaskIdentifier = .invalid
+        backgroundTaskIdentifier = UIApplication.shared.beginBackgroundTask {
+            UIApplication.shared.endBackgroundTask(backgroundTaskIdentifier)
+        }
+        backgroundTaskIdentifiers.insert(backgroundTaskIdentifier)
+        return backgroundTaskIdentifier
+    }
+    
+    func endBackgroundTask(_ identifier: UIBackgroundTaskIdentifier) {
+        UIApplication.shared.endBackgroundTask(identifier)
+        backgroundTaskIdentifiers.remove(identifier)
     }
     
     override func viewDidLayoutSubviews() {
@@ -235,6 +253,9 @@ class JobManagerExample: TableViewController {
     }
     
     func generateGDB(URL: URL, syncModel: AGSSyncModel, extent: AGSEnvelope?) {
+        // try to keep the app running in the background for this job if possible
+        let backgroundTaskIdentifier = self.startBackgroundTask()
+        
         let task = AGSGeodatabaseSyncTask(url: URL)
         
         // hold on to task so that it stays retained while it's loading
@@ -242,11 +263,9 @@ class JobManagerExample: TableViewController {
         
         task.load { [weak self, weak task] error in
             // make sure we are still around...
-            guard let self = self else {
-                return
-            }
-            
-            guard let strongTask = task else {
+            guard let self = self, let strongTask = task else {
+                // don't need to end the background task here as that
+                // would have been done in deinit
                 return
             }
             
@@ -256,11 +275,8 @@ class JobManagerExample: TableViewController {
             }
             
             // return if error or no featureServiceInfo
-            guard error == nil else {
-                return
-            }
-            
-            guard let fsi = strongTask.featureServiceInfo else {
+            guard error == nil, let fsi = strongTask.featureServiceInfo else {
+                self.endBackgroundTask(backgroundTaskIdentifier)
                 return
             }
             
@@ -301,6 +317,7 @@ class JobManagerExample: TableViewController {
                 },
                 completion: { [weak self] in
                     self?.jobCompletionHandler(result: $0, error: $1)
+                    self?.endBackgroundTask(backgroundTaskIdentifier)
                 }
             )
             
@@ -310,6 +327,9 @@ class JobManagerExample: TableViewController {
     }
     
     func takeOffline(map: AGSMap, extent: AGSEnvelope) {
+        // try to keep the app running in the background for this job if possible
+        let backgroundTaskIdentifier = self.startBackgroundTask()
+        
         let task = AGSOfflineMapTask(onlineMap: map)
         
         let uuid = NSUUID()
@@ -318,6 +338,8 @@ class JobManagerExample: TableViewController {
         task.defaultGenerateOfflineMapParameters(withAreaOfInterest: extent) { [weak self] params, error in
             // make sure we are still around...
             guard let self = self else {
+                // don't need to end the background task here as that
+                // would have been done in deinit
                 return
             }
             
@@ -334,6 +356,7 @@ class JobManagerExample: TableViewController {
                     },
                     completion: { [weak self] in
                         self?.jobCompletionHandler(result: $0, error: $1)
+                        self?.endBackgroundTask(backgroundTaskIdentifier)
                     }
                 )
                 
@@ -342,6 +365,7 @@ class JobManagerExample: TableViewController {
             } else {
                 // if could not get default parameters, then fire completion with the error
                 self.jobCompletionHandler(result: nil, error: error)
+                self.endBackgroundTask(backgroundTaskIdentifier)
             }
         }
     }
