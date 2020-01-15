@@ -554,6 +554,9 @@ extension ARExample {
                 let camera = AGSCamera(latitude: center.y, longitude: center.x, altitude: 0, heading: 0, pitch: 90.0, roll: 0)
                 self?.arView.originCamera = camera
                 self?.arView.translationFactor = 2000
+                
+                // Set the clipping distance to limit the data display around the originCamera.
+                self?.arView.clippingDistance = 750
             }
         }
         
@@ -601,6 +604,9 @@ extension ARExample {
                     let camera = AGSCamera(latitude: center.y, longitude: center.x, altitude: elevation, heading: 0, pitch: 90, roll: 0)
                     self?.arView.originCamera = camera
                     self?.arView.translationFactor = 18000
+                    
+                    // Reset the clipping distance so we view the full scene.
+                    self?.arView.clippingDistance = 0
                 }
             }
         }
@@ -649,6 +655,9 @@ extension ARExample {
                     let camera = AGSCamera(latitude: center.y, longitude: center.x, altitude: elevation, heading: 0, pitch: 90.0, roll: 0)
                     self?.arView.originCamera = camera
                     self?.arView.translationFactor = 1000
+
+                    // Set the clipping distance to limit the data display around the originCamera.
+                    self?.arView.clippingDistance = 500
                 }
             }
         }

@@ -22,17 +22,10 @@ import UserNotifications
 // restart the application, and find out what jobs were running and have the ability to
 // resume them.
 //
-// The other aspect of this sample is that if you just background the app then it will
-// provide a helper method that helps with background fetch.
-//
-// See the AppDelegate.swift for implementation of the function:
-// `func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void)`
-// We forward that call to the shared JobManager so that it can perform the background fetch.
-//
 
 class JobTableViewCell: UITableViewCell {
     var job: AGSJob?
-    var statusObservation: NSKeyValueObservation?
+    var observation: NSKeyValueObservation?
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
@@ -44,15 +37,15 @@ class JobTableViewCell: UITableViewCell {
     
     func configureWithJob(job: AGSJob?) {
         // invalidate previous observation
-        statusObservation?.invalidate()
-        statusObservation = nil
+        observation?.invalidate()
+        observation = nil
         
         self.job = job
         
         self.updateUI()
         
-        // observe job status
-        statusObservation = self.job?.observe(\.status, options: .new) { [weak self] (_, _) in
+        // observe job
+        observation = self.job?.progress.observe(\.fractionCompleted) { [weak self] (_, _) in
             DispatchQueue.main.async {
                 self?.updateUI()
             }
@@ -108,6 +101,8 @@ class JobManagerExample: TableViewController {
         return JobManager.shared.jobs
     }
     
+    var backgroundTaskIdentifiers = Set<UIBackgroundTaskIdentifier>()
+    
     var toolbar: UIToolbar?
     
     override func viewDidLoad() {
@@ -129,19 +124,6 @@ class JobManagerExample: TableViewController {
         // now anchor toolbar below new safe area
         toolbar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         
-        // button to kick off a new job
-        let kickOffJobItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(kickOffJob))
-        
-        // button to resume all paused jobs
-        // use this to resume the paused jobs you have after restarting your app
-        let resumeAllPausedJobsItem = UIBarButtonItem(barButtonSystemItem: .play, target: self, action: #selector(resumeAllPausedJobs))
-        
-        // button to clear the finished jobs
-        let clearFinishedJobsItem = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(clearFinishedJobs))
-        
-        let flex = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        toolbar.items = [kickOffJobItem, flex, resumeAllPausedJobsItem, flex, clearFinishedJobsItem]
-        
         // request authorization for user notifications, this way we can notify user in bg when job complete
         let center = UNUserNotificationCenter.current()
         center.requestAuthorization(options: [.alert, .badge, .sound]) { (granted, _) in
@@ -154,9 +136,69 @@ class JobManagerExample: TableViewController {
         tableView.register(JobTableViewCell.self, forCellReuseIdentifier: "JobCell")
     }
     
-    @objc
-    func resumeAllPausedJobs() {
-        JobManager.shared.resumeAllPausedJobs(statusHandler: self.jobStatusHandler, completion: self.jobCompletionHandler)
+    override func viewDidAppear(_ animated: Bool) {
+        // resume any paused jobs when this view controller is shown
+        JobManager.shared.resumeAllPausedJobs(
+            statusHandler: { [weak self] in
+                self?.jobStatusHandler(status: $0)
+            },
+            completion: { [weak self] in
+                self?.jobCompletionHandler(result: $0, error: $1)
+            }
+        )
+        
+        super.viewDidAppear(animated)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        // When the view controller is popped, we pause all running jobs.
+        // In a normal app you would not need to do this, but this view controller
+        // is acting as an app example. Thus when it is not being shown, we pause
+        // the jobs so that when the view controller is re-shown we can resume and rewire
+        // the handlers up to them. Otherwise we would have no way to hook into the status
+        // of any currently running jobs. A normal app would not likely need this as it would
+        // have an object globally wiring up status and completion handlers to jobs.
+        // But since this sample view controller can be pushed/pop, we need this.
+        JobManager.shared.pauseAllJobs()
+        
+        // clear out background tasks that we started for the jobs
+        backgroundTaskIdentifiers.forEach { UIApplication.shared.endBackgroundTask($0) }
+        backgroundTaskIdentifiers.removeAll()
+        
+        super.viewWillDisappear(animated)
+    }
+    
+    deinit {
+        // clear out background tasks that we started for the jobs
+        backgroundTaskIdentifiers.forEach { UIApplication.shared.endBackgroundTask($0) }
+    }
+    
+    func startBackgroundTask() -> UIBackgroundTaskIdentifier {
+        var backgroundTaskIdentifier: UIBackgroundTaskIdentifier = .invalid
+        backgroundTaskIdentifier = UIApplication.shared.beginBackgroundTask {
+            UIApplication.shared.endBackgroundTask(backgroundTaskIdentifier)
+        }
+        backgroundTaskIdentifiers.insert(backgroundTaskIdentifier)
+        return backgroundTaskIdentifier
+    }
+    
+    func endBackgroundTask(_ identifier: UIBackgroundTaskIdentifier) {
+        UIApplication.shared.endBackgroundTask(identifier)
+        backgroundTaskIdentifiers.remove(identifier)
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if let toolbar = toolbar, toolbar.items == nil {
+            // button to kick off a new job
+            let kickOffJobItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(kickOffJob))
+            
+            // button to clear the finished jobs
+            let clearFinishedJobsItem = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(clearFinishedJobs))
+            
+            let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+            toolbar.items = [kickOffJobItem, flexibleSpace, clearFinishedJobsItem]
+        }
     }
     
     @objc
@@ -211,6 +253,9 @@ class JobManagerExample: TableViewController {
     }
     
     func generateGDB(URL: URL, syncModel: AGSSyncModel, extent: AGSEnvelope?) {
+        // try to keep the app running in the background for this job if possible
+        let backgroundTaskIdentifier = self.startBackgroundTask()
+        
         let task = AGSGeodatabaseSyncTask(url: URL)
         
         // hold on to task so that it stays retained while it's loading
@@ -218,25 +263,20 @@ class JobManagerExample: TableViewController {
         
         task.load { [weak self, weak task] error in
             // make sure we are still around...
-            guard let self = self else {
-                return
-            }
-            
-            guard let strongTask = task else {
+            guard let self = self, let strongTask = task else {
+                // don't need to end the background task here as that
+                // would have been done in deinit
                 return
             }
             
             // remove task from array now that it's loaded
-            if let index = self.tasks.index(where: { return $0 === strongTask }) {
+            if let index = self.tasks.firstIndex(where: { return $0 === strongTask }) {
                 self.tasks.remove(at: index)
             }
             
             // return if error or no featureServiceInfo
-            guard error == nil else {
-                return
-            }
-            
-            guard let fsi = strongTask.featureServiceInfo else {
+            guard error == nil, let fsi = strongTask.featureServiceInfo else {
+                self.endBackgroundTask(backgroundTaskIdentifier)
                 return
             }
             
@@ -271,7 +311,15 @@ class JobManagerExample: TableViewController {
             JobManager.shared.register(job: job)
             
             // start the job
-            job.start(statusHandler: self.jobStatusHandler, completion: self.jobCompletionHandler)
+            job.start(
+                statusHandler: { [weak self] in
+                    self?.jobStatusHandler(status: $0)
+                },
+                completion: { [weak self] in
+                    self?.jobCompletionHandler(result: $0, error: $1)
+                    self?.endBackgroundTask(backgroundTaskIdentifier)
+                }
+            )
             
             // refresh the tableview
             self.tableView.reloadData()
@@ -279,6 +327,9 @@ class JobManagerExample: TableViewController {
     }
     
     func takeOffline(map: AGSMap, extent: AGSEnvelope) {
+        // try to keep the app running in the background for this job if possible
+        let backgroundTaskIdentifier = self.startBackgroundTask()
+        
         let task = AGSOfflineMapTask(onlineMap: map)
         
         let uuid = NSUUID()
@@ -287,6 +338,8 @@ class JobManagerExample: TableViewController {
         task.defaultGenerateOfflineMapParameters(withAreaOfInterest: extent) { [weak self] params, error in
             // make sure we are still around...
             guard let self = self else {
+                // don't need to end the background task here as that
+                // would have been done in deinit
                 return
             }
             
@@ -297,13 +350,22 @@ class JobManagerExample: TableViewController {
                 JobManager.shared.register(job: job)
                 
                 // start the job
-                job.start(statusHandler: self.jobStatusHandler, completion: self.jobCompletionHandler)
+                job.start(
+                    statusHandler: { [weak self] in
+                        self?.jobStatusHandler(status: $0)
+                    },
+                    completion: { [weak self] in
+                        self?.jobCompletionHandler(result: $0, error: $1)
+                        self?.endBackgroundTask(backgroundTaskIdentifier)
+                    }
+                )
                 
                 // refresh the tableview
                 self.tableView.reloadData()
             } else {
                 // if could not get default parameters, then fire completion with the error
                 self.jobCompletionHandler(result: nil, error: error)
+                self.endBackgroundTask(backgroundTaskIdentifier)
             }
         }
     }
@@ -343,6 +405,8 @@ extension AGSJobStatus {
             return "Succeeded"
         case .started:
             return "Started"
+        @unknown default:
+            fatalError("Unknown AGSJobStatus")
         }
     }
 }

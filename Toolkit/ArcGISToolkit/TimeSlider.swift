@@ -2582,6 +2582,8 @@ extension AGSTimeValue: Comparable {
             return duration * 604800
         case .years:
             return duration * 31556952
+        @unknown default:
+            fatalError("Unknown AGSTimeValue.unit")
         }
     }
     
@@ -2611,6 +2613,8 @@ extension AGSTimeValue: Comparable {
             return (duration * 7, Calendar.Component.day)
         case .years:
             return (duration, Calendar.Component.year)
+        @unknown default:
+            fatalError("Unknown AGSTimeValue.unit")
         }
     }
     // swiftlint:enable cyclomatic_complexity
