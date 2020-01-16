@@ -36,7 +36,7 @@ public class DataSource: NSObject {
     public init(geoView: AGSGeoView) {
         super.init()
         self.geoView = geoView
-        geoViewDidChange(nil)
+        geoViewDidChange()
     }
     
     /// The `AGSGeoView` containing either an `AGSMap` or `AGSScene` with the operational and
@@ -45,7 +45,7 @@ public class DataSource: NSObject {
     /// - Since: 100.8.0
     public private(set) var geoView: AGSGeoView? {
         didSet {
-            geoViewDidChange(oldValue)
+            geoViewDidChange()
         }
     }
 
@@ -57,7 +57,7 @@ public class DataSource: NSObject {
     /// - Since: 100.8.0
     public private(set) var layerContents = [AGSLayerContent]()
     
-    private func geoViewDidChange(_ previousGeoView: AGSGeoView?) {
+    private func geoViewDidChange() {
         if let mapView = geoView as? AGSMapView {
             mapView.map?.load { [weak self] (error) in
                 guard let self = self,
