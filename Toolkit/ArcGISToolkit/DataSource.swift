@@ -20,7 +20,7 @@ import ArcGIS
 public class DataSource: NSObject {
     /// Returns a `DataSource` initialized with the given `AGSLayerContent` array..
     /// - Parameter layers: The array of `AGSLayerContent`.
-    /// - Since: 100.7.0
+    /// - Since: 100.8.0
     public init(layers: [AGSLayerContent]) {
         super.init()
         layerContents.append(contentsOf: layers)
@@ -28,7 +28,7 @@ public class DataSource: NSObject {
     
     /// Returns a `DataSource` initialized with the operational and base map layers of a map or scene in an `AGSGeoView`.
     /// - Parameter geoView: The `AGSGeoView` containing the map/scene's operational and base map layers.
-    /// - Since: 100.7.0
+    /// - Since: 100.8.0
     public init(geoView: AGSGeoView) {
         super.init()
         self.geoView = geoView
@@ -37,7 +37,7 @@ public class DataSource: NSObject {
     
     /// The `AGSGeoView` containing either an `AGSMap` or `AGSScene` with the operational and base map layers to use as data.
     /// If the `DataSource` was initialized with an array of `AGSLayerContent`, `goeView` will be nil.
-    /// - Since: 100.7.0
+    /// - Since: 100.8.0
     public private(set) var geoView: AGSGeoView? {
         didSet {
             geoViewDidChange(oldValue)
@@ -47,7 +47,7 @@ public class DataSource: NSObject {
     /// The list of all layers used to generate the TOC/Legend, read-only.  It contains both the operational layers of the map/scene and
     /// the reference and base layers of the basemap.  The order of the layer contents is the order in which they are drawn
     /// in a map or scene:  bottom up (the first layer in the array is at the bottom and drawn first; the last layer is at the top and drawn last).
-    /// - Since: 100.7.0
+    /// - Since: 100.8.0
     public private(set) var layerContents = [AGSLayerContent]()
     
     private func geoViewDidChange(_ previousGeoView: AGSGeoView?) {
