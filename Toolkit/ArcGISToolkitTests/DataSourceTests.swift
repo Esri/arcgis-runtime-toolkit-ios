@@ -61,7 +61,7 @@ class DataSourceTests: XCTestCase {
     /// Tests boundary conditions by verifying the `layerContents` property returns the correct number of layerContents
     func testBoundaryConditions() {
         //
-        // Test with no basemap.
+        // Test with no base map.
         //
         let sceneView = AGSSceneView()
         let scene = AGSScene()
@@ -92,7 +92,7 @@ class DataSourceTests: XCTestCase {
         XCTAssertEqual(layerCount(map: map), dataSource.layerContents.count)
         
         //
-        // Test with no layers at all.
+        // Test with no operational or base map layers.
         //
         mapView = AGSMapView()
         map = AGSMap(spatialReference: .wgs84())
@@ -105,6 +105,12 @@ class DataSourceTests: XCTestCase {
         dataSource = DataSource(geoView: mapView)
         XCTAssertEqual(layerCount(map: map), dataSource.layerContents.count)
         XCTAssertEqual(dataSource.layerContents.count, 0)
+
+        //
+        // Test with empty layers array.
+        //
+        let emptyDataSource = DataSource(layers: [])
+        XCTAssertEqual(emptyDataSource.layerContents.count, 0)
     }
 
     // MARK: Internal
