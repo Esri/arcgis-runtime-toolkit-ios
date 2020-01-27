@@ -16,8 +16,8 @@ import UIKit
 import ArcGIS
 
 /// The data source is used to represent an array of `AGSLayerContent` for use in a variety of
-/// implementations.  It is iinitialized with either an array of `AGSLayerContent`
-/// or an `AGSGeoView` from whose `AGSMap` or `AGSScene`the  operational and
+/// implementations. It is initialized with either an array of `AGSLayerContent`
+/// or an `AGSGeoView` from whose `AGSMap` or `AGSScene` the  operational and
 /// base map layers (`AGSLayerContent`) are extracted.
 public class DataSource: NSObject {
     /// Returns a `DataSource` initialized with the given `AGSLayerContent` array..
