@@ -7,3 +7,4 @@
 * [Scalebar](Scalebar)
 * [TimeSlider](TimeSlider)
 * [AR](AR)
+* [Bookmarks](Bookmarks)
