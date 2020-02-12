@@ -1,6 +1,6 @@
 # ArcGIS Runtime Toolkit for iOS
 
-[![doc](https://img.shields.io/badge/Doc-purple)](Documentation/readme) [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage) [![CocoaPods](https://img.shields.io/cocoapods/v/ArcGIS-Runtime-Toolkit-iOS)](https://cocoapods.org/)
+[![doc](https://img.shields.io/badge/Doc-purple)](Documentation) [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage) [![CocoaPods](https://img.shields.io/cocoapods/v/ArcGIS-Runtime-Toolkit-iOS)](https://cocoapods.org/)
 
 The ArcGIS Runtime SDK for iOS Toolkit contains components that will simplify your iOS app development. Check out the [Examples](/Examples) project to see these components in action or read through the [Documentation](/Documentation) to learn more about them.
 
