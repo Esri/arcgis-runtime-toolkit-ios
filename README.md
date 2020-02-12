@@ -16,7 +16,7 @@ To use Toolkit in your project:
 * **[Bookmarks](Documentation/Bookmarks)** - Shows bookmarks, from a map, scene, or a list.
 * **[Compass](Documentation/Compass)** - Shows a compass direction when the map is rotated. Auto-hides when the map points north up.
 * **[JobManager](Documentation/JobManager)** - Suspends and resumes ArcGIS Runtime tasks when the app is background, terminated, and relaunched.
-* **[LegendViewController](Documentation/LegendViewController)** - Displays a legend for a single layer in your map (and optionally for its sub layers).
+* **[LegendViewController](Documentation/LegendViewController)** - Displays a legend for all the layers in a map or scene contained in an `AGSGeoView`.
 * **[MeasureToolbar](Documentation/MeasureToolbar)** - Allows measurement of distances and areas on the map view.
 * **[PopupController](Documentation/PopupController)** - Display details and media, edit attributes, geometry and related records, and manage the attachments of features and graphics (popups are defined in the popup property of features and graphics).
 * **[Scalebar](Documentation/Scalebar)** - Displays current scale reference.
@@ -96,4 +96,3 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 A copy of the license is available in the repository's [LICENSE]( /LICENSE) file.
-
