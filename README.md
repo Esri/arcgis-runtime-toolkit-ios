@@ -12,16 +12,16 @@ To use Toolkit in your project:
 
 ## Toolkit Components
 
-* [Augmented reality (AR)](Documentation/AR) - Integrates the scene view with ARKit to enable augmented reality (AR).
-* [Bookmarks](Documentation/Bookmarks) - Shows bookmarks, from a map, scene, or a list.
-* [Compass](Documentation/Compass) - Shows a compass direction when the map is rotated. Auto-hides when the map points north up.
-* [JobManager](Documentation/JobManager) - Suspends and resumes ArcGIS Runtime tasks when the app is background, terminated, and relaunched.
-* [LegendViewController](Documentation/LegendViewController) - Displays a legend for a single layer in your map (and optionally for its sub layers).
-* [MeasureToolbar](Documentation/MeasureToolbar) - Allows measurement of distances and areas on the map view.
-* [PopupController](Documentation/PopupController) - Display details and media, edit attributes, geometry and related records, and manage the attachments of features and graphics (popups are defined in the popup property of features and graphics).
-* [Scalebar](Documentation/Scalebar) - Displays current scale reference.
-* [TemplatePickerViewController](Documentation/TemplatePicker) - Allows a user to choose a template from a list of `AGSFeatureTemplate` when creating new features.
-* [TimeSlider](Documentation/TimeSlider) - Allows interactively defining a temporal range (i.e. time extent) and animating time moving forward or backward. Can be used to manipulate the time extent in a MapView or SceneView.
+* **[Augmented reality (AR)](Documentation/AR)** - Integrates the scene view with ARKit to enable augmented reality (AR).
+* **[Bookmarks](Documentation/Bookmarks)** - Shows bookmarks, from a map, scene, or a list.
+* **[Compass](Documentation/Compass)** - Shows a compass direction when the map is rotated. Auto-hides when the map points north up.
+* **[JobManager](Documentation/JobManager)** - Suspends and resumes ArcGIS Runtime tasks when the app is background, terminated, and relaunched.
+* **[LegendViewController](Documentation/LegendViewController)** - Displays a legend for a single layer in your map (and optionally for its sub layers).
+* **[MeasureToolbar](Documentation/MeasureToolbar)** - Allows measurement of distances and areas on the map view.
+* **[PopupController](Documentation/PopupController)** - Display details and media, edit attributes, geometry and related records, and manage the attachments of features and graphics (popups are defined in the popup property of features and graphics).
+* **[Scalebar](Documentation/Scalebar)** - Displays current scale reference.
+* **[TemplatePickerViewController](Documentation/TemplatePicker)** - Allows a user to choose a template from a list of `AGSFeatureTemplate` when creating new features.
+* **[TimeSlider](Documentation/TimeSlider)** - Allows interactively defining a temporal range (i.e. time extent) and animating time moving forward or backward. Can be used to manipulate the time extent in a MapView or SceneView.
 
 ## Requirements
 
