@@ -48,7 +48,7 @@ public class ArcGISARView: UIView {
 
     /// The data source used to get device location.  Used either in conjuction with ARKit data or when ARKit is not present or not being used.
     /// - Since: 100.6.0
-    public var locationDataSource: AGSCLLocationDataSource? {
+    public var locationDataSource: AGSLocationDataSource? {
         didSet {
             locationDataSource?.locationChangeHandlerDelegate = self
         }
