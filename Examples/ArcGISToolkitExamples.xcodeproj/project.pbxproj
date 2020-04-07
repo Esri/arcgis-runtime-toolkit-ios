@@ -516,6 +516,7 @@
 				INFOPLIST_FILE = ArcGISToolkitExamples/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 100.8;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.esri.${PRODUCT_NAME}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -537,6 +538,7 @@
 				INFOPLIST_FILE = ArcGISToolkitExamples/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 100.8;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.esri.${PRODUCT_NAME}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
