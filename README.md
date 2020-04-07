@@ -17,7 +17,7 @@ Toolkit components that will simplify your iOS app development with ArcGIS Runti
 
 ## Requirements
 * [ArcGIS Runtime SDK for iOS](https://developers.arcgis.com/en/ios/) 100.8.0 (or higher)
-* Xcode 10.2 (or higher)
+* Xcode 11.0 (or higher)
 
 The *ArcGIS Runtime Toolkit for iOS* has a *Target SDK* version of *12.0*, meaning that it can run on devices with *iOS 12.0* or newer.
 
