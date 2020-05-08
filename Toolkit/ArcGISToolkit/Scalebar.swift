@@ -181,7 +181,7 @@ public class Scalebar: UIView {
         }
     }
     
-    @IBInspectable public var lineColor: UIColor = UIColor.white {
+    @IBInspectable public var lineColor: UIColor = .white {
         didSet {
             setNeedsDisplay()
         }

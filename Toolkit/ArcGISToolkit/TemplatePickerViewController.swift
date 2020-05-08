@@ -98,7 +98,7 @@ public class TemplatePickerViewController: TableViewController {
     
     private func makeSearchController() -> UISearchController {
         let searchController = UISearchController(searchResultsController: nil)
-        searchController.dimsBackgroundDuringPresentation = false
+        searchController.obscuresBackgroundDuringPresentation = false
         searchController.hidesNavigationBarDuringPresentation = false
         searchController.searchResultsUpdater = self
         
