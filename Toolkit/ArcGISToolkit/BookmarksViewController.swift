@@ -64,6 +64,7 @@ public class BookmarksViewController: UIViewController {
     public init<S: Sequence>(bookmarks: S) where S.Element == AGSBookmark {
         super.init(nibName: nil, bundle: nil)
         self.bookmarks.append(contentsOf: bookmarks)
+        tableViewController.bookmarks = self.bookmarks
         sharedInit()
     }
     
