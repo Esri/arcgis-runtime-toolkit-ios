@@ -12,9 +12,9 @@
 		883904441DF6022A001F3188 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 883904421DF6022A001F3188 /* Main.storyboard */; };
 		883904461DF6022A001F3188 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 883904451DF6022A001F3188 /* Assets.xcassets */; };
 		883904491DF6022A001F3188 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 883904471DF6022A001F3188 /* LaunchScreen.storyboard */; };
-		883904511DF60296001F3188 /* ArcGIS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 883904501DF60296001F3188 /* ArcGIS.framework */; };
-		883904521DF60296001F3188 /* ArcGIS.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 883904501DF60296001F3188 /* ArcGIS.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		883EA74B20741A56006D6F72 /* PopupExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 883EA74A20741A56006D6F72 /* PopupExample.swift */; };
+		887AB7E624F884EE0011DA65 /* ArcGIS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 887AB7C824F8825D0011DA65 /* ArcGIS.framework */; };
+		887AB7E724F884FC0011DA65 /* ArcGIS.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 887AB7C824F8825D0011DA65 /* ArcGIS.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		88A01D7D1EA188EF00CD9621 /* ArcGISToolkit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 88B689A41E96E9AC00B67FAB /* ArcGISToolkit.framework */; };
 		88A01D7E1EA188EF00CD9621 /* ArcGISToolkit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 88B689A41E96E9AC00B67FAB /* ArcGISToolkit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		88B689C81E96EDF400B67FAB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689BE1E96EDF400B67FAB /* AppDelegate.swift */; };
@@ -35,6 +35,27 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		887AB7C724F8825D0011DA65 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 887AB7BE24F8825D0011DA65 /* ArcGISRT.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 88D9705D1A3662560019D11D;
+			remoteInfo = ArcGIS;
+		};
+		887AB7C924F8825D0011DA65 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 887AB7BE24F8825D0011DA65 /* ArcGISRT.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 88B4ED171A366EBC00EB11E1;
+			remoteInfo = "ArcGIS-mac64";
+		};
+		887AB7DC24F884E30011DA65 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 887AB7BE24F8825D0011DA65 /* ArcGISRT.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 88D9705C1A3662560019D11D;
+			remoteInfo = ArcGIS;
+		};
 		88A01D7F1EA188EF00CD9621 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 88B6899F1E96E9AB00B67FAB /* ArcGISToolkit.xcodeproj */;
@@ -72,8 +93,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				887AB7E724F884FC0011DA65 /* ArcGIS.framework in Embed Frameworks */,
 				88A01D7E1EA188EF00CD9621 /* ArcGISToolkit.framework in Embed Frameworks */,
-				883904521DF60296001F3188 /* ArcGIS.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -88,8 +109,8 @@
 		883904451DF6022A001F3188 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		883904481DF6022A001F3188 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8839044A1DF6022A001F3188 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		883904501DF60296001F3188 /* ArcGIS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ArcGIS.framework; path = $HOME/Library/SDKs/ArcGIS/iOS/Frameworks/Dynamic/ArcGIS.framework; sourceTree = "<absolute>"; };
 		883EA74A20741A56006D6F72 /* PopupExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopupExample.swift; sourceTree = "<group>"; };
+		887AB7BE24F8825D0011DA65 /* ArcGISRT.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ArcGISRT.xcodeproj; path = ../../../../Source/ArcGIS/cocoa/api/Common/ArcGISRT.xcodeproj; sourceTree = "<group>"; };
 		88B6899F1E96E9AB00B67FAB /* ArcGISToolkit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ArcGISToolkit.xcodeproj; path = ../Toolkit/ArcGISToolkit.xcodeproj; sourceTree = "<group>"; };
 		88B689BE1E96EDF400B67FAB /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		88B689BF1E96EDF400B67FAB /* ExamplesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExamplesViewController.swift; sourceTree = "<group>"; };
@@ -113,8 +134,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				887AB7E624F884EE0011DA65 /* ArcGIS.framework in Frameworks */,
 				88A01D7D1EA188EF00CD9621 /* ArcGISToolkit.framework in Frameworks */,
-				883904511DF60296001F3188 /* ArcGIS.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -124,10 +145,11 @@
 		883904321DF6022A001F3188 = {
 			isa = PBXGroup;
 			children = (
+				887AB7BE24F8825D0011DA65 /* ArcGISRT.xcodeproj */,
 				88B6899F1E96E9AB00B67FAB /* ArcGISToolkit.xcodeproj */,
-				883904501DF60296001F3188 /* ArcGIS.framework */,
 				8839043D1DF6022A001F3188 /* ArcGISToolkitExamples */,
 				8839043C1DF6022A001F3188 /* Products */,
+				887AB7E524F884EE0011DA65 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -153,6 +175,22 @@
 				88B689D21E96EDFE00B67FAB /* Examples */,
 			);
 			path = ArcGISToolkitExamples;
+			sourceTree = "<group>";
+		};
+		887AB7BF24F8825D0011DA65 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				887AB7C824F8825D0011DA65 /* ArcGIS.framework */,
+				887AB7CA24F8825D0011DA65 /* ArcGIS.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		887AB7E524F884EE0011DA65 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		88B689A01E96E9AB00B67FAB /* Products */ = {
@@ -210,6 +248,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				887AB7DD24F884E30011DA65 /* PBXTargetDependency */,
 				88B689A61E96E9E000B67FAB /* PBXTargetDependency */,
 				88A01D801EA188EF00CD9621 /* PBXTargetDependency */,
 			);
@@ -230,6 +269,7 @@
 				TargetAttributes = {
 					8839043A1DF6022A001F3188 = {
 						CreatedOnToolsVersion = 8.0;
+						DevelopmentTeam = P8HGHS7JQ8;
 						LastSwiftMigration = 1110;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
@@ -253,6 +293,10 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
+					ProductGroup = 887AB7BF24F8825D0011DA65 /* Products */;
+					ProjectRef = 887AB7BE24F8825D0011DA65 /* ArcGISRT.xcodeproj */;
+				},
+				{
 					ProductGroup = 88B689A01E96E9AB00B67FAB /* Products */;
 					ProjectRef = 88B6899F1E96E9AB00B67FAB /* ArcGISToolkit.xcodeproj */;
 				},
@@ -265,6 +309,20 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		887AB7C824F8825D0011DA65 /* ArcGIS.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = ArcGIS.framework;
+			remoteRef = 887AB7C724F8825D0011DA65 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		887AB7CA24F8825D0011DA65 /* ArcGIS.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = ArcGIS.framework;
+			remoteRef = 887AB7C924F8825D0011DA65 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		88B689A41E96E9AC00B67FAB /* ArcGISToolkit.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
@@ -357,6 +415,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		887AB7DD24F884E30011DA65 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = ArcGIS;
+			targetProxy = 887AB7DC24F884E30011DA65 /* PBXContainerItemProxy */;
+		};
 		88A01D801EA188EF00CD9621 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = ArcGISToolkit;
@@ -508,11 +571,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				DEVELOPMENT_TEAM = "";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(USER_LIBRARY_DIR)/SDKs/ArcGIS/iOS/Frameworks/Dynamic",
-				);
+				DEVELOPMENT_TEAM = P8HGHS7JQ8;
 				INFOPLIST_FILE = ArcGISToolkitExamples/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.esri.${PRODUCT_NAME}";
@@ -528,11 +587,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				DEVELOPMENT_TEAM = "";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(USER_LIBRARY_DIR)/SDKs/ArcGIS/iOS/Frameworks/Dynamic",
-				);
+				DEVELOPMENT_TEAM = P8HGHS7JQ8;
 				INFOPLIST_FILE = ArcGISToolkitExamples/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.esri.${PRODUCT_NAME}";
