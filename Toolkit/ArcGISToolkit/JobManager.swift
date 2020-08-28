@@ -62,14 +62,14 @@ public class JobManager: NSObject {
         }
         didSet {
             keyedJobs.values.forEach { observeJobStatus(job: $0) }
-
+            
             // If there was a change, then re-store the serialized AGSJobs in UserDefaults
             if keyedJobs != oldValue {
                 saveJobsToUserDefaults()
             }
         }
     }
-
+    
     /// A convenience accessor to the `AGSJob`s that the `JobManager` is managing.
     public var jobs: [AGSJob] {
         return Array(keyedJobs.values)
@@ -112,7 +112,7 @@ public class JobManager: NSObject {
             jobStatusObservations.removeValue(forKey: job.serverJobID)
         }
     }
-
+    
     /// Register an `AGSJob` with the `JobManager`.
     ///
     /// - Parameter job: The AGSJob to register.
@@ -123,7 +123,7 @@ public class JobManager: NSObject {
         keyedJobs[jobUniqueID] = job
         return jobUniqueID
     }
-
+    
     /// Unregister an `AGSJob` from the `JobManager`.
     ///
     /// - Parameter job: The job to unregister.
@@ -198,6 +198,7 @@ public class JobManager: NSObject {
     /// - Parameters:
     ///   - application:  See [Apple's documentation](https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1623125-application)
     ///   - completionHandler:  See [Apple's documentation](https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1623125-application)
+    @available(iOS, deprecated: 13.0, message: "Please use 'UIApplication.shared.beginBackgroundTask(expirationHandler:)' when kicking off your job instead")
     public func application(application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         if keyedJobs.isEmpty {
             return completionHandler(.noData)
@@ -225,6 +226,14 @@ public class JobManager: NSObject {
     public func resumeAllPausedJobs(statusHandler: @escaping JobStatusHandler, completion: @escaping JobCompletionHandler) {
         keyedJobs.lazy.filter { $0.value.status == .paused || $0.value.status == .notStarted }.forEach {
             $0.value.start(statusHandler: statusHandler, completion: completion)
+        }
+    }
+    
+    /// Pauses any currently running job.
+    public func pauseAllJobs() {
+        keyedJobs.values.forEach {
+            guard $0.status == .started else { return }
+            $0.progress.pause()
         }
     }
     

@@ -111,7 +111,7 @@ public class UnitsViewController: TableViewController {
     /// - Returns: A configured search controller.
     private func makeSearchController() -> UISearchController {
         let searchController = UISearchController(searchResultsController: nil)
-        searchController.dimsBackgroundDuringPresentation = false
+        searchController.obscuresBackgroundDuringPresentation = false
         searchController.hidesNavigationBarDuringPresentation = false
         searchController.searchResultsUpdater = self
         
