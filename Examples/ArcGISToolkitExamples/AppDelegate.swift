@@ -46,12 +46,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
     
-    /// Here is where we forward background fetch to the JobManager
-    /// so that jobs can be updated in the background
-    func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        JobManager.shared.application(application: application, performFetchWithCompletionHandler: completionHandler)
-    }
-    
     /// We need to forward these calls to ArcGIS so that we can be a good citizen and allow ArcGIS to call the completionHandler
     /// once the associated download session is finished handling events.
     func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
