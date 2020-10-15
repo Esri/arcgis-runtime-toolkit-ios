@@ -35,13 +35,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		88A01D7F1EA188EF00CD9621 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 88B6899F1E96E9AB00B67FAB /* ArcGISToolkit.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 8812336F1DF601A700B2EA8E;
-			remoteInfo = ArcGISToolkit;
-		};
 		88B689A31E96E9AC00B67FAB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 88B6899F1E96E9AB00B67FAB /* ArcGISToolkit.xcodeproj */;
@@ -211,7 +204,6 @@
 			);
 			dependencies = (
 				88B689A61E96E9E000B67FAB /* PBXTargetDependency */,
-				88A01D801EA188EF00CD9621 /* PBXTargetDependency */,
 			);
 			name = ArcGISToolkitExamples;
 			productName = ArcGISToolkitExamples;
@@ -357,11 +349,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		88A01D801EA188EF00CD9621 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = ArcGISToolkit;
-			targetProxy = 88A01D7F1EA188EF00CD9621 /* PBXContainerItemProxy */;
-		};
 		88B689A61E96E9E000B67FAB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = ArcGISToolkit;
