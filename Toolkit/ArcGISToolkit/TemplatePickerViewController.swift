@@ -184,7 +184,8 @@ public class TemplatePickerViewController: TableViewController {
                     let indexPathRow = indexPath.row
                     
                     // The size of the table view is still not finalized at this point, so we check to make sure the section number of `indexPath` does exist in the `tableView`.
-                    if indexPathSection < self.tableView.numberOfSections, indexPathRow < self.tableView.numberOfRows(inSection: indexPathSection) {
+                    if indexPathSection < self.tableView.numberOfSections,
+                       indexPathRow < self.tableView.numberOfRows(inSection: indexPathSection) {
                         self.tableView.reloadRows(at: [indexPath], with: .automatic)
                     }
                 }
