@@ -179,6 +179,7 @@ public class TemplatePickerViewController: TableViewController {
                     // update info with swatch
                     infos[index].swatch = image
                     
+                    // The size of the table view is still not finalized at this point, so we can't use `reloadRows(...)`.
                     self.tableView.reloadData()
                 }
             }
