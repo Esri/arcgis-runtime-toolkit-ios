@@ -180,12 +180,10 @@ public class TemplatePickerViewController: TableViewController {
                     infos[index].swatch = image
                     
                     let indexPath = self.indexPath(for: info)
-                    let indexPathSection = indexPath.section
-                    let indexPathRow = indexPath.row
                     
                     // Make sure the new indexPath is valid before reloading the row.
-                    if indexPathSection < self.tableView.numberOfSections,
-                       indexPathRow < self.tableView.numberOfRows(inSection: indexPathSection) {
+                    if indexPath.section < self.tableView.numberOfSections,
+                       indexPath.row < self.tableView.numberOfRows(inSection: indexPath.section) {
                         self.tableView.reloadRows(at: [indexPath], with: .automatic)
                     }
                 }
