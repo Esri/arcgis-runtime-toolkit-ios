@@ -179,8 +179,12 @@ public class TemplatePickerViewController: TableViewController {
                     // update info with swatch
                     infos[index].swatch = image
                     
-                    // The size of the table view is still not finalized at this point, so we can't use `reloadRows(...)`.
-                    self.tableView.reloadData()
+                    let indexPath = self.indexPath(for: info)
+                    
+                    // The size of the table view is still not finalized at this point, so we check to make sure the section number of `indexPath` does exist in the `tableView`.
+                    if indexPath.section < self.tableView.numberOfSections {
+                        self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                    }
                 }
             }
         }
