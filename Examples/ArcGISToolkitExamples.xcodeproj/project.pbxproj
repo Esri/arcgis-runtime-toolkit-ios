@@ -98,7 +98,7 @@
 		E47B17352304AB7D000C9C8B /* CalibrationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalibrationView.swift; sourceTree = "<group>"; };
 		E48405741E9BE7E600927208 /* LegendExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegendExample.swift; sourceTree = "<group>"; };
 		E48ADDB923563E17005A53AF /* BookmarksExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksExample.swift; sourceTree = "<group>"; };
-		E4E7E57F255C51A4002458B9 /* ArcGIS.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ArcGIS.xcframework; path = $HOME/Library/SDKs/ArcGIS/Frameworks/ArcGIS.xcframework; sourceTree = "<group>"; };
+		E4E7E57F255C51A4002458B9 /* ArcGIS.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ArcGIS.xcframework; path = $HOME/Library/SDKs/ArcGIS/Frameworks/ArcGIS.xcframework; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
