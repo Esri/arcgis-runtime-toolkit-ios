@@ -38,7 +38,7 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
                 
                 //set layerViewStateChangedHandler
                 if let geoView = geoView {
-                    geoView.layerViewStateChangedHandler = { [weak self] (layer: AGSLayer, layerViewState: AGSLayerViewState) in
+                    geoView.layerViewStateChangedHandler = { [weak self] (_, _) in
                         DispatchQueue.main.async {
                             self?.updateLegendArray()
                         }
