@@ -179,9 +179,13 @@ public class TemplatePickerViewController: TableViewController {
                     // update info with swatch
                     infos[index].swatch = image
                     
-                    // reload index where that info currently is
                     let indexPath = self.indexPath(for: info)
-                    self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                    
+                    // Make sure the new indexPath is valid before reloading the row.
+                    if indexPath.section < self.tableView.numberOfSections,
+                       indexPath.row < self.tableView.numberOfRows(inSection: indexPath.section) {
+                        self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                    }
                 }
             }
         }
