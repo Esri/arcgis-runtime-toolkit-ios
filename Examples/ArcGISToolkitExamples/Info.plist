@@ -31,6 +31,8 @@
 	<string>For showing the current location in a map</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>For collecting attachments in popups</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>For collecting attachments in popups</string>
 	<key>UIBackgroundModes</key>
 	<array/>
 	<key>UILaunchStoryboardName</key>
