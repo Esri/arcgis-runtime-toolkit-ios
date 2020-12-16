@@ -23,7 +23,7 @@ override func viewDidLoad() {
 }
 ```
 
-Note: Make sure to add `Privacy - Photo Library Usage Description` `Privacy - Microphone Usage Description`, and `Privacy - Camera Usage Description` to your project's `Info.plist` to correctly add attachments. 
+Note: Make sure to add `Privacy - Photo Library Usage Description`, `Privacy - Microphone Usage Description`, and `Privacy - Camera Usage Description` to your project's `Info.plist` to correctly add attachments. 
 
 To see it in action, try out the [Examples](../../Examples) and refer to [PopupExample.swift](../../Examples/ArcGISToolkitExamples/PopupExample.swift) in the project.
 
