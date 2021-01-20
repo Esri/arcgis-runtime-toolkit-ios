@@ -17,7 +17,7 @@ import ArcGISToolkit
 import ArcGIS
 
 class TimeSliderExample: MapViewController {
-    private var map = AGSMap(basemap: AGSBasemap.topographic())
+    private var map = AGSMap(basemapStyle: .arcGISTopographic)
     private var timeSlider = TimeSlider()
     
     override func viewDidLoad() {

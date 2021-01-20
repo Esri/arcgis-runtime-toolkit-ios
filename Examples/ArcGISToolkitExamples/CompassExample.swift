@@ -21,8 +21,9 @@ class CompassExample: MapViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Initialize an AGSMap with the National Geographic basemap and center it on South America.
-        map = AGSMap(basemapType: .nationalGeographic, latitude: -25, longitude: -56, levelOfDetail: 3)
+        // Initialize an AGSMap with the Modern Antique basemap and center it on South America.
+        map = AGSMap(basemapStyle: .arcGISModernAntique)
+        map?.initialViewpoint = AGSViewpoint(latitude: -25, longitude: -56, scale: 6e7)
         mapView.map = map
         
         // Create the compass and add it to our view.

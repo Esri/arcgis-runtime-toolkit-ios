@@ -21,6 +21,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         // Override point for customization after application launch.
+                
+        // Note: it is not best practice to store API keys in source code.
+        // The API key is referenced here for the convenience of this example.
+        #warning("Replace \"YOUR_API_KEY\" with a valid API key.")
+        AGSArcGISRuntimeEnvironment.apiKey = "YOUR_API_KEY"
         return true
     }
 

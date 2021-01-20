@@ -22,7 +22,7 @@ class ScalebarExample: MapViewController, AGSGeoViewTouchDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        map = AGSMap(basemapType: .topographic, latitude: 0, longitude: 0, levelOfDetail: 0)
+        map = AGSMap(basemapStyle: .arcGISTopographic)
         mapView.map = map
         
         let width = CGFloat(175)
