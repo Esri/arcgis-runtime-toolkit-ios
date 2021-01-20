@@ -30,7 +30,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
          Production deployment of applications built with ArcGIS Runtime requires you to license ArcGIS Runtime functionality. For more information see https://links.esri.com/arcgis-runtime-license-and-deploy.
          */
         // Uncomment the following line to access Esri location services using an API key.
-        // AGSArcGISRuntimeEnvironment.apiKey = “<#API Key#>”
+        // AGSArcGISRuntimeEnvironment.apiKey = "<#API Key#>"
         return true
     }
 
