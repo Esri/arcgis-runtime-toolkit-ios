@@ -24,7 +24,7 @@ To use Toolkit in your project:
 * **[TimeSlider](Documentation/TimeSlider)** - Allows interactively defining a temporal range (i.e. time extent) and animating time moving forward or backward. Can be used to manipulate the time extent in a MapView or SceneView.
 
 ## Requirements
-* [ArcGIS Runtime SDK for iOS](https://developers.arcgis.com/en/ios/) 100.9.0 (or higher)
+* [ArcGIS Runtime SDK for iOS](https://developers.arcgis.com/ios/) 100.10.0 (or higher)
 * Xcode 11.0 (or higher)
 
 The *ArcGIS Runtime Toolkit for iOS* has a *Target SDK* version of *12.0*, meaning that it can run on devices with *iOS 12.0* or newer.
@@ -50,11 +50,11 @@ Carthage is a decentralized dependency manager that builds your dependencies and
 
 New to Carthage? Visit the Carthage [GitHub](https://github.com/Carthage/Carthage) page.
 
-Note that you must also have the __ArcGIS Runtime SDK for iOS__ installed and your project set up as per the instructions [here](https://developers.arcgis.com/ios/latest/swift/guide/install.htm#ESRI_SECTION1_D57435A2BEBC4D29AFA3A4CAA722506A).
+Note that you must also have the __ArcGIS Runtime SDK for iOS__ installed and your project set up as per the instructions [here](https://developers.arcgis.com/ios/get-started/).
 
 ### Manual
 
- 1. Ensure you have downloaded and installed __ArcGIS Runtime SDK for iOS__ as described [here](https://developers.arcgis.com/ios/latest/swift/guide/install.htm#ESRI_SECTION1_D57435A2BEBC4D29AFA3A4CAA722506A)
+ 1. Ensure you have downloaded and installed __ArcGIS Runtime SDK for iOS__ as described [here](https://developers.arcgis.com/ios/get-started/)
  2. Clone or download this repo. 
  3. Drag and Drop the `Toolkit/ArcGISToolkit.xcodeproj` file into your project through the XCode Project Navigator pane.
  4. Drag the `ArcGISToolkit.framework` from the `ArcGISToolkit.xcodeproj/ArcGISToolkit/Products` folder to the "TARGETS" settings for your application and drop it in the "Embedded Binaries" section in the "General" tab
@@ -67,7 +67,7 @@ Both the Toolkit and Examples app support SwiftLint.  You can install SwiftLint 
 ## Additional Resources
 
 * [Developers guide documentation](https://developers.arcgis.com/ios)
-* [Runtime API Reference](https://developers.arcgis.com/ios/latest/api-reference/)
+* [Runtime API Reference](https://developers.arcgis.com/ios/api-reference//)
 * [Samples](https://github.com/Esri/arcgis-runtime-samples-ios)
 * Got a question? Ask the community on our [forum](http://geonet.esri.com/community/developers/native-app-developers/arcgis-runtime-sdk-for-ios)
 
@@ -80,7 +80,7 @@ Find a bug or want to request a new feature?  Please let us know by [submitting 
 Esri welcomes contributions from anyone and everyone. Please see our [guidelines for contributing](https://github.com/esri/contributing).
 
 ## Licensing
-Copyright 2017 - 2020 Esri
+Copyright 2017 - 2021 Esri
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
