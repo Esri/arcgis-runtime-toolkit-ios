@@ -24,7 +24,7 @@ class PopupExample: MapViewController {
         super.viewDidLoad()
         
         // Create a map
-        map = AGSMap(basemap: .topographic())
+        map = AGSMap(basemapStyle: .arcGISTopographic)
         let featureTable = AGSServiceFeatureTable(url: URL(string: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/DamageAssessment/FeatureServer/0")!)
         let featureLayer = AGSFeatureLayer(featureTable: featureTable)
         map?.operationalLayers.add(featureLayer)
