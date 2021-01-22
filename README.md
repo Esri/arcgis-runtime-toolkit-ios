@@ -34,7 +34,7 @@ The *ArcGIS Runtime Toolkit for iOS* has a *Target SDK* version of *12.0*, meani
 ### Cocoapods
 
  1. Add `pod 'ArcGIS-Runtime-Toolkit-iOS'` to your podfile
- 2. Run `pod install`. This will download the toolkit and the ArcGIS Runtime SDK for iOS which the toolkit depends upon and then configure your project to reference them both.	
+ 2. Run `pod install`. This will download the toolkit and the ArcGIS Runtime SDK for iOS which the toolkit depends upon and then configure your project to reference them both
  3. Add `import ArcGISToolkit` in your source code and start using the toolkit components 
 
  New to cocoapods? Visit [cocoapods.org](https://cocoapods.org/)
@@ -55,8 +55,8 @@ Note that you must also have the __ArcGIS Runtime SDK for iOS__ installed and yo
 ### Manual
 
  1. Ensure you have downloaded and installed __ArcGIS Runtime SDK for iOS__ as described [here](https://developers.arcgis.com/ios/get-started/)
- 2. Clone or download this repo. 
- 3. Drag and Drop the `Toolkit/ArcGISToolkit.xcodeproj` file into your project through the XCode Project Navigator pane.
+ 2. Clone or download this repo
+ 3. Drag and Drop the `Toolkit/ArcGISToolkit.xcodeproj` file into your project through the XCode Project Navigator pane
  4. Drag the `ArcGISToolkit.framework` from the `ArcGISToolkit.xcodeproj/ArcGISToolkit/Products` folder to the "TARGETS" settings for your application and drop it in the "Embedded Binaries" section in the "General" tab
  5. Add `import ArcGISToolkit` in your source code and start using the toolkit components 
 
