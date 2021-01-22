@@ -67,7 +67,7 @@ Both the Toolkit and Examples app support SwiftLint.  You can install SwiftLint 
 ## Additional Resources
 
 * [Developers guide documentation](https://developers.arcgis.com/ios)
-* [Runtime API Reference](https://developers.arcgis.com/ios/api-reference//)
+* [Runtime API Reference](https://developers.arcgis.com/ios/api-reference)
 * [Samples](https://github.com/Esri/arcgis-runtime-samples-ios)
 * Got a question? Ask the community on our [forum](http://geonet.esri.com/community/developers/native-app-developers/arcgis-runtime-sdk-for-ios)
 
