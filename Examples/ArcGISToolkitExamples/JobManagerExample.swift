@@ -218,7 +218,7 @@ class JobManagerExample: TableViewController {
             let portalItem = AGSPortalItem(url: URL(string: "https://www.arcgis.com/home/item.html?id=acc027394bc84c2fb04d1ed317aac674")!)!
             let map = AGSMap(item: portalItem)
             // naperville
-            let env = AGSEnvelope(xMin: -9825684.031125, yMin: 5102237.935062, xMax: -9798254.961608, yMax: 5151000.725314, spatialReference: AGSSpatialReference.webMercator())
+            let env = AGSEnvelope(xMin: -9813416.487598, yMin: 5126112.596989, xMax: -9812775.435463, yMax: 5127101.526749, spatialReference: AGSSpatialReference.webMercator())
             takeOffline(map: map, extent: env)
         }
         
