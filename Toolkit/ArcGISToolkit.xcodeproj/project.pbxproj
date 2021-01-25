@@ -512,7 +512,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 100.9;
+				MARKETING_VERSION = 100.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.esri.ArcGISToolkit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -540,7 +540,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 100.9;
+				MARKETING_VERSION = 100.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.esri.ArcGISToolkit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
