@@ -127,8 +127,6 @@ class ARExample: UIViewController {
         sceneInfo.append(contentsOf: [(sceneFunction: streetsScene, label: "Streets - Full Scale", tableTop: false, trackingMode: .continuous),
                                       (sceneFunction: imageryScene, label: "Imagery - Full Scale", tableTop: false, trackingMode: .initial),
                                       (sceneFunction: pointCloudScene, label: "Point Cloud - Tabletop", tableTop: true, trackingMode: .ignore),
-                                      (sceneFunction: yosemiteScene, label: "Yosemite - Tabletop", tableTop: true, trackingMode: .ignore),
-                                      (sceneFunction: borderScene, label: "US - Mexico Border - Tabletop", tableTop: true, trackingMode: .ignore),
                                       (sceneFunction: emptyScene, label: "Empty - Full Scale", tableTop: false, trackingMode: .initial)])
         
         // Use the first sceneInfo to create and set the scene.
@@ -557,108 +555,6 @@ extension ARExample {
                 
                 // Set the clipping distance to limit the data display around the originCamera.
                 self?.arView.clippingDistance = 750
-            }
-        }
-        
-        // Clear the location data source, as we're setting the originCamera directly.
-        arView.locationDataSource = nil
-        return scene
-    }
-    
-    /// Creates a scene centered on Yosemite National Park.
-    /// Mode:  Tabletop AR
-    ///
-    /// - Returns: The new scene.
-    private func yosemiteScene() -> AGSScene {
-        let scene = AGSScene()
-        scene.addElevationSource()
-        
-        // Create the Yosemite layer.
-        let layer = AGSIntegratedMeshLayer(url: URL(string: "https://tiles.arcgis.com/tiles/FQD0rKU8X5sAQfh8/arcgis/rest/services/VRICON_Yosemite_Sample_Integrated_Mesh_scene_layer/SceneServer")!)
-        scene.operationalLayers.add(layer)
-        scene.load { [weak self, weak scene] (error) in
-            self?.statusViewController?.errorMessage = error?.localizedDescription
-            if error != nil {
-                return
-            }
-            
-            // Get the center point of the layer's extent.
-            guard let layer = scene?.operationalLayers.firstObject as? AGSLayer else { return }
-            guard let extent = layer.fullExtent else { return }
-            let center = extent.center
-            
-            scene?.baseSurface?.elevationSources.first?.load { (error) in
-                self?.statusViewController?.errorMessage = error?.localizedDescription
-                if error != nil {
-                    return
-                }
-                
-                // Find the elevation of the layer at the center point.
-                scene?.baseSurface?.elevation(for: center) { (elevation, error) in
-                    self?.statusViewController?.errorMessage = error?.localizedDescription
-                    if error != nil {
-                        return
-                    }
-                    
-                    // Create the origin camera at the center point and elevation of the data.  This will ensure the data is anchored to the table.
-                    let camera = AGSCamera(latitude: center.y, longitude: center.x, altitude: elevation, heading: 0, pitch: 90, roll: 0)
-                    self?.arView.originCamera = camera
-                    self?.arView.translationFactor = 18000
-                    
-                    // Reset the clipping distance so we view the full scene.
-                    self?.arView.clippingDistance = 0
-                }
-            }
-        }
-        
-        // Clear the location data source, as we're setting the originCamera directly.
-        arView.locationDataSource = nil
-        return scene
-    }
-    
-    /// Creates a scene centered the US-Mexico border.
-    /// Mode:  Tabletop AR
-    ///
-    /// - Returns: The new scene.
-    private func borderScene() -> AGSScene {
-        let scene = AGSScene()
-        scene.addElevationSource()
-        
-        // Create the border layer.
-        let layer = AGSIntegratedMeshLayer(url: URL(string: "https://tiles.arcgis.com/tiles/FQD0rKU8X5sAQfh8/arcgis/rest/services/VRICON_SW_US_Sample_Integrated_Mesh_scene_layer/SceneServer")!)
-        scene.operationalLayers.add(layer)
-        scene.load { [weak self, weak scene] (error) in
-            self?.statusViewController?.errorMessage = error?.localizedDescription
-            if error != nil {
-                return
-            }
-            
-            // Get the center point of the layer's extent.
-            guard let layer = scene?.operationalLayers.firstObject as? AGSLayer else { return }
-            guard let extent = layer.fullExtent else { return }
-            let center = extent.center
-            
-            scene?.baseSurface?.elevationSources.first?.load { (error) in
-                self?.statusViewController?.errorMessage = error?.localizedDescription
-                if error != nil {
-                    return
-                }
-                
-                // Find the elevation of the layer at the center point.
-                scene?.baseSurface?.elevation(for: center) { (elevation, error) in
-                    self?.statusViewController?.errorMessage = error?.localizedDescription
-                    if error != nil {
-                        return
-                    }
-                    
-                    // Create the origin camera at the center point and elevation of the data.  This will ensure the data is anchored to the table.
-                    let camera = AGSCamera(latitude: center.y, longitude: center.x, altitude: elevation, heading: 0, pitch: 90.0, roll: 0)
-                    self?.arView.originCamera = camera
-                    self?.arView.translationFactor = 1000
-
-                    // Set the clipping distance to limit the data display around the originCamera.
-                    self?.arView.clippingDistance = 500
-                }
             }
         }
         
