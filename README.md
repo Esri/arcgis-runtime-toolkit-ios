@@ -25,7 +25,7 @@ To use Toolkit in your project:
 
 ## Requirements
 * [ArcGIS Runtime SDK for iOS](https://developers.arcgis.com/ios/) 100.10.0 (or higher)
-* Xcode 11.0 (or higher)
+* Xcode 12.0 (or higher)
 
 The *ArcGIS Runtime Toolkit for iOS* has a *Target SDK* version of *12.0*, meaning that it can run on devices with *iOS 12.0* or newer.
 
