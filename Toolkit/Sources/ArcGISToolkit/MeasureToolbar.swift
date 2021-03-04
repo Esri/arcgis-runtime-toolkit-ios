@@ -259,7 +259,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
     private var selectModeButtons: [UIBarButtonItem] = []
     
     private func sharedInitialization() {
-        let bundle = Bundle(for: type(of: self))
+        let bundle = Bundle.module
         let measureLengthImage = UIImage(named: "MeasureLength", in: bundle, compatibleWith: traitCollection)!
         let measureAreaImage = UIImage(named: "MeasureArea", in: bundle, compatibleWith: traitCollection)!
         let measureFeatureImage = UIImage(named: "MeasureFeature", in: bundle, compatibleWith: traitCollection)!

@@ -54,7 +54,7 @@ public class Compass: UIImageView {
         super.init(frame: .zero)
         
         // Set our image to the CompassIcon in the Assets
-        let bundle = Bundle(for: type(of: self))
+        let bundle = Bundle.module
         image = UIImage(named: "CompassIcon", in: bundle, compatibleWith: nil)
         
         // add gesture recognizer to know when arrow is tapped

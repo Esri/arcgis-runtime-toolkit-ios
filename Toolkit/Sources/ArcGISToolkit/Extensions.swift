@@ -12,6 +12,7 @@
 // limitations under the License.
 
 import Foundation
+import UIKit
 
 extension UIApplication {
     func topViewController(_ controller: UIViewController? = UIApplication.shared.keyWindow?.rootViewController) -> UIViewController? {
