@@ -12,7 +12,6 @@
 // limitations under the License.
 
 import Foundation
-import Dispatch
 
 internal class Coalescer {
     // Class to coalesce actions into intervals.
