@@ -56,7 +56,6 @@
 		E47B17352304AB7D000C9C8B /* CalibrationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalibrationView.swift; sourceTree = "<group>"; };
 		E48405741E9BE7E600927208 /* LegendExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegendExample.swift; sourceTree = "<group>"; };
 		E48ADDB923563E17005A53AF /* BookmarksExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksExample.swift; sourceTree = "<group>"; };
-		E4E7E57F255C51A4002458B9 /* ArcGIS.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ArcGIS.xcframework; path = $HOME/Library/SDKs/ArcGIS/Frameworks/ArcGIS.xcframework; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,7 +76,6 @@
 				79CA564025F1942200E9FE3D /* arcgis-runtime-toolkit-ios */,
 				8839043D1DF6022A001F3188 /* ArcGISToolkitExamples */,
 				8839043C1DF6022A001F3188 /* Products */,
-				E4E7E57E255C51A4002458B9 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -134,14 +132,6 @@
 			path = Misc;
 			sourceTree = "<group>";
 		};
-		E4E7E57E255C51A4002458B9 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				E4E7E57F255C51A4002458B9 /* ArcGIS.xcframework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -157,7 +147,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				79CA564625F1953500E9FE3D /* PBXTargetDependency */,
 			);
 			name = ArcGISToolkitExamples;
 			packageProductDependencies = (
@@ -268,13 +257,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		79CA564625F1953500E9FE3D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = 79CA564525F1953500E9FE3D /* ArcGISToolkit */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		883904421DF6022A001F3188 /* Main.storyboard */ = {
@@ -476,10 +458,6 @@
 
 /* Begin XCSwiftPackageProductDependency section */
 		79CA564325F1952D00E9FE3D /* ArcGISToolkit */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = ArcGISToolkit;
-		};
-		79CA564525F1953500E9FE3D /* ArcGISToolkit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ArcGISToolkit;
 		};
