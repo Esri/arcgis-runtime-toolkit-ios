@@ -41,13 +41,11 @@ let package = Package(
     targets: [
         .target(
             name: "ArcGISToolkit",
-            dependencies: ["ArcGIS"],
-            path: "Toolkit/Sources"
+            dependencies: ["ArcGIS"]
         ),
         .testTarget(
             name: "ArcGISToolkitTests",
-            dependencies: ["ArcGISToolkit"],
-            path: "Toolkit/Tests"
+            dependencies: ["ArcGISToolkit"]
         )
     ]
 )
