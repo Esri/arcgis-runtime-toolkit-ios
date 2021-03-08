@@ -67,7 +67,7 @@ Note that you must also have the __ArcGIS Runtime SDK for iOS__ installed and yo
 
  1. Clone or download this repo
  2. Drag and Drop the `arcgis-runtime-toolkit-ios` folder into your project through the Xcode Project Navigator pane
- 3. Add the *ArcGISToolkit* library in your app, by adding it to the Frameoworks, Libraries, and Embedded Content section of the General pane for your app target.
+ 3. Add the *ArcGISToolkit* library in your app, by adding it to the Frameworks, Libraries, and Embedded Content section of the General pane for your app target. The *ArcGISToolkit* library contains the *ArcGIS Runtime SDK for iOS* library, so you don't need to add that separately
  4. Add `import ArcGIS` and `import ArcGISToolkit` in your source code and start using the toolkit components 
 
 ## SwiftLint
