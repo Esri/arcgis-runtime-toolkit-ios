@@ -95,7 +95,7 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
     // use this static method to instantiate the view controller from our storyboard
     public static func makeLegendViewController(geoView: AGSGeoView? = nil) -> LegendViewController? {
         // get the bundle and then the storyboard
-        let storyboard = UIStoryboard(name: "Legend", bundle: Bundle.module)
+        let storyboard = UIStoryboard(name: "Legend", bundle: .module)
         
         // create the legend VC from the storyboard
         let legendVC = storyboard.instantiateInitialViewController() as? LegendViewController
