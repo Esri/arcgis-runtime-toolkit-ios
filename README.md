@@ -50,18 +50,7 @@ The *ArcGIS Runtime Toolkit for iOS* has a *Target SDK* version of *12.0*, meani
 
  New to cocoapods? Visit [cocoapods.org](https://cocoapods.org/)
 
-### Carthage
-
-Carthage is a decentralized dependency manager that builds your dependencies and provides you with binary frameworks.
-
- 1. Add `github "esri/arcgis-runtime-toolkit-ios"` to your Cartfile
- 2. Run `carthage update`
- 3. Drag the `ArcGISToolkit.framework ` from the `Carthage/Build ` folder to the "TARGETS" settings for your application and drop it in the "Embedded Binaries" section in the "General" tab
- 4. Add `import ArcGISToolkit` in your source code and start using the toolkit components 
-
-New to Carthage? Visit the Carthage [GitHub](https://github.com/Carthage/Carthage) page.
-
-Note that you must also have the __ArcGIS Runtime SDK for iOS__ installed and your project set up as per the instructions [here](https://developers.arcgis.com/ios/get-started/).
+Note: Support for Carthage as been dropped for v100.11.0.
 
 ### Manual
 
