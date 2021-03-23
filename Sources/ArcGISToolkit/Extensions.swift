@@ -30,3 +30,10 @@ extension UIApplication {
         return controller
     }
 }
+
+#if !SPM
+// This is a workaround for cocoapods compatibility.
+extension Bundle {
+    static var module: Bundle { Bundle(identifier: "org.cocoapods.ArcGISToolkit")! }
+}
+#endif

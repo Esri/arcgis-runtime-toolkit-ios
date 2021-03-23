@@ -41,7 +41,10 @@ let package = Package(
     targets: [
         .target(
             name: "ArcGISToolkit",
-            dependencies: ["ArcGIS"]
+            dependencies: ["ArcGIS"],
+            swiftSettings: [
+                .define("SPM")
+            ]
         ),
         .testTarget(
             name: "ArcGISToolkitTests",
