@@ -14,10 +14,24 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "8812336F1DF601A700B2EA8E"
-               BuildableName = "ArcGISToolkit.framework"
+               BlueprintIdentifier = "ArcGISToolkit"
+               BuildableName = "ArcGISToolkit"
                BlueprintName = "ArcGISToolkit"
-               ReferencedContainer = "container:ArcGISToolkit.xcodeproj">
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ArcGISToolkitTests"
+               BuildableName = "ArcGISToolkitTests"
+               BlueprintName = "ArcGISToolkitTests"
+               ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -32,10 +46,10 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E4685B02237CA3C400F168CF"
-               BuildableName = "ArcGISToolkitTests.xctest"
+               BlueprintIdentifier = "ArcGISToolkitTests"
+               BuildableName = "ArcGISToolkitTests"
                BlueprintName = "ArcGISToolkitTests"
-               ReferencedContainer = "container:ArcGISToolkit.xcodeproj">
+               ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -50,15 +64,6 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "8812336F1DF601A700B2EA8E"
-            BuildableName = "ArcGISToolkit.framework"
-            BlueprintName = "ArcGISToolkit"
-            ReferencedContainer = "container:ArcGISToolkit.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -69,10 +74,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "8812336F1DF601A700B2EA8E"
-            BuildableName = "ArcGISToolkit.framework"
+            BlueprintIdentifier = "ArcGISToolkit"
+            BuildableName = "ArcGISToolkit"
             BlueprintName = "ArcGISToolkit"
-            ReferencedContainer = "container:ArcGISToolkit.xcodeproj">
+            ReferencedContainer = "container:">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>
