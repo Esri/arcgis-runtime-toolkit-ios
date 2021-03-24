@@ -24,7 +24,7 @@ To use Toolkit in your project:
 * **[TimeSlider](Documentation/TimeSlider)** - Allows interactively defining a temporal range (i.e. time extent) and animating time moving forward or backward. Can be used to manipulate the time extent in a MapView or SceneView.
 
 ## Requirements
-* [ArcGIS Runtime SDK for iOS](https://developers.arcgis.com/ios/) 100.10.0 (or higher)
+* [ArcGIS Runtime SDK for iOS](https://developers.arcgis.com/ios/) 100.11.0 (or higher)
 * Xcode 12.0 (or higher)
 
 The *ArcGIS Runtime Toolkit for iOS* has a *Target SDK* version of *13.0*, meaning that it can run on devices with *iOS 13.0* or newer.
