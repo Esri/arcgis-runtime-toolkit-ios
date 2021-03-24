@@ -513,7 +513,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
             planar = linearUnit.convert(toMeters: planar)
             if planar > planarLengthMetersThreshold {
                 let planarDisplay = AGSLinearUnit.meters().convert(planar, to: selectedLinearUnit)
-                //`print("returning planar length... \(planar) sq meters")
+                // `print("returning planar length... \(planar) sq meters")
                 return planarDisplay
             }
         }
@@ -537,7 +537,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
             if let planarMiles = linearUnit.toAreaUnit()?.convert(planar, to: AGSAreaUnit.squareMiles()),
                 planarMiles > planarAreaSquareMilesThreshold {
                 let planarDisplay = AGSAreaUnit.squareMiles().convert(planarMiles, to: selectedAreaUnit)
-                //print("returning planar area... \(planarMiles) sq miles")
+                // print("returning planar area... \(planarMiles) sq miles")
                 return planarDisplay
             }
         }
