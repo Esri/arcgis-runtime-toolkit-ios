@@ -31,7 +31,7 @@ extension UIApplication {
     }
 }
 
-#if !SPM
+#if !SWIFT_PACKAGE
 // This is a workaround for cocoapods compatibility.
 extension Bundle {
     static var module: Bundle { Bundle(identifier: "org.cocoapods.ArcGISToolkit")! }
