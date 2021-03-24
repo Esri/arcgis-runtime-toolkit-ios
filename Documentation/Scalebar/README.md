@@ -11,7 +11,7 @@ The scalebar uses geodetic calculations to provide accurate measurements for map
         scalebar.style = .alternatingBar
         scalebar.units = .metric
         scalebar.alignment = .left
-        view.addSubview(sb)
+        view.addSubview(scalebar)
 ```
 
 To see it in action, try out the [Examples](../../Examples) and refer to [ScalebarExample.swift](../../Examples/ArcGISToolkitExamples/ScalebarExample.swift) in the project.
