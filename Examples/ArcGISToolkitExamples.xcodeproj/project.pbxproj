@@ -8,13 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		2140781E209B629000FBFDCC /* TimeSliderExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2140781D209B629000FBFDCC /* TimeSliderExample.swift */; };
+		79CA564425F1952D00E9FE3D /* ArcGISToolkit in Frameworks */ = {isa = PBXBuildFile; productRef = 79CA564325F1952D00E9FE3D /* ArcGISToolkit */; };
 		8800656E2228577A00F76945 /* TemplatePickerExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8800656D2228577A00F76945 /* TemplatePickerExample.swift */; };
 		883904441DF6022A001F3188 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 883904421DF6022A001F3188 /* Main.storyboard */; };
 		883904461DF6022A001F3188 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 883904451DF6022A001F3188 /* Assets.xcassets */; };
 		883904491DF6022A001F3188 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 883904471DF6022A001F3188 /* LaunchScreen.storyboard */; };
 		883EA74B20741A56006D6F72 /* PopupExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 883EA74A20741A56006D6F72 /* PopupExample.swift */; };
-		88A01D7D1EA188EF00CD9621 /* ArcGISToolkit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 88B689A41E96E9AC00B67FAB /* ArcGISToolkit.framework */; };
-		88A01D7E1EA188EF00CD9621 /* ArcGISToolkit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 88B689A41E96E9AC00B67FAB /* ArcGISToolkit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		88B689C81E96EDF400B67FAB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689BE1E96EDF400B67FAB /* AppDelegate.swift */; };
 		88B689C91E96EDF400B67FAB /* ExamplesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689BF1E96EDF400B67FAB /* ExamplesViewController.swift */; };
 		88B689CB1E96EDF400B67FAB /* MeasureExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B689C11E96EDF400B67FAB /* MeasureExample.swift */; };
@@ -30,51 +29,11 @@
 		E47B17372304AB7D000C9C8B /* CalibrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47B17352304AB7D000C9C8B /* CalibrationView.swift */; };
 		E48405751E9BE7E600927208 /* LegendExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48405741E9BE7E600927208 /* LegendExample.swift */; };
 		E48ADDBA23563E17005A53AF /* BookmarksExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48ADDB923563E17005A53AF /* BookmarksExample.swift */; };
-		E4F93A45255C8C2900298E30 /* ArcGIS.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4E7E57F255C51A4002458B9 /* ArcGIS.xcframework */; };
-		E4F93A46255C8C2900298E30 /* ArcGIS.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E4E7E57F255C51A4002458B9 /* ArcGIS.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		88B689A31E96E9AC00B67FAB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 88B6899F1E96E9AB00B67FAB /* ArcGISToolkit.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 881233701DF601A700B2EA8E;
-			remoteInfo = ArcGISToolkit;
-		};
-		88B689A51E96E9E000B67FAB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 88B6899F1E96E9AB00B67FAB /* ArcGISToolkit.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 8812336F1DF601A700B2EA8E;
-			remoteInfo = ArcGISToolkit;
-		};
-		E4CD706023A8436F000A3B1C /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 88B6899F1E96E9AB00B67FAB /* ArcGISToolkit.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = E4685B03237CA3C400F168CF;
-			remoteInfo = ArcGISToolkitTests;
-		};
-/* End PBXContainerItemProxy section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		883904531DF60296001F3188 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				E4F93A46255C8C2900298E30 /* ArcGIS.xcframework in Embed Frameworks */,
-				88A01D7E1EA188EF00CD9621 /* ArcGISToolkit.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		2140781D209B629000FBFDCC /* TimeSliderExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeSliderExample.swift; sourceTree = "<group>"; };
+		79CA564025F1942200E9FE3D /* arcgis-runtime-toolkit-ios */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "arcgis-runtime-toolkit-ios"; path = ..; sourceTree = "<group>"; };
 		8800656D2228577A00F76945 /* TemplatePickerExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemplatePickerExample.swift; sourceTree = "<group>"; };
 		8839043B1DF6022A001F3188 /* ArcGISToolkitExamples.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ArcGISToolkitExamples.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		883904431DF6022A001F3188 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -82,7 +41,6 @@
 		883904481DF6022A001F3188 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8839044A1DF6022A001F3188 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		883EA74A20741A56006D6F72 /* PopupExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopupExample.swift; sourceTree = "<group>"; };
-		88B6899F1E96E9AB00B67FAB /* ArcGISToolkit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ArcGISToolkit.xcodeproj; path = ../Toolkit/ArcGISToolkit.xcodeproj; sourceTree = "<group>"; };
 		88B689BE1E96EDF400B67FAB /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		88B689BF1E96EDF400B67FAB /* ExamplesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExamplesViewController.swift; sourceTree = "<group>"; };
 		88B689C11E96EDF400B67FAB /* MeasureExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeasureExample.swift; sourceTree = "<group>"; };
@@ -98,7 +56,6 @@
 		E47B17352304AB7D000C9C8B /* CalibrationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalibrationView.swift; sourceTree = "<group>"; };
 		E48405741E9BE7E600927208 /* LegendExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegendExample.swift; sourceTree = "<group>"; };
 		E48ADDB923563E17005A53AF /* BookmarksExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksExample.swift; sourceTree = "<group>"; };
-		E4E7E57F255C51A4002458B9 /* ArcGIS.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ArcGIS.xcframework; path = $HOME/Library/SDKs/ArcGIS/Frameworks/ArcGIS.xcframework; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,8 +63,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E4F93A45255C8C2900298E30 /* ArcGIS.xcframework in Frameworks */,
-				88A01D7D1EA188EF00CD9621 /* ArcGISToolkit.framework in Frameworks */,
+				79CA564425F1952D00E9FE3D /* ArcGISToolkit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -117,10 +73,9 @@
 		883904321DF6022A001F3188 = {
 			isa = PBXGroup;
 			children = (
-				88B6899F1E96E9AB00B67FAB /* ArcGISToolkit.xcodeproj */,
+				79CA564025F1942200E9FE3D /* arcgis-runtime-toolkit-ios */,
 				8839043D1DF6022A001F3188 /* ArcGISToolkitExamples */,
 				8839043C1DF6022A001F3188 /* Products */,
-				E4E7E57E255C51A4002458B9 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -146,15 +101,6 @@
 				88B689D21E96EDFE00B67FAB /* Examples */,
 			);
 			path = ArcGISToolkitExamples;
-			sourceTree = "<group>";
-		};
-		88B689A01E96E9AB00B67FAB /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				88B689A41E96E9AC00B67FAB /* ArcGISToolkit.framework */,
-				E4CD706123A8436F000A3B1C /* ArcGISToolkitTests.xctest */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		88B689D21E96EDFE00B67FAB /* Examples */ = {
@@ -186,14 +132,6 @@
 			path = Misc;
 			sourceTree = "<group>";
 		};
-		E4E7E57E255C51A4002458B9 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				E4E7E57F255C51A4002458B9 /* ArcGIS.xcframework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -204,15 +142,16 @@
 				883904371DF6022A001F3188 /* Sources */,
 				883904381DF6022A001F3188 /* Frameworks */,
 				883904391DF6022A001F3188 /* Resources */,
-				883904531DF60296001F3188 /* Embed Frameworks */,
 				E47ED066233AC27B0032440E /* Run Linter */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				88B689A61E96E9E000B67FAB /* PBXTargetDependency */,
 			);
 			name = ArcGISToolkitExamples;
+			packageProductDependencies = (
+				79CA564325F1952D00E9FE3D /* ArcGISToolkit */,
+			);
 			productName = ArcGISToolkitExamples;
 			productReference = 8839043B1DF6022A001F3188 /* ArcGISToolkitExamples.app */;
 			productType = "com.apple.product-type.application";
@@ -250,35 +189,12 @@
 			mainGroup = 883904321DF6022A001F3188;
 			productRefGroup = 8839043C1DF6022A001F3188 /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = 88B689A01E96E9AB00B67FAB /* Products */;
-					ProjectRef = 88B6899F1E96E9AB00B67FAB /* ArcGISToolkit.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				8839043A1DF6022A001F3188 /* ArcGISToolkitExamples */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		88B689A41E96E9AC00B67FAB /* ArcGISToolkit.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = ArcGISToolkit.framework;
-			remoteRef = 88B689A31E96E9AC00B67FAB /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		E4CD706123A8436F000A3B1C /* ArcGISToolkitTests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = ArcGISToolkitTests.xctest;
-			remoteRef = E4CD706023A8436F000A3B1C /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		883904391DF6022A001F3188 /* Resources */ = {
@@ -341,14 +257,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		88B689A61E96E9E000B67FAB /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = ArcGISToolkit;
-			targetProxy = 88B689A51E96E9E000B67FAB /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		883904421DF6022A001F3188 /* Main.storyboard */ = {
@@ -493,7 +401,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = ArcGISToolkitExamples/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -513,7 +421,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = ArcGISToolkitExamples/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -547,6 +455,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		79CA564325F1952D00E9FE3D /* ArcGISToolkit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ArcGISToolkit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 883904331DF6022A001F3188 /* Project object */;
 }
