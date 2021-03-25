@@ -505,7 +505,7 @@ extension ArcGISARView: AGSLocationChangeHandlerDelegate {
             }
         }
         
-        // Always set originCamera; then reset ARKit            
+        // Always set originCamera; then reset ARKit
         // Create a new camera based on our location and set it on the cameraController.
         // Note for the .initial tracking mode (or if we've yet to set an initial locatin),
         //   we create a new camera with the location and defaults for heading, pitch, roll.

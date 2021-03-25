@@ -33,7 +33,7 @@ private let _jobManagerSharedInstance = JobManager(jobManagerID: "shared")
  Use the shared instance of the JobManager, or create your own with a unique ID. When you kick off a Job, register it with the JobManager.
  
  For supporting background fetch you can forward the call from your AppDelegate's
- `func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping` 
+ `func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping`
  function, to the same function in this class.
  
  method.
