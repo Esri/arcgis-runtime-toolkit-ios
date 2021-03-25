@@ -7,7 +7,7 @@ The ArcGIS Runtime SDK for iOS Toolkit contains components that will simplify yo
 To use Toolkit in your project:
 
 * **[Install with CocoaPods](#cocoapods)** - Add `pod 'ArcGIS-Runtime-Toolkit-iOS'` to your podfile
-* **[Install with Carthage](#carthage)** - Add `github "esri/arcgis-runtime-toolkit-ios"` to your cartfile
+* **[Install with Swift Package Manager](#swift-package-manager)** - Add `https://github.com/Esri/arcgis-runtime-toolkit-ios` as the package repository URL.
 * **[Build manually](#manual)** - Build and include manually if you'd like to customize or extend toolkit
 
 ## Toolkit Components
@@ -24,7 +24,7 @@ To use Toolkit in your project:
 * **[TimeSlider](Documentation/TimeSlider)** - Allows interactively defining a temporal range (i.e. time extent) and animating time moving forward or backward. Can be used to manipulate the time extent in a MapView or SceneView.
 
 ## Requirements
-* [ArcGIS Runtime SDK for iOS](https://developers.arcgis.com/ios/) 100.10.0 (or higher)
+* [ArcGIS Runtime SDK for iOS](https://developers.arcgis.com/ios/) 100.11.0 (or higher)
 * Xcode 12.0 (or higher)
 
 The *ArcGIS Runtime Toolkit for iOS* has a *Target SDK* version of *13.0*, meaning that it can run on devices with *iOS 13.0* or newer.
