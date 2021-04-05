@@ -53,9 +53,9 @@ The *ArcGIS Runtime Toolkit for iOS* has a *Target SDK* version of *13.0*, meani
 ### Manual
 
  1. Ensure you have downloaded and installed __ArcGIS Runtime SDK for iOS__ as described [here](https://developers.arcgis.com/ios/get-started/)
- 2. Clone or download this repo
- 3. Drag and Drop the `ArcGISToolkit.xcodeproj` file into your project through the XCode Project Navigator pane
- 4. Drag the `ArcGISToolkit.framework` from the `ArcGISToolkit.xcodeproj/ArcGISToolkit/Products` folder to the "TARGETS" settings for your application and drop it in the "Embedded Binaries" section in the "General" tab
+ 2. Clone or download this repository
+ 3. Drag and Drop the `ArcGISToolkit.xcodeproj` file into your project through the Xcode Project Navigator pane
+ 4. Under "Frameworks, Libraries, and Embedded Content" click on the + and choose `ArcGISToolkit.framework`
  5. Add `import ArcGISToolkit` in your source code and start using the toolkit components 
 
 Note: Support for Carthage as been dropped for v100.11.0.
