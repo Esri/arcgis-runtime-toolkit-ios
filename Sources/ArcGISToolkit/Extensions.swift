@@ -32,8 +32,17 @@ extension UIApplication {
 }
 
 #if !SWIFT_PACKAGE
-// This is a workaround for cocoapods compatibility.
+// This is a workaround for installing the toolkit using the project file or cocoapods.
 extension Bundle {
-    static var module: Bundle { Bundle(identifier: "org.cocoapods.ArcGISToolkit")! }
+    static var module: Bundle {
+        var validModule: Bundle
+        // Toolkit was installed using project file.
+        if let module = Bundle(identifier: "com.esri.ArcGISToolkit") {
+            validModule = module
+        } else { // Toolkit was installed using cocoapods.
+            validModule = Bundle(identifier: "org.cocoapods.ArcGISToolkit")!
+        }
+        return validModule
+    }
 }
 #endif
