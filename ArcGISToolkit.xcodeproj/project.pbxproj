@@ -27,22 +27,7 @@
 		799DBBE8261BC1AE006B61DC /* MeasureToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 799DBBD5261BC1AE006B61DC /* MeasureToolbar.swift */; };
 		799DBBE9261BC1AE006B61DC /* Compass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 799DBBD6261BC1AE006B61DC /* Compass.swift */; };
 		799DBBED261BC1DC006B61DC /* ArcGIS.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 799DBBEC261BC1DC006B61DC /* ArcGIS.xcframework */; };
-		799DBBEE261BC1DC006B61DC /* ArcGIS.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 799DBBEC261BC1DC006B61DC /* ArcGIS.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		799DBBEF261BC1DC006B61DC /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				799DBBEE261BC1DC006B61DC /* ArcGIS.xcframework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		799DBBAC261BC004006B61DC /* ArcGISToolkit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ArcGISToolkit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -176,7 +161,6 @@
 				799DBBA8261BC004006B61DC /* Sources */,
 				799DBBA9261BC004006B61DC /* Frameworks */,
 				799DBBAA261BC004006B61DC /* Resources */,
-				799DBBEF261BC1DC006B61DC /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
