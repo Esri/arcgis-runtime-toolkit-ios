@@ -11,6 +11,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import Foundation
+
 internal class Coalescer {
     // Class to coalesce actions into intervals.
     // This is helpful for the Scalebar because we get updates to the visibleArea up to 60hz and we

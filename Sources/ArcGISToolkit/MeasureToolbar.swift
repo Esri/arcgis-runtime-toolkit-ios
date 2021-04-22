@@ -259,7 +259,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
     private var selectModeButtons: [UIBarButtonItem] = []
     
     private func sharedInitialization() {
-        let bundle = Bundle(for: type(of: self))
+        let bundle = Bundle.module
         let measureLengthImage = UIImage(named: "MeasureLength", in: bundle, compatibleWith: traitCollection)!
         let measureAreaImage = UIImage(named: "MeasureArea", in: bundle, compatibleWith: traitCollection)!
         let measureFeatureImage = UIImage(named: "MeasureFeature", in: bundle, compatibleWith: traitCollection)!
@@ -513,7 +513,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
             planar = linearUnit.convert(toMeters: planar)
             if planar > planarLengthMetersThreshold {
                 let planarDisplay = AGSLinearUnit.meters().convert(planar, to: selectedLinearUnit)
-                //`print("returning planar length... \(planar) sq meters")
+                // `print("returning planar length... \(planar) sq meters")
                 return planarDisplay
             }
         }
@@ -537,7 +537,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
             if let planarMiles = linearUnit.toAreaUnit()?.convert(planar, to: AGSAreaUnit.squareMiles()),
                 planarMiles > planarAreaSquareMilesThreshold {
                 let planarDisplay = AGSAreaUnit.squareMiles().convert(planarMiles, to: selectedAreaUnit)
-                //print("returning planar area... \(planarMiles) sq miles")
+                // print("returning planar area... \(planarMiles) sq miles")
                 return planarDisplay
             }
         }

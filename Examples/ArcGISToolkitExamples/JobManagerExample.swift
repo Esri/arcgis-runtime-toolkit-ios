@@ -17,7 +17,7 @@ import ArcGISToolkit
 import UserNotifications
 
 // NOTE:
-// 
+//
 // The JobManagerExample allows you to kick off some jobs, kill the application,
 // restart the application, and find out what jobs were running and have the ability to
 // resume them.

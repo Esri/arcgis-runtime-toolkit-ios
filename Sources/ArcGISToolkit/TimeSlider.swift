@@ -1330,7 +1330,7 @@ public class TimeSlider: UIControl {
         layer.addSublayer(currentExtentEndTimeLabel)
         
         // Create the images
-        let bundle = Bundle(for: type(of: self))
+        let bundle = Bundle.module
         let playImage = UIImage(named: "Play", in: bundle, compatibleWith: nil)
         let pauseImage = UIImage(named: "Pause", in: bundle, compatibleWith: nil)
         let forwardImage = UIImage(named: "Forward", in: bundle, compatibleWith: nil)

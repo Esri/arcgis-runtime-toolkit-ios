@@ -36,7 +36,7 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
                     })
                 }
                 
-                //set layerViewStateChangedHandler
+                // set layerViewStateChangedHandler
                 if let geoView = geoView {
                     geoView.layerViewStateChangedHandler = { [weak self] (_, _) in
                         DispatchQueue.main.async {
@@ -95,8 +95,7 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
     // use this static method to instantiate the view controller from our storyboard
     public static func makeLegendViewController(geoView: AGSGeoView? = nil) -> LegendViewController? {
         // get the bundle and then the storyboard
-        let bundle = Bundle(for: LegendViewController.self)
-        let storyboard = UIStoryboard(name: "Legend", bundle: bundle)
+        let storyboard = UIStoryboard(name: "Legend", bundle: .module)
         
         // create the legend VC from the storyboard
         let legendVC = storyboard.instantiateInitialViewController() as? LegendViewController
@@ -270,7 +269,7 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
         } else {
             // fetch the legend infos
             layerContent.fetchLegendInfos { [weak self] (legendInfos, _) in
-                //handle legendInfos
+                // handle legendInfos
                 self?.legendInfos[LegendViewController.objectIdentifierFor(layerContent)] = legendInfos
                 self?.updateLegendArray()
             }
@@ -292,7 +291,7 @@ public class LegendViewController: UIViewController, UITableViewDelegate, UITabl
                 // if we're respecting the scale range, make sure our layerContent is in scale
                 if let viewpoint = geoView?.currentViewpoint(with: .centerAndScale) {
                     if !viewpoint.targetScale.isNaN {
-                        //if targetScale is not NAN (i.e., is valid...)
+                        // if targetScale is not NAN (i.e., is valid...)
                         showAtScale = layerContent.isVisible(atScale: viewpoint.targetScale)
                     }
                 }

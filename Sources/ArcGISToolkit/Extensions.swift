@@ -12,9 +12,10 @@
 // limitations under the License.
 
 import Foundation
+import UIKit
 
 extension UIApplication {
-    func topViewController(_ controller: UIViewController? = UIApplication.shared.keyWindow?.rootViewController) -> UIViewController? {
+    func topViewController(_ controller: UIViewController? = UIApplication.shared.windows.first(where: { $0.isKeyWindow })?.rootViewController) -> UIViewController? {
         if let navigationController = controller as? UINavigationController {
             return topViewController(navigationController.visibleViewController)
         }
@@ -29,3 +30,10 @@ extension UIApplication {
         return controller
     }
 }
+
+#if !SWIFT_PACKAGE
+// This is a workaround for cocoapods compatibility.
+extension Bundle {
+    static var module: Bundle { Bundle(identifier: "org.cocoapods.ArcGISToolkit")! }
+}
+#endif

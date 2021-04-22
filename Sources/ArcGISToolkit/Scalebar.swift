@@ -381,10 +381,10 @@ public class Scalebar: UIView {
             return
         }
         
-        //print("current scale: \(mapView.mapScale)")
+        // print("current scale: \(mapView.mapScale)")
         
         guard minScale <= 0 || mapView.mapScale < minScale else {
-            //print("current scale: \(mapView.mapScale), minScale \(minScale)")
+            // print("current scale: \(mapView.mapScale), minScale \(minScale)")
             renderer.currentScaleDisplay = nil
             setNeedsDisplay()
             return
@@ -450,7 +450,7 @@ public class Scalebar: UIView {
         let mapLengthString = Scalebar.numberFormatter.string(from: NSNumber(value: lineMapLength)) ?? ""
         renderer.currentScaleDisplay = ScaleDisplay(mapScale: mapScale, unitsPerPoint: unitsPerPoint, lineMapLength: lineMapLength, displayUnit: displayUnit, lineDisplayLength: lineDisplayLength, mapCenter: mapCenter, mapLengthString: mapLengthString)
         
-        //print("geodetic: \(useGeodeticCalculations), lineDisplayLength: \(numberFormatter.string(from: lineDisplayLength as NSNumber)!), mapLength: \(lineMapLength) \(displayUnit.abbreviation))")
+        // print("geodetic: \(useGeodeticCalculations), lineDisplayLength: \(numberFormatter.string(from: lineDisplayLength as NSNumber)!), mapLength: \(lineMapLength) \(displayUnit.abbreviation))")
         
         // invalidate intrinsic content size
         invalidateIntrinsicContentSize()
