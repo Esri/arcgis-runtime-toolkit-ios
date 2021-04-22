@@ -25,7 +25,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "ArcGISToolkit",
+    name: "arcgis-runtime-toolkit-ios",
     platforms: [
         .iOS(.v13)
     ],
