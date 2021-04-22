@@ -36,12 +36,12 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(name: "ArcGIS", url: "https://github.com/Esri/arcgis-runtime-ios", .upToNextMinor(from: "100.11.0"))
+        .package(url: "https://github.com/Esri/arcgis-runtime-ios", .upToNextMinor(from: "100.11.0"))
     ],
     targets: [
         .target(
             name: "ArcGISToolkit",
-            dependencies: ["ArcGIS"]
+            dependencies: [.product(name: "ArcGIS", package: "arcgis-runtime-ios")]
         ),
         .testTarget(
             name: "ArcGISToolkitTests",
