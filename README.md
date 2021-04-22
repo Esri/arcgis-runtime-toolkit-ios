@@ -40,7 +40,7 @@ The *ArcGIS Runtime Toolkit for iOS* has a *Target SDK* version of *13.0*, meani
  
  Note: The Toolkit Swift Package adds the ArcGIS SDK Swift Package as a dependency so no need to add both separately. If you already have the ArcGIS SDK Swift Package delete that and just add the Toolkit Swift Package. 
 
- New to Swift Package Manager? Visit [swift.org/package-manager/](https://swift.org/package-manager/)
+ New to Swift Package Manager? Visit [swift.org/package-manager/](https://swift.org/package-manager/).
 
 ### Cocoapods
 
@@ -57,7 +57,7 @@ The *ArcGIS Runtime Toolkit for iOS* has a *Target SDK* version of *13.0*, meani
  3. Add the *ArcGISToolkit* library in your app, by adding it to the Frameworks, Libraries, and Embedded Content section of the General pane for your app target. The *ArcGISToolkit* library contains the *ArcGIS Runtime SDK for iOS* library, so you don't need to add that separately.
  4. Add `import ArcGIS` and `import ArcGISToolkit` in your source code and start using the toolkit components 
 
-Note: Support for Carthage as been dropped for v100.11.0.
+Note: Support for Carthage has been dropped for v100.11.0.
 
 ## SwiftLint
 

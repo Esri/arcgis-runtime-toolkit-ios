@@ -40,6 +40,7 @@ playground.xcworkspace
 # Packages/
 .build/
 Package.resolved
+.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 
 # CocoaPods
 #
