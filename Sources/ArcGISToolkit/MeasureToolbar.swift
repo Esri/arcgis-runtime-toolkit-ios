@@ -159,7 +159,8 @@ private enum MeasureToolbarMode {
     case feature
 }
 
-public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
+@available(iOSApplicationExtension, unavailable)
+public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate, UnitsViewControllerDelegate {
     // Exposed so that the user can customize the sketch editor styles.
     // Consumers of the MeasureToolbar should not mutate the sketch editor state
     // other than it's style.
@@ -462,7 +463,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         let navigationController = UINavigationController(rootViewController: unitsViewController)
         navigationController.modalPresentationStyle = .formSheet
         
-        UIApplication.shared.topViewController()?.present(navigationController, animated: true)
+        topViewController()?.present(navigationController, animated: true)
     }
     
     /// Called in response to
@@ -671,9 +672,7 @@ public class MeasureToolbar: UIToolbar, AGSGeoViewTouchDelegate {
         }
         return nil
     }
-}
 
-extension MeasureToolbar: UnitsViewControllerDelegate {
     public func unitsViewControllerDidCancel(_ unitsViewController: UnitsViewController) {
         unitsViewController.dismiss(animated: true)
     }
@@ -688,5 +687,20 @@ extension MeasureToolbar: UnitsViewControllerDelegate {
         default:
             fatalError("Unsupported unit type")
         }
+    }
+    
+    func topViewController(_ controller: UIViewController? = UIApplication.shared.windows.first(where: { $0.isKeyWindow })?.rootViewController) -> UIViewController? {
+        if let navigationController = controller as? UINavigationController {
+            return topViewController(navigationController.visibleViewController)
+        }
+        if let tabController = controller as? UITabBarController {
+            if let selected = tabController.selectedViewController {
+                return topViewController(selected)
+            }
+        }
+        if let presented = controller?.presentedViewController {
+            return topViewController(presented)
+        }
+        return controller
     }
 }

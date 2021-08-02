@@ -14,23 +14,6 @@
 import Foundation
 import UIKit
 
-extension UIApplication {
-    func topViewController(_ controller: UIViewController? = UIApplication.shared.windows.first(where: { $0.isKeyWindow })?.rootViewController) -> UIViewController? {
-        if let navigationController = controller as? UINavigationController {
-            return topViewController(navigationController.visibleViewController)
-        }
-        if let tabController = controller as? UITabBarController {
-            if let selected = tabController.selectedViewController {
-                return topViewController(selected)
-            }
-        }
-        if let presented = controller?.presentedViewController {
-            return topViewController(presented)
-        }
-        return controller
-    }
-}
-
 #if !SWIFT_PACKAGE
 // This is a workaround for cocoapods compatibility.
 extension Bundle {
