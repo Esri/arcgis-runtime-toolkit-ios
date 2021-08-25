@@ -217,7 +217,7 @@ public class JobManager: NSObject {
     ///
     /// An `AGSJob`'s status is `.paused` when it is created from JSON. So any `AGSJob`s that have been reloaded from User Defaults will be in the `.paused` state.
     ///
-    /// See the [Tasks and Jobs](https://developers.arcgis.com/ios/latest/swift/guide/tasks-and-jobs.htm#ESRI_SECTION1_BA1D597878F049278CC787A1C04F9734)
+    /// See the [Tasks and Jobs](https://developers.arcgis.com/ios/programming-patterns/tasks-and-jobs/#pause-resume-or-cancel-a-job)
     /// guide topic for more details.
     ///
     /// - Parameters:
@@ -251,7 +251,7 @@ public class JobManager: NSObject {
     ///
     /// This happens when the `JobManager` is initialized. All `AGSJob`s will be in the `.paused` state when first restored from JSON.
     ///
-    /// See the [Tasks and Jobs](https://developers.arcgis.com/ios/latest/swift/guide/tasks-and-jobs.htm#ESRI_SECTION1_BA1D597878F049278CC787A1C04F9734)
+    /// See the [Tasks and Jobs](https://developers.arcgis.com/ios/programming-patterns/tasks-and-jobs/#pause-resume-or-cancel-a-job)
     /// guide topic for more details.
     private func loadJobsFromUserDefaults() {
         if let storedJobsJSON = UserDefaults.standard.dictionary(forKey: jobsDefaultsKey) {

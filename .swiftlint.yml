@@ -63,3 +63,6 @@ disabled_rules:
 
 trailing_whitespace:
   ignores_empty_lines: true
+  
+excluded:
+  - Pods
