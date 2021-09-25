@@ -24,6 +24,11 @@
 
 import PackageDescription
 
+// To use an local installation of ArcGIS Runtime for iOS, uncomment the following lines and also uncomment
+// package depenencies:package:path and comment the depenencies:package:url
+// import class Foundation.ProcessInfo
+// let sdk_install_package:String = (ProcessInfo.processInfo.environment["HOME"] ?? "") + "/Library/SDKs/ArcGIS"
+
 let package = Package(
     name: "arcgis-runtime-toolkit-ios",
     platforms: [
@@ -36,7 +41,11 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/Esri/arcgis-runtime-ios", .upToNextMinor(from: "100.12.0"))
+        .package(
+            name: "arcgis-runtime-ios",
+            // path: sdk_install_package
+            url: "https://github.com/Esri/arcgis-runtime-ios", .upToNextMinor(from: "100.12.0")
+            )
     ],
     targets: [
         .target(
