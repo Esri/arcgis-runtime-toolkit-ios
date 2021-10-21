@@ -24,17 +24,14 @@ protocol FloorFilterViewControllerDelegate {
 public class FloorFilterView: UIViewController, FloorFilterViewControllerDelegate {
     
     /// Public variables and functions accessible to the developer
-    /// Selected site from the prompt
     public var selectedSite: AGSFloorSite? {
         return viewModel.selectedSite
     }
     
-    /// The selected facility from the prompt
     public var selectedFacility: AGSFloorFacility? {
         return viewModel.selectedFacility
     }
     
-    /// The selected level from the list
     public var selectedLevel: AGSFloorLevel? {
         return viewModel.selectedLevel
     }
@@ -42,13 +39,14 @@ public class FloorFilterView: UIViewController, FloorFilterViewControllerDelegat
     /// Listener when a level is changed
     public var onSelectedLevelChangedListener : (() -> Void)? = nil
 
+    /// Refresh the view with the new map
     public func refresh(geoView: AGSGeoView?){
         self.geoView = geoView
         state = FloorFilterState.initiallyCollapsed
         updateViewsVisibilityForState(state: state)
     }
     
-    /// Variables for styling
+    /// Variables for styling the Floor Filter View
     public var fontSize: CGFloat = 14.0
     public var fontName: String = "Avenir"
     public var selectionColor: UIColor = UIColor(hexString: "#C7EAFF")
@@ -108,7 +106,7 @@ public class FloorFilterView: UIViewController, FloorFilterViewControllerDelegat
         }
     }
     
-    /// This static method will be used to initialize the Floor Filter View and attach it as a SubView
+    /// Static method that will be used to initialize the Floor Filter View and attach it as a SubView
     public static func makeFloorFilterView(geoView: AGSGeoView?, buttonWidth: Int = 50, buttonHeight: Int = 50, xMargin: CGFloat = 40, yMargin: CGFloat = UIScreen.main.bounds.height - 320, maxDisplayLevels: Int = 3) -> FloorFilterView? {
      
         let storyboard = UIStoryboard(name: "FloorFilter", bundle: .module)
