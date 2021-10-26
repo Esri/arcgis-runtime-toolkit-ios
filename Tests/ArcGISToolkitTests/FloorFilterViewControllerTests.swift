@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import XCTest
-import ArcGISToolkit
+@testable import ArcGISToolkit
 import ArcGIS
 
 class FloorFilterViewControllerTests: XCTestCase {
@@ -27,8 +27,73 @@ class FloorFilterViewControllerTests: XCTestCase {
     func testBottomPlacement() {
         let floorFilterView = FloorFilterView.makeFloorFilterView(geoView: AGSGeoView(frame: .zero), xMargin: 40, yMargin: UIScreen.main.bounds.height - 300)
         let yPositionOfFloorFilterView = UIScreen.main.bounds.height - CGFloat(300) - CGFloat(floorFilterView?.view.bounds.height ?? 0)
-        let expectedHeight = ((50*2)+(50*3)+1)
+        let expectedHeight = ((50*2)+(50*3))
         XCTAssertEqual(UIScreen.main.bounds.height - 300 - CGFloat(expectedHeight), yPositionOfFloorFilterView)
+    }
+    
+    func testSitesData() {
+        let portal = AGSPortal(url: URL(string: "https://indoors.maps.arcgis.com/")!, loginRequired: false)
+        let portalItem = AGSPortalItem(portal: portal, itemID: "f133a698536f44c8884ad81f80b6cfc7")
+        let map = AGSMap(item: portalItem)
+        let mapView = AGSMapView()
+        mapView.map = map
+        
+        XCTLoad(map)
+        if let floorManager = map.floorManager {
+            XCTLoad(floorManager)
+        
+        let viewModel = FloorFilterViewModel()
+        viewModel.floorManager = floorManager
+        XCTAssertEqual(getSitesData().count, viewModel.sites.count)
+        }
+    }
+    
+    func testFacilitiesData() {
+        let portal = AGSPortal(url: URL(string: "https://indoors.maps.arcgis.com/")!, loginRequired: false)
+        let portalItem = AGSPortalItem(portal: portal, itemID: "f133a698536f44c8884ad81f80b6cfc7")
+        let map = AGSMap(item: portalItem)
+        let mapView = AGSMapView()
+        mapView.map = map
+        
+        XCTLoad(map)
+        if let floorManager = map.floorManager {
+            XCTLoad(floorManager)
+        
+            let viewModel = FloorFilterViewModel()
+            viewModel.floorManager = floorManager
+            viewModel.selectedSite = viewModel.sites.first
+            XCTAssertEqual(getFacilitiesData().count, viewModel.facilities.count)
+        }
+    }
+    
+    func testLevelsData() {
+        let portal = AGSPortal(url: URL(string: "https://indoors.maps.arcgis.com/")!, loginRequired: false)
+        let portalItem = AGSPortalItem(portal: portal, itemID: "f133a698536f44c8884ad81f80b6cfc7")
+        let map = AGSMap(item: portalItem)
+        let mapView = AGSMapView()
+        mapView.map = map
+
+        XCTLoad(map)
+        if let floorManager = map.floorManager {
+            XCTLoad(floorManager)
+        
+        let viewModel = FloorFilterViewModel()
+        viewModel.floorManager = floorManager
+        XCTAssertEqual(getLevelsData().count, viewModel.allLevels.count)
+        }
+    }
+    
+    // test data used in the test Map
+    func getSitesData() -> [String]{
+        return ["Esri Redlands Main"]
+    }
+    
+    func getFacilitiesData() -> [String] {
+        return ["Building L"]
+    }
+    
+    func getLevelsData() -> [String] {
+        return ["L1", "L2", "L3"]
     }
     
 }

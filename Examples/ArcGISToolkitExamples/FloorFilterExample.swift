@@ -24,9 +24,8 @@ class FloorFilterExample: MapViewController {
         super.viewDidLoad()
         
         // Create the map from a portal item and assign to the mapView.
-        let portal = AGSPortal(url: URL(string: "https://indoors.maps.arcgis.com/")!, loginRequired: false)
-        let portalItem = AGSPortalItem(portal: portal, itemID: "f133a698536f44c8884ad81f80b6cfc7")
-//        let portalItem = AGSPortalItem(portal: portal, itemID: "02b60b8af1324da886f35fe62db87f3a")
+        let portal = AGSPortal(url: URL(string: "https://indoors.maps.arcgis.com/")!, loginRequired: true)
+        let portalItem = AGSPortalItem(portal: portal, itemID: "cc680379ac834c6ca0f8ebf0b97d0037")
         let map = AGSMap(item: portalItem)
         mapView.map = map
         mapView.map?.basemap = AGSBasemap.topographicVector()

@@ -87,7 +87,7 @@ public class FloorFilterView: UIViewController, FloorFilterViewControllerDelegat
     private var state = FloorFilterState.initiallyCollapsed
     private var isPlacedOnTopOfScreen = false
     
-    public var floorManager: AGSFloorManager?
+    private var floorManager: AGSFloorManager?
     
     // GeoView that the Floor Filter is rendered on
     // For Version 1 only MapView (2D) is supported to render the Floor Filter
