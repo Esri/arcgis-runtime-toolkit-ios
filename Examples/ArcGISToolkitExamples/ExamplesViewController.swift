@@ -21,17 +21,18 @@ class ExamplesViewController: VCListViewController {
         self.title = "Toolkit Samples"
         
         self.viewControllerInfos = [
-            ("Compass", CompassExample.self, nil),
-            ("Measure", MeasureExample.self, nil),
-            ("Scalebar", ScalebarExample.self, nil),
-            ("Legend", LegendExample.self, nil),
-            ("Job Manager", JobManagerExample.self, nil),
-            ("Time Slider", TimeSliderExample.self, nil),
-            ("Popup Controller", PopupExample.self, nil),
-            ("Template Picker", TemplatePickerExample.self, nil),
-            ("AR", ARExample.self, nil),
-            ("Bookmarks", BookmarksExample.self, nil),
-            ("Floor Filter", FloorFilterExample.self, nil),
+//            ("Compass", CompassExample.self, nil),
+//            ("Measure", MeasureExample.self, nil),
+//            ("Scalebar", ScalebarExample.self, nil),
+//            ("Legend", LegendExample.self, nil),
+//            ("Job Manager", JobManagerExample.self, nil),
+//            ("Time Slider", TimeSliderExample.self, nil),
+//            ("Popup Controller", PopupExample.self, nil),
+//            ("Template Picker", TemplatePickerExample.self, nil),
+//            ("AR", ARExample.self, nil),
+//            ("Bookmarks", BookmarksExample.self, nil),
+            ("Floor Filter Airport", FloorFilterExample2.self, nil),
+            ("Floor Filter Corporate Campus", FloorFilterExample.self, nil),
         ]
     }
 }

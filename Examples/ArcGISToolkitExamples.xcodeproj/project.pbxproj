@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		2140781E209B629000FBFDCC /* TimeSliderExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2140781D209B629000FBFDCC /* TimeSliderExample.swift */; };
 		79CA564425F1952D00E9FE3D /* ArcGISToolkit in Frameworks */ = {isa = PBXBuildFile; productRef = 79CA564325F1952D00E9FE3D /* ArcGISToolkit */; };
+		8204835C273CF3C100646795 /* FloorFilterExample2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8204835B273CF3C100646795 /* FloorFilterExample2.swift */; };
 		82EACDA9270CE8BA00A40C11 /* FloorFilterExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82EACDA8270CE8BA00A40C11 /* FloorFilterExample.swift */; };
 		8800656E2228577A00F76945 /* TemplatePickerExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8800656D2228577A00F76945 /* TemplatePickerExample.swift */; };
 		883904441DF6022A001F3188 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 883904421DF6022A001F3188 /* Main.storyboard */; };
@@ -35,6 +36,7 @@
 /* Begin PBXFileReference section */
 		2140781D209B629000FBFDCC /* TimeSliderExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeSliderExample.swift; sourceTree = "<group>"; };
 		79CA564025F1942200E9FE3D /* arcgis-runtime-toolkit-ios */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "arcgis-runtime-toolkit-ios"; path = ..; sourceTree = "<group>"; };
+		8204835B273CF3C100646795 /* FloorFilterExample2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloorFilterExample2.swift; sourceTree = "<group>"; };
 		82EACDA8270CE8BA00A40C11 /* FloorFilterExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloorFilterExample.swift; sourceTree = "<group>"; };
 		8800656D2228577A00F76945 /* TemplatePickerExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemplatePickerExample.swift; sourceTree = "<group>"; };
 		8839043B1DF6022A001F3188 /* ArcGISToolkitExamples.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ArcGISToolkitExamples.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -119,6 +121,7 @@
 				E447A12A2267BB9500578C0B /* ARExample.swift */,
 				E48ADDB923563E17005A53AF /* BookmarksExample.swift */,
 				82EACDA8270CE8BA00A40C11 /* FloorFilterExample.swift */,
+				8204835B273CF3C100646795 /* FloorFilterExample2.swift */,
 			);
 			name = Examples;
 			sourceTree = "<group>";
@@ -254,6 +257,7 @@
 				88B689CE1E96EDF400B67FAB /* ScalebarExample.swift in Sources */,
 				88B689C91E96EDF400B67FAB /* ExamplesViewController.swift in Sources */,
 				E447A12B2267BB9500578C0B /* ARExample.swift in Sources */,
+				8204835C273CF3C100646795 /* FloorFilterExample2.swift in Sources */,
 				E48405751E9BE7E600927208 /* LegendExample.swift in Sources */,
 				E46893271FEDAE29008ADA79 /* CompassExample.swift in Sources */,
 				82EACDA9270CE8BA00A40C11 /* FloorFilterExample.swift in Sources */,
