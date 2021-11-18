@@ -107,7 +107,7 @@ public class FloorFilterView: UIViewController, FloorFilterViewControllerDelegat
     }
     
     /// Static method that will be used to initialize the Floor Filter View and attach it as a SubView
-    public static func makeFloorFilterView(geoView: AGSGeoView?, buttonWidth: Int = 50, buttonHeight: Int = 50, xMargin: CGFloat = 40, yMargin: CGFloat = UIScreen.main.bounds.height - 320, maxDisplayLevels: Int = 3) -> FloorFilterView? {
+    public static func makeFloorFilterView(geoView: AGSGeoView?, buttonWidth: Int = 50, buttonHeight: Int = 50, xMargin: CGFloat = 50, yMargin: CGFloat = UIScreen.main.bounds.height - 320, maxDisplayLevels: Int = 3) -> FloorFilterView? {
      
         let storyboard = UIStoryboard(name: "FloorFilter", bundle: .module)
         let floorFilterVC = storyboard.instantiateViewController(identifier: "FloorFilter") as? FloorFilterView

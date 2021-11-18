@@ -25,19 +25,13 @@ class FloorFilterExample: MapViewController {
         
         // Create the map from a portal item and assign to the mapView.
         let portal = AGSPortal(url: URL(string: "https://indoors.maps.arcgis.com/")!, loginRequired: false)
-        let portalItem = AGSPortalItem(portal: portal, itemID: "02b60b8af1324da886f35fe62db87f3a")
-        let map = AGSMap(item: portalItem)
-        mapView.map = map
-        mapView.map?.basemap = AGSBasemap.topographicVector()
+        let portalItem = AGSPortalItem(portal: portal, itemID: "0972ef84ecf84bf99787c88e3d73bf1c")
+        mapView.map = AGSMap(item: portalItem)
         
-        
-        self.floorFilterVC = FloorFilterView.makeFloorFilterView(geoView: mapView, buttonWidth: 50, buttonHeight: 50, xMargin: 50, yMargin: UIScreen.main.bounds.height - 300)
+        // create the floor filter view
+        self.floorFilterVC = FloorFilterView.makeFloorFilterView(geoView: mapView, buttonWidth: 50, buttonHeight: 50, xMargin: 20, yMargin: UIScreen.main.bounds.height - 320)
         if let floorFilterVC = self.floorFilterVC {
-            
-            floorFilterVC.onSelectedLevelChangedListener = {
-                print("Level was changed")
-            }
-            // add floor filter to the current view
+            // add floor filter view to the current view
             self.view.addSubview(floorFilterVC.view)
         }
     }
