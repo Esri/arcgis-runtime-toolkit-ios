@@ -10,9 +10,9 @@ learn more about them.
 
 To use Toolkit in your project:
 
-* **[Install with CocoaPods](#cocoapods)** - Add `pod 'ArcGIS-Runtime-Toolkit-iOS'` to your podfile
 * **[Install with Swift Package Manager](#swift-package-manager)** - Add
   `https://github.com/Esri/arcgis-runtime-toolkit-ios` as the package repository URL.
+* **[Install with CocoaPods](#cocoapods)** - Add `pod 'ArcGIS-Runtime-Toolkit-iOS'` to your podfile
 * **[Build manually](#manual)** - Build and include manually if you'd like to customize or extend toolkit
 
 ## Toolkit Components
