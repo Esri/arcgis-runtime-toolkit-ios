@@ -21,5 +21,4 @@ internal class SiteFacilityTableViewCell: UITableViewCell {
     @IBOutlet weak var siteFacilityNameLabel: UILabel!
     @IBOutlet weak var siteFacilityDotImg: UIImageView!
     @IBOutlet weak var siteFacilityRightChevnron: UIImageView!
-    
 }

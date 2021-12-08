@@ -16,12 +16,15 @@ import UIKit
 import ArcGIS
 import Foundation
 
+
+
 protocol FloorFilterViewControllerDelegate {
     // Updates the Floor Filter levels list with the site and facility that were selected from the prompt
     func siteFacilityIsUpdated(viewModel: FloorFilterViewModel)
 }
 
-public class FloorFilterView: UIViewController, FloorFilterViewControllerDelegate {
+
+public class FloorFilterViewController: UIViewController, FloorFilterViewControllerDelegate {
     
     /// Public variables and functions accessible to the developer
     public var selectedSite: AGSFloorSite? {
@@ -32,6 +35,7 @@ public class FloorFilterView: UIViewController, FloorFilterViewControllerDelegat
         return viewModel.selectedFacility
     }
     
+ 
     public var selectedLevel: AGSFloorLevel? {
         return viewModel.selectedLevel
     }
@@ -54,7 +58,7 @@ public class FloorFilterView: UIViewController, FloorFilterViewControllerDelegat
     public var selectedTextColor: UIColor = UIColor(hexString: "#004874")
     public var unselectedTextColor: UIColor = UIColor(hexString: "#323236")
     
-    // Floor Filter UI Elements and Constraints
+    /// Floor Filter UI Elements and Constraints
     @IBOutlet var floorFilterView: UIView!
     @IBOutlet weak var siteBtn: UIButton!
     @IBOutlet weak var levelsTableView: UITableView!
@@ -67,10 +71,10 @@ public class FloorFilterView: UIViewController, FloorFilterViewControllerDelegat
     @IBOutlet weak var siteBtnWidth: NSLayoutConstraint!
     @IBOutlet weak var levelCellWidth: NSLayoutConstraint!
     
-    // Floor Filter view styles variables
-    // These are the default, but will get updated with values that are provided during initialization
-    private var buttonHeight: Int = 35
-    private var buttonWidth: Int = 40
+    /// Floor Filter view styles variables
+    /// These are the default, but will get updated with values that are provided during initialization
+    private var buttonHeight: CGFloat = 35
+    private var buttonWidth: CGFloat = 40
     private var maxDisplayLevels: Int = 3
     private var xMargin: CGFloat = 40.0
     private var yMargin: CGFloat = UIScreen.main.bounds.height - 320
@@ -78,7 +82,7 @@ public class FloorFilterView: UIViewController, FloorFilterViewControllerDelegat
     private var delegate: FloorFilterViewControllerDelegate?
     private var viewModel = FloorFilterViewModel()
     
-    // State of the visibility of the Floor Filter
+    /// State of the visibility of the Floor Filter
     private enum FloorFilterState {
         case initiallyCollapsed
         case partiallyExpanded
@@ -89,8 +93,8 @@ public class FloorFilterView: UIViewController, FloorFilterViewControllerDelegat
     
     private var floorManager: AGSFloorManager?
     
-    // GeoView that the Floor Filter is rendered on
-    // For Version 1 only MapView (2D) is supported to render the Floor Filter
+    /// GeoView that the Floor Filter is rendered on
+    /// For Version 1 only MapView (2D) is supported to render the Floor Filter
     private var geoView: AGSGeoView? {
         didSet {
             if geoView != nil {
@@ -107,10 +111,10 @@ public class FloorFilterView: UIViewController, FloorFilterViewControllerDelegat
     }
     
     /// Static method that will be used to initialize the Floor Filter View and attach it as a SubView
-    public static func makeFloorFilterView(geoView: AGSGeoView?, buttonWidth: Int = 50, buttonHeight: Int = 50, xMargin: CGFloat = 40, yMargin: CGFloat = UIScreen.main.bounds.height - 320, maxDisplayLevels: Int = 3) -> FloorFilterView? {
+    public static func makeFloorFilterView(geoView: AGSGeoView?, buttonWidth: CGFloat = 50, buttonHeight: CGFloat = 50, xMargin: CGFloat = 40, yMargin: CGFloat = UIScreen.main.bounds.height - 320, maxDisplayLevels: Int = 3) -> FloorFilterViewController? {
      
         let storyboard = UIStoryboard(name: "FloorFilter", bundle: .module)
-        let floorFilterVC = storyboard.instantiateViewController(identifier: "FloorFilter") as? FloorFilterView
+        let floorFilterVC = storyboard.instantiateViewController(identifier: "FloorFilter") as? FloorFilterViewController
        
         // Set the styles for the Floor Filter
         floorFilterVC?.buttonHeight = buttonHeight
@@ -121,9 +125,9 @@ public class FloorFilterView: UIViewController, FloorFilterViewControllerDelegat
         
         // The height is calculated by using the ButtonHeight defined and multiplying by the number of levels displayed on the levels list
         // Since there are two buttons (Close and Site) multiply ButtonHeight by 2
-        let height = (buttonHeight * maxDisplayLevels) + (buttonHeight * 2)
-
-        floorFilterVC?.view.frame = CGRect(x: Int(xMargin), y: Int(yMargin), width: buttonWidth, height: height)
+        let height = (buttonHeight * CGFloat(maxDisplayLevels)) + (buttonHeight * 2)
+        
+        floorFilterVC?.view.frame = CGRect(x: xMargin, y: yMargin, width: buttonWidth, height: height)
         floorFilterVC?.geoView = geoView
       
         return floorFilterVC
@@ -232,6 +236,7 @@ public class FloorFilterView: UIViewController, FloorFilterViewControllerDelegat
         self.levelsTableView.reloadData()
     }
     
+    /// Updates which state of the floor filter should be state
     private func updateViewsVisibilityForState(state: FloorFilterState) {
         siteBtnHeight.constant = CGFloat(buttonHeight)
         siteBtnWidth.constant = CGFloat(buttonWidth)
@@ -246,7 +251,7 @@ public class FloorFilterView: UIViewController, FloorFilterViewControllerDelegat
         case .fullyExpanded:
             closeBtn?.isHidden = false
             self.levelsTableView?.isHidden = false
-            self.tableViewHeight.constant = viewModel.visibleLevelsInExpandedList.count >= maxDisplayLevels ? CGFloat(buttonHeight * maxDisplayLevels) : CGFloat(buttonHeight * viewModel.visibleLevelsInExpandedList.count)
+            self.tableViewHeight.constant = viewModel.visibleLevelsInExpandedList.count >= maxDisplayLevels ? CGFloat(buttonHeight * CGFloat(maxDisplayLevels)) : CGFloat(buttonHeight * CGFloat(viewModel.visibleLevelsInExpandedList.count))
         
         case .partiallyExpanded:
             closeBtn?.isHidden = true
@@ -273,9 +278,9 @@ public class FloorFilterView: UIViewController, FloorFilterViewControllerDelegat
         floorFilterView.layer.shadowOpacity = 0.8
     }
     
+    /// Add a corner radius to each of the views
+    /// Depending on the placement of the Floor Filter and the current state
     private func addCornerRadiusBasedOnPlacement() {
-        // Add a corner radius to each of the views
-        // Depending on the placement of the Floor Filter and the current state
         if (isPlacedOnTopOfScreen) {
             switch state {
             case .fullyExpanded:
@@ -315,10 +320,11 @@ public class FloorFilterView: UIViewController, FloorFilterViewControllerDelegat
         }
     }
     
+    /// Logic to adjust the floor filter if it placed on the top or bottom of the screen
     private func adjustConstraintsBasedOnPlacement() {
         guard let floorFilterStackView = floorFilterStackView else { return }
         
-        let heightOfExpandedView = (buttonHeight * maxDisplayLevels) + (buttonHeight * 2)
+        let heightOfExpandedView = (buttonHeight * CGFloat(maxDisplayLevels)) + (buttonHeight * 2)
         let yPositionOfFloorFilterView = UIScreen.main.bounds.height - CGFloat(yMargin) - CGFloat(heightOfExpandedView)
         
         // If the defined Y Margin is less than half the screen height, then Floor Filter opens downwards
@@ -357,7 +363,7 @@ public class FloorFilterView: UIViewController, FloorFilterViewControllerDelegat
     }
 }
 
-extension FloorFilterView: UITableViewDataSource, UITableViewDelegate {
+extension FloorFilterViewController: UITableViewDataSource, UITableViewDelegate {
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return state == .partiallyExpanded ? 1 : viewModel.visibleLevelsInExpandedList.count
@@ -384,21 +390,14 @@ extension FloorFilterView: UITableViewDataSource, UITableViewDelegate {
         } else {
             cell.textLabel?.text = viewModel.selectedLevel?.shortName
         }
-       
-        if let selectedLevel = viewModel.selectedLevel {
-           if (cell.textLabel?.text == selectedLevel.shortName) {
+        
+        let visibleLevelVerticalOrder = levels.first { $0.isVisible }.map { $0.verticalOrder }
+        let levelShortNames = levels.filter { $0.verticalOrder == visibleLevelVerticalOrder }.map {$0.shortName}
+        if (levelShortNames.contains(cell.textLabel?.text ?? "")) {
             cell.backgroundColor = selectionColor
             cell.textLabel?.textColor = selectedTextColor
-           }
-        } else {
-            // When no level is selected, then use the default vertical order as the selected level
-            let defaultLevel = levels.first { $0.verticalOrder == viewModel.defaultVerticalOrder }
-            viewModel.selectedLevel = defaultLevel
-            
-            if (cell.textLabel?.text == defaultLevel?.shortName) {
-                cell.backgroundColor = selectionColor
-            }
         }
+       
         return cell
     }
     
@@ -422,7 +421,7 @@ extension FloorFilterView: UITableViewDataSource, UITableViewDelegate {
     }
 }
 
-// Extensions for UIViewController to get the top most view controller of the application
+/// Extensions for UIViewController to get the top most view controller of the application
 extension UIViewController {
     func topMostViewController() -> UIViewController {
         if let tab = self as? UITabBarController {
@@ -459,7 +458,7 @@ extension UIApplication {
     }
 }
 
-// Extension for UI Color to convert a HexString to UIColor
+/// Extension for UI Color to convert a HexString to UIColor
 extension UIColor {
     convenience init(hexString: String, alpha: CGFloat = 1.0) {
         let hexString: String = hexString.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
@@ -489,7 +488,7 @@ extension UIColor {
     }
 }
 
-// Extension for UIView to add corner radius 
+/// Extension for UIView to add corner radius
 extension UIView {
     func cornerRadius(usingCorners corners: UIRectCorner, cornerRadii: CGSize) {
         let path = UIBezierPath(roundedRect: self.bounds, byRoundingCorners: corners, cornerRadii: cornerRadii)

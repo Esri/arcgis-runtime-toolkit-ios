@@ -31,7 +31,7 @@ class ExamplesViewController: VCListViewController {
             ("Template Picker", TemplatePickerExample.self, nil),
             ("AR", ARExample.self, nil),
             ("Bookmarks", BookmarksExample.self, nil),
-            ("Floor Filter", FloorFilterExample.self, nil),
+            ("Floor Filter", FloorFilterExample.self, nil)
         ]
     }
 }

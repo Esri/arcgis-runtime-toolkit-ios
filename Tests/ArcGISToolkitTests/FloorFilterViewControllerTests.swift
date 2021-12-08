@@ -19,19 +19,19 @@ import ArcGIS
 class FloorFilterViewControllerTests: XCTestCase {
     
     func testTopPlacement() {
-        let floorFilterView = FloorFilterView.makeFloorFilterView(geoView: AGSGeoView(frame: .zero), xMargin: UIScreen.main.bounds.width - 100, yMargin: 100)
+        let floorFilterView = FloorFilterViewController.makeFloorFilterView(geoView: AGSGeoView(frame: .zero), xMargin: UIScreen.main.bounds.width - 100, yMargin: 100)
         let xPositionOfFloorFilterView = UIScreen.main.bounds.width - CGFloat(100) - CGFloat(floorFilterView?.view.bounds.width ?? 0)
         XCTAssertEqual(UIScreen.main.bounds.width - 100 - 50, xPositionOfFloorFilterView)
     }
     
     func testBottomPlacement() {
-        let floorFilterView = FloorFilterView.makeFloorFilterView(geoView: AGSGeoView(frame: .zero), xMargin: 40, yMargin: UIScreen.main.bounds.height - 300)
+        let floorFilterView = FloorFilterViewController.makeFloorFilterView(geoView: AGSGeoView(frame: .zero), xMargin: 40, yMargin: UIScreen.main.bounds.height - 300)
         let yPositionOfFloorFilterView = UIScreen.main.bounds.height - CGFloat(300) - CGFloat(floorFilterView?.view.bounds.height ?? 0)
         let expectedHeight = ((50*2)+(50*3))
         XCTAssertEqual(UIScreen.main.bounds.height - 300 - CGFloat(expectedHeight), yPositionOfFloorFilterView)
     }
     
-    func testSitesData() {
+    func testSitesData() throws {
         let portal = AGSPortal(url: URL(string: "https://indoors.maps.arcgis.com/")!, loginRequired: false)
         let portalItem = AGSPortalItem(portal: portal, itemID: "f133a698536f44c8884ad81f80b6cfc7")
         let map = AGSMap(item: portalItem)
@@ -39,16 +39,14 @@ class FloorFilterViewControllerTests: XCTestCase {
         mapView.map = map
         
         XCTLoad(map)
-        if let floorManager = map.floorManager {
-            XCTLoad(floorManager)
-        
+        let floorManager = try XCTUnwrap(map.floorManager)
         let viewModel = FloorFilterViewModel()
         viewModel.floorManager = floorManager
         XCTAssertEqual(getSitesData().count, viewModel.sites.count)
-        }
+    
     }
     
-    func testFacilitiesData() {
+    func testFacilitiesData() throws {
         let portal = AGSPortal(url: URL(string: "https://indoors.maps.arcgis.com/")!, loginRequired: false)
         let portalItem = AGSPortalItem(portal: portal, itemID: "f133a698536f44c8884ad81f80b6cfc7")
         let map = AGSMap(item: portalItem)
@@ -56,14 +54,12 @@ class FloorFilterViewControllerTests: XCTestCase {
         mapView.map = map
         
         XCTLoad(map)
-        if let floorManager = map.floorManager {
-            XCTLoad(floorManager)
+        let floorManager = try XCTUnwrap(map.floorManager)
+        let viewModel = FloorFilterViewModel()
+        viewModel.floorManager = floorManager
+        viewModel.selectedSite = viewModel.sites.first
+        XCTAssertEqual(getFacilitiesData().count, viewModel.facilities.count)
         
-            let viewModel = FloorFilterViewModel()
-            viewModel.floorManager = floorManager
-            viewModel.selectedSite = viewModel.sites.first
-            XCTAssertEqual(getFacilitiesData().count, viewModel.facilities.count)
-        }
     }
     
     func testLevelsData() {
@@ -74,16 +70,14 @@ class FloorFilterViewControllerTests: XCTestCase {
         mapView.map = map
 
         XCTLoad(map)
-        if let floorManager = map.floorManager {
-            XCTLoad(floorManager)
-        
+        let floorManager = try XCTUnwrap(map.floorManager)
         let viewModel = FloorFilterViewModel()
         viewModel.floorManager = floorManager
         XCTAssertEqual(getLevelsData().count, viewModel.allLevels.count)
-        }
+        
     }
     
-    // test data used in the test Map
+    /// test data used in the test Map
     func getSitesData() -> [String]{
         return ["Esri Redlands Main"]
     }

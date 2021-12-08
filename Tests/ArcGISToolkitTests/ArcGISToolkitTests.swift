@@ -63,7 +63,7 @@ class ArcGISToolkitTests: XCTestCase {
         XCTAssertNotNil(bookmarksVC)
         
         // FloorFilterView
-        let floorFilterVC = FloorFilterView.makeFloorFilterView(geoView: AGSMapView(frame: .zero))
+        let floorFilterVC = FloorFilterViewController.makeFloorFilterView(geoView: AGSMapView(frame: .zero))
         XCTAssertNotNil(floorFilterVC)
     }
 }

@@ -17,4 +17,4 @@ When the Site Button is clicked, a prompt opens so the user can select a site an
 
 ```
 
-To see it in action, try out the [Examples](../../Examples) and refer to [CompassExample.swift](../../Examples/ArcGISToolkitExamples/FloorFilterExample.swift) in the project.
+To see it in action, try out the [Examples](../../Examples) and refer to [FloorFilterExample.swift](../../Examples/ArcGISToolkitExamples/FloorFilterExample.swift) in the project.

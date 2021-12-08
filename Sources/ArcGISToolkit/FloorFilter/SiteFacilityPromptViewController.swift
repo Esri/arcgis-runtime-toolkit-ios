@@ -17,11 +17,10 @@ import ArcGIS
 import Foundation
 
 internal class SiteFacilityPromptViewController: UIViewController {
-    
     var delegate: FloorFilterViewControllerDelegate?
     var viewModel = FloorFilterViewModel()
     
-    // UI Elements and constraints
+    /// UI Elements and constraints
     @IBOutlet weak var siteFacilitySearchBar: UISearchBar!
     @IBOutlet weak var backBtn: UIImageView!
     @IBOutlet weak var closeBtn: UIImageView!
@@ -34,11 +33,11 @@ internal class SiteFacilityPromptViewController: UIViewController {
     
     private var originalYPositionForPanel: CGFloat = 0.0
     
-    // Show the facilities list directly if the map has no sites configured or if there is a previously selected facility 
+    /// Show the facilities list directly if the map has no sites configured or if there is a previously selected facility
     private var isShowingFacilities = false
     private var isSearchActive = false
     
-    // Filtered facilities and sites list based on search query
+    /// Filtered facilities and sites list based on search query
     private var filteredSearchFacilities: [AGSFloorFacility] = []
     private var filteredSearchSites: [AGSFloorSite] = []
     
@@ -107,9 +106,8 @@ internal class SiteFacilityPromptViewController: UIViewController {
     }
 }
 
-// Extension for Search Bar functions
+/// Extension for Search Bar functions
 extension SiteFacilityPromptViewController: UISearchBarDelegate {
-    
     private func initializeSiteFacilitySearchBar() {
         siteFacilitySearchBar.delegate = self
         resetSearchFilteredResults()
@@ -152,10 +150,9 @@ extension SiteFacilityPromptViewController: UISearchBarDelegate {
         self.siteFacilitySearchBar.endEditing(true)
         self.siteFacilitySearchBar.showsCancelButton = false
     }
-    
 }
 
-// Extension for the Sites and Facilities Table View
+/// Extension for the Sites and Facilities Table View
 extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDelegate {
     
     private func initializeSiteFacilityTableView() {
@@ -257,7 +254,7 @@ extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDe
         }
     }
     
-    // Filter the sites or facilities data based on the search query
+    /// Filter the sites or facilities data based on the search query
     public func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if (isShowingFacilities) {
             // If the search query is empty then set FilteredSearchFacilities to all the facilities in the data

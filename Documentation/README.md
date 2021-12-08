@@ -10,3 +10,5 @@
 * [Scalebar](Scalebar) - Displays current scale reference.
 * [TemplatePickerViewController](TemplatePicker) - Allows a user to choose a template from a list of `AGSFeatureTemplate` when creating new features.
 * [TimeSlider](TimeSlider) - Allows interactively defining a temporal range (i.e. time extent) and animating time moving forward or backward. Can be used to manipulate the time extent in a MapView or SceneView.
+*[FloorFilter](FloorFilter) - Allows to filter floor plan data in a GeoView by a site, a building in the site, or a floor in the building. 
+
