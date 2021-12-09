@@ -27,17 +27,53 @@ protocol FloorFilterViewControllerDelegate {
 public class FloorFilterViewController: UIViewController, FloorFilterViewControllerDelegate {
     
     /// Public variables and functions accessible to the developer
+    private var _selectedSite: AGSFloorSite? = nil
     public var selectedSite: AGSFloorSite? {
-        return viewModel.selectedSite
+        get {
+            _selectedSite ?? viewModel.selectedSite
+        }
+        set {
+            _selectedSite = newValue
+            selectedFacility = nil
+            selectedLevel = nil
+            viewModel.selectedSite = newValue
+            viewModel.zoomToSelection()
+        }
     }
     
+    private var _selectedFacility: AGSFloorFacility? = nil
     public var selectedFacility: AGSFloorFacility? {
-        return viewModel.selectedFacility
+        get {
+            _selectedFacility ?? viewModel.selectedFacility
+        }
+        set {
+            _selectedFacility = newValue
+            if (_selectedFacility != nil) {
+                _selectedSite = viewModel.selectedFacility?.site
+            }
+            selectedLevel = viewModel.getDefaultLevelForFacility(facility: newValue)
+            viewModel.selectedFacility = newValue
+            viewModel.zoomToSelection()
+        }
     }
     
  
+    private var _selectedLevel: AGSFloorLevel? = nil
     public var selectedLevel: AGSFloorLevel? {
-        return viewModel.selectedLevel
+        get {
+            _selectedLevel ?? viewModel.selectedLevel
+        }
+        set {
+            if (_selectedLevel != newValue) {
+                _selectedLevel = newValue
+            }
+            if (_selectedLevel != nil) {
+                let selectedLevelsFacility = viewModel.selectedLevel?.facility
+                _selectedSite = selectedLevelsFacility?.site
+            }
+            viewModel.selectedLevel = newValue
+            viewModel.filterMapToSelectedLevel()
+        }
     }
     
     /// Listener when a level is changed
@@ -278,7 +314,22 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         floorFilterView.layer.shadowOpacity = 0.8
     }
     
-    /// Add a corner radius to each of the views
+    /// Add a corner radius for the cells in the levels table
+    /// Depending on the visible state of the floor filter
+    private func setTableViewCellCornerRadius(cell: UITableViewCell) {
+        if state == .fullyExpanded {
+            cell.cornerRadius(usingCorners: [.allCorners], cornerRadii: CGSize(width: 0.0, height: 0.0))
+            
+        } else {
+            if (isPlacedOnTopOfScreen) {
+                cell.cornerRadius(usingCorners: [UIRectCorner.bottomLeft, UIRectCorner.bottomRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
+            } else {
+                cell.cornerRadius(usingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
+            }
+        }
+    }
+    
+    /// Add a corner radius to the site and close button 
     /// Depending on the placement of the Floor Filter and the current state
     private func addCornerRadiusBasedOnPlacement() {
         if (isPlacedOnTopOfScreen) {
@@ -286,15 +337,9 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
             case .fullyExpanded:
                 siteBtn?.cornerRadius(usingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
                 closeBtn?.cornerRadius(usingCorners: [.bottomLeft, .bottomRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
-                levelsTableView.visibleCells.forEach {
-                    $0.cornerRadius(usingCorners: [.bottomLeft, .bottomRight], cornerRadii: CGSize(width: 0.0, height: 0.0))
-                }
             
             case .partiallyExpanded:
                 siteBtn?.cornerRadius(usingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
-                levelsTableView.visibleCells.forEach {
-                    $0.cornerRadius(usingCorners: [.bottomLeft, .bottomRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
-                }
                 
             case .initiallyCollapsed:
                 siteBtn?.cornerRadius(usingCorners: .allCorners, cornerRadii: CGSize(width: 5.0, height: 5.0))
@@ -304,15 +349,9 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
             case .fullyExpanded:
                 siteBtn?.cornerRadius(usingCorners: [.bottomLeft, .bottomRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
                 closeBtn?.cornerRadius(usingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
-                levelsTableView.visibleCells.forEach {
-                    $0.cornerRadius(usingCorners: [.bottomLeft, .bottomRight], cornerRadii: CGSize(width: 0.0, height: 0.0))
-                }
             
             case .partiallyExpanded:
                 siteBtn?.cornerRadius(usingCorners: [.bottomLeft, .bottomRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
-                levelsTableView.visibleCells.forEach {
-                    $0.cornerRadius(usingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
-                }
                 
             case .initiallyCollapsed:
                 siteBtn?.cornerRadius(usingCorners: .allCorners, cornerRadii: CGSize(width: 5.0, height: 5.0))
@@ -376,10 +415,12 @@ extension FloorFilterViewController: UITableViewDataSource, UITableViewDelegate 
         // Style the cell
         cell.heightAnchor.constraint(equalToConstant: CGFloat(buttonHeight)).isActive = true
         cell.widthAnchor.constraint(equalToConstant: CGFloat(buttonWidth)).isActive = true
-        cell.textLabel?.adjustsFontSizeToFitWidth = true
         cell.textLabel?.font = UIFont(name: fontName, size: fontSize)
+        cell.textLabel?.adjustsFontSizeToFitWidth = true
         cell.backgroundColor = backgroundColor
         cell.textLabel?.textColor = unselectedTextColor
+        cell.textLabel?.textAlignment = .center
+        setTableViewCellCornerRadius(cell: cell)
         
         // If the Floor Filter state is fully expanded then set the title of the cell based on the levels list
         // Otherwise set the title of cell to the selected level short name
