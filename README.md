@@ -10,9 +10,9 @@ learn more about them.
 
 To use Toolkit in your project:
 
-* **[Install with CocoaPods](#cocoapods)** - Add `pod 'ArcGIS-Runtime-Toolkit-iOS'` to your podfile
 * **[Install with Swift Package Manager](#swift-package-manager)** - Add
   `https://github.com/Esri/arcgis-runtime-toolkit-ios` as the package repository URL.
+* **[Install with CocoaPods](#cocoapods)** - Add `pod 'ArcGIS-Runtime-Toolkit-iOS'` to your podfile
 * **[Build manually](#manual)** - Build and include manually if you'd like to customize or extend toolkit
 
 ## Toolkit Components
@@ -38,7 +38,7 @@ To use Toolkit in your project:
 
 ## Requirements
 
-* [ArcGIS Runtime SDK for iOS](https://developers.arcgis.com/ios/) 100.12.0 (or higher)
+* [ArcGIS Runtime SDK for iOS](https://developers.arcgis.com/ios/) 100.13.0 (or higher)
 * Xcode 12.0 (or higher)
 
 The *ArcGIS Runtime Toolkit for iOS* has a *Target SDK* version of *13.0*, meaning that it can run on devices with *iOS
@@ -51,7 +51,7 @@ The *ArcGIS Runtime Toolkit for iOS* has a *Target SDK* version of *13.0*, meani
  1. Open your project in Xcode
  2. Go to *File* > *Swift Packages* > *Add Package Dependency* option
  3. Enter `https://github.com/Esri/arcgis-runtime-toolkit-ios` as the package repository URL
- 4. Choose version 100.12.0 or a later version. Click Next. Only version 100.11.0 or newer supports Swift Package
+ 4. Choose version 100.13.0 or a later version. Click Next. Only version 100.11.0 or newer supports Swift Package
     Manager.
 
  Note: The Toolkit Swift Package adds the ArcGIS SDK Swift Package as a dependency so no need to add both separately. If
