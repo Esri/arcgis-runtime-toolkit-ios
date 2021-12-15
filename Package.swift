@@ -24,6 +24,13 @@
 
 import PackageDescription
 
+// This is setup by default to use a hosted version of the ArcGIS Runtime for iOS.
+// To use a local installation of ArcGIS Runtime for iOS, uncomment the lines below declaring
+// the `localArcGISPackage` constant and use that as the package dependency instead of the
+// hosted version.
+// import class Foundation.ProcessInfo
+// let localArcGISPackage = ProcessInfo.processInfo.environment["HOME"]! + "/Library/SDKs/ArcGIS"
+
 let package = Package(
     name: "arcgis-runtime-toolkit-ios",
     platforms: [
@@ -36,7 +43,11 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/Esri/arcgis-runtime-ios", .upToNextMinor(from: "100.12.0"))
+        .package(
+            name: "arcgis-runtime-ios",
+            // path: localArcGISPackage
+            url: "https://github.com/Esri/arcgis-runtime-ios", .upToNextMinor(from: "100.13.0")
+        )
     ],
     targets: [
         .target(
