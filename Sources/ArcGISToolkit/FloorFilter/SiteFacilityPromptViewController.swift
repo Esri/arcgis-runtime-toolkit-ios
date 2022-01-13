@@ -81,7 +81,7 @@ internal class SiteFacilityPromptViewController: UIViewController {
     }
     
     @objc func closeSiteFacilityPrompt() {
-        self.dismiss(animated: false, completion: nil)
+        self.dismiss(animated: true, completion: nil)
     }
     
     @objc func backButtonPressed() {
@@ -90,15 +90,15 @@ internal class SiteFacilityPromptViewController: UIViewController {
     }
     
     private func updatePromptTitle() {
-        promptTitle?.font = UIFont.boldSystemFont(ofSize: 17)
-        promptSubtitle?.isHidden = true
-        promptSubtitle?.text = ""
+        promptTitle.font = UIFont.boldSystemFont(ofSize: 17)
+        promptSubtitle.isHidden = true
+        promptSubtitle.text = ""
         if (isShowingFacilities) {
             // Add the subtitle when showing facilities
-            promptSubtitle?.isHidden = false
-            promptSubtitle?.text = "Select a Facility"
-            promptTitle?.text = "\(viewModel.selectedSite?.name ?? "")"
-            backBtn?.isHidden = false
+            promptSubtitle.isHidden = false
+            promptSubtitle.text = "Select a Facility"
+            promptTitle.text = "\(viewModel.selectedSite?.name ?? "")"
+            backBtn.isHidden = false
         } else {
             promptTitle?.text = "\(viewModel.selectedSite?.name ?? "Select a Site")"
             backBtn?.isHidden = true
@@ -154,7 +154,6 @@ extension SiteFacilityPromptViewController: UISearchBarDelegate {
 
 /// Extension for the Sites and Facilities Table View
 extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDelegate {
-    
     private func initializeSiteFacilityTableView() {
         siteFacilityTableView.delegate = self
         siteFacilityTableView.dataSource = self
@@ -169,7 +168,6 @@ extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDe
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = siteFacilityTableView.dequeueReusableCell(withIdentifier: "FloorFilterSiteFacilityCell", for: indexPath) as? SiteFacilityTableViewCell {
-            
             let sites = getFilteredSites()
             let facilities = getFilteredFacilities()
         

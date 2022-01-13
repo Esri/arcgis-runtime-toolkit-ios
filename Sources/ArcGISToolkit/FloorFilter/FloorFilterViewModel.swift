@@ -56,6 +56,7 @@ internal class FloorFilterViewModel {
     /// The default vertical order is 0 according to Runtime 100.12 update for AGSFloorManager
     public let defaultVerticalOrder = 0
 
+    /// Reset FloorFilter saved data
     public func reset() {
         floorManager = nil
         selectedSite = nil
@@ -63,6 +64,8 @@ internal class FloorFilterViewModel {
         selectedLevel = nil
     }
     
+    /// Gets the default level for a facility
+    /// Uses level with vertical order 0 otherwise gets the lowest level
     public func getDefaultLevelForFacility(facility: AGSFloorFacility?) -> AGSFloorLevel? {
         let candidateLevels = allLevels.filter {$0.facility == facility}
         return candidateLevels.first {$0.verticalOrder == 0} ?? getLowestLevel(levels: candidateLevels)
@@ -70,16 +73,12 @@ internal class FloorFilterViewModel {
     
     /// Returns the AGSFloorLevel with the lowest verticalOrder.
     private func getLowestLevel(levels: [AGSFloorLevel]) -> AGSFloorLevel? {
-        var lowestLevel: AGSFloorLevel? = nil
-        allLevels.forEach {
-            if ($0.verticalOrder != Int.min && $0.verticalOrder != Int.max) {
-                let lowestVerticalOrder = lowestLevel?.verticalOrder
-                if (lowestVerticalOrder == nil || lowestVerticalOrder ?? defaultVerticalOrder > $0.verticalOrder) {
-                    lowestLevel = $0
-                }
-            }
+        let sortedLevels = allLevels.sorted {
+            $0.verticalOrder < $1.verticalOrder
         }
-        return lowestLevel
+        return sortedLevels.first {
+            $0.verticalOrder != Int.min && $0.verticalOrder != Int.max
+        }
     }
     
     /// Sets the visibility of all the levels on the map based on the vertical order of the current selected level

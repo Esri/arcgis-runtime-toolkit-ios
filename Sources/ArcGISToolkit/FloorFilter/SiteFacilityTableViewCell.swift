@@ -16,6 +16,7 @@ import UIKit
 import ArcGIS
 import Foundation
 
+/// custom cell for site/facility 
 internal class SiteFacilityTableViewCell: UITableViewCell {
     
     @IBOutlet weak var siteFacilityNameLabel: UILabel!

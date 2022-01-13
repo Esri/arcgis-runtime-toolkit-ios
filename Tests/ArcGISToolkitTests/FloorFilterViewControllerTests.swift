@@ -17,7 +17,6 @@ import XCTest
 import ArcGIS
 
 class FloorFilterViewControllerTests: XCTestCase {
-    
     func testTopPlacement() {
         let floorFilterView = FloorFilterViewController.makeFloorFilterView(geoView: AGSGeoView(frame: .zero), xMargin: UIScreen.main.bounds.width - 100, yMargin: 100)
         let xPositionOfFloorFilterView = UIScreen.main.bounds.width - CGFloat(100) - CGFloat(floorFilterView?.view.bounds.width ?? 0)
@@ -42,8 +41,7 @@ class FloorFilterViewControllerTests: XCTestCase {
         let floorManager = try XCTUnwrap(map.floorManager)
         let viewModel = FloorFilterViewModel()
         viewModel.floorManager = floorManager
-        XCTAssertEqual(getSitesData().count, viewModel.sites.count)
-    
+        XCTAssertEqual(viewModel.sites.count, 1)
     }
     
     func testFacilitiesData() throws {
@@ -58,8 +56,7 @@ class FloorFilterViewControllerTests: XCTestCase {
         let viewModel = FloorFilterViewModel()
         viewModel.floorManager = floorManager
         viewModel.selectedSite = viewModel.sites.first
-        XCTAssertEqual(getFacilitiesData().count, viewModel.facilities.count)
-        
+        XCTAssertEqual(viewModel.facilities.count, 1)
     }
     
     func testLevelsData() {
@@ -73,21 +70,7 @@ class FloorFilterViewControllerTests: XCTestCase {
         let floorManager = try XCTUnwrap(map.floorManager)
         let viewModel = FloorFilterViewModel()
         viewModel.floorManager = floorManager
-        XCTAssertEqual(getLevelsData().count, viewModel.allLevels.count)
-        
-    }
-    
-    /// test data used in the test Map
-    func getSitesData() -> [String]{
-        return ["Esri Redlands Main"]
-    }
-    
-    func getFacilitiesData() -> [String] {
-        return ["Building L"]
-    }
-    
-    func getLevelsData() -> [String] {
-        return ["L1", "L2", "L3"]
+        XCTAssertEqual(viewModel.allLevels.count, 3)
     }
     
 }
