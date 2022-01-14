@@ -32,16 +32,24 @@ class FloorFilterExample: MapViewController {
         self.floorFilterVC = FloorFilterViewController.makeFloorFilterView(
             geoView: mapView,
             buttonWidth: 50,
-            buttonHeight: 50,
-            xMargin: 50,
-            yMargin: UIScreen.main.bounds.height - 300
+            buttonHeight: 50
         )
+        
+        let xMargin = CGFloat(10)
+        let yMargin = CGFloat(30)
+        let width = CGFloat(50)
+        
         if let floorFilterVC = self.floorFilterVC {
             floorFilterVC.onSelectedLevelChangedListener = {
                 print("Level was changed")
             }
             // Add floor filter to the current view
             self.view.addSubview(floorFilterVC.view)
+            floorFilterVC.view.translatesAutoresizingMaskIntoConstraints = false
+            floorFilterVC.view.widthAnchor.constraint(equalToConstant: width).isActive = true
+            floorFilterVC.view.bottomAnchor.constraint(equalTo: mapView.attributionTopAnchor, constant: -yMargin).isActive = true
+            floorFilterVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: xMargin).isActive = true
+        
         }
     }
 }

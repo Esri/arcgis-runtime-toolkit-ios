@@ -163,8 +163,9 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         // Since there are two buttons (Close and Site) multiply ButtonHeight by 2
         let height = (buttonHeight * CGFloat(maxDisplayLevels)) + (buttonHeight * 2)
         
-        floorFilterVC?.view.frame = CGRect(x: xMargin, y: yMargin, width: buttonWidth, height: height)
+//        floorFilterVC?.view.frame = CGRect(x: xMargin, y: yMargin, width: buttonWidth, height: height)
         floorFilterVC?.geoView = geoView
+//        floorFilterVC?.view.translatesAutoresizingMaskIntoConstraints = false
       
         return floorFilterVC
     }
@@ -181,6 +182,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         super.viewWillAppear(animated)
         updateViewsVisibilityForState(state: state)
         initializeSiteButton()
+        initializeButtonsClickListeners()
         
         // Adjust the constraints and order of the views in the Floor Filter if placement is on top or bottom of the sceen
         adjustConstraintsBasedOnPlacement()
