@@ -112,8 +112,6 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     private var buttonHeight: CGFloat = 35
     private var buttonWidth: CGFloat = 40
     private var maxDisplayLevels: Int = 3
-    private var xMargin: CGFloat = 40.0
-    private var yMargin: CGFloat = UIScreen.main.bounds.height - 320
   
     private var delegate: FloorFilterViewControllerDelegate?
     private var viewModel = FloorFilterViewModel()
@@ -147,7 +145,12 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     }
     
     /// Static method that will be used to initialize the Floor Filter View and attach it as a SubView
-    public static func makeFloorFilterView(geoView: AGSGeoView?, buttonWidth: CGFloat = 50, buttonHeight: CGFloat = 50, xMargin: CGFloat = 40, yMargin: CGFloat = UIScreen.main.bounds.height - 320, maxDisplayLevels: Int = 3) -> FloorFilterViewController? {
+    public static func makeFloorFilterView(
+        geoView: AGSGeoView?,
+        buttonWidth: CGFloat = 50,
+        buttonHeight: CGFloat = 50,
+        maxDisplayLevels: Int = 3
+        ) -> FloorFilterViewController? {
      
         let storyboard = UIStoryboard(name: "FloorFilter", bundle: .module)
         let floorFilterVC = storyboard.instantiateViewController(identifier: "FloorFilter") as? FloorFilterViewController
@@ -155,15 +158,8 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         // Set the styles for the Floor Filter
         floorFilterVC?.buttonHeight = buttonHeight
         floorFilterVC?.buttonWidth = buttonWidth
-        floorFilterVC?.xMargin = xMargin
-        floorFilterVC?.yMargin = yMargin
         floorFilterVC?.maxDisplayLevels = maxDisplayLevels
         
-        // The height is calculated by using the ButtonHeight defined and multiplying by the number of levels displayed on the levels list
-        // Since there are two buttons (Close and Site) multiply ButtonHeight by 2
-        let height = (buttonHeight * CGFloat(maxDisplayLevels)) + (buttonHeight * 2)
-        
-        floorFilterVC?.view.frame = CGRect(x: xMargin, y: yMargin, width: buttonWidth, height: height)
         floorFilterVC?.geoView = geoView
       
         return floorFilterVC
@@ -364,7 +360,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         guard let floorFilterStackView = floorFilterStackView else { return }
         
         let heightOfExpandedView = (buttonHeight * CGFloat(maxDisplayLevels)) + (buttonHeight * 2)
-        let yPositionOfFloorFilterView = UIScreen.main.bounds.height - CGFloat(yMargin) - CGFloat(heightOfExpandedView)
+        let yPositionOfFloorFilterView = CGFloat(self.view.frame.minY) - CGFloat(heightOfExpandedView)
         
         // If the defined Y Margin is less than half the screen height, then Floor Filter opens downwards
         isPlacedOnTopOfScreen = yPositionOfFloorFilterView >= (UIScreen.main.bounds.height / 2)
@@ -430,6 +426,7 @@ extension FloorFilterViewController: UITableViewDataSource, UITableViewDelegate 
             }
         } else {
             cell.textLabel?.text = viewModel.selectedLevel?.shortName
+                ?? viewModel.getDefaultLevelForFacility(facility: viewModel.selectedFacility)?.shortName
         }
         
         let visibleLevelVerticalOrder = levels.first { $0.isVisible }.map { $0.verticalOrder }

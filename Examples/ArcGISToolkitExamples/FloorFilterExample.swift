@@ -29,19 +29,33 @@ class FloorFilterExample: MapViewController {
         let map = AGSMap(item: portalItem)
         mapView.map = map
         
-        self.floorFilterVC = FloorFilterViewController.makeFloorFilterView(
+        let leadingConstraint = CGFloat(40)
+        let trailingConstraint = CGFloat(-320)
+        let maxDisplaylevels = 3
+        let buttonHeight = 50
+        
+        // height constraint is calculated by using the ButtonHeight defined and multiplying by the number of the levels displayed on the levels list
+        // Since there are two buttons (close and site button) multiply buttonHeight by 2
+        let height = (buttonHeight * maxDisplaylevels) + (buttonHeight * 2)
+        floorFilterVC = FloorFilterViewController.makeFloorFilterView(
             geoView: mapView,
             buttonWidth: 50,
             buttonHeight: 50,
-            xMargin: 50,
-            yMargin: UIScreen.main.bounds.height - 300
+            maxDisplayLevels: 3
         )
         if let floorFilterVC = self.floorFilterVC {
             floorFilterVC.onSelectedLevelChangedListener = {
                 print("Level was changed")
             }
             // Add floor filter to the current view
-            self.view.addSubview(floorFilterVC.view)
+            floorFilterVC.view.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview(floorFilterVC.view)
+            
+            floorFilterVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: leadingConstraint).isActive = true
+            floorFilterVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: trailingConstraint).isActive = true
+            floorFilterVC.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -leadingConstraint).isActive = true
+            floorFilterVC.view.heightAnchor.constraint(equalToConstant: CGFloat(height)).isActive = true
+         
         }
     }
 }
