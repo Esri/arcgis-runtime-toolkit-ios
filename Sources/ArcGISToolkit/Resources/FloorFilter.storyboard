@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina5_5" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -43,7 +43,7 @@
                                         </constraints>
                                         <prototypes>
                                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" restorationIdentifier="FloorFilterSiteFacilityCell" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="FloorFilterSiteFacilityCell" id="0To-UR-h49" userLabel="FloorFilterSiteFacilityCell" customClass="SiteFacilityTableViewCell" customModule="ArcGISToolkit">
-                                                <rect key="frame" x="0.0" y="28" width="364" height="43.666667938232422"/>
+                                                <rect key="frame" x="0.0" y="44.666666030883789" width="364" height="43.666667938232422"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="0To-UR-h49" id="h3R-6K-DxX">
                                                     <rect key="frame" x="0.0" y="0.0" width="364" height="43.666667938232422"/>
@@ -146,8 +146,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="48" height="280"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <stackView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="hu0-iP-wgv">
-                                <rect key="frame" x="0.0" y="0.0" width="48" height="276"/>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="2" translatesAutoresizingMaskIntoConstraints="NO" id="hu0-iP-wgv">
+                                <rect key="frame" x="0.0" y="0.0" width="48" height="280"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleAspectFit" restorationIdentifier="CloseBtn" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6Gq-b5-cMd" userLabel="CloseBtn">
                                         <rect key="frame" x="0.0" y="0.0" width="48" height="48"/>
@@ -162,7 +162,7 @@
                                         </state>
                                     </button>
                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="1OE-0w-M3G" userLabel="levelsList">
-                                        <rect key="frame" x="0.0" y="48" width="48" height="180"/>
+                                        <rect key="frame" x="0.0" y="50" width="48" height="180"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
@@ -172,7 +172,7 @@
                                         <color key="separatorColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <prototypes>
                                             <tableViewCell clipsSubviews="YES" contentMode="center" restorationIdentifier="levelCell" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationWidth="0.0" shouldIndentWhileEditing="NO" reuseIdentifier="levelCell" rowHeight="40" id="E77-hT-5hd" userLabel="levelCell">
-                                                <rect key="frame" x="0.0" y="28" width="48" height="40"/>
+                                                <rect key="frame" x="0.0" y="44.666666030883789" width="48" height="40"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="E77-hT-5hd" id="Fmb-OK-OWd">
                                                     <rect key="frame" x="0.0" y="0.0" width="48" height="40"/>
@@ -184,7 +184,7 @@
                                         </prototypes>
                                     </tableView>
                                     <button opaque="NO" contentMode="center" restorationIdentifier="SiteBtn" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cQp-cO-G7u" userLabel="SiteBtn">
-                                        <rect key="frame" x="0.0" y="228" width="48" height="48"/>
+                                        <rect key="frame" x="0.0" y="232" width="48" height="48"/>
                                         <color key="backgroundColor" red="0.99999600649999998" green="1" blue="1" alpha="0.76953125000000011" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="48" id="bAw-GB-siy"/>
@@ -201,6 +201,12 @@
                         <viewLayoutGuide key="safeArea" id="1As-Is-Llv"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="hu0-iP-wgv" firstAttribute="bottom" secondItem="1As-Is-Llv" secondAttribute="bottom" id="ALH-pY-31J"/>
+                            <constraint firstItem="hu0-iP-wgv" firstAttribute="top" secondItem="1As-Is-Llv" secondAttribute="top" id="KzC-wT-a9b"/>
+                            <constraint firstItem="hu0-iP-wgv" firstAttribute="trailing" secondItem="1As-Is-Llv" secondAttribute="trailing" id="QYI-vT-8Tm"/>
+                            <constraint firstItem="hu0-iP-wgv" firstAttribute="leading" secondItem="1As-Is-Llv" secondAttribute="leading" id="TbY-TW-7Bq"/>
+                        </constraints>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
                                 <integer key="value" value="5"/>
