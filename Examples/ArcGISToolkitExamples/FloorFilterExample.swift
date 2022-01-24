@@ -30,32 +30,35 @@ class FloorFilterExample: MapViewController {
         mapView.map = map
         
         let leadingConstraint = CGFloat(40)
-        let trailingConstraint = CGFloat(-320)
-        let maxDisplaylevels = 3
-        let buttonHeight = 50
         
-        // height constraint is calculated by using the ButtonHeight defined and multiplying by the number of the levels displayed on the levels list
-        // Since there are two buttons (close and site button) multiply buttonHeight by 2
-        let height = (buttonHeight * maxDisplaylevels) + (buttonHeight * 2)
+        // The style of the floor filter determines which way it will open. If the floor filter is placed on the top of the screen, it is recommended to use the style 'expandDown'.
+        // If floor filter placed on the bottom of the screen, then use 'expandUp'
         floorFilterVC = FloorFilterViewController.makeFloorFilterView(
             geoView: mapView,
             buttonWidth: 50,
             buttonHeight: 50,
-            maxDisplayLevels: 3
+            maxDisplayLevels: 3,
+            style: .expandDown
         )
         if let floorFilterVC = self.floorFilterVC {
             floorFilterVC.onSelectedLevelChangedListener = {
                 print("Level was changed")
             }
+            
             // Add floor filter to the current view
             floorFilterVC.view.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview(floorFilterVC.view)
-            
+    
             floorFilterVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: leadingConstraint).isActive = true
-            floorFilterVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: trailingConstraint).isActive = true
-            floorFilterVC.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -leadingConstraint).isActive = true
-            floorFilterVC.view.heightAnchor.constraint(equalToConstant: CGFloat(height)).isActive = true
-         
+
+
+            // This places the floor filter at the top of the view,
+            // just below the top anchor of the safe area layout guide.
+            floorFilterVC.view.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: leadingConstraint).isActive = true
+
+            // This places the floor filter at the bottom of the view,
+            // anchored to the top of the map view's attribution bar.
+//            floorFilterVC.view.bottomAnchor.constraint(equalTo: mapView.attributionTopAnchor, constant: -leadingConstraint).isActive = true
         }
     }
 }

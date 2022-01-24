@@ -25,6 +25,16 @@ protocol FloorFilterViewControllerDelegate {
 
 
 public class FloorFilterViewController: UIViewController, FloorFilterViewControllerDelegate {
+    /// The direction the floor filter should expand in.
+    public enum Style {
+        /// The level list expands down from the floor filter button.
+        case expandDown
+        /// The level list expands up from the floor filter button.
+        case expandUp
+    }
+    
+    /// The style of the floor filter.  The default is `.expandUp`.
+    public var style: Style = .expandUp
     
     /// Public variables and functions accessible to the developer
     private var _selectedSite: AGSFloorSite? = nil
@@ -123,7 +133,6 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         case fullyExpanded
     }
     private var state = FloorFilterState.initiallyCollapsed
-    private var isPlacedOnTopOfScreen = false
     
     private var floorManager: AGSFloorManager?
     
@@ -149,8 +158,9 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         geoView: AGSGeoView?,
         buttonWidth: CGFloat = 50,
         buttonHeight: CGFloat = 50,
-        maxDisplayLevels: Int = 3
-        ) -> FloorFilterViewController? {
+        maxDisplayLevels: Int = 3,
+        style: Style = .expandUp
+    ) -> FloorFilterViewController? {
      
         let storyboard = UIStoryboard(name: "FloorFilter", bundle: .module)
         let floorFilterVC = storyboard.instantiateViewController(identifier: "FloorFilter") as? FloorFilterViewController
@@ -159,6 +169,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         floorFilterVC?.buttonHeight = buttonHeight
         floorFilterVC?.buttonWidth = buttonWidth
         floorFilterVC?.maxDisplayLevels = maxDisplayLevels
+        floorFilterVC?.style = style
         
         floorFilterVC?.geoView = geoView
       
@@ -283,7 +294,9 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         case .fullyExpanded:
             closeBtn?.isHidden = false
             self.levelsTableView?.isHidden = false
-            self.tableViewHeight.constant = viewModel.visibleLevelsInExpandedList.count >= maxDisplayLevels ? CGFloat(buttonHeight * CGFloat(maxDisplayLevels)) : CGFloat(buttonHeight * CGFloat(viewModel.visibleLevelsInExpandedList.count))
+            let levelCount = CGFloat(min(viewModel.visibleLevelsInExpandedList.count, maxDisplayLevels))
+            let constant = levelCount * buttonHeight
+            self.tableViewHeight.constant = constant
         
         case .partiallyExpanded:
             closeBtn?.isHidden = true
@@ -317,7 +330,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
             cell.cornerRadius(usingCorners: [.allCorners], cornerRadii: CGSize(width: 0.0, height: 0.0))
             
         } else {
-            if (isPlacedOnTopOfScreen) {
+            if (style == .expandDown) {
                 cell.cornerRadius(usingCorners: [UIRectCorner.bottomLeft, UIRectCorner.bottomRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
             } else {
                 cell.cornerRadius(usingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
@@ -325,10 +338,10 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         }
     }
     
-    /// Add a corner radius to the site and close button 
+    /// Add a corner radius to the site and close button
     /// Depending on the placement of the Floor Filter and the current state
     private func addCornerRadiusBasedOnPlacement() {
-        if (isPlacedOnTopOfScreen) {
+        if (style == .expandDown) {
             switch state {
             case .fullyExpanded:
                 siteBtn?.cornerRadius(usingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
@@ -358,15 +371,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     /// Logic to adjust the floor filter if it placed on the top or bottom of the screen
     private func adjustConstraintsBasedOnPlacement() {
         guard let floorFilterStackView = floorFilterStackView else { return }
-        
-        let heightOfExpandedView = (buttonHeight * CGFloat(maxDisplayLevels)) + (buttonHeight * 2)
-        let yPositionOfFloorFilterView = CGFloat(self.view.frame.minY) - CGFloat(heightOfExpandedView)
-        
-        // If the defined Y Margin is less than half the screen height, then Floor Filter opens downwards
-        isPlacedOnTopOfScreen = yPositionOfFloorFilterView >= (UIScreen.main.bounds.height / 2)
         addCornerRadiusBasedOnPlacement()
-        // Always center the stack view's x axis to the superview regardless of placement
-        let stackViewCenterXConstraint = NSLayoutConstraint(item: floorFilterStackView, attribute: .centerX, relatedBy: .equal, toItem: self.view, attribute: .centerX, multiplier: 1, constant: 0)
         
         // First remove the Close Button and Site Button from the stack and then based on placement add the Buttons
         floorFilterStackView.removeArrangedSubview(closeBtn)
@@ -374,10 +379,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         floorFilterStackView.setNeedsLayout()
         floorFilterStackView.layoutIfNeeded()
         
-        if (isPlacedOnTopOfScreen) {
-            let stackViewTopConstraint = NSLayoutConstraint(item: floorFilterStackView, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier: 1, constant: 0)
-            self.view.addConstraints([stackViewTopConstraint, stackViewCenterXConstraint])
-            
+        if (style == .expandDown) {
             // Place the Site Button at the top of the Floor Filter View
             // The Levels List will be unchanged and remain as the second element on the Floor Filter view
             // Place the Close Button at the bottom of the list
@@ -385,9 +387,6 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
             floorFilterStackView.insertArrangedSubview(closeBtn, at: 2)
             floorFilterStackView.setNeedsLayout()
         } else {
-            let stackViewBottomConstraint = NSLayoutConstraint(item: floorFilterStackView, attribute: .bottom, relatedBy: .equal, toItem: self.view, attribute: .bottom, multiplier: 1, constant: 0)
-            self.view.addConstraints([stackViewBottomConstraint, stackViewCenterXConstraint])
-            
             // Place the Close Button at the top of the Floor Filter View
             // The Levels List will be unchanged and remain as the second element on the Floor Filter view
             // Place the Site Button at the bottom of the list
