@@ -38,7 +38,7 @@ class FloorFilterExample: MapViewController {
             buttonWidth: 50,
             buttonHeight: 50,
             maxDisplayLevels: 3,
-            style: .expandDown
+            style: .expandUp
         )
         if let floorFilterVC = self.floorFilterVC {
             floorFilterVC.onSelectedLevelChangedListener = {
@@ -48,17 +48,15 @@ class FloorFilterExample: MapViewController {
             // Add floor filter to the current view
             floorFilterVC.view.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview(floorFilterVC.view)
-    
+            
             floorFilterVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: leadingConstraint).isActive = true
-
-
-            // This places the floor filter at the top of the view,
-            // just below the top anchor of the safe area layout guide.
-            floorFilterVC.view.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: leadingConstraint).isActive = true
 
             // This places the floor filter at the bottom of the view,
             // anchored to the top of the map view's attribution bar.
-//            floorFilterVC.view.bottomAnchor.constraint(equalTo: mapView.attributionTopAnchor, constant: -leadingConstraint).isActive = true
+            // To place the floor filter at the top of the view, remove the bottom anchor
+            // and set the top anchor to true
+            floorFilterVC.view.bottomAnchor.constraint(equalTo: mapView.attributionTopAnchor, constant: -leadingConstraint).isActive = true
+
         }
     }
 }

@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina5_5" orientation="portrait" appearance="light"/>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -142,7 +143,7 @@
             <objects>
                 <viewController storyboardIdentifier="FloorFilter" autoresizesArchivedViewToFullSize="NO" automaticallyAdjustsScrollViewInsets="NO" modalPresentationStyle="currentContext" useStoryboardIdentifierAsRestorationIdentifier="YES" id="Cw7-Iz-A3J" customClass="FloorFilterViewController" customModule="ArcGISToolkit" sceneMemberID="viewController">
                     <view key="view" opaque="NO" contentMode="redraw" layoutMarginsFollowReadableWidth="YES" insetsLayoutMarginsFromSafeArea="NO" id="xSx-j0-hTo">
-                        <rect key="frame" x="0.0" y="0.0" width="48" height="280"/>
+                        <rect key="frame" x="0.0" y="0.0" width="48" height="278"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="hu0-iP-wgv">
@@ -201,10 +202,10 @@
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="hu0-iP-wgv" firstAttribute="width" secondItem="1As-Is-Llv" secondAttribute="width" id="2Hg-sG-eWY"/>
-                            <constraint firstItem="hu0-iP-wgv" firstAttribute="leading" secondItem="1As-Is-Llv" secondAttribute="leading" id="487-pC-MwS"/>
-                            <constraint firstItem="hu0-iP-wgv" firstAttribute="top" secondItem="1As-Is-Llv" secondAttribute="top" id="DgW-Wa-ffZ"/>
-                            <constraint firstItem="hu0-iP-wgv" firstAttribute="trailing" secondItem="1As-Is-Llv" secondAttribute="trailing" id="ard-OU-46E"/>
+                            <constraint firstItem="hu0-iP-wgv" firstAttribute="bottom" secondItem="1As-Is-Llv" secondAttribute="bottom" id="0Y5-uY-wMN"/>
+                            <constraint firstItem="hu0-iP-wgv" firstAttribute="leading" secondItem="1As-Is-Llv" secondAttribute="leading" id="Xec-c4-VeU"/>
+                            <constraint firstItem="hu0-iP-wgv" firstAttribute="top" secondItem="1As-Is-Llv" secondAttribute="top" id="b19-nF-zfg"/>
+                            <constraint firstItem="hu0-iP-wgv" firstAttribute="trailing" secondItem="1As-Is-Llv" secondAttribute="trailing" id="uQd-ZD-IMu"/>
                         </constraints>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
@@ -215,7 +216,7 @@
                     <extendedEdge key="edgesForExtendedLayout"/>
                     <value key="contentSizeForViewInPopover" type="size" width="80" height="90"/>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-                    <size key="freeformSize" width="48" height="280"/>
+                    <size key="freeformSize" width="48" height="278"/>
                     <connections>
                         <outlet property="closeBtn" destination="6Gq-b5-cMd" id="ZQr-b5-d1c"/>
                         <outlet property="closeBtnHeight" destination="NBH-4z-icg" id="Yki-ss-lGi"/>
