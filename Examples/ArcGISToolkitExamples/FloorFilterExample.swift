@@ -32,7 +32,7 @@ class FloorFilterExample: MapViewController {
         let leadingConstraint = CGFloat(40)
         
         // The style of the floor filter determines which way it will open. If the floor filter is placed on the top of the screen, it is recommended to use the style 'expandDown'.
-        // If floor filter placed on the bottom of the screen, then use 'expandUp'
+        // If floor filter placed on the bottom of the screen, then use 'expandUp'.
         floorFilterVC = FloorFilterViewController.makeFloorFilterView(
             geoView: mapView,
             buttonWidth: 50,
@@ -53,8 +53,6 @@ class FloorFilterExample: MapViewController {
 
             // This places the floor filter at the bottom of the view,
             // anchored to the top of the map view's attribution bar.
-            // To place the floor filter at the top of the view, remove the bottom anchor
-            // and set the top anchor to true
             floorFilterVC.view.bottomAnchor.constraint(equalTo: mapView.attributionTopAnchor, constant: -leadingConstraint).isActive = true
 
         }
