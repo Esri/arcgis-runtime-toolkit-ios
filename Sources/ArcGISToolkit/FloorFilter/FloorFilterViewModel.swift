@@ -116,7 +116,7 @@ internal class FloorFilterViewModel {
             center: envelope.center,
             width: envelope.width * padding,
             height: envelope.height * padding
-            )
+        )
             
         if !envelopeWithBuffer.isEmpty {
             let viewPoint = AGSViewpoint(targetExtent: envelopeWithBuffer)

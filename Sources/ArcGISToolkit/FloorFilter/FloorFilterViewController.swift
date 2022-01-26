@@ -17,12 +17,10 @@ import ArcGIS
 import Foundation
 
 
-
 protocol FloorFilterViewControllerDelegate {
     // Updates the Floor Filter levels list with the site and facility that were selected from the prompt
     func siteFacilityIsUpdated(viewModel: FloorFilterViewModel)
 }
-
 
 public class FloorFilterViewController: UIViewController, FloorFilterViewControllerDelegate {
     /// The direction the floor filter should expand in.
@@ -66,7 +64,6 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
             viewModel.zoomToSelection()
         }
     }
-    
  
     private var _selectedLevel: AGSFloorLevel? = nil
     public var selectedLevel: AGSFloorLevel? {
@@ -100,9 +97,9 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     public var fontSize: CGFloat = 14.0
     public var fontName: String = "Avenir"
     public var selectionColor: UIColor = UIColor(hexString: "#C7EAFF")
-    public var backgroundColor: UIColor = UIColor(hexString: "#F2F2F7")
+    public var backgroundColor: UIColor = UIColor.systemGray6
     public var selectedTextColor: UIColor = UIColor(hexString: "#004874")
-    public var unselectedTextColor: UIColor = UIColor(hexString: "#323236")
+    public var unselectedTextColor: UIColor = UIColor.label
     
     /// Floor Filter UI Elements and Constraints
     @IBOutlet var floorFilterView: UIView!
@@ -143,10 +140,11 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
             if geoView != nil {
                 if let mapView = geoView as? AGSMapView {
                     mapView.map?.load { [weak self] (_) in
-                        self?.viewModel.mapView = mapView
-                        self?.viewModel.map = mapView.map
-                        self?.floorManager = mapView.map?.floorManager
-                        self?.initializeFloorManager()
+                        guard let self = self else { return }
+                        self.viewModel.mapView = mapView
+                        self.viewModel.map = mapView.map
+                        self.floorManager = mapView.map?.floorManager
+                        self.initializeFloorManager()
                     }
                 }
             }

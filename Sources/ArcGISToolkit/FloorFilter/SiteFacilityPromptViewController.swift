@@ -16,6 +16,7 @@ import UIKit
 import ArcGIS
 import Foundation
 
+/// ViewController for the site and facility prompt
 internal class SiteFacilityPromptViewController: UIViewController {
     var delegate: FloorFilterViewControllerDelegate?
     var viewModel = FloorFilterViewModel()
@@ -178,7 +179,6 @@ extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDe
             
             cell.siteFacilityDotImg.isHidden = true
             cell.siteFacilityNameLabel?.font = UIFont(name:"Avenir", size:16)
-            cell.backgroundColor = UIColor.white
             
             if (isShowingFacilities) {
                 if (indexPath.row <= facilities.count-1) {

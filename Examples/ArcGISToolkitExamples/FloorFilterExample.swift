@@ -55,6 +55,10 @@ class FloorFilterExample: MapViewController {
             // anchored to the top of the map view's attribution bar.
             floorFilterVC.view.bottomAnchor.constraint(equalTo: mapView.attributionTopAnchor, constant: -leadingConstraint).isActive = true
 
+            // This places the floor filter at the top of the view,
+            // just below the top anchor of the safe area layout guide.
+            // Set the constraint to true and set the bottom constraint to false
+            floorFilterVC.view.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: leadingConstraint).isActive = false
         }
     }
 }
