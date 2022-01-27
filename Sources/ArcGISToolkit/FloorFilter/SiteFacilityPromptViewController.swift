@@ -16,7 +16,7 @@ import UIKit
 import ArcGIS
 import Foundation
 
-/// ViewController for the site and facility prompt
+/// ViewController for the site and facility prompt.
 class SiteFacilityPromptViewController: UIViewController {
     weak var delegate: FloorFilterViewControllerDelegate?
     var viewModel = FloorFilterViewModel()
@@ -34,11 +34,11 @@ class SiteFacilityPromptViewController: UIViewController {
     
     private var originalYPositionForPanel: CGFloat = 0.0
     
-    /// Show the facilities list directly if the map has no sites configured or if there is a previously selected facility
+    /// Show the facilities list directly if the map has no sites configured or if there is a previously selected facility.
     private var isShowingFacilities = false
     private var isSearchActive = false
     
-    /// Filtered facilities and sites list based on search query
+    /// Filtered facilities and sites list based on search query.
     private var filteredSearchFacilities: [AGSFloorFacility] = []
     private var filteredSearchSites: [AGSFloorSite] = []
     
@@ -106,7 +106,7 @@ class SiteFacilityPromptViewController: UIViewController {
     }
 }
 
-/// Extension for Search Bar functions
+/// Extension for Search Bar functions.
 extension SiteFacilityPromptViewController: UISearchBarDelegate {
     private func initializeSiteFacilitySearchBar() {
         siteFacilitySearchBar.delegate = self
@@ -152,7 +152,7 @@ extension SiteFacilityPromptViewController: UISearchBarDelegate {
     }
 }
 
-/// Extension for the Sites and Facilities Table View
+/// Extension for the Sites and Facilities Table View.
 extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDelegate {
     private func initializeSiteFacilityTableView() {
         siteFacilityTableView.delegate = self
@@ -171,7 +171,7 @@ extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDe
         let sites = filteredSites()
         let facilities = filteredFacilities()
         
-        // If there are no sites in the map, then directly show the facilities list
+        // If there are no sites in the map, then directly show the facilities list.
         if (sites.isEmpty) {
             isShowingFacilities = true
         }
@@ -184,7 +184,7 @@ extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDe
                 cell.siteFacilityNameLabel.text = facilities[indexPath.row].name
                 cell.accessoryType = .none
                     
-                // Highlight any previously selected Facility
+                // Highlight any previously selected Facility.
                 if (cell.siteFacilityNameLabel.text == viewModel.selectedFacility?.name) {
                     cell.siteFacilityDotImg.isHidden = false
                     cell.siteFacilityNameLabel?.font = UIFont.boldSystemFont(ofSize: 16.0)
@@ -195,7 +195,7 @@ extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDe
             cell.siteFacilityNameLabel?.text = sites[indexPath.row].name
             cell.accessoryType = .disclosureIndicator
                 
-            // If the user clicks on Back Button, then highlight any previously selected Site
+            // If the user clicks on Back Button, then highlight any previously selected Site.
             if (cell.siteFacilityNameLabel.text == viewModel.selectedSite?.name) {
                 cell.siteFacilityDotImg.isHidden = false
                 cell.siteFacilityNameLabel?.font = UIFont.boldSystemFont(ofSize: 16.0)
@@ -216,15 +216,15 @@ extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDe
             if (isShowingFacilities) {
                 viewModel.selectedFacility = facilities[indexPath.row]
                 
-                // When a facility is selected, reset the previously selected level
+                // When a facility is selected, reset the previously selected level.
                 viewModel.selectedLevel = nil
-                
-                // Close the prompt and zoom to the selected facility
+                    
+                // Close the prompt and zoom to the selected facility.
                 closeSiteFacilityPrompt()
                 viewModel.zoomToSelection()
                 delegate?.siteFacilityIsUpdated(viewModel: viewModel)
                 
-                // Reset the search bar
+                // Reset the search bar.
                 resetSearchFilteredResults()
                 dismissSearchBar()
             } else {
@@ -233,10 +233,10 @@ extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDe
                 
                 dismissSearchBar()
                 
-                // Zoom to the map to the selected site in case the user closes the prompt without selecting a facility
+                // Zoom to the map to the selected site in case the user closes the prompt without selecting a facility.
                 viewModel.zoomToSelection()
                 
-                // Reload the list to show the list of facilities for the selected site
+                // Reload the list to show the list of facilities for the selected site.
                 isShowingFacilities = true
                 updatePromptTitle()
                 siteFacilityTableView.reloadData()
@@ -244,16 +244,16 @@ extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDe
         }
     }
     
-    /// Filter the sites or facilities data based on the search query
+    /// Filter the sites or facilities data based on the search query.
     public func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if (isShowingFacilities) {
-            // If the search query is empty then set FilteredSearchFacilities to all the facilities in the data
+            // If the search query is empty then set FilteredSearchFacilities to all the facilities in the data.
             filteredSearchFacilities = searchText.isEmpty ? viewModel.facilities : viewModel.facilities.filter {
                     (facility: AGSFloorFacility) -> Bool in
                     return facility.name.range(of: searchText, options: .caseInsensitive, range: nil, locale: nil) != nil
             }
         } else {
-            // If the search query is empty then set FilteredSearchSites to all the sites in the data
+            // If the search query is empty then set FilteredSearchSites to all the sites in the data.
             filteredSearchSites = searchText.isEmpty ? viewModel.sites : viewModel.sites.filter {
                     (site: AGSFloorSite) -> Bool in
                     return site.name.range(of: searchText, options: .caseInsensitive, range: nil, locale: nil) != nil

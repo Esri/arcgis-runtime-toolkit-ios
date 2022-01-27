@@ -6,7 +6,7 @@ The ArcGIS Runtime SDK currently supports filtering a 2D floor aware map based o
 
 ###Behavior:
 
-When the Site button is tapped, a prompt opens so the user can select a site and then a facility. After selecting a site and facility, a list of levels is displayed on top of the site button.
+When the Site button is tapped, a prompt opens so the user can select a site and then a facility. After selecting a site and facility, a list of levels is displayed either above or below the site button.
 
 ### Usage
 

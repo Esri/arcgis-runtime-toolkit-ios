@@ -16,7 +16,7 @@ import UIKit
 import ArcGIS
 import Foundation
 
-/// custom cell for site/facility 
+/// Custom cell for site/facility.
 class SiteFacilityTableViewCell: UITableViewCell {
     @IBOutlet var siteFacilityNameLabel: UILabel!
     @IBOutlet var siteFacilityDotImg: UIImageView!

@@ -29,10 +29,9 @@ class FloorFilterExample: MapViewController {
         let map = AGSMap(item: portalItem)
         mapView.map = map
         
-        let leadingConstraint = CGFloat(40)
-        
-        // The style of the floor filter determines which way it will open. If the floor filter is placed on the top of the screen, it is recommended to use the style 'expandDown'.
-        // If floor filter placed on the bottom of the screen, then use 'expandUp'.
+        // The expansion direction of the floor filter determines which way it will open.
+        // If the floor filter is placed on the top of the screen, it is recommended to use the style 'down'.
+        // If floor filter placed on the bottom of the screen, then use 'up'.
         floorFilterVC = FloorFilterViewController.makeFloorFilterView(
             geoView: mapView,
             expansionDirection: .up
@@ -42,12 +41,13 @@ class FloorFilterExample: MapViewController {
                 print("Level was changed")
             }
             
-            // Add floor filter to the current view
+            // Add floor filter to the current view.
             floorFilterVC.view.translatesAutoresizingMaskIntoConstraints = false
           
             view.addSubview(floorFilterVC.view)
             addChild(floorFilterVC)
             
+            let leadingConstraint = CGFloat(40)
             floorFilterVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: leadingConstraint).isActive = true
 
             // This places the floor filter at the bottom of the view,
