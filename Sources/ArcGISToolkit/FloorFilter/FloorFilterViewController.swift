@@ -112,11 +112,6 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     @IBOutlet var closeBtnWidth: NSLayoutConstraint!
     @IBOutlet var siteBtnWidth: NSLayoutConstraint!
     @IBOutlet var levelCellWidth: NSLayoutConstraint!
-    
-    /// Stores the last row that was selected in the levels tableview.
-    private var lastSelectedRow: IndexPath?
-    /// Store the row that is currently selected in the levels tableView.
-    private var currentlySelectedRow: IndexPath?
   
     private weak var delegate: FloorFilterViewControllerDelegate?
     private var viewModel = FloorFilterViewModel()
@@ -425,9 +420,6 @@ extension FloorFilterViewController: UITableViewDataSource, UITableViewDelegate 
     }
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        lastSelectedRow = currentlySelectedRow
-        currentlySelectedRow = indexPath
-        
         if (state == .fullyExpanded) {
             viewModel.selectedLevel = viewModel.visibleLevelsInExpandedList[indexPath.row]
             if let onSelectedLevelChangedListener = onSelectedLevelChangedListener {
