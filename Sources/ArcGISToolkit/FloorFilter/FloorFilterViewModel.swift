@@ -53,14 +53,6 @@ class FloorFilterViewModel {
     public var selectedSite: AGSFloorSite?
     public var selectedFacility: AGSFloorFacility?
     public var selectedLevel: AGSFloorLevel?
-
-    /// Reset FloorFilter saved data
-    public func reset() {
-        floorManager = nil
-        selectedSite = nil
-        selectedFacility = nil
-        selectedLevel = nil
-    }
     
     /// Gets the default level for a facility
     /// Uses level with vertical order 0 otherwise gets the lowest level

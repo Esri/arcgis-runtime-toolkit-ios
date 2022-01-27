@@ -84,12 +84,6 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     
     /// Listener when a level is changed
     public var onSelectedLevelChangedListener: (() -> Void)? = nil
-
-    /// Refresh the view with the new map
-    public func refresh(geoView: AGSGeoView?){
-        self.geoView = geoView
-        state = FloorFilterState.initiallyCollapsed
-    }
     
     /// Variables for styling the Floor Filter View
     public var levelFont = UIFont(name: "Avenir", size: 14.0)
@@ -145,7 +139,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     
     /// GeoView that the Floor Filter is rendered on
     /// For Version 1 only MapView (2D) is supported to render the Floor Filter
-    private var geoView: AGSGeoView? {
+    public var geoView: AGSGeoView? {
         didSet {
             switch geoView {
             case let mapView as AGSMapView:
@@ -155,6 +149,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
                     self.viewModel.map = mapView.map
                     self.floorManager = mapView.map?.floorManager
                     self.initializeFloorManager()
+                    self.state = FloorFilterState.initiallyCollapsed
                 }
             default:
                 break
@@ -214,7 +209,6 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
                 }
                                         
                 if (floorManager.loadStatus == .loaded) {
-                    self.viewModel.reset()
                     self.viewModel.floorManager = floorManager
                     self.initializeSiteButton()
                                             
