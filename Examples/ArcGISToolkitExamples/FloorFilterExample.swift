@@ -44,6 +44,7 @@ class FloorFilterExample: MapViewController {
             
             // Add floor filter to the current view
             floorFilterVC.view.translatesAutoresizingMaskIntoConstraints = false
+          
             view.addSubview(floorFilterVC.view)
             addChild(floorFilterVC)
             

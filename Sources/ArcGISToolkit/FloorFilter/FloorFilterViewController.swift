@@ -450,16 +450,8 @@ extension FloorFilterViewController: UITableViewDataSource, UITableViewDelegate 
             state = .fullyExpanded
         }
         
-//        // for the very first time, the last selected row will be nil, so do not add that to the array
-        guard let currentlySelectedRow = currentlySelectedRow else { return }
-        var rowsToReload = [currentlySelectedRow]
-        if let lastSelectedRow = lastSelectedRow {
-            rowsToReload.append(lastSelectedRow)
-        }
-        
         viewModel.filterMapToSelectedLevel()
         levelsTableView?.reloadData()
-        print("Shreya selected levels last \(lastSelectedRow) and current \(currentlySelectedRow)")
     }
     
 }
