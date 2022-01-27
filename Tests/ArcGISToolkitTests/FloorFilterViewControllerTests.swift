@@ -28,7 +28,7 @@ class FloorFilterViewControllerTests: XCTestCase {
         let floorManager = try XCTUnwrap(map.floorManager)
         XCTLoad(floorManager)
         let viewModel = FloorFilterViewModel()
-        viewModel.floorManager = floorManager
+        viewModel.mapView = mapView
         XCTAssertEqual(viewModel.sites.count, 1)
     }
     

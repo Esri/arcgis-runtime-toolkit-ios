@@ -145,7 +145,6 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
                 mapView.map?.load { [weak self] _ in
                     guard let self = self else { return }
                     self.viewModel.mapView = mapView
-                    self.viewModel.map = mapView.map
                     self.floorManager = mapView.map?.floorManager
                     self.initializeFloorManager()
                     self.state = FloorFilterState.initiallyCollapsed
@@ -208,7 +207,6 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
                 }
                                         
                 if (floorManager.loadStatus == .loaded) {
-                    self.viewModel.floorManager = floorManager
                     self.initializeSiteButton()
                                             
                     // Filter the map to any previously selected level.

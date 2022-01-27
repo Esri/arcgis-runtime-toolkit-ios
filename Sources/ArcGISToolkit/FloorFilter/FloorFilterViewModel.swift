@@ -21,8 +21,9 @@ import ArcGIS
 class FloorFilterViewModel {
     /// The MapView, Map and Floor Manager are set in the FloorFilterViewController when the map is loaded
     public var mapView: AGSMapView?
-    public var map: AGSMap?
-    public var floorManager: AGSFloorManager?
+    internal var floorManager: AGSFloorManager? {
+        return mapView?.map?.floorManager
+    }
     
     public var sites: [AGSFloorSite] {
         return floorManager?.sites ?? []
