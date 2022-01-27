@@ -43,7 +43,7 @@ class FloorFilterViewControllerTests: XCTestCase {
         let floorManager = try XCTUnwrap(map.floorManager)
         XCTLoad(floorManager)
         let viewModel = FloorFilterViewModel()
-        viewModel.floorManager = floorManager
+        viewModel.mapView = mapView
         viewModel.selectedSite = viewModel.sites.first
         XCTAssertEqual(viewModel.facilities.count, 1)
     }
@@ -59,7 +59,7 @@ class FloorFilterViewControllerTests: XCTestCase {
         let floorManager = try XCTUnwrap(map.floorManager)
         XCTLoad(floorManager)
         let viewModel = FloorFilterViewModel()
-        viewModel.floorManager = floorManager
+        viewModel.mapView = mapView
         XCTAssertEqual(viewModel.allLevels.count, 3)
     }
     
