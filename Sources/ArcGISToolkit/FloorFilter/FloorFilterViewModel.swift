@@ -18,7 +18,7 @@ import ArcGIS
 
 /// View Model class that contains the Data Model of the Floor Filter
 /// Also contains the business logic to filter and change the map extent based on selected site/level/facility
-internal class FloorFilterViewModel {
+class FloorFilterViewModel {
     /// The MapView, Map and Floor Manager are set in the FloorFilterViewController when the map is loaded
     public var mapView: AGSMapView?
     public var map: AGSMap?
@@ -52,9 +52,6 @@ internal class FloorFilterViewModel {
     public var selectedSite: AGSFloorSite?
     public var selectedFacility: AGSFloorFacility?
     public var selectedLevel: AGSFloorLevel?
-    
-    /// The default vertical order is 0 according to Runtime 100.12 update for AGSFloorManager
-    static private let defaultVerticalOrder = 0
 
     /// Reset FloorFilter saved data
     public func reset() {
@@ -68,16 +65,16 @@ internal class FloorFilterViewModel {
     /// Uses level with vertical order 0 otherwise gets the lowest level
     public func getDefaultLevelForFacility(facility: AGSFloorFacility?) -> AGSFloorLevel? {
         let candidateLevels = allLevels.filter { $0.facility == facility }
-        return candidateLevels.first { $0.verticalOrder == 0 } ?? getLowestLevel(levels: candidateLevels)
+        return candidateLevels.first { $0.verticalOrder == 0 } ?? getLowestLevel()
     }
     
     /// Returns the AGSFloorLevel with the lowest verticalOrder.
-    private func getLowestLevel(levels: [AGSFloorLevel]) -> AGSFloorLevel? {
+    private func getLowestLevel() -> AGSFloorLevel? {
         let sortedLevels = allLevels.sorted {
             $0.verticalOrder < $1.verticalOrder
         }
         return sortedLevels.first {
-            $0.verticalOrder != Int.min && $0.verticalOrder != Int.max
+            $0.verticalOrder != .min && $0.verticalOrder != .max
         }
     }
     
@@ -91,19 +88,19 @@ internal class FloorFilterViewModel {
     
     /// Zooms to the facility if there is a selected facility, otherwise zooms to the site.
     public func zoomToSelection() {
-        if selectedFacility != nil {
-            zoomToFacility()
-        } else if selectedSite != nil {
-            zoomToSite()
+        if let selectedFacility = selectedFacility {
+            zoom(to: selectedFacility)
+        } else if let selectedSite = selectedSite {
+            zoom(to: selectedSite)
         }
     }
     
-    private func zoomToSite() {
-        zoomToExtent(mapView: mapView, envelope: selectedSite?.geometry?.extent)
+    private func zoom(to floorSite: AGSFloorSite) {
+        zoomToExtent(mapView: mapView, envelope: floorSite.geometry?.extent)
     }
     
-    private func zoomToFacility() {
-        zoomToExtent(mapView: mapView, envelope: selectedFacility?.geometry?.extent)
+    private func zoom(to floorFacility: AGSFloorFacility) {
+        zoomToExtent(mapView: mapView, envelope: floorFacility.geometry?.extent)
     }
     
     private func zoomToExtent(mapView: AGSMapView?, envelope: AGSEnvelope?) {

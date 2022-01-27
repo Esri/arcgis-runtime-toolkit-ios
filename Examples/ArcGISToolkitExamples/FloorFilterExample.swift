@@ -35,10 +35,7 @@ class FloorFilterExample: MapViewController {
         // If floor filter placed on the bottom of the screen, then use 'expandUp'.
         floorFilterVC = FloorFilterViewController.makeFloorFilterView(
             geoView: mapView,
-            buttonWidth: 50,
-            buttonHeight: 50,
-            maxDisplayLevels: 3,
-            style: .expandUp
+            expansionDirection: .up
         )
         if let floorFilterVC = self.floorFilterVC {
             floorFilterVC.onSelectedLevelChangedListener = {

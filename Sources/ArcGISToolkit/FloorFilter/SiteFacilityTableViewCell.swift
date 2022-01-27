@@ -17,8 +17,8 @@ import ArcGIS
 import Foundation
 
 /// custom cell for site/facility 
-internal class SiteFacilityTableViewCell: UITableViewCell {
-    @IBOutlet weak var siteFacilityNameLabel: UILabel!
-    @IBOutlet weak var siteFacilityDotImg: UIImageView!
-    @IBOutlet weak var siteFacilityRightChevnron: UIImageView!
+class SiteFacilityTableViewCell: UITableViewCell {
+    @IBOutlet var siteFacilityNameLabel: UILabel!
+    @IBOutlet var siteFacilityDotImg: UIImageView!
+    @IBOutlet var siteFacilityRightChevnron: UIImageView!
 }

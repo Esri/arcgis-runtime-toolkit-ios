@@ -17,8 +17,8 @@ import ArcGIS
 import Foundation
 
 /// ViewController for the site and facility prompt
-internal class SiteFacilityPromptViewController: UIViewController {
-    var delegate: FloorFilterViewControllerDelegate?
+class SiteFacilityPromptViewController: UIViewController {
+    weak var delegate: FloorFilterViewControllerDelegate?
     var viewModel = FloorFilterViewModel()
     
     /// UI Elements and constraints
@@ -42,20 +42,17 @@ internal class SiteFacilityPromptViewController: UIViewController {
     private var filteredSearchFacilities: [AGSFloorFacility] = []
     private var filteredSearchSites: [AGSFloorSite] = []
     
-    private func getFilteredFacilities() -> [AGSFloorFacility] {
+    private func filteredFacilities() -> [AGSFloorFacility] {
         return isSearchActive ? filteredSearchFacilities : viewModel.facilities
     }
     
-    private func getFilteredSites() -> [AGSFloorSite] {
+    private func filteredSites() -> [AGSFloorSite] {
         return isSearchActive ? filteredSearchSites : viewModel.sites
     }
     
     override public func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        isShowingFacilities = (viewModel.sites.isEmpty || viewModel.selectedFacility != nil) ? true : false
-        initializeButtonsClickListeners()
-        updatePromptViewHeight()
-        updatePromptTitle()
+        isShowingFacilities = (viewModel.sites.isEmpty || viewModel.selectedFacility != nil)
     }
     
     override public func viewDidLoad() {
@@ -82,7 +79,7 @@ internal class SiteFacilityPromptViewController: UIViewController {
     }
     
     @objc func closeSiteFacilityPrompt() {
-        self.dismiss(animated: true, completion: nil)
+        dismiss(animated: true)
     }
     
     @objc func backButtonPressed() {
@@ -98,10 +95,10 @@ internal class SiteFacilityPromptViewController: UIViewController {
             // Add the subtitle when showing facilities
             promptSubtitle.isHidden = false
             promptSubtitle.text = "Select a Facility"
-            promptTitle.text = "\(viewModel.selectedSite?.name ?? "")"
+            promptTitle.text = viewModel.selectedSite?.name ?? ""
             backBtn.isHidden = false
         } else {
-            promptTitle?.text = "\(viewModel.selectedSite?.name ?? "Select a Site")"
+            promptTitle?.text = viewModel.selectedSite?.name ?? "Select a Site"
             backBtn?.isHidden = true
         }
     }
@@ -112,7 +109,7 @@ extension SiteFacilityPromptViewController: UISearchBarDelegate {
     private func initializeSiteFacilitySearchBar() {
         siteFacilitySearchBar.delegate = self
         resetSearchFilteredResults()
-        UIBarButtonItem.appearance(whenContainedInInstancesOf: [UISearchBar.self]).setTitleTextAttributes([NSAttributedString.Key(rawValue: NSAttributedString.Key.foregroundColor.rawValue): UIColor.customBlue], for: .normal)
+        siteFacilitySearchBar.tintColor = .customBlue
     }
     
     public func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
@@ -164,56 +161,52 @@ extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDe
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         updatePromptTitle()
-        return isShowingFacilities ? getFilteredFacilities().count : getFilteredSites().count
+        return isShowingFacilities ? filteredFacilities().count : filteredSites().count
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if let cell = siteFacilityTableView.dequeueReusableCell(withIdentifier: "FloorFilterSiteFacilityCell", for: indexPath) as? SiteFacilityTableViewCell {
-            let sites = getFilteredSites()
-            let facilities = getFilteredFacilities()
+        let cell = siteFacilityTableView.dequeueReusableCell(withIdentifier: "FloorFilterSiteFacilityCell", for: indexPath) as! SiteFacilityTableViewCell
+        let sites = filteredSites()
+        let facilities = filteredFacilities()
         
-            // If there are no sites in the map, then directly show the facilities list
-            if (sites.isEmpty) {
-                isShowingFacilities = true
-            }
-            
-            cell.siteFacilityDotImg.isHidden = true
-            cell.siteFacilityNameLabel?.font = UIFont(name:"Avenir", size:16)
-            
-            if (isShowingFacilities) {
-                if (indexPath.row <= facilities.count-1) {
-                    cell.siteFacilityNameLabel.text = facilities[indexPath.row].name
-                    cell.siteFacilityRightChevnron.isHidden = true
-                    
-                    // Highlight any previously selected Facility
-                    if (cell.siteFacilityNameLabel.text == viewModel.selectedFacility?.name) {
-                        cell.siteFacilityDotImg.isHidden = false
-                        cell.siteFacilityNameLabel?.font = UIFont.boldSystemFont(ofSize: 16.0)
-                    }
-                    return cell
-                }
-            } else {
-                if (indexPath.row <= sites.count-1) {
-                    cell.siteFacilityNameLabel?.text = sites[indexPath.row].name
-                    cell.siteFacilityRightChevnron.isHidden = false
-                    
-                    // If the user clicks on Back Button, then highlight any previously selected Site
-                    if (cell.siteFacilityNameLabel.text == viewModel.selectedSite?.name) {
-                        cell.siteFacilityDotImg.isHidden = false
-                        cell.siteFacilityNameLabel?.font = UIFont.boldSystemFont(ofSize: 16.0)
-                    }
-                    return cell
-                }
-            }
+        // If there are no sites in the map, then directly show the facilities list
+        if (sites.isEmpty) {
+            isShowingFacilities = true
         }
-        
+            
+        cell.siteFacilityDotImg.isHidden = true
+        cell.siteFacilityNameLabel?.font = UIFont(name:"Avenir", size:16)
+            
+        if (isShowingFacilities) {
+            if (indexPath.row <= facilities.count-1) {
+                cell.siteFacilityNameLabel.text = facilities[indexPath.row].name
+                cell.siteFacilityRightChevnron.isHidden = true
+                    
+                // Highlight any previously selected Facility
+                if (cell.siteFacilityNameLabel.text == viewModel.selectedFacility?.name) {
+                    cell.siteFacilityDotImg.isHidden = false
+                    cell.siteFacilityNameLabel?.font = UIFont.boldSystemFont(ofSize: 16.0)
+                }
+                return cell
+            }
+        } else {
+            cell.siteFacilityNameLabel?.text = sites[indexPath.row].name
+            cell.siteFacilityRightChevnron.isHidden = false
+                
+            // If the user clicks on Back Button, then highlight any previously selected Site
+            if (cell.siteFacilityNameLabel.text == viewModel.selectedSite?.name) {
+                cell.siteFacilityDotImg.isHidden = false
+                cell.siteFacilityNameLabel?.font = UIFont.boldSystemFont(ofSize: 16.0)
+            }
+            return cell
+        }
         return UITableViewCell()
     }
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let cell = siteFacilityTableView.cellForRow(at: indexPath) as? SiteFacilityTableViewCell {
-            let sites = getFilteredSites()
-            let facilities = getFilteredFacilities()
+            let sites = filteredSites()
+            let facilities = filteredFacilities()
             
             cell.siteFacilityDotImg.isHidden = true
             cell.siteFacilityNameLabel?.font = UIFont.boldSystemFont(ofSize: 16.0)

@@ -16,23 +16,22 @@ import UIKit
 import ArcGIS
 import Foundation
 
-
-protocol FloorFilterViewControllerDelegate {
+protocol FloorFilterViewControllerDelegate: AnyObject {
     // Updates the Floor Filter levels list with the site and facility that were selected from the prompt
     func siteFacilityIsUpdated(viewModel: FloorFilterViewModel)
 }
 
 public class FloorFilterViewController: UIViewController, FloorFilterViewControllerDelegate {
     /// The direction the floor filter should expand in.
-    public enum Style {
+    public enum ExpansionDirection {
         /// The level list expands down from the floor filter button.
-        case expandDown
+        case down
         /// The level list expands up from the floor filter button.
-        case expandUp
+        case up
     }
     
     /// The style of the floor filter.  The default is `.expandUp`.
-    public var style: Style = .expandUp
+    public var style: ExpansionDirection = .up
     
     /// Public variables and functions accessible to the developer
     private var _selectedSite: AGSFloorSite? = nil
@@ -84,7 +83,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     }
     
     /// Listener when a level is changed
-    public var onSelectedLevelChangedListener : (() -> Void)? = nil
+    public var onSelectedLevelChangedListener: (() -> Void)? = nil
 
     /// Refresh the view with the new map
     public func refresh(geoView: AGSGeoView?){
@@ -100,27 +99,35 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     public var backgroundColor: UIColor = UIColor.systemGray6
     public var selectedTextColor: UIColor = UIColor(hexString: "#004874")
     public var unselectedTextColor: UIColor = UIColor.label
+    public var buttonSize: CGSize = CGSize(width: 50, height: 50)
+    public var maxDisplayLevels: Int = 3
     
     /// Floor Filter UI Elements and Constraints
     @IBOutlet var floorFilterView: UIView!
-    @IBOutlet weak var siteBtn: UIButton!
-    @IBOutlet weak var levelsTableView: UITableView!
-    @IBOutlet weak var closeBtn: UIButton!
-    @IBOutlet weak var floorFilterStackView: UIStackView!
-    @IBOutlet weak var closeBtnHeight: NSLayoutConstraint!
-    @IBOutlet weak var siteBtnHeight: NSLayoutConstraint!
-    @IBOutlet weak var tableViewHeight: NSLayoutConstraint!
-    @IBOutlet weak var closeBtnWidth: NSLayoutConstraint!
-    @IBOutlet weak var siteBtnWidth: NSLayoutConstraint!
-    @IBOutlet weak var levelCellWidth: NSLayoutConstraint!
+    @IBOutlet var siteBtn: UIButton!
+    @IBOutlet var levelsTableView: UITableView!
+    @IBOutlet var closeBtn: UIButton!
+    @IBOutlet var floorFilterStackView: UIStackView!
+    @IBOutlet var closeBtnHeight: NSLayoutConstraint!
+    @IBOutlet var siteBtnHeight: NSLayoutConstraint!
+    @IBOutlet var tableViewHeight: NSLayoutConstraint!
+    @IBOutlet var closeBtnWidth: NSLayoutConstraint!
+    @IBOutlet var siteBtnWidth: NSLayoutConstraint!
+    @IBOutlet var levelCellWidth: NSLayoutConstraint!
     
     /// Floor Filter view styles variables
     /// These are the default, but will get updated with values that are provided during initialization
+    
     private var buttonHeight: CGFloat = 35
     private var buttonWidth: CGFloat = 40
-    private var maxDisplayLevels: Int = 3
+    
+    
+    /// Stores the last row that was selected in the levels tableview
+    private var lastSelectedRow: IndexPath?
+    /// Store the row that is currently selected in the levels tableView
+    private var currentlySelectedRow: IndexPath?
   
-    private var delegate: FloorFilterViewControllerDelegate?
+    private weak var delegate: FloorFilterViewControllerDelegate?
     private var viewModel = FloorFilterViewModel()
     
     /// State of the visibility of the Floor Filter
@@ -137,16 +144,17 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     /// For Version 1 only MapView (2D) is supported to render the Floor Filter
     private var geoView: AGSGeoView? {
         didSet {
-            if geoView != nil {
-                if let mapView = geoView as? AGSMapView {
-                    mapView.map?.load { [weak self] (_) in
-                        guard let self = self else { return }
-                        self.viewModel.mapView = mapView
-                        self.viewModel.map = mapView.map
-                        self.floorManager = mapView.map?.floorManager
-                        self.initializeFloorManager()
-                    }
+            switch geoView {
+            case let mapView as AGSMapView:
+                mapView.map?.load { [weak self] _ in
+                    guard let self = self else { return }
+                    self.viewModel.mapView = mapView
+                    self.viewModel.map = mapView.map
+                    self.floorManager = mapView.map?.floorManager
+                    self.initializeFloorManager()
                 }
+            default:
+                break
             }
         }
     }
@@ -154,23 +162,13 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     /// Static method that will be used to initialize the Floor Filter View and attach it as a SubView
     public static func makeFloorFilterView(
         geoView: AGSGeoView?,
-        buttonWidth: CGFloat = 50,
-        buttonHeight: CGFloat = 50,
-        maxDisplayLevels: Int = 3,
-        style: Style = .expandUp
-    ) -> FloorFilterViewController? {
-     
+        expansionDirection: ExpansionDirection = .up
+    ) -> FloorFilterViewController {
         let storyboard = UIStoryboard(name: "FloorFilter", bundle: .module)
-        let floorFilterVC = storyboard.instantiateViewController(identifier: "FloorFilter") as? FloorFilterViewController
-       
-        // Set the styles for the Floor Filter
-        floorFilterVC?.buttonHeight = buttonHeight
-        floorFilterVC?.buttonWidth = buttonWidth
-        floorFilterVC?.maxDisplayLevels = maxDisplayLevels
-        floorFilterVC?.style = style
+        let floorFilterVC: FloorFilterViewController = storyboard.instantiateViewController(identifier: "FloorFilter")
+        floorFilterVC.style = expansionDirection
+        floorFilterVC.geoView = geoView
         
-        floorFilterVC?.geoView = geoView
-      
         return floorFilterVC
     }
     
@@ -184,11 +182,8 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     
     override public func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        // Update the views that are visibile and their heights based on the state of the Floor Filter
         updateViewsVisibilityForState(state: state)
-        initializeSiteButton()
-        
-        // Adjust the constraints and order of the views in the Floor Filter if placement is on top or bottom of the sceen
-        adjustConstraintsBasedOnPlacement()
     }
     
     override public func viewDidLoad() {
@@ -209,23 +204,23 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     private func initializeFloorManager() {
         guard let floorManager = floorManager else { return }
         
-        DispatchQueue.main.async {
-            floorManager.load(completion: { error in
-                if (error != nil || floorManager.loadStatus != .loaded) {
+        floorManager.load(completion: { error in
+            DispatchQueue.main.async {
+                if error != nil || floorManager.loadStatus != .loaded {
                     return
                 }
-                
+                                        
                 if (floorManager.loadStatus == .loaded) {
                     self.viewModel.reset()
                     self.viewModel.floorManager = floorManager
                     self.initializeSiteButton()
-                    
+                                            
                     // Filter the map to any previously selected level
                     self.viewModel.filterMapToSelectedLevel()
                     self.levelsTableView.reloadData()
                 }
-            })
-        }
+            }
+        })
     }
     
     private func initializeSiteButton() {
@@ -272,20 +267,20 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     }
     
     @objc func collapseLevelsList(sender: UITapGestureRecognizer) {
-        state = FloorFilterState.partiallyExpanded
+        state = .partiallyExpanded
         updateViewsVisibilityForState(state: state)
         self.levelsTableView.reloadData()
     }
     
     /// Updates which state of the floor filter should be state
     private func updateViewsVisibilityForState(state: FloorFilterState) {
-        siteBtnHeight.constant = CGFloat(buttonHeight)
-        siteBtnWidth.constant = CGFloat(buttonWidth)
-        closeBtnWidth.constant = CGFloat(buttonWidth)
-        levelCellWidth.constant = CGFloat(buttonWidth)
+        siteBtnHeight.constant = buttonSize.height
+        siteBtnWidth.constant = buttonSize.width
+        closeBtnWidth.constant = buttonSize.width
+        levelCellWidth.constant = buttonSize.width
         closeBtn.backgroundColor = backgroundColor.withAlphaComponent(0.9)
         // by design the close button height will be 3/4th the size of the button size
-        closeBtnHeight.constant = CGFloat(Double(buttonHeight) * 0.75)
+        closeBtnHeight.constant = buttonSize.height * 0.75
         addCornerRadiusBasedOnPlacement()
         
         switch state {
@@ -293,15 +288,13 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
             closeBtn?.isHidden = false
             self.levelsTableView?.isHidden = false
             let levelCount = CGFloat(min(viewModel.visibleLevelsInExpandedList.count, maxDisplayLevels))
-            let constant = levelCount * buttonHeight
+            let constant = levelCount * buttonSize.height
             self.tableViewHeight.constant = constant
-        
         case .partiallyExpanded:
             closeBtn?.isHidden = true
             self.levelsTableView?.isHidden = false
-            siteBtnHeight.constant = CGFloat(buttonHeight)
-            tableViewHeight.constant = CGFloat(buttonHeight)
-            
+            siteBtnHeight.constant = buttonSize.height
+            tableViewHeight.constant = buttonSize.height
         case .initiallyCollapsed:
             closeBtn?.isHidden = true
             self.levelsTableView?.isHidden = true
@@ -310,7 +303,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     
     func siteFacilityIsUpdated(viewModel: FloorFilterViewModel) {
         self.viewModel = viewModel
-        state = FloorFilterState.fullyExpanded
+        state = .fullyExpanded
         updateViewsVisibilityForState(state: state)
         self.levelsTableView.reloadData()
     }
@@ -325,11 +318,11 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     /// Depending on the visible state of the floor filter
     private func setTableViewCellCornerRadius(cell: UITableViewCell) {
         if state == .fullyExpanded {
-            cell.cornerRadius(usingCorners: [.allCorners], cornerRadii: CGSize(width: 0.0, height: 0.0))
+            cell.cornerRadius(usingCorners: [.allCorners], cornerRadii: .zero)
             
         } else {
-            if (style == .expandDown) {
-                cell.cornerRadius(usingCorners: [UIRectCorner.bottomLeft, UIRectCorner.bottomRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
+            if (style == .down) {
+                cell.cornerRadius(usingCorners: [.bottomLeft, .bottomRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
             } else {
                 cell.cornerRadius(usingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
             }
@@ -339,7 +332,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     /// Add a corner radius to the site and close button
     /// Depending on the placement of the Floor Filter and the current state
     private func addCornerRadiusBasedOnPlacement() {
-        if (style == .expandDown) {
+        if (style == .down) {
             switch state {
             case .fullyExpanded:
                 siteBtn?.cornerRadius(usingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
@@ -377,7 +370,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         floorFilterStackView.setNeedsLayout()
         floorFilterStackView.layoutIfNeeded()
         
-        if (style == .expandDown) {
+        if (style == .down) {
             // Place the Site Button at the top of the Floor Filter View
             // The Levels List will be unchanged and remain as the second element on the Floor Filter view
             // Place the Close Button at the bottom of the list
@@ -397,6 +390,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
 
 extension FloorFilterViewController: UITableViewDataSource, UITableViewDelegate {
     
+    
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return state == .partiallyExpanded ? 1 : viewModel.visibleLevelsInExpandedList.count
     }
@@ -406,37 +400,43 @@ extension FloorFilterViewController: UITableViewDataSource, UITableViewDelegate 
         let levels = viewModel.visibleLevelsInExpandedList
         
         // Style the cell
-        cell.heightAnchor.constraint(equalToConstant: CGFloat(buttonHeight)).isActive = true
-        cell.widthAnchor.constraint(equalToConstant: CGFloat(buttonWidth)).isActive = true
+        if cell.heightAnchor.constraint(equalToConstant: buttonSize.height).isActive == false {
+            cell.heightAnchor.constraint(equalToConstant: buttonSize.height).isActive = true
+        }
+        if cell.widthAnchor.constraint(equalToConstant: buttonSize.width).isActive == false {
+            cell.widthAnchor.constraint(equalToConstant: buttonSize.width).isActive = true
+        }
         cell.textLabel?.font = UIFont(name: fontName, size: fontSize)
         cell.textLabel?.adjustsFontSizeToFitWidth = true
-        cell.backgroundColor = backgroundColor
-        cell.textLabel?.textColor = unselectedTextColor
         cell.textLabel?.textAlignment = .center
         setTableViewCellCornerRadius(cell: cell)
         
         // If the Floor Filter state is fully expanded then set the title of the cell based on the levels list
         // Otherwise set the title of cell to the selected level short name
         if (state == .fullyExpanded) {
-            if (!levels.isEmpty) {
-                cell.textLabel?.text = levels[indexPath.row].shortName
-            }
+            cell.textLabel?.text = levels[indexPath.row].shortName
         } else {
             cell.textLabel?.text = viewModel.selectedLevel?.shortName
                 ?? viewModel.getDefaultLevelForFacility(facility: viewModel.selectedFacility)?.shortName
         }
         
         let visibleLevelVerticalOrder = levels.first { $0.isVisible }.map { $0.verticalOrder }
-        let levelShortNames = levels.filter { $0.verticalOrder == visibleLevelVerticalOrder }.map {$0.shortName}
+        let levelShortNames = levels.filter { $0.verticalOrder == visibleLevelVerticalOrder }.map { $0.shortName }
         if (levelShortNames.contains(cell.textLabel?.text ?? "")) {
             cell.backgroundColor = selectionColor
             cell.textLabel?.textColor = selectedTextColor
+        } else {
+            cell.backgroundColor = backgroundColor
+            cell.textLabel?.textColor = unselectedTextColor
         }
        
         return cell
     }
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        lastSelectedRow = currentlySelectedRow
+        currentlySelectedRow = indexPath
+        
         if (state == .fullyExpanded) {
             viewModel.selectedLevel = viewModel.visibleLevelsInExpandedList[indexPath.row]
             if let onSelectedLevelChangedListener = onSelectedLevelChangedListener {
@@ -451,9 +451,18 @@ extension FloorFilterViewController: UITableViewDataSource, UITableViewDelegate 
             updateViewsVisibilityForState(state: state)
         }
         
+//        // for the very first time, the last selected row will be nil, so do not add that to the array
+        guard let currentlySelectedRow = currentlySelectedRow else { return }
+        var rowsToReload = [currentlySelectedRow]
+        if let lastSelectedRow = lastSelectedRow {
+            rowsToReload.append(lastSelectedRow)
+        }
+        
         viewModel.filterMapToSelectedLevel()
-        levelsTableView.reloadData()
+        levelsTableView?.reloadData()
+        print("Shreya selected levels last \(lastSelectedRow) and current \(currentlySelectedRow)")
     }
+    
 }
 
 /// Extensions for UIViewController to get the top most view controller of the application

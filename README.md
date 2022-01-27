@@ -35,7 +35,7 @@ To use Toolkit in your project:
   `AGSFeatureTemplate` when creating new features.
 * **[TimeSlider](Documentation/TimeSlider)** - Allows interactively defining a temporal range (i.e. time extent) and
   animating time moving forward or backward. Can be used to manipulate the time extent in a MapView or SceneView.
- * **[FloorFilter](Documentation/FloorFilter)** - Allows to filter floor plan data in a GeoView by a site, a building in the site, or a floor in the building. 
+ * **[FloorFilter](Documentation/FloorFilter)** - Allows to filter floor plan data in a geo view by a site, a building in the site, or a floor in the building. 
 
 ## Requirements
 
