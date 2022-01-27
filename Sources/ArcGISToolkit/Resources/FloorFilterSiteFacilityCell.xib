@@ -18,21 +18,17 @@
                 <rect key="frame" x="0.0" y="0.0" width="277" height="45"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="chevron.right" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="St7-Qf-W9T" userLabel="siteFacilityRightChevron">
-                        <rect key="frame" x="236.5" y="13" width="12.5" height="16.5"/>
-                        <color key="tintColor" systemColor="systemGray3Color"/>
-                    </imageView>
                     <stackView opaque="NO" contentMode="scaleToFill" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="eZD-gv-Hpa">
-                        <rect key="frame" x="20" y="11" width="148.5" height="20"/>
+                        <rect key="frame" x="20" y="13" width="148.5" height="18"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.65000000000000002" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="7EP-je-Wdn" userLabel="siteFacilityDot">
-                                <rect key="frame" x="0.0" y="0.0" width="18" height="20"/>
+                                <rect key="frame" x="0.0" y="0.0" width="18" height="18"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="tintColor" systemColor="systemBlueColor"/>
                                 <imageReference key="image" image="Dot" symbolScale="small"/>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Esri Redlands Main" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qGO-Hp-aeA" userLabel="siteFacilityName">
-                                <rect key="frame" x="26" y="0.0" width="122.5" height="20"/>
+                                <rect key="frame" x="26" y="0.0" width="122.5" height="18"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -42,11 +38,7 @@
                 </subviews>
                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                 <constraints>
-                    <constraint firstItem="eZD-gv-Hpa" firstAttribute="top" secondItem="St7-Qf-W9T" secondAttribute="top" id="BKN-r8-2PW"/>
-                    <constraint firstItem="St7-Qf-W9T" firstAttribute="top" secondItem="sS3-2K-4kh" secondAttribute="topMargin" id="Gng-yg-5my"/>
                     <constraint firstItem="eZD-gv-Hpa" firstAttribute="leading" secondItem="sS3-2K-4kh" secondAttribute="leading" constant="20" id="HPe-YL-3PF"/>
-                    <constraint firstAttribute="trailing" secondItem="St7-Qf-W9T" secondAttribute="trailing" constant="28" id="JL7-Jn-VyZ"/>
-                    <constraint firstItem="St7-Qf-W9T" firstAttribute="centerY" secondItem="eZD-gv-Hpa" secondAttribute="centerY" id="TjF-qb-lem"/>
                     <constraint firstAttribute="bottomMargin" secondItem="eZD-gv-Hpa" secondAttribute="bottom" constant="3" id="b1j-y3-kbT"/>
                 </constraints>
             </tableViewCellContentView>
@@ -57,22 +49,17 @@
             <connections>
                 <outlet property="siteFacilityDotImg" destination="7EP-je-Wdn" id="Szm-Rl-56u"/>
                 <outlet property="siteFacilityNameLabel" destination="qGO-Hp-aeA" id="pwt-UG-NXf"/>
-                <outlet property="siteFacilityRightChevnron" destination="St7-Qf-W9T" id="Jxx-mt-ijz"/>
             </connections>
             <point key="canvasLocation" x="-136.95652173913044" y="98.102678571428569"/>
         </tableViewCell>
     </objects>
     <resources>
         <image name="Dot" width="18" height="18"/>
-        <image name="chevron.right" catalog="system" width="96" height="128"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemBlueColor">
             <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
-        <systemColor name="systemGray3Color">
-            <color red="0.7803921568627451" green="0.7803921568627451" blue="0.80000000000000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

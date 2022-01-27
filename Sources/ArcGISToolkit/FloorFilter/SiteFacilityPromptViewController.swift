@@ -23,8 +23,8 @@ class SiteFacilityPromptViewController: UIViewController {
     
     /// UI Elements and constraints
     @IBOutlet weak var siteFacilitySearchBar: UISearchBar!
-    @IBOutlet weak var backBtn: UIImageView!
-    @IBOutlet weak var closeBtn: UIImageView!
+    @IBOutlet weak var backBtn: UIButton!
+    @IBOutlet weak var closeBtn: UIButton!
     @IBOutlet weak var promptTitle: UILabel!
     @IBOutlet weak var promptSubtitle: UILabel!
     @IBOutlet weak var promptTitleSubtitleStackView: UIStackView!
@@ -41,6 +41,8 @@ class SiteFacilityPromptViewController: UIViewController {
     /// Filtered facilities and sites list based on search query
     private var filteredSearchFacilities: [AGSFloorFacility] = []
     private var filteredSearchSites: [AGSFloorSite] = []
+    
+    private var selectedSiteIndexPath = IndexPath(row: 0, section: 0)
     
     private func filteredFacilities() -> [AGSFloorFacility] {
         return isSearchActive ? filteredSearchFacilities : viewModel.facilities
@@ -84,7 +86,7 @@ class SiteFacilityPromptViewController: UIViewController {
     
     @objc func backButtonPressed() {
         isShowingFacilities = false
-        siteFacilityTableView?.reloadData()
+        siteFacilityTableView?.reloadRows(at: [selectedSiteIndexPath], with: .none)
     }
     
     private func updatePromptTitle() {
@@ -180,7 +182,7 @@ extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDe
         if (isShowingFacilities) {
             if (indexPath.row <= facilities.count-1) {
                 cell.siteFacilityNameLabel.text = facilities[indexPath.row].name
-                cell.siteFacilityRightChevnron.isHidden = true
+                cell.accessoryType = .none
                     
                 // Highlight any previously selected Facility
                 if (cell.siteFacilityNameLabel.text == viewModel.selectedFacility?.name) {
@@ -191,7 +193,7 @@ extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDe
             }
         } else {
             cell.siteFacilityNameLabel?.text = sites[indexPath.row].name
-            cell.siteFacilityRightChevnron.isHidden = false
+            cell.accessoryType = .disclosureIndicator
                 
             // If the user clicks on Back Button, then highlight any previously selected Site
             if (cell.siteFacilityNameLabel.text == viewModel.selectedSite?.name) {
@@ -212,9 +214,7 @@ extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDe
             cell.siteFacilityNameLabel?.font = UIFont.boldSystemFont(ofSize: 16.0)
             
             if (isShowingFacilities) {
-                if (indexPath.row <= facilities.count-1) {
-                    viewModel.selectedFacility = facilities[indexPath.row]
-                }
+                viewModel.selectedFacility = facilities[indexPath.row]
                 
                 // When a facility is selected, reset the previously selected level
                 viewModel.selectedLevel = nil
@@ -228,9 +228,8 @@ extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDe
                 resetSearchFilteredResults()
                 dismissSearchBar()
             } else {
-                if (indexPath.row <= sites.count-1) {
-                    viewModel.selectedSite = sites[indexPath.row]
-                }
+                viewModel.selectedSite = sites[indexPath.row]
+                selectedSiteIndexPath = indexPath
                 
                 dismissSearchBar()
                 

@@ -20,5 +20,4 @@ import Foundation
 class SiteFacilityTableViewCell: UITableViewCell {
     @IBOutlet var siteFacilityNameLabel: UILabel!
     @IBOutlet var siteFacilityDotImg: UIImageView!
-    @IBOutlet var siteFacilityRightChevnron: UIImageView!
 }

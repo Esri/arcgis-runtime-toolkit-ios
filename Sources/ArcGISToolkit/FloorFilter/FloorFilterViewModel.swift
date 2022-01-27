@@ -44,7 +44,8 @@ class FloorFilterViewModel {
     }
     
     /// All the levels in the map
-    private var allLevels: [AGSFloorLevel] {
+    /// make this property public so it can be accessible to test 
+    public var allLevels: [AGSFloorLevel] {
         return floorManager?.levels ?? []
     }
     

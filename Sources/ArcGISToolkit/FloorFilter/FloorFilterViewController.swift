@@ -89,15 +89,13 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     public func refresh(geoView: AGSGeoView?){
         self.geoView = geoView
         state = FloorFilterState.initiallyCollapsed
-        updateViewsVisibilityForState(state: state)
     }
     
     /// Variables for styling the Floor Filter View
-    public var fontSize: CGFloat = 14.0
-    public var fontName: String = "Avenir"
-    public var selectionColor: UIColor = UIColor(hexString: "#C7EAFF")
+    public var levelFont = UIFont(name: "Avenir", size: 14.0)
+    public var selectionColor = UIColor(red: 0.78, green: 0.92, blue: 1.00, alpha: 1.00)
     public var backgroundColor: UIColor = UIColor.systemGray6
-    public var selectedTextColor: UIColor = UIColor(hexString: "#004874")
+    public var selectedTextColor = UIColor(red: 0.00, green: 0.28, blue: 0.45, alpha: 1.00)
     public var unselectedTextColor: UIColor = UIColor.label
     public var buttonSize: CGSize = CGSize(width: 50, height: 50)
     public var maxDisplayLevels: Int = 3
@@ -136,7 +134,12 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         case partiallyExpanded
         case fullyExpanded
     }
-    private var state = FloorFilterState.initiallyCollapsed
+    private var state = FloorFilterState.initiallyCollapsed {
+        didSet {
+            guard state != oldValue else { return }
+            stateDidChange(state: state)
+        }
+    }
     
     private var floorManager: AGSFloorManager?
     
@@ -253,14 +256,8 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         let storyboard = UIStoryboard(name: "FloorFilter", bundle: .module)
         
         if let siteFacilityPromptVC = storyboard.instantiateViewController(identifier: "SiteFacilityPromptVC") as? SiteFacilityPromptViewController {
-            siteFacilityPromptVC.providesPresentationContextTransitionStyle = true
-            siteFacilityPromptVC.definesPresentationContext = true
-            siteFacilityPromptVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
-            siteFacilityPromptVC.modalTransitionStyle = UIModalTransitionStyle.coverVertical
-            
-            if let topVC = UIApplication.shared.topMostViewController() {
-                topVC.present(siteFacilityPromptVC, animated: true, completion: nil)
-            }
+            siteFacilityPromptVC.modalPresentationStyle = .automatic
+            present(siteFacilityPromptVC, animated: true)
             siteFacilityPromptVC.delegate = self
             siteFacilityPromptVC.viewModel = viewModel
         }
@@ -268,8 +265,12 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     
     @objc func collapseLevelsList(sender: UITapGestureRecognizer) {
         state = .partiallyExpanded
-        updateViewsVisibilityForState(state: state)
         self.levelsTableView.reloadData()
+    }
+    
+    /// Observer when the state property is changed
+    private func stateDidChange(state: FloorFilterState) {
+        updateViewsVisibilityForState(state: state)
     }
     
     /// Updates which state of the floor filter should be state
@@ -304,7 +305,6 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     func siteFacilityIsUpdated(viewModel: FloorFilterViewModel) {
         self.viewModel = viewModel
         state = .fullyExpanded
-        updateViewsVisibilityForState(state: state)
         self.levelsTableView.reloadData()
     }
     
@@ -406,7 +406,7 @@ extension FloorFilterViewController: UITableViewDataSource, UITableViewDelegate 
         if cell.widthAnchor.constraint(equalToConstant: buttonSize.width).isActive == false {
             cell.widthAnchor.constraint(equalToConstant: buttonSize.width).isActive = true
         }
-        cell.textLabel?.font = UIFont(name: fontName, size: fontSize)
+        cell.textLabel?.font = levelFont
         cell.textLabel?.adjustsFontSizeToFitWidth = true
         cell.textLabel?.textAlignment = .center
         setTableViewCellCornerRadius(cell: cell)
@@ -448,7 +448,6 @@ extension FloorFilterViewController: UITableViewDataSource, UITableViewDelegate 
         // Do not set the selected level
         if (state == .partiallyExpanded) {
             state = .fullyExpanded
-            updateViewsVisibilityForState(state: state)
         }
         
 //        // for the very first time, the last selected row will be nil, so do not add that to the array
@@ -499,36 +498,6 @@ extension UIApplication {
             return keyWindow.rootViewController?.topMostViewController()
         }
         return nil
-    }
-}
-
-/// Extension for UI Color to convert a HexString to UIColor
-extension UIColor {
-    convenience init(hexString: String, alpha: CGFloat = 1.0) {
-        let hexString: String = hexString.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-        let scanner = Scanner(string: hexString)
-        if (hexString.hasPrefix("#")) {
-            scanner.currentIndex = scanner.string.index(after: scanner.currentIndex)
-        }
-        var color: UInt64 = 0
-        scanner.scanHexInt64(&color)
-        let mask = 0x000000FF
-        let r = Int(color >> 16) & mask
-        let g = Int(color >> 8) & mask
-        let b = Int(color) & mask
-        let red   = CGFloat(r) / 255.0
-        let green = CGFloat(g) / 255.0
-        let blue  = CGFloat(b) / 255.0
-        self.init(red:red, green:green, blue:blue, alpha:alpha)
-    }
-    func toHexString() -> String {
-        var r:CGFloat = 0
-        var g:CGFloat = 0
-        var b:CGFloat = 0
-        var a:CGFloat = 0
-        getRed(&r, green: &g, blue: &b, alpha: &a)
-        let rgb:Int = (Int)(r*255)<<16 | (Int)(g*255)<<8 | (Int)(b*255)<<0
-        return String(format:"#%06x", rgb)
     }
 }
 
