@@ -386,12 +386,8 @@ extension FloorFilterViewController: UITableViewDataSource, UITableViewDelegate 
         let levels = viewModel.visibleLevelsInExpandedList
         
         // Style the cell
-        if cell.heightAnchor.constraint(equalToConstant: buttonSize.height).isActive == false {
-            cell.heightAnchor.constraint(equalToConstant: buttonSize.height).isActive = true
-        }
-        if cell.widthAnchor.constraint(equalToConstant: buttonSize.width).isActive == false {
-            cell.widthAnchor.constraint(equalToConstant: buttonSize.width).isActive = true
-        }
+        cell.heightAnchor.constraint(equalToConstant: buttonSize.height).isActive = true
+        cell.widthAnchor.constraint(equalToConstant: buttonSize.width).isActive = true
         cell.textLabel?.font = levelFont
         cell.textLabel?.adjustsFontSizeToFitWidth = true
         cell.textLabel?.textAlignment = .center
