@@ -38,10 +38,14 @@ class FloorFilterViewModel {
     }
     
     /// Levels that are visible in the expanded Floor Filter levels table view
-    /// Reverse the order of the levels to make it in ascending order
+    /// Sort the levels by verticalOrder in a descending order
     public var visibleLevelsInExpandedList: [AGSFloorLevel] {
         guard let floorManager = floorManager else { return [] }
-        return facilities.isEmpty ? floorManager.levels : floorManager.levels.filter { $0.facility == selectedFacility }.reversed()
+        return facilities.isEmpty ? floorManager.levels : floorManager.levels.filter {
+            $0.facility == selectedFacility
+        }.sorted {
+            $0.verticalOrder > $1.verticalOrder
+        }
     }
     
     /// All the levels in the map
