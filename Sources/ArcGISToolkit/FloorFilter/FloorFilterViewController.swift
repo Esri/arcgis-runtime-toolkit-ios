@@ -87,7 +87,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     }
     
     /// Color when a level is selected in the list
-    public var selectionColor = UIColor(red: 0.78, green: 0.92, blue: 1.00, alpha: 1.00) {
+    public var selectionColor: UIColor = lightDefaultSelectionColor {
         didSet {
             processStylingParametersUpdate()
         }
@@ -101,7 +101,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     }
     
     /// Text color of the level displayed that is selected
-    public var selectedTextColor = UIColor(red: 0.00, green: 0.28, blue: 0.45, alpha: 1.00) {
+    public var selectedTextColor = lightSelectedLevelsTextColor {
         didSet {
             processStylingParametersUpdate()
         }
@@ -143,6 +143,18 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
   
     private weak var delegate: FloorFilterViewControllerDelegate?
     private var viewModel = FloorFilterViewModel()
+    
+    /// default selection color for levels list for light mode
+    private static let lightDefaultSelectionColor = UIColor(red: 0.78, green: 0.92, blue: 1.00, alpha: 1.00)
+    
+    ///default selection color for levels list for dark mode
+    private static let darkDefaultSelectionColor = UIColor(red: 0.39, green: 0.46, blue: 0.5, alpha: 1.00)
+    
+    /// default selected text color for levels for light mode
+    private static let lightSelectedLevelsTextColor = UIColor(red: 0.00, green: 0.28, blue: 0.45, alpha: 1.00)
+    
+    /// default selected text color for levels for dark mode
+    private static let darkSelectedLevelsTextColor = UIColor(red: 0.00, green: 0.56, blue: 0.9, alpha: 1.00)
     
     /// State of the visibility of the Floor Filter.
     private enum FloorFilterState {
@@ -220,6 +232,14 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         
         // Adjust the constraints and order of the views in the Floor Filter if placement is on top or bottom of the sceen.
         adjustConstraintsBasedOnPlacement()
+        
+        adjustDefaultSelectionColor()
+        adjustDefaultSelectedTextColor()
+    }
+    
+    public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        adjustDefaultSelectionColor()
+        adjustDefaultSelectedTextColor()
     }
     
     private func initializeFloorManager() {
@@ -229,13 +249,11 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
             if error != nil || floorManager.loadStatus != .loaded {
                 return
             }
-            if (floorManager.loadStatus == .loaded) {
-                self.initializeSiteButton()
-                                            
-                // Filter the map to any previously selected level.
-                self.viewModel.filterMapToSelectedLevel()
-                self.levelsTableView.reloadData()
-            }
+            self.initializeSiteButton()
+                                        
+            // Filter the map to any previously selected level.
+            self.viewModel.filterMapToSelectedLevel()
+            self.levelsTableView.reloadData()
         })
     }
     
@@ -284,6 +302,32 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     /// Observer when the state property is changed.
     private func stateDidChange() {
         updateViewsVisibilityForState(state: state)
+    }
+    
+    /// Color is adjusted based on dark or light mode of the system
+    private func adjustDefaultSelectionColor() {
+        let darkSelectionColor = FloorFilterViewController.darkDefaultSelectionColor
+        let lightSelectionColor = FloorFilterViewController.lightDefaultSelectionColor
+        if (selectionColor == darkSelectionColor || selectionColor == lightSelectionColor) {
+            if (traitCollection.userInterfaceStyle == .dark) {
+                selectionColor = darkSelectionColor
+            } else {
+                selectionColor = lightSelectionColor
+            }
+        }
+    }
+    
+    /// Color is adjusted based on dark or light mode of the system
+    private func adjustDefaultSelectedTextColor() {
+        let darkTextColor = FloorFilterViewController.darkSelectedLevelsTextColor
+        let lightTextColor = FloorFilterViewController.lightSelectedLevelsTextColor
+        if (selectedTextColor == lightTextColor || selectedTextColor == darkTextColor) {
+            if (traitCollection.userInterfaceStyle == .dark) {
+                selectedTextColor = darkTextColor
+            } else {
+                selectedTextColor = lightTextColor
+            }
+        }
     }
     
     /// Updates which state of the floor filter should be state.
