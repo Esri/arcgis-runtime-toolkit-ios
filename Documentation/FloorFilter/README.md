@@ -12,8 +12,9 @@ When the Site button is tapped, a prompt opens so the user can select a site and
 
 ```swift
 
-        let floorFilterViewController = FloorFilterViewController.makeFloorFilterController(geoView: mapView)
-        self.view.addSubview(floorFilterViewController.view)
+addChild(floorFilterViewController)
+view.addSubview(floorFilterViewController.view)
+floorFilterViewController.didMove(toParent: self)
 
 ```
 

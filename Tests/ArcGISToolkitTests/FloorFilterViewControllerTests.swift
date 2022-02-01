@@ -62,5 +62,4 @@ class FloorFilterViewControllerTests: XCTestCase {
         viewModel.mapView = mapView
         XCTAssertEqual(viewModel.allLevels.count, 3)
     }
-    
 }

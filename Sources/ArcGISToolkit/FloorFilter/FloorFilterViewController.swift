@@ -1,5 +1,5 @@
 //
-// Copyright 2021 Esri.
+// Copyright 2022 Esri.
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,13 +36,11 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     
     /// Returns the site that is currently selected.
     /// Also allows users to pass a site that needs to be selected.
-    private var _selectedSite: AGSFloorSite? = nil
     public var selectedSite: AGSFloorSite? {
         get {
-            _selectedSite ?? viewModel.selectedSite
+            viewModel.selectedSite
         }
         set {
-            _selectedSite = newValue
             selectedFacility = nil
             selectedLevel = nil
             viewModel.selectedSite = newValue
@@ -52,17 +50,12 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     
     /// Returns the facility that is currently selected.
     /// Also allows users to pass a facility that needs to be selected.
-    private var _selectedFacility: AGSFloorFacility? = nil
     public var selectedFacility: AGSFloorFacility? {
         get {
-            _selectedFacility ?? viewModel.selectedFacility
+            viewModel.selectedFacility
         }
         set {
-            _selectedFacility = newValue
-            if (_selectedFacility != nil) {
-                _selectedSite = viewModel.selectedFacility?.site
-            }
-            selectedLevel = viewModel.getDefaultLevelForFacility(facility: newValue)
+            selectedLevel = viewModel.defaultLevel(for: newValue)
             viewModel.selectedFacility = newValue
             viewModel.zoomToSelection()
         }
@@ -70,28 +63,21 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
  
     /// Returns the level that is currently selected.
     /// Also allows users to pass a level that needs to be selected.
-    private var _selectedLevel: AGSFloorLevel? = nil
     public var selectedLevel: AGSFloorLevel? {
         get {
-            _selectedLevel ?? viewModel.selectedLevel
+            viewModel.selectedLevel
         }
         set {
-            if (_selectedLevel != newValue) {
-                _selectedLevel = newValue
-            }
-            if (_selectedLevel != nil) {
-                let selectedLevelsFacility = viewModel.selectedLevel?.facility
-                _selectedSite = selectedLevelsFacility?.site
-            }
             viewModel.selectedLevel = newValue
             viewModel.filterMapToSelectedLevel()
         }
     }
     
     /// Listener when a level is changed.
-    public var onSelectedLevelChangedListener: (() -> Void)? = nil
+    public var onSelectedLevelChangedListener: (() -> Void)?
     
-    /// Variables for styling the Floor Filter View.
+    // Variables for styling the Floor Filter View.
+    
     public var levelFont = UIFont(name: "Avenir", size: 14.0)
     public var selectionColor = UIColor(red: 0.78, green: 0.92, blue: 1.00, alpha: 1.00)
     public var backgroundColor: UIColor = UIColor.systemGray6
@@ -122,10 +108,10 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         case partiallyExpanded
         case fullyExpanded
     }
+    
     private var state = FloorFilterState.initiallyCollapsed {
         didSet {
-            guard state != oldValue else { return }
-            stateDidChange(state: state)
+            stateDidChange()
         }
     }
     
@@ -163,10 +149,12 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         return floorFilterVC
     }
     
+    @available(*, unavailable)
     override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         fatalError("use the method `makeFloorFilterView` instead")
     }
     
+    @available(*, unavailable)
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
@@ -225,10 +213,10 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     }
     
     private func initializeButtonsClickListeners() {
-        siteBtn.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.showSiteFacilityPrompt)))
+        siteBtn.addTarget(self, action: #selector(showSiteFacilityPrompt(sender:)), for: .touchUpInside)
         siteBtn.isUserInteractionEnabled = true
         
-        closeBtn.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.collapseLevelsList)))
+        closeBtn.addTarget(self, action: #selector(collapseLevelsList(sender:)), for: .touchUpInside)
         closeBtn.isUserInteractionEnabled = true
     }
     
@@ -255,7 +243,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     }
     
     /// Observer when the state property is changed.
-    private func stateDidChange(state: FloorFilterState) {
+    private func stateDidChange() {
         updateViewsVisibilityForState(state: state)
     }
     
@@ -305,7 +293,6 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     private func setTableViewCellCornerRadius(cell: UITableViewCell) {
         if state == .fullyExpanded {
             cell.cornerRadius(usingCorners: [.allCorners], cornerRadii: .zero)
-            
         } else {
             if (style == .down) {
                 cell.cornerRadius(usingCorners: [.bottomLeft, .bottomRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
@@ -323,10 +310,8 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
             case .fullyExpanded:
                 siteBtn?.cornerRadius(usingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
                 closeBtn?.cornerRadius(usingCorners: [.bottomLeft, .bottomRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
-            
             case .partiallyExpanded:
                 siteBtn?.cornerRadius(usingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
-                
             case .initiallyCollapsed:
                 siteBtn?.cornerRadius(usingCorners: .allCorners, cornerRadii: CGSize(width: 5.0, height: 5.0))
             }
@@ -335,10 +320,8 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
             case .fullyExpanded:
                 siteBtn?.cornerRadius(usingCorners: [.bottomLeft, .bottomRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
                 closeBtn?.cornerRadius(usingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
-            
             case .partiallyExpanded:
                 siteBtn?.cornerRadius(usingCorners: [.bottomLeft, .bottomRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
-                
             case .initiallyCollapsed:
                 siteBtn?.cornerRadius(usingCorners: .allCorners, cornerRadii: CGSize(width: 5.0, height: 5.0))
             }
@@ -399,10 +382,10 @@ extension FloorFilterViewController: UITableViewDataSource, UITableViewDelegate 
             cell.textLabel?.text = levels[indexPath.row].shortName
         } else {
             cell.textLabel?.text = viewModel.selectedLevel?.shortName
-                ?? viewModel.getDefaultLevelForFacility(facility: viewModel.selectedFacility)?.shortName
+                ?? viewModel.defaultLevel(for: viewModel.selectedFacility)?.shortName
         }
         
-        let visibleLevelVerticalOrder = levels.first { $0.isVisible }.map { $0.verticalOrder }
+        let visibleLevelVerticalOrder = levels.first(where: \.isVisible)?.verticalOrder
         let levelShortNames = levels.filter { $0.verticalOrder == visibleLevelVerticalOrder }.map { $0.shortName }
         if (levelShortNames.contains(cell.textLabel?.text ?? "")) {
             cell.backgroundColor = selectionColor
@@ -431,44 +414,6 @@ extension FloorFilterViewController: UITableViewDataSource, UITableViewDelegate 
         
         viewModel.filterMapToSelectedLevel()
         levelsTableView?.reloadData()
-    }
-    
-}
-
-/// Extensions for UIViewController to get the top most view controller of the application.
-extension UIViewController {
-    func topMostViewController() -> UIViewController {
-        if let tab = self as? UITabBarController {
-            return tab.selectedViewController?.topMostViewController() ?? self
-        }
-
-        if let navigation = self as? UINavigationController {
-            if navigation.visibleViewController?.isBeingDismissed ?? false {
-                return navigation.visibleViewController?.presentingViewController ?? self
-            }
-            else {
-                return navigation.visibleViewController?.topMostViewController() ?? self
-            }
-        }
-
-        if let presented = self.presentedViewController {
-            if presented.isBeingDismissed {
-                return presented.presentingViewController ?? self
-            }
-            else {
-                return presented.topMostViewController()
-            }
-        }
-        return self
-    }
-}
-
-extension UIApplication {
-    func topMostViewController() -> UIViewController? {
-        if let keyWindow = windows.first(where: { $0.isKeyWindow }) {
-            return keyWindow.rootViewController?.topMostViewController()
-        }
-        return nil
     }
 }
 

@@ -18,28 +18,29 @@ import ArcGIS
 
 /// View Model class that contains the Data Model of the Floor Filter
 /// Also contains the business logic to filter and change the map extent based on selected site/level/facility
-class FloorFilterViewModel {
+final class FloorFilterViewModel {
     /// The MapView, Map and Floor Manager are set in the FloorFilterViewController when the map is loaded
     public var mapView: AGSMapView?
-    internal var floorManager: AGSFloorManager? {
+    
+    var floorManager: AGSFloorManager? {
         return mapView?.map?.floorManager
     }
     
-    public var sites: [AGSFloorSite] {
+    var sites: [AGSFloorSite] {
         return floorManager?.sites ?? []
     }
     
     /// Facilities in the selected site
     /// If no site is selected then the list is empty
     /// If the sites data does not exist in the map, then use all the facilities in the map
-    public var facilities: [AGSFloorFacility] {
+    var facilities: [AGSFloorFacility] {
         guard let floorManager = floorManager else { return [] }
         return sites.isEmpty ? floorManager.facilities : floorManager.facilities.filter { $0.site == selectedSite }
     }
     
     /// Levels that are visible in the expanded Floor Filter levels table view
     /// Sort the levels by verticalOrder in a descending order
-    public var visibleLevelsInExpandedList: [AGSFloorLevel] {
+    var visibleLevelsInExpandedList: [AGSFloorLevel] {
         guard let floorManager = floorManager else { return [] }
         return facilities.isEmpty ? floorManager.levels : floorManager.levels.filter {
             $0.facility == selectedFacility
@@ -50,24 +51,24 @@ class FloorFilterViewModel {
     
     /// All the levels in the map
     /// make this property public so it can be accessible to test 
-    public var allLevels: [AGSFloorLevel] {
+    var allLevels: [AGSFloorLevel] {
         return floorManager?.levels ?? []
     }
     
     /// The site, facility, and level that are selected by the user
-    public var selectedSite: AGSFloorSite?
-    public var selectedFacility: AGSFloorFacility?
-    public var selectedLevel: AGSFloorLevel?
+    var selectedSite: AGSFloorSite?
+    var selectedFacility: AGSFloorFacility?
+    var selectedLevel: AGSFloorLevel?
     
     /// Gets the default level for a facility
     /// Uses level with vertical order 0 otherwise gets the lowest level
-    public func getDefaultLevelForFacility(facility: AGSFloorFacility?) -> AGSFloorLevel? {
+    func defaultLevel(for facility: AGSFloorFacility?) -> AGSFloorLevel? {
         let candidateLevels = allLevels.filter { $0.facility == facility }
-        return candidateLevels.first { $0.verticalOrder == 0 } ?? getLowestLevel()
+        return candidateLevels.first { $0.verticalOrder == 0 } ?? lowestLevel()
     }
     
     /// Returns the AGSFloorLevel with the lowest verticalOrder.
-    private func getLowestLevel() -> AGSFloorLevel? {
+    private func lowestLevel() -> AGSFloorLevel? {
         let sortedLevels = allLevels.sorted {
             $0.verticalOrder < $1.verticalOrder
         }
@@ -77,7 +78,7 @@ class FloorFilterViewModel {
     }
     
     /// Sets the visibility of all the levels on the map based on the vertical order of the current selected level
-    public func filterMapToSelectedLevel() {
+    func filterMapToSelectedLevel() {
         guard let selectedLevel = selectedLevel else { return }
         allLevels.forEach {
             $0.isVisible = $0.verticalOrder == selectedLevel.verticalOrder
@@ -85,7 +86,7 @@ class FloorFilterViewModel {
     }
     
     /// Zooms to the facility if there is a selected facility, otherwise zooms to the site.
-    public func zoomToSelection() {
+    func zoomToSelection() {
         if let selectedFacility = selectedFacility {
             zoom(to: selectedFacility)
         } else if let selectedSite = selectedSite {

@@ -17,7 +17,7 @@ import ArcGIS
 import Foundation
 
 /// ViewController for the site and facility prompt.
-class SiteFacilityPromptViewController: UIViewController {
+final class SiteFacilityPromptViewController: UIViewController {
     weak var delegate: FloorFilterViewControllerDelegate?
     var viewModel = FloorFilterViewModel()
     
@@ -68,9 +68,9 @@ class SiteFacilityPromptViewController: UIViewController {
     }
     
     private func initializeButtonsClickListeners() {
-        closeBtn.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.closeSiteFacilityPrompt)))
+        closeBtn.addTarget(self, action: #selector(closeSiteFacilityPrompt), for: .touchUpInside)
         closeBtn.isUserInteractionEnabled = true
-        backBtn.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.backButtonPressed)))
+        backBtn.addTarget(self, action: #selector(backButtonPressed), for: .touchUpInside)
         backBtn.isUserInteractionEnabled = true
     }
     
@@ -180,17 +180,15 @@ extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDe
         cell.siteFacilityNameLabel?.font = UIFont(name:"Avenir", size:16)
             
         if (isShowingFacilities) {
-            if (indexPath.row <= facilities.count-1) {
-                cell.siteFacilityNameLabel.text = facilities[indexPath.row].name
-                cell.accessoryType = .none
+            cell.siteFacilityNameLabel.text = facilities[indexPath.row].name
+            cell.accessoryType = .none
                     
-                // Highlight any previously selected Facility.
-                if (cell.siteFacilityNameLabel.text == viewModel.selectedFacility?.name) {
-                    cell.siteFacilityDotImg.isHidden = false
-                    cell.siteFacilityNameLabel?.font = UIFont.boldSystemFont(ofSize: 16.0)
-                }
-                return cell
+            // Highlight any previously selected Facility.
+            if (cell.siteFacilityNameLabel.text == viewModel.selectedFacility?.name) {
+                cell.siteFacilityDotImg.isHidden = false
+                cell.siteFacilityNameLabel?.font = UIFont.boldSystemFont(ofSize: 16.0)
             }
+            return cell
         } else {
             cell.siteFacilityNameLabel?.text = sites[indexPath.row].name
             cell.accessoryType = .disclosureIndicator
@@ -202,7 +200,7 @@ extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDe
             }
             return cell
         }
-        return UITableViewCell()
+        return cell
     }
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
