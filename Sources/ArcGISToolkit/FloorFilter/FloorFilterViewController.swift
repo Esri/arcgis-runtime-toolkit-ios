@@ -226,18 +226,15 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         guard let floorManager = floorManager else { return }
         
         floorManager.load(completion: { error in
-            DispatchQueue.main.async {
-                if error != nil || floorManager.loadStatus != .loaded {
-                    return
-                }
-                                        
-                if (floorManager.loadStatus == .loaded) {
-                    self.initializeSiteButton()
+            if error != nil || floorManager.loadStatus != .loaded {
+                return
+            }
+            if (floorManager.loadStatus == .loaded) {
+                self.initializeSiteButton()
                                             
-                    // Filter the map to any previously selected level.
-                    self.viewModel.filterMapToSelectedLevel()
-                    self.levelsTableView.reloadData()
-                }
+                // Filter the map to any previously selected level.
+                self.viewModel.filterMapToSelectedLevel()
+                self.levelsTableView.reloadData()
             }
         })
     }
@@ -389,7 +386,6 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         floorFilterStackView.removeArrangedSubview(closeBtn)
         floorFilterStackView.removeArrangedSubview(siteBtn)
         floorFilterStackView.setNeedsLayout()
-        floorFilterStackView.layoutIfNeeded()
         
         if (style == .down) {
             // Place the Site Button at the top of the Floor Filter View.
