@@ -29,11 +29,8 @@ final class SiteFacilityPromptViewController: UIViewController {
     @IBOutlet weak var promptSubtitle: UILabel!
     @IBOutlet weak var promptTitleSubtitleStackView: UIStackView!
     @IBOutlet weak var siteFacilityTableView: UITableView!
-    @IBOutlet weak var bottomConstraint: NSLayoutConstraint!
     @IBOutlet weak var designableViewHeight: NSLayoutConstraint!
-    
-    private var originalYPositionForPanel: CGFloat = 0.0
-    
+        
     /// Show the facilities list directly if the map has no sites configured or if there is a previously selected facility.
     private var isShowingFacilities = false
     private var isSearchActive = false
@@ -63,29 +60,23 @@ final class SiteFacilityPromptViewController: UIViewController {
         initializeSiteFacilitySearchBar()
         initializeButtonsClickListeners()
        
-        updatePromptViewHeight()
         updatePromptTitle()
     }
     
     private func initializeButtonsClickListeners() {
         closeBtn.addTarget(self, action: #selector(closeSiteFacilityPrompt), for: .touchUpInside)
         closeBtn.isUserInteractionEnabled = true
-        backBtn.addTarget(self, action: #selector(backButtonPressed), for: .touchUpInside)
+        backBtn.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
         backBtn.isUserInteractionEnabled = true
-    }
-    
-    private func updatePromptViewHeight() {
-        self.designableViewHeight.constant = 380
-        bottomConstraint.constant = ((UIScreen.main.bounds.height / 2) - (self.designableViewHeight.constant / 2))
-        originalYPositionForPanel = bottomConstraint.constant
     }
     
     @objc func closeSiteFacilityPrompt() {
         dismiss(animated: true)
     }
     
-    @objc func backButtonPressed() {
+    @objc func backButtonTapped() {
         isShowingFacilities = false
+        dismissSearchBar()
         siteFacilityTableView?.reloadRows(at: [selectedSiteIndexPath], with: .none)
     }
     
@@ -116,26 +107,26 @@ extension SiteFacilityPromptViewController: UISearchBarDelegate {
     
     public func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
         isSearchActive = true
-        self.siteFacilitySearchBar.showsCancelButton = true
+        siteFacilitySearchBar.showsCancelButton = true
     }
     
     public func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         isSearchActive = false
-        self.siteFacilitySearchBar.resignFirstResponder()
-        self.siteFacilitySearchBar.endEditing(true)
+        siteFacilitySearchBar.resignFirstResponder()
+        siteFacilitySearchBar.endEditing(true)
     }
     
     public func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         isSearchActive = false
-        self.siteFacilitySearchBar.text = ""
-        self.siteFacilitySearchBar.resignFirstResponder()
-        self.siteFacilitySearchBar.endEditing(true)
+        siteFacilitySearchBar.text = ""
+        siteFacilitySearchBar.resignFirstResponder()
+        siteFacilitySearchBar.endEditing(true)
     }
     
     public func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
         isSearchActive = false
-        self.siteFacilitySearchBar.resignFirstResponder()
-        self.siteFacilitySearchBar.endEditing(true)
+        siteFacilitySearchBar.resignFirstResponder()
+        siteFacilitySearchBar.endEditing(true)
     }
     
     private func resetSearchFilteredResults() {
@@ -144,11 +135,11 @@ extension SiteFacilityPromptViewController: UISearchBarDelegate {
     }
     
     private func dismissSearchBar() {
-        self.isSearchActive = false
-        self.siteFacilitySearchBar.text = ""
-        self.siteFacilitySearchBar.resignFirstResponder()
-        self.siteFacilitySearchBar.endEditing(true)
-        self.siteFacilitySearchBar.showsCancelButton = false
+        isSearchActive = false
+        siteFacilitySearchBar.text = ""
+        siteFacilitySearchBar.resignFirstResponder()
+        siteFacilitySearchBar.endEditing(true)
+        siteFacilitySearchBar.showsCancelButton = false
     }
 }
 
@@ -200,7 +191,6 @@ extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDe
             }
             return cell
         }
-        return cell
     }
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -240,6 +230,10 @@ extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDe
                 siteFacilityTableView.reloadData()
             }
         }
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 45.0
     }
     
     /// Filter the sites or facilities data based on the search query.

@@ -32,7 +32,8 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     }
     
     /// The style of the floor filter.  The default is `.up`.
-    public var style: ExpansionDirection = .up
+    /// This is immutable and will be initialized when the FloorFilter is initialized
+    public private(set) var style: ExpansionDirection = .up
     
     /// Returns the site that is currently selected.
     /// Also allows users to pass a site that needs to be selected.
@@ -78,13 +79,54 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     
     // Variables for styling the Floor Filter View.
     
-    public var levelFont = UIFont(name: "Avenir", size: 14.0)
-    public var selectionColor = UIColor(red: 0.78, green: 0.92, blue: 1.00, alpha: 1.00)
-    public var backgroundColor: UIColor = UIColor.systemGray6
-    public var selectedTextColor = UIColor(red: 0.00, green: 0.28, blue: 0.45, alpha: 1.00)
-    public var unselectedTextColor: UIColor = UIColor.label
-    public var buttonSize: CGSize = CGSize(width: 50, height: 50)
-    public var maxDisplayLevels: Int = 3
+    /// Font of the level short name
+    public var levelFont = UIFont(name: "Avenir", size: 14.0) {
+        didSet {
+            processStylingParametersUpdate()
+        }
+    }
+    
+    /// Color when a level is selected in the list
+    public var selectionColor = UIColor(red: 0.78, green: 0.92, blue: 1.00, alpha: 1.00) {
+        didSet {
+            processStylingParametersUpdate()
+        }
+    }
+    
+    /// Background color of the site button, tableview and the close button
+    public var backgroundColor: UIColor = UIColor.systemGray6 {
+        didSet {
+            processStylingParametersUpdate()
+        }
+    }
+    
+    /// Text color of the level displayed that is selected
+    public var selectedTextColor = UIColor(red: 0.00, green: 0.28, blue: 0.45, alpha: 1.00) {
+        didSet {
+            processStylingParametersUpdate()
+        }
+    }
+    
+    /// Text color of the level displayed when it is unselected
+    public var unselectedTextColor: UIColor = UIColor.label {
+        didSet {
+            processStylingParametersUpdate()
+        }
+    }
+    
+    /// Size of the each of the levels button, site button and close button
+    public var buttonSize: CGSize = CGSize(width: 50, height: 50) {
+        didSet {
+            processStylingParametersUpdate()
+        }
+    }
+    
+    /// This is used to determine the amount of levels to show in the TableView
+    public var maxDisplayLevels: Int = 3 {
+        didSet {
+            processStylingParametersUpdate()
+        }
+    }
     
     /// Floor Filter UI Elements and Constraints.
     @IBOutlet var floorFilterView: UIView!
@@ -254,6 +296,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         closeBtnWidth.constant = buttonSize.width
         levelCellWidth.constant = buttonSize.width
         closeBtn.backgroundColor = backgroundColor.withAlphaComponent(0.9)
+        siteBtn.backgroundColor = backgroundColor
         // by design the close button height will be 3/4th the size of the button size.
         closeBtnHeight.constant = buttonSize.height * 0.75
         addCornerRadiusBasedOnPlacement()
@@ -261,18 +304,18 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         switch state {
         case .fullyExpanded:
             closeBtn?.isHidden = false
-            self.levelsTableView?.isHidden = false
+            levelsTableView?.isHidden = false
             let levelCount = CGFloat(min(viewModel.visibleLevelsInExpandedList.count, maxDisplayLevels))
             let constant = levelCount * buttonSize.height
-            self.tableViewHeight.constant = constant
+            tableViewHeight.constant = constant
         case .partiallyExpanded:
             closeBtn?.isHidden = true
-            self.levelsTableView?.isHidden = false
+            levelsTableView?.isHidden = false
             siteBtnHeight.constant = buttonSize.height
             tableViewHeight.constant = buttonSize.height
         case .initiallyCollapsed:
             closeBtn?.isHidden = true
-            self.levelsTableView?.isHidden = true
+            levelsTableView?.isHidden = true
         }
     }
     
@@ -286,6 +329,15 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         floorFilterView.layer.shadowColor = UIColor.gray.cgColor
         floorFilterView.layer.shadowOffset = CGSize(width: 0.0, height: 1.0)
         floorFilterView.layer.shadowOpacity = 0.8
+    }
+    
+    /// Callback when a styling parameter is updated
+    /// Reload the table view, site button and close button
+    /// Calling stateDidChange will also reload the size
+    private func processStylingParametersUpdate() {
+        levelsTableView.reloadData()
+        stateDidChange()
+        adjustConstraintsBasedOnPlacement()
     }
     
     /// Add a corner radius for the cells in the levels table.
@@ -368,9 +420,6 @@ extension FloorFilterViewController: UITableViewDataSource, UITableViewDelegate 
         let cell = tableView.dequeueReusableCell(withIdentifier: "levelCell", for: indexPath)
         let levels = viewModel.visibleLevelsInExpandedList
         
-        // Style the cell
-        cell.heightAnchor.constraint(equalToConstant: buttonSize.height).isActive = true
-        cell.widthAnchor.constraint(equalToConstant: buttonSize.width).isActive = true
         cell.textLabel?.font = levelFont
         cell.textLabel?.adjustsFontSizeToFitWidth = true
         cell.textLabel?.textAlignment = .center
@@ -414,6 +463,10 @@ extension FloorFilterViewController: UITableViewDataSource, UITableViewDelegate 
         
         viewModel.filterMapToSelectedLevel()
         levelsTableView?.reloadData()
+    }
+    
+    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return buttonSize.height
     }
 }
 
