@@ -16,7 +16,7 @@ import XCTest
 @testable import ArcGISToolkit
 import ArcGIS
 
-class FloorFilterViewControllerTests: XCTestCase {
+final class FloorFilterViewModelTests: XCTestCase {
     func testSitesData() throws {
         let portal = AGSPortal(url: URL(string: "https://indoors.maps.arcgis.com/")!, loginRequired: false)
         let portalItem = AGSPortalItem(portal: portal, itemID: "f133a698536f44c8884ad81f80b6cfc7")

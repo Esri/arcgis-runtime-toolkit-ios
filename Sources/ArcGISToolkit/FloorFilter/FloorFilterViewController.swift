@@ -33,7 +33,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     
     /// The style of the floor filter.  The default is `.up`.
     /// This is immutable and will be initialized when the FloorFilter is initialized
-    public private(set) var style: ExpansionDirection = .up
+    public private(set) var expansionDirection: ExpansionDirection = .up
     
     /// Returns the site that is currently selected.
     /// Also allows users to pass a site that needs to be selected.
@@ -87,7 +87,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     }
     
     /// Color when a level is selected in the list
-    public var selectionColor: UIColor = lightDefaultSelectionColor {
+    public var selectionColor: UIColor = .selectedLevelBackground {
         didSet {
             processStylingParametersUpdate()
         }
@@ -96,12 +96,12 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     /// Background color of the site button, tableview and the close button
     public var backgroundColor: UIColor = UIColor.systemGray6 {
         didSet {
-            processStylingParametersUpdate()
+            backgroundColorDidChange()
         }
     }
     
     /// Text color of the level displayed that is selected
-    public var selectedTextColor = lightSelectedLevelsTextColor {
+    public var selectedTextColor: UIColor = .selectedLevelText {
         didSet {
             processStylingParametersUpdate()
         }
@@ -117,7 +117,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     /// Size of the each of the levels button, site button and close button
     public var buttonSize: CGSize = CGSize(width: 50, height: 50) {
         didSet {
-            processStylingParametersUpdate()
+            buttonSizeDidChange()
         }
     }
     
@@ -143,18 +143,6 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
   
     private weak var delegate: FloorFilterViewControllerDelegate?
     private var viewModel = FloorFilterViewModel()
-    
-    /// default selection color for levels list for light mode
-    private static let lightDefaultSelectionColor = UIColor(red: 0.78, green: 0.92, blue: 1.00, alpha: 1.00)
-    
-    ///default selection color for levels list for dark mode
-    private static let darkDefaultSelectionColor = UIColor(red: 0.39, green: 0.46, blue: 0.5, alpha: 1.00)
-    
-    /// default selected text color for levels for light mode
-    private static let lightSelectedLevelsTextColor = UIColor(red: 0.00, green: 0.28, blue: 0.45, alpha: 1.00)
-    
-    /// default selected text color for levels for dark mode
-    private static let darkSelectedLevelsTextColor = UIColor(red: 0.00, green: 0.56, blue: 0.9, alpha: 1.00)
     
     /// State of the visibility of the Floor Filter.
     private enum FloorFilterState {
@@ -197,7 +185,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     ) -> FloorFilterViewController {
         let storyboard = UIStoryboard(name: "FloorFilter", bundle: .module)
         let floorFilterVC: FloorFilterViewController = storyboard.instantiateViewController(identifier: "FloorFilter")
-        floorFilterVC.style = expansionDirection
+        floorFilterVC.expansionDirection = expansionDirection
         floorFilterVC.geoView = geoView
         
         return floorFilterVC
@@ -226,20 +214,13 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         initializeSiteButton()
         initializeLevelsTableView()
         initializeButtonsClickListeners()
+        buttonSizeDidChange()
         
         // Update the views that are visibile and their heights based on the state of the Floor Filter.
         updateViewsVisibilityForState(state: state)
         
         // Adjust the constraints and order of the views in the Floor Filter if placement is on top or bottom of the sceen.
         adjustConstraintsBasedOnPlacement()
-        
-        adjustDefaultSelectionColor()
-        adjustDefaultSelectedTextColor()
-    }
-    
-    public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        adjustDefaultSelectionColor()
-        adjustDefaultSelectedTextColor()
     }
     
     private func initializeFloorManager() {
@@ -258,14 +239,14 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     }
     
     private func initializeSiteButton() {
-        // Disable the Site Button if the Floor Manager is not loaded yet.
-        if (viewModel.floorManager == nil) {
-            siteBtn.backgroundColor = UIColor.systemGray3
-            siteBtn.isUserInteractionEnabled = false
-        } else {
+        // Enable the site button if both the floor manager and the map is loaded.
+        if (viewModel.floorManager != nil && (geoView as? AGSMapView)?.map?.loadStatus == .loaded) {
             addShadow()
             siteBtn.backgroundColor = backgroundColor.withAlphaComponent(0.9)
             siteBtn.isUserInteractionEnabled = true
+        } else {
+            siteBtn.backgroundColor = UIColor.systemGray
+            siteBtn.isUserInteractionEnabled = false
         }
     }
     
@@ -283,10 +264,21 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         levelsTableView.separatorStyle = .none
     }
     
+    private func buttonSizeDidChange() {
+        guard isViewLoaded else { return }
+        siteBtnHeight.constant = buttonSize.height
+        siteBtnWidth.constant = buttonSize.width
+        closeBtnWidth.constant = buttonSize.width
+        levelCellWidth.constant = buttonSize.width
+        // By design, the close button height will be 3/4th the size of the button size.
+        closeBtnHeight.constant = buttonSize.height * 0.75
+    }
+    
     @objc func showSiteFacilityPrompt(sender: UITapGestureRecognizer) {
         let storyboard = UIStoryboard(name: "FloorFilter", bundle: .module)
         
-        if let siteFacilityPromptVC = storyboard.instantiateViewController(identifier: "SiteFacilityPromptVC") as? SiteFacilityPromptViewController {
+        if (!viewModel.sites.isEmpty || !viewModel.facilities.isEmpty) {
+            let siteFacilityPromptVC = storyboard.instantiateViewController(identifier: "SiteFacilityPromptVC") as! SiteFacilityPromptViewController
             siteFacilityPromptVC.modalPresentationStyle = .automatic
             present(siteFacilityPromptVC, animated: true)
             siteFacilityPromptVC.delegate = self
@@ -304,42 +296,8 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         updateViewsVisibilityForState(state: state)
     }
     
-    /// Color is adjusted based on dark or light mode of the system
-    private func adjustDefaultSelectionColor() {
-        let darkSelectionColor = FloorFilterViewController.darkDefaultSelectionColor
-        let lightSelectionColor = FloorFilterViewController.lightDefaultSelectionColor
-        if (selectionColor == darkSelectionColor || selectionColor == lightSelectionColor) {
-            if (traitCollection.userInterfaceStyle == .dark) {
-                selectionColor = darkSelectionColor
-            } else {
-                selectionColor = lightSelectionColor
-            }
-        }
-    }
-    
-    /// Color is adjusted based on dark or light mode of the system
-    private func adjustDefaultSelectedTextColor() {
-        let darkTextColor = FloorFilterViewController.darkSelectedLevelsTextColor
-        let lightTextColor = FloorFilterViewController.lightSelectedLevelsTextColor
-        if (selectedTextColor == lightTextColor || selectedTextColor == darkTextColor) {
-            if (traitCollection.userInterfaceStyle == .dark) {
-                selectedTextColor = darkTextColor
-            } else {
-                selectedTextColor = lightTextColor
-            }
-        }
-    }
-    
     /// Updates which state of the floor filter should be state.
     private func updateViewsVisibilityForState(state: FloorFilterState) {
-        siteBtnHeight.constant = buttonSize.height
-        siteBtnWidth.constant = buttonSize.width
-        closeBtnWidth.constant = buttonSize.width
-        levelCellWidth.constant = buttonSize.width
-        closeBtn.backgroundColor = backgroundColor.withAlphaComponent(0.9)
-        siteBtn.backgroundColor = backgroundColor
-        // by design the close button height will be 3/4th the size of the button size.
-        closeBtnHeight.constant = buttonSize.height * 0.75
         addCornerRadiusBasedOnPlacement()
         
         switch state {
@@ -376,9 +334,17 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     /// Reload the table view, site button and close button
     /// Calling stateDidChange will also reload the size
     private func processStylingParametersUpdate() {
+        guard isViewLoaded else { return }
         levelsTableView.reloadData()
         stateDidChange()
         adjustConstraintsBasedOnPlacement()
+    }
+    
+    private func backgroundColorDidChange() {
+        guard isViewLoaded else { return }
+        siteBtn?.backgroundColor = backgroundColor
+        closeBtn?.backgroundColor = backgroundColor
+        levelsTableView?.backgroundColor = backgroundColor
     }
     
     /// Add a corner radius for the cells in the levels table.
@@ -387,7 +353,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         if state == .fullyExpanded {
             cell.cornerRadius(usingCorners: [.allCorners], cornerRadii: .zero)
         } else {
-            if (style == .down) {
+            if (expansionDirection == .down) {
                 cell.cornerRadius(usingCorners: [.bottomLeft, .bottomRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
             } else {
                 cell.cornerRadius(usingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
@@ -398,7 +364,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     /// Add a corner radius to the site and close button.
     /// Depending on the placement of the Floor Filter and the current state.
     private func addCornerRadiusBasedOnPlacement() {
-        if (style == .down) {
+        if (expansionDirection == .down) {
             switch state {
             case .fullyExpanded:
                 siteBtn?.cornerRadius(usingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: 5.0, height: 5.0))
@@ -431,7 +397,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         floorFilterStackView.removeArrangedSubview(siteBtn)
         floorFilterStackView.setNeedsLayout()
         
-        if (style == .down) {
+        if (expansionDirection == .down) {
             // Place the Site Button at the top of the Floor Filter View.
             // The Levels List will be unchanged and remain as the second element on the Floor Filter view.
             // Place the Close Button at the bottom of the list.
@@ -517,5 +483,24 @@ extension UIView {
         let maskLayer = CAShapeLayer()
         maskLayer.path = path.cgPath
         self.layer.mask = maskLayer
+    }
+}
+
+private extension UIColor {
+    /// The default background color for selected levels.
+    static let selectedLevelBackground = UIColor { traits in
+        if traits.userInterfaceStyle == .dark {
+            return UIColor(red: 0.39, green: 0.46, blue: 0.5, alpha: 1.00)
+        } else {
+            return UIColor(red: 0.78, green: 0.92, blue: 1.00, alpha: 1.00)
+        }
+    }
+    /// The default text color for selected levels.
+    static let selectedLevelText = UIColor { traits in
+        if traits.userInterfaceStyle == .dark {
+            return UIColor(red: 0.00, green: 0.56, blue: 0.9, alpha: 1.00)
+        } else {
+            return UIColor(red: 0.00, green: 0.28, blue: 0.45, alpha: 1.00)
+        }
     }
 }

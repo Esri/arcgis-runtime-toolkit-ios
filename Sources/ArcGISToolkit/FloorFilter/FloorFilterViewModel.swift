@@ -20,7 +20,7 @@ import ArcGIS
 /// Also contains the business logic to filter and change the map extent based on selected site/level/facility
 final class FloorFilterViewModel {
     /// The MapView, Map and Floor Manager are set in the FloorFilterViewController when the map is loaded
-    public var mapView: AGSMapView?
+    var mapView: AGSMapView?
     
     var floorManager: AGSFloorManager? {
         return mapView?.map?.floorManager

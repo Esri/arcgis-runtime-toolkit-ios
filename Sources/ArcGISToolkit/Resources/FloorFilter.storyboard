@@ -41,26 +41,6 @@
                                         <constraints>
                                             <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="150" id="Nqv-Pv-Xd2"/>
                                         </constraints>
-                                        <prototypes>
-                                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" restorationIdentifier="FloorFilterSiteFacilityCell" preservesSuperviewLayoutMargins="YES" selectionStyle="gray" indentationWidth="10" reuseIdentifier="FloorFilterSiteFacilityCell" textLabel="4JE-Su-Xpl" style="IBUITableViewCellStyleDefault" id="0To-UR-h49" userLabel="FloorFilterSiteFacilityCell" customClass="SiteFacilityTableViewCell" customModule="ArcGISToolkit">
-                                                <rect key="frame" x="0.0" y="28" width="354" height="43.666667938232422"/>
-                                                <autoresizingMask key="autoresizingMask"/>
-                                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="0To-UR-h49" id="h3R-6K-DxX">
-                                                    <rect key="frame" x="0.0" y="0.0" width="354" height="43.666667938232422"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
-                                                    <subviews>
-                                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="4JE-Su-Xpl">
-                                                            <rect key="frame" x="20" y="0.0" width="314" height="43.666667938232422"/>
-                                                            <autoresizingMask key="autoresizingMask"/>
-                                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                            <nil key="textColor"/>
-                                                            <nil key="highlightedColor"/>
-                                                        </label>
-                                                    </subviews>
-                                                </tableViewCellContentView>
-                                                <color key="backgroundColor" systemColor="systemGray6Color"/>
-                                            </tableViewCell>
-                                        </prototypes>
                                     </tableView>
                                     <stackView opaque="NO" contentMode="scaleToFill" alignment="top" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="Cit-1G-9R2">
                                         <rect key="frame" x="21.999999999999993" y="17.999999999999996" width="115.33333333333331" height="36.666666666666657"/>
@@ -128,8 +108,8 @@
                         <gestureRecognizers/>
                         <constraints>
                             <constraint firstItem="Qbg-Bh-unB" firstAttribute="centerX" secondItem="Hf5-Ab-rLC" secondAttribute="centerX" id="3qE-y8-WCL"/>
-                            <constraint firstItem="Qbg-Bh-unB" firstAttribute="leading" secondItem="Hf5-Ab-rLC" secondAttribute="leading" constant="30" id="Gv4-uz-55O"/>
-                            <constraint firstAttribute="trailing" secondItem="Qbg-Bh-unB" secondAttribute="trailing" constant="30" id="Ve2-jm-8BZ"/>
+                            <constraint firstItem="Qbg-Bh-unB" firstAttribute="leading" secondItem="Shm-AL-Qff" secondAttribute="leading" constant="30" id="Gv4-uz-55O"/>
+                            <constraint firstItem="Shm-AL-Qff" firstAttribute="trailing" secondItem="Qbg-Bh-unB" secondAttribute="trailing" constant="30" id="Ve2-jm-8BZ"/>
                             <constraint firstItem="Qbg-Bh-unB" firstAttribute="centerY" secondItem="Hf5-Ab-rLC" secondAttribute="centerY" id="nv4-VL-bQV"/>
                         </constraints>
                     </view>
@@ -240,7 +220,7 @@
                         <outlet property="siteBtn" destination="cQp-cO-G7u" id="Ji2-g9-CO6"/>
                         <outlet property="siteBtnHeight" destination="bAw-GB-siy" id="MWr-qV-w7W"/>
                         <outlet property="siteBtnWidth" destination="cE3-Wx-CLC" id="IpY-j1-6EL"/>
-                        <outlet property="tableViewHeight" destination="zOh-xT-z68" id="aqL-5y-5D7"/>
+                        <outlet property="tableViewHeight" destination="zOh-xT-z68" id="yUs-Sj-I2S"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="U1l-w8-i0i" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

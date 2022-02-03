@@ -1,5 +1,5 @@
 //
-// Copyright 2021 Esri.
+// Copyright 2022 Esri.
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,14 +22,14 @@ final class SiteFacilityPromptViewController: UIViewController {
     var viewModel = FloorFilterViewModel()
     
     /// UI Elements and constraints
-    @IBOutlet weak var siteFacilitySearchBar: UISearchBar!
-    @IBOutlet weak var backBtn: UIButton!
-    @IBOutlet weak var closeBtn: UIButton!
-    @IBOutlet weak var promptTitle: UILabel!
-    @IBOutlet weak var promptSubtitle: UILabel!
-    @IBOutlet weak var promptTitleSubtitleStackView: UIStackView!
-    @IBOutlet weak var siteFacilityTableView: UITableView!
-    @IBOutlet weak var designableViewHeight: NSLayoutConstraint!
+    @IBOutlet var siteFacilitySearchBar: UISearchBar!
+    @IBOutlet var backBtn: UIButton!
+    @IBOutlet var closeBtn: UIButton!
+    @IBOutlet var promptTitle: UILabel!
+    @IBOutlet var promptSubtitle: UILabel!
+    @IBOutlet var promptTitleSubtitleStackView: UIStackView!
+    @IBOutlet var siteFacilityTableView: UITableView!
+    @IBOutlet var designableViewHeight: NSLayoutConstraint!
         
     /// Show the facilities list directly if the map has no sites configured or if there is a previously selected facility.
     private var isShowingFacilities = false
@@ -39,22 +39,29 @@ final class SiteFacilityPromptViewController: UIViewController {
     private var filteredSearchFacilities: [AGSFloorFacility] = []
     private var filteredSearchSites: [AGSFloorSite] = []
     
-    private var selectedSiteIndexPath = IndexPath(row: 0, section: 0)
-    
     private func filteredFacilities() -> [AGSFloorFacility] {
-        return isSearchActive ? filteredSearchFacilities : viewModel.facilities
+        if (isSearchActive) {
+            return filteredSearchFacilities.isEmpty ? viewModel.facilities : filteredSearchFacilities
+        } else {
+            return viewModel.facilities
+        }
     }
     
     private func filteredSites() -> [AGSFloorSite] {
-        return isSearchActive ? filteredSearchSites : viewModel.sites
+        if (isSearchActive) {
+            return filteredSearchSites.isEmpty ? viewModel.sites : filteredSearchSites
+        } else {
+            return viewModel.sites
+        }
     }
     
-    override public func viewWillAppear(_ animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         isShowingFacilities = (viewModel.sites.isEmpty || viewModel.selectedFacility != nil)
+        initializeSiteFacilityTableView()
     }
     
-    override public func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
         initializeSiteFacilityTableView()
         initializeSiteFacilitySearchBar()
@@ -75,9 +82,9 @@ final class SiteFacilityPromptViewController: UIViewController {
     }
     
     @objc func backButtonTapped() {
-        isShowingFacilities = false
         dismissSearchBar()
-        siteFacilityTableView?.reloadRows(at: [selectedSiteIndexPath], with: .none)
+        isShowingFacilities = false
+        siteFacilityTableView?.reloadData()
     }
     
     private func updatePromptTitle() {
@@ -105,25 +112,25 @@ extension SiteFacilityPromptViewController: UISearchBarDelegate {
         siteFacilitySearchBar.tintColor = .customBlue
     }
     
-    public func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
         isSearchActive = true
         siteFacilitySearchBar.showsCancelButton = true
     }
     
-    public func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         isSearchActive = false
         siteFacilitySearchBar.resignFirstResponder()
         siteFacilitySearchBar.endEditing(true)
     }
     
-    public func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         isSearchActive = false
         siteFacilitySearchBar.text = ""
         siteFacilitySearchBar.resignFirstResponder()
         siteFacilitySearchBar.endEditing(true)
     }
     
-    public func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
         isSearchActive = false
         siteFacilitySearchBar.resignFirstResponder()
         siteFacilitySearchBar.endEditing(true)
@@ -150,14 +157,16 @@ extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDe
         siteFacilityTableView.dataSource = self
         siteFacilityTableView.separatorStyle = .none
         siteFacilityTableView.register(UINib(nibName: "FloorFilterSiteFacilityCell", bundle: .module), forCellReuseIdentifier: "FloorFilterSiteFacilityCell")
+        siteFacilityTableView.estimatedRowHeight = 45.0
+        siteFacilityTableView.rowHeight = UITableView.automaticDimension
     }
     
-    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         updatePromptTitle()
         return isShowingFacilities ? filteredFacilities().count : filteredSites().count
     }
     
-    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = siteFacilityTableView.dequeueReusableCell(withIdentifier: "FloorFilterSiteFacilityCell", for: indexPath) as! SiteFacilityTableViewCell
         let sites = filteredSites()
         let facilities = filteredFacilities()
@@ -179,7 +188,6 @@ extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDe
                 cell.siteFacilityDotImg.isHidden = false
                 cell.siteFacilityNameLabel?.font = UIFont.boldSystemFont(ofSize: 16.0)
             }
-            return cell
         } else {
             cell.siteFacilityNameLabel?.text = sites[indexPath.row].name
             cell.accessoryType = .disclosureIndicator
@@ -189,55 +197,50 @@ extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDe
                 cell.siteFacilityDotImg.isHidden = false
                 cell.siteFacilityNameLabel?.font = UIFont.boldSystemFont(ofSize: 16.0)
             }
-            return cell
         }
+        
+        return cell
     }
     
-    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let cell = siteFacilityTableView.cellForRow(at: indexPath) as? SiteFacilityTableViewCell {
-            let sites = filteredSites()
-            let facilities = filteredFacilities()
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let cell = siteFacilityTableView.cellForRow(at: indexPath) as! SiteFacilityTableViewCell
+        let sites = filteredSites()
+        let facilities = filteredFacilities()
             
-            cell.siteFacilityDotImg.isHidden = true
-            cell.siteFacilityNameLabel?.font = UIFont.boldSystemFont(ofSize: 16.0)
+        cell.siteFacilityDotImg.isHidden = true
+        cell.siteFacilityNameLabel?.font = UIFont.boldSystemFont(ofSize: 16.0)
             
-            if (isShowingFacilities) {
-                viewModel.selectedFacility = facilities[indexPath.row]
+        if (isShowingFacilities) {
+            viewModel.selectedFacility = facilities[indexPath.row]
                 
-                // When a facility is selected, reset the previously selected level.
-                viewModel.selectedLevel = nil
+            // When a facility is selected, reset the previously selected level.
+            viewModel.selectedLevel = nil
                     
-                // Close the prompt and zoom to the selected facility.
-                closeSiteFacilityPrompt()
-                viewModel.zoomToSelection()
-                delegate?.siteFacilityIsUpdated(viewModel: viewModel)
+            // Close the prompt and zoom to the selected facility.
+            closeSiteFacilityPrompt()
+            viewModel.zoomToSelection()
+            delegate?.siteFacilityIsUpdated(viewModel: viewModel)
                 
-                // Reset the search bar.
-                resetSearchFilteredResults()
-                dismissSearchBar()
-            } else {
-                viewModel.selectedSite = sites[indexPath.row]
-                selectedSiteIndexPath = indexPath
+            // Reset the search bar.
+            resetSearchFilteredResults()
+            dismissSearchBar()
+        } else {
+            viewModel.selectedSite = sites[indexPath.row]
                 
-                dismissSearchBar()
+            dismissSearchBar()
                 
-                // Zoom to the map to the selected site in case the user closes the prompt without selecting a facility.
-                viewModel.zoomToSelection()
+            // Zoom to the map to the selected site in case the user closes the prompt without selecting a facility.
+            viewModel.zoomToSelection()
                 
-                // Reload the list to show the list of facilities for the selected site.
-                isShowingFacilities = true
-                updatePromptTitle()
-                siteFacilityTableView.reloadData()
-            }
+            // Reload the list to show the list of facilities for the selected site.
+            isShowingFacilities = true
+            updatePromptTitle()
+            siteFacilityTableView.reloadData()
         }
-    }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 45.0
     }
     
     /// Filter the sites or facilities data based on the search query.
-    public func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if (isShowingFacilities) {
             // If the search query is empty then set FilteredSearchFacilities to all the facilities in the data.
             filteredSearchFacilities = searchText.isEmpty ? viewModel.facilities : viewModel.facilities.filter {
