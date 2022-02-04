@@ -346,7 +346,6 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         guard isViewLoaded else { return }
         siteBtn?.backgroundColor = backgroundColor
         closeBtn?.backgroundColor = backgroundColor
-        levelsTableView?.backgroundColor = backgroundColor
     }
     
     /// Add a corner radius for the cells in the levels table.
