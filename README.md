@@ -22,6 +22,7 @@ To use Toolkit in your project:
 * **[Bookmarks](Documentation/Bookmarks)** - Shows bookmarks, from a map, scene, or a list.
 * **[Compass](Documentation/Compass)** - Shows a compass direction when the map is rotated. Auto-hides when the map
   points north up.
+* **[FloorFilter](Documentation/FloorFilter)** - Allows to filter floor plan data in a geo view by a site, a building in the site, or a floor in the building. 
 * **[JobManager](Documentation/JobManager)** - Suspends and resumes ArcGIS Runtime tasks when the app is background,
   terminated, and relaunched.
 * **[LegendViewController](Documentation/LegendViewController)** - Displays a legend for all the layers in a map or

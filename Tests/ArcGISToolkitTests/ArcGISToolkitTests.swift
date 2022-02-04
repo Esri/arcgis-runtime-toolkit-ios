@@ -61,6 +61,10 @@ class ArcGISToolkitTests: XCTestCase {
         let bookmark = AGSBookmark(name: "Barcelona", viewpoint: AGSViewpoint(latitude: 41.385063, longitude: 2.173404, scale: 6e5))
         bookmarksVC = BookmarksViewController(bookmarks: [bookmark])
         XCTAssertNotNil(bookmarksVC)
+        
+        // FloorFilterView
+        let floorFilterVC = FloorFilterViewController.makeFloorFilterView(geoView: AGSMapView(frame: .zero))
+        XCTAssertNotNil(floorFilterVC)
     }
 }
 
