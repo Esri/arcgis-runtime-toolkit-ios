@@ -177,7 +177,7 @@ extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDe
         }
             
         cell.siteFacilityDotImg.isHidden = true
-        cell.siteFacilityNameLabel?.font = UIFont(name:"Avenir", size:16)
+        cell.siteFacilityNameLabel?.font = UIFont(name: "Avenir", size: 16)
             
         if (isShowingFacilities) {
             cell.siteFacilityNameLabel.text = facilities[indexPath.row].name

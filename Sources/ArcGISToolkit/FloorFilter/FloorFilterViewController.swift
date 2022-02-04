@@ -215,6 +215,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         initializeLevelsTableView()
         initializeButtonsClickListeners()
         buttonSizeDidChange()
+        backgroundColorDidChange()
         
         // Update the views that are visibile and their heights based on the state of the Floor Filter.
         updateViewsVisibilityForState(state: state)
@@ -240,13 +241,13 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     
     private func initializeSiteButton() {
         // Enable the site button if both the floor manager and the map is loaded.
-        if (viewModel.floorManager != nil && (geoView as? AGSMapView)?.map?.loadStatus == .loaded) {
+        let emptySites = viewModel.sites.isEmpty
+        let emptyFacilities = viewModel.facilities.isEmpty
+        if (viewModel.floorManager != nil && (geoView as? AGSMapView)?.map?.loadStatus == .loaded && (!emptySites || !emptyFacilities)) {
             addShadow()
-            siteBtn.backgroundColor = backgroundColor.withAlphaComponent(0.9)
-            siteBtn.isUserInteractionEnabled = true
+            siteBtn.isEnabled = true
         } else {
-            siteBtn.backgroundColor = UIColor.systemGray
-            siteBtn.isUserInteractionEnabled = false
+            siteBtn.isEnabled = false
         }
     }
     
@@ -275,13 +276,11 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     
     @objc func showSiteFacilityPrompt(sender: UIButton) {
         // Only show the prompt if there sites or facilities data
-        if (!viewModel.sites.isEmpty || !viewModel.facilities.isEmpty) {
-            let siteFacilityPromptVC = storyboard!.instantiateViewController(identifier: "SiteFacilityPromptVC") as! SiteFacilityPromptViewController
-            siteFacilityPromptVC.modalPresentationStyle = .automatic
-            present(siteFacilityPromptVC, animated: true)
-            siteFacilityPromptVC.delegate = self
-            siteFacilityPromptVC.viewModel = viewModel
-        }
+        let siteFacilityPromptVC = storyboard!.instantiateViewController(identifier: "SiteFacilityPromptVC") as! SiteFacilityPromptViewController
+        siteFacilityPromptVC.modalPresentationStyle = .automatic
+        present(siteFacilityPromptVC, animated: true)
+        siteFacilityPromptVC.delegate = self
+        siteFacilityPromptVC.viewModel = viewModel
     }
     
     @objc func collapseLevelsList(sender: UIButton) {
@@ -308,7 +307,6 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         case .partiallyExpanded:
             closeBtn?.isHidden = true
             levelsTableView?.isHidden = false
-            siteBtnHeight.constant = buttonSize.height
             tableViewHeight.constant = buttonSize.height
         case .initiallyCollapsed:
             closeBtn?.isHidden = true
@@ -420,8 +418,6 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
 }
 
 extension FloorFilterViewController: UITableViewDataSource, UITableViewDelegate {
-    
-    
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return state == .partiallyExpanded ? 1 : viewModel.visibleLevelsInExpandedList.count
     }
@@ -447,7 +443,7 @@ extension FloorFilterViewController: UITableViewDataSource, UITableViewDelegate 
         let visibleLevelVerticalOrder = levels.first(where: \.isVisible)?.verticalOrder
         if let text = cell.textLabel?.text,
            levels.contains(where: { level in
-            level.verticalOrder == visibleLevelVerticalOrder && level.shortName == text
+                level.verticalOrder == visibleLevelVerticalOrder && level.shortName == text
            }) {
             cell.backgroundColor = selectionColor
             cell.textLabel?.textColor = selectedTextColor
