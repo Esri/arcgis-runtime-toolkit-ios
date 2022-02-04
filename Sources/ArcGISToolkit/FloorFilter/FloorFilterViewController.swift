@@ -240,9 +240,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     
     private func initializeSiteButton() {
         // Enable the site button if both the floor manager and the map is loaded.
-        let hasSites = !viewModel.sites.isEmpty
-        let hasFacilities = !viewModel.facilities.isEmpty
-        if (viewModel.floorManager != nil && (geoView as? AGSMapView)?.map?.loadStatus == .loaded && (hasSites || hasFacilities)) {
+        if (viewModel.floorManager != nil && (geoView as? AGSMapView)?.map?.loadStatus == .loaded) {
             addShadow()
             siteBtn.backgroundColor = backgroundColor.withAlphaComponent(0.9)
             siteBtn.isUserInteractionEnabled = true
@@ -276,11 +274,14 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     }
     
     @objc func showSiteFacilityPrompt(sender: UIButton) {
-        let siteFacilityPromptVC = storyboard!.instantiateViewController(identifier: "SiteFacilityPromptVC") as! SiteFacilityPromptViewController
-        siteFacilityPromptVC.modalPresentationStyle = .automatic
-        present(siteFacilityPromptVC, animated: true)
-        siteFacilityPromptVC.delegate = self
-        siteFacilityPromptVC.viewModel = viewModel
+        // Only show the prompt if there sites or facilities data
+        if (!viewModel.sites.isEmpty || !viewModel.facilities.isEmpty) {
+            let siteFacilityPromptVC = storyboard!.instantiateViewController(identifier: "SiteFacilityPromptVC") as! SiteFacilityPromptViewController
+            siteFacilityPromptVC.modalPresentationStyle = .automatic
+            present(siteFacilityPromptVC, animated: true)
+            siteFacilityPromptVC.delegate = self
+            siteFacilityPromptVC.viewModel = viewModel
+        }
     }
     
     @objc func collapseLevelsList(sender: UIButton) {
