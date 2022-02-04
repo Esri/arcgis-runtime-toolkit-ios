@@ -240,7 +240,9 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     
     private func initializeSiteButton() {
         // Enable the site button if both the floor manager and the map is loaded.
-        if (viewModel.floorManager != nil && (geoView as? AGSMapView)?.map?.loadStatus == .loaded) {
+        let hasSites = !viewModel.sites.isEmpty
+        let hasFacilities = !viewModel.facilities.isEmpty
+        if (viewModel.floorManager != nil && (geoView as? AGSMapView)?.map?.loadStatus == .loaded && (hasSites || hasFacilities)) {
             addShadow()
             siteBtn.backgroundColor = backgroundColor.withAlphaComponent(0.9)
             siteBtn.isUserInteractionEnabled = true
@@ -261,7 +263,6 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     private func initializeLevelsTableView() {
         levelsTableView.delegate = self
         levelsTableView.dataSource = self
-        levelsTableView.separatorStyle = .none
     }
     
     private func buttonSizeDidChange() {
@@ -274,19 +275,15 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         closeBtnHeight.constant = buttonSize.height * 0.75
     }
     
-    @objc func showSiteFacilityPrompt(sender: UITapGestureRecognizer) {
-        let storyboard = UIStoryboard(name: "FloorFilter", bundle: .module)
-        
-        if (!viewModel.sites.isEmpty || !viewModel.facilities.isEmpty) {
-            let siteFacilityPromptVC = storyboard.instantiateViewController(identifier: "SiteFacilityPromptVC") as! SiteFacilityPromptViewController
-            siteFacilityPromptVC.modalPresentationStyle = .automatic
-            present(siteFacilityPromptVC, animated: true)
-            siteFacilityPromptVC.delegate = self
-            siteFacilityPromptVC.viewModel = viewModel
-        }
+    @objc func showSiteFacilityPrompt(sender: UIButton) {
+        let siteFacilityPromptVC = storyboard!.instantiateViewController(identifier: "SiteFacilityPromptVC") as! SiteFacilityPromptViewController
+        siteFacilityPromptVC.modalPresentationStyle = .automatic
+        present(siteFacilityPromptVC, animated: true)
+        siteFacilityPromptVC.delegate = self
+        siteFacilityPromptVC.viewModel = viewModel
     }
     
-    @objc func collapseLevelsList(sender: UITapGestureRecognizer) {
+    @objc func collapseLevelsList(sender: UIButton) {
         state = .partiallyExpanded
         self.levelsTableView.reloadData()
     }
@@ -320,7 +317,13 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     
     func siteFacilityIsUpdated(viewModel: FloorFilterViewModel) {
         self.viewModel = viewModel
-        state = .fullyExpanded
+        // if no facility is selected, then set the state to initially collapsed
+        if (viewModel.selectedFacility != nil) {
+            state = .fullyExpanded
+        } else {
+            state = .initiallyCollapsed
+        }
+       
         self.levelsTableView.reloadData()
     }
     
@@ -441,15 +444,16 @@ extension FloorFilterViewController: UITableViewDataSource, UITableViewDelegate 
         }
         
         let visibleLevelVerticalOrder = levels.first(where: \.isVisible)?.verticalOrder
-        let levelShortNames = levels.filter { $0.verticalOrder == visibleLevelVerticalOrder }.map { $0.shortName }
-        if (levelShortNames.contains(cell.textLabel?.text ?? "")) {
+        if let text = cell.textLabel?.text,
+           levels.contains(where: { level in
+            level.verticalOrder == visibleLevelVerticalOrder && level.shortName == text
+           }) {
             cell.backgroundColor = selectionColor
             cell.textLabel?.textColor = selectedTextColor
         } else {
             cell.backgroundColor = backgroundColor
             cell.textLabel?.textColor = unselectedTextColor
         }
-       
         return cell
     }
     
@@ -477,7 +481,7 @@ extension FloorFilterViewController: UITableViewDataSource, UITableViewDelegate 
 }
 
 /// Extension for UIView to add corner radius
-extension UIView {
+private extension UIView {
     func cornerRadius(usingCorners corners: UIRectCorner, cornerRadii: CGSize) {
         let path = UIBezierPath(roundedRect: self.bounds, byRoundingCorners: corners, cornerRadii: cornerRadii)
         let maskLayer = CAShapeLayer()

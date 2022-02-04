@@ -63,8 +63,9 @@ final class FloorFilterViewModel {
     /// Gets the default level for a facility
     /// Uses level with vertical order 0 otherwise gets the lowest level
     func defaultLevel(for facility: AGSFloorFacility?) -> AGSFloorLevel? {
-        let candidateLevels = allLevels.filter { $0.facility == facility }
-        return candidateLevels.first { $0.verticalOrder == 0 } ?? lowestLevel()
+        return allLevels.first(where: { level in
+            level.facility == facility && level.verticalOrder == .zero
+        }) ?? lowestLevel()
     }
     
     /// Returns the AGSFloorLevel with the lowest verticalOrder.

@@ -41,7 +41,7 @@ final class SiteFacilityPromptViewController: UIViewController {
     
     private func filteredFacilities() -> [AGSFloorFacility] {
         if (isSearchActive) {
-            return filteredSearchFacilities.isEmpty ? viewModel.facilities : filteredSearchFacilities
+            return filteredSearchFacilities
         } else {
             return viewModel.facilities
         }
@@ -49,7 +49,7 @@ final class SiteFacilityPromptViewController: UIViewController {
     
     private func filteredSites() -> [AGSFloorSite] {
         if (isSearchActive) {
-            return filteredSearchSites.isEmpty ? viewModel.sites : filteredSearchSites
+            return filteredSearchSites
         } else {
             return viewModel.sites
         }
@@ -226,11 +226,14 @@ extension SiteFacilityPromptViewController: UITableViewDataSource, UITableViewDe
             dismissSearchBar()
         } else {
             viewModel.selectedSite = sites[indexPath.row]
+            viewModel.selectedFacility = nil
+            viewModel.selectedLevel = nil
                 
             dismissSearchBar()
                 
             // Zoom to the map to the selected site in case the user closes the prompt without selecting a facility.
             viewModel.zoomToSelection()
+            delegate?.siteFacilityIsUpdated(viewModel: viewModel)
                 
             // Reload the list to show the list of facilities for the selected site.
             isShowingFacilities = true
