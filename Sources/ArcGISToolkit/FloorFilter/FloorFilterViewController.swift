@@ -278,9 +278,9 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         // Only show the prompt if there sites or facilities data
         let siteFacilityPromptVC = storyboard!.instantiateViewController(identifier: "SiteFacilityPromptVC") as! SiteFacilityPromptViewController
         siteFacilityPromptVC.modalPresentationStyle = .automatic
-        present(siteFacilityPromptVC, animated: true)
         siteFacilityPromptVC.delegate = self
         siteFacilityPromptVC.viewModel = viewModel
+        present(siteFacilityPromptVC, animated: true)
     }
     
     @objc func collapseLevelsList(sender: UIButton) {
