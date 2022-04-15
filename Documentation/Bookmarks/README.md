@@ -2,7 +2,7 @@
 
 The Bookmarks component will display a list of bookmarks in a table view and allows the user to select a bookmark and perform some action. 
 
-## Bookmarks Behavior:
+## Bookmarks Behavior
 
 The `BookmarksTableViewController` can be created using either an `AGSGeoView` or an array of `AGSBookmark`s.
 
