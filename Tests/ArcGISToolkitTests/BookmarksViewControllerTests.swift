@@ -17,6 +17,10 @@ import ArcGISToolkit
 import ArcGIS
 
 class BookmarksViewControllerTests: XCTestCase {
+    override func setUp() async throws {
+        AGSArcGISRuntimeEnvironment.apiKey = "<#API Key#>"
+    }
+    
     /// Tests the creation of the `BookmarksViewController` using a list of `AGSBookmark`.
     func testBookmarksList() {
         let bookmarks = generateBookmarks()
