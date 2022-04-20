@@ -83,7 +83,7 @@ minor edits to the [swift package](Package.swift).
 
 ## Configure API Key
 
-Some of the Toolkit components and examples utilize ArcGIS Platform location services and therefore require an API Key to be set in `AppDelegate.swift`. Please see the [setup guide](https://developers.arcgis.com/ios/get-started/#3-access-services-and-content-with-an-api-key) for more information.
+Some of the toolkit components and examples utilize a set of ready-to-use ArcGIS Platform services, including basemaps, and therefore require an API Key to be set in `AppDelegate.swift`. Please see the [setup guide](https://developers.arcgis.com/ios/get-started/#3-access-services-and-content-with-an-api-key) for more information.
 
 ## SwiftLint
 
