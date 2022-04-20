@@ -17,6 +17,10 @@ import ArcGISToolkit
 import ArcGIS
 
 class BookmarksViewControllerTests: XCTestCase {
+    override func setUp() async throws {
+        AGSArcGISRuntimeEnvironment.apiKey = "<#API Key#>"
+    }
+    
     /// Tests the creation of the `BookmarksViewController` using a list of `AGSBookmark`.
     func testBookmarksList() {
         let bookmarks = generateBookmarks()
@@ -27,7 +31,7 @@ class BookmarksViewControllerTests: XCTestCase {
     /// Tests the creation of the `BookmarksViewController` using an `AGSMapView` by verifying the `bookmarks` property returns the correct number of bookmarks.
     func testBookmarksMapView() {
         let mapView = AGSMapView()
-        let map = AGSMap(basemap: .streets())
+        let map = AGSMap(basemapStyle: .arcGISStreets)
         mapView.map = map
         
         let bookmarks = generateBookmarks()
@@ -44,7 +48,7 @@ class BookmarksViewControllerTests: XCTestCase {
     /// Tests the ability to detect changes to the map and bookmarks array in order to update the list of bookmarks.
     func testChangeMapAndBookmarks() {
         let mapView = AGSMapView()
-        let map = AGSMap(basemap: .streets())
+        let map = AGSMap(basemapStyle: .arcGISStreets)
         mapView.map = map
 
         let bookmarks = generateBookmarks()
@@ -57,7 +61,7 @@ class BookmarksViewControllerTests: XCTestCase {
         let bookmarksVC = BookmarksViewController(geoView: mapView)
         
         // Change the map.
-        let newMap = AGSMap(basemap: .imagery())
+        let newMap = AGSMap(basemapStyle: .arcGISImagery)
         newMap.bookmarks.add(AGSBookmark(name: "Mysterious Desert Pattern", viewpoint: AGSViewpoint(latitude: 27.3805833, longitude: 33.6321389, scale: 6e3)))
         mapView.map = newMap
         
@@ -81,7 +85,7 @@ class BookmarksViewControllerTests: XCTestCase {
     /// Tests the creation of the `BookmarksViewController` using an `AGSSceneView` by verifying the `bookmarks` property returns the correct number of bookmarks
     func testBookmarksSceneView() {
         let sceneView = AGSSceneView()
-        let scene = AGSScene(basemap: .streets())
+        let scene = AGSScene(basemapStyle: .arcGISStreets)
         sceneView.scene = scene
 
         let bookmarks = generateBookmarks()
@@ -98,7 +102,7 @@ class BookmarksViewControllerTests: XCTestCase {
     /// Tests the ability to detect changes to the scene and bookmarks array in order to update the list of bookmarks.
     func testChangeSceneAndBookmarks() {
         let sceneView = AGSSceneView()
-        let scene = AGSScene(basemap: .streets())
+        let scene = AGSScene(basemapStyle: .arcGISStreets)
         sceneView.scene = scene
         
         let bookmarks = generateBookmarks()
@@ -111,7 +115,7 @@ class BookmarksViewControllerTests: XCTestCase {
         let bookmarksVC = BookmarksViewController(geoView: sceneView)
         
         // Change the scene.
-        let newScene = AGSScene(basemap: .imagery())
+        let newScene = AGSScene(basemapStyle: .arcGISImagery)
         newScene.bookmarks.add(AGSBookmark(name: "Mysterious Desert Pattern", viewpoint: AGSViewpoint(latitude: 27.3805833, longitude: 33.6321389, scale: 6e3)))
         sceneView.scene = newScene
         
@@ -135,7 +139,7 @@ class BookmarksViewControllerTests: XCTestCase {
     /// Tests changing the mapView and ensuring the `bookmarks` property is updated.
     func testChangeMapView() {
         let mapView = AGSMapView()
-        let map = AGSMap(basemap: .streets())
+        let map = AGSMap(basemapStyle: .arcGISStreets)
         mapView.map = map
 
         let bookmarks = generateBookmarks()
@@ -152,7 +156,7 @@ class BookmarksViewControllerTests: XCTestCase {
 
         // Change the mapView.
         let newMapView = AGSMapView()
-        let newMap = AGSMap(basemap: .imagery())
+        let newMap = AGSMap(basemapStyle: .arcGISImagery)
         newMapView.map = newMap
 
         // Create a new array of `AGSBookmark` and add to map.
@@ -173,7 +177,7 @@ class BookmarksViewControllerTests: XCTestCase {
     /// Tests changing the sceneView and ensuring the `bookmarks` property is updated.
     func testChangeSceneView() {
         let sceneView = AGSSceneView()
-        let scene = AGSScene(basemap: .streets())
+        let scene = AGSScene(basemapStyle: .arcGISStreets)
         sceneView.scene = scene
         
         let bookmarks = generateBookmarks()
@@ -190,7 +194,7 @@ class BookmarksViewControllerTests: XCTestCase {
 
         // Change the sceneView.
         let newSceneView = AGSSceneView()
-        let newScene = AGSScene(basemap: .imagery())
+        let newScene = AGSScene(basemapStyle: .arcGISImagery)
         newSceneView.scene = newScene
 
         // Create a new array of `AGSBookmark` and add to map.

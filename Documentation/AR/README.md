@@ -35,7 +35,7 @@ NSLayoutConstraint.activate([
 
 
 // Create a simple scene.
-arView.sceneView.scene = AGSScene(basemapType: .imagery)
+arView.sceneView.scene = AGSScene(basemapStyle: .arcGISImagery)
 
 // Set a AGSCLLocationDataSource, used to get our initial real-world location.
 arView.locationDataSource = AGSCLLocationDataSource()

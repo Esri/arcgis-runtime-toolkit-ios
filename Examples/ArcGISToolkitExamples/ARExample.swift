@@ -506,7 +506,7 @@ extension ARExample {
     /// - Returns: The new scene.
     private func streetsScene() -> AGSScene {
         // Create scene with the streets basemap.
-        let scene = AGSScene(basemapType: .streets)
+        let scene = AGSScene(basemapStyle: .arcGISStreets)
         scene.addElevationSource()
         
         // Set the location data source so we use our GPS location as the originCamera.
@@ -521,7 +521,7 @@ extension ARExample {
     /// - Returns: The new scene.
     private func imageryScene() -> AGSScene {
         // Create scene with the streets basemap.
-        let scene = AGSScene(basemapType: .imageryWithLabels)
+        let scene = AGSScene(basemapStyle: .arcGISImagery)
         scene.addElevationSource()
         
         // Set the location data source so we use our GPS location as the originCamera.
