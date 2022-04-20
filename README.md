@@ -81,6 +81,10 @@ The *ArcGIS Runtime Toolkit for iOS* has a *Target SDK* version of *13.0*, meani
 Note: The manual installation method also allows you to use a local installation ArcGIS Runtime SDK for iOS by making
 minor edits to the [swift package](Package.swift).
 
+## Configure API Key
+
+Some of the toolkit components and examples utilize a set of ready-to-use ArcGIS Platform services, including basemaps, and therefore require an API Key to be set in `AppDelegate.swift`. Please see the [setup guide](https://developers.arcgis.com/ios/get-started/#3-access-services-and-content-with-an-api-key) for more information.
+
 ## SwiftLint
 
 Both the Toolkit and Examples app support SwiftLint.  You can install SwiftLint from
@@ -108,7 +112,7 @@ contributing](https://github.com/esri/contributing).
 
 ## Licensing
 
-Copyright 2017 - 2021 Esri
+Copyright 2017 - 2022 Esri
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
 License. You may obtain a copy of the License at
