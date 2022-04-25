@@ -35,7 +35,7 @@ class ARExample: UIViewController {
     private let arView = ArcGISARView(renderVideoFeed: true)
     
     /// Denotes whether we've placed the scene in table top experiences.
-    private var didPlaceScene: Bool = false
+    private var didPlaceScene = false
 
     // View controller displaying current status of `ARExample`.
     private let statusViewController: ARStatusViewController? = {
