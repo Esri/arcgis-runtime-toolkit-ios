@@ -35,7 +35,7 @@ class ARExample: UIViewController {
     private let arView = ArcGISARView(renderVideoFeed: true)
     
     /// Denotes whether we've placed the scene in table top experiences.
-    private var didPlaceScene: Bool = false
+    private var didPlaceScene = false
 
     // View controller displaying current status of `ARExample`.
     private let statusViewController: ARStatusViewController? = {
@@ -67,10 +67,10 @@ class ARExample: UIViewController {
     private var toolbar = UIToolbar(frame: .zero)
     
     /// Button used to display the `CalibrationView`.
-    private let calibrationItem = UIBarButtonItem(title: "Calibration", style: .plain, target: self, action: #selector(displayCalibration(_:)))
+    private let calibrationItem = UIBarButtonItem(title: "Calibration", style: .plain, target: ARExample.self, action: #selector(displayCalibration(_:)))
     
     /// Button used to change the current scene.
-    private let sceneItem = UIBarButtonItem(title: "Change Scene", style: .plain, target: self, action: #selector(changeScene(_:)))
+    private let sceneItem = UIBarButtonItem(title: "Change Scene", style: .plain, target: ARExample.self, action: #selector(changeScene(_:)))
     
     // MARK: Initialization
     
