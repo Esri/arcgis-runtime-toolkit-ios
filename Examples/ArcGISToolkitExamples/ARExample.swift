@@ -67,10 +67,10 @@ class ARExample: UIViewController {
     private var toolbar = UIToolbar(frame: .zero)
     
     /// Button used to display the `CalibrationView`.
-    private let calibrationItem = UIBarButtonItem(title: "Calibration", style: .plain, target: self, action: #selector(displayCalibration(_:)))
+    private let calibrationItem = UIBarButtonItem(title: "Calibration", style: .plain, target: ARExample.self, action: #selector(displayCalibration(_:)))
     
     /// Button used to change the current scene.
-    private let sceneItem = UIBarButtonItem(title: "Change Scene", style: .plain, target: self, action: #selector(changeScene(_:)))
+    private let sceneItem = UIBarButtonItem(title: "Change Scene", style: .plain, target: ARExample.self, action: #selector(changeScene(_:)))
     
     // MARK: Initialization
     
