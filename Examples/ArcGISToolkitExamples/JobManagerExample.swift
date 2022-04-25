@@ -405,6 +405,8 @@ extension AGSJobStatus {
             return "Succeeded"
         case .started:
             return "Started"
+        case .canceling:
+            return "Canceling"
         @unknown default:
             fatalError("Unknown AGSJobStatus")
         }
