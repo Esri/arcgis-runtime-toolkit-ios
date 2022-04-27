@@ -19,7 +19,7 @@ import ArcGISToolkit
 /// A view displaying controls for adjusting a scene view's location, heading, and elevation. Used to calibrate an AR session.
 class CalibrationView: UIView {
     /// Denotes whether to show the elevation control and label; defaults to `true`.
-    var elevationControlVisibility: Bool = true {
+    var elevationControlVisibility = true {
         didSet {
             elevationSlider.isHidden = !elevationControlVisibility
             elevationLabel.isHidden = !elevationControlVisibility

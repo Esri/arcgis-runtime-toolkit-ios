@@ -46,7 +46,7 @@ let package = Package(
         .package(
             name: "arcgis-runtime-ios",
             // path: localArcGISPackage
-            url: "https://github.com/Esri/arcgis-runtime-ios", .upToNextMinor(from: "100.13.0")
+            url: "https://github.com/Esri/arcgis-runtime-ios", .upToNextMinor(from: "100.14.0")
         )
     ],
     targets: [

@@ -290,8 +290,9 @@ public class ArcGISARView: UIView {
     /// - Since: 100.6.0
     public func stopTracking() {
         arSCNView.session.pause()
-        locationDataSource?.stop()
-        isTracking = false
+        locationDataSource?.stop { [weak self] in
+            self?.isTracking = false
+        }
     }
     
     // MARK: Private
@@ -528,7 +529,7 @@ extension ArcGISARView: AGSLocationChangeHandlerDelegate {
 
         if locationTrackingMode != .continuous {
             // Stop the data source if the tracking mode is not continuous.
-            locationDataSource.stop()
+            locationDataSource.stop(completion: nil)
         }
         
         locationChangeHandlerDelegate?.locationDataSource?(locationDataSource, locationDidChange: location)

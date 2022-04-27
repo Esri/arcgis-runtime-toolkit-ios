@@ -3,6 +3,7 @@
 * [Augmented reality (AR)](AR) - Integrates the scene view with ARKit to enable augmented reality (AR).
 * [Bookmarks](Bookmarks) - Shows bookmarks, from a map, scene, or a list.
 * [Compass](Compass) - Shows a compass direction when the map is rotated. Auto-hides when the map points north up.
+* [FloorFilter](FloorFilter) - Allows to filter floor plan data in a geo view by a site, a building in the site, or a floor in the building. 
 * [JobManager](JobManager) - Suspends and resumes ArcGIS Runtime tasks when the app is background, terminated, and relaunched.
 * [LegendViewController](LegendViewController) - Displays a legend for all the layers in a map or scene contained in an `AGSGeoView`.
 * [MeasureToolbar](MeasureToolbar) - Allows measurement of distances and areas on the map view.
