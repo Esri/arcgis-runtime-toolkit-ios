@@ -43,7 +43,7 @@ To use Toolkit in your project:
 * Xcode 13.0 (or higher)
 
 The *ArcGIS Runtime Toolkit for iOS* has a *Target SDK* version of *13.0*, meaning that it can run on devices with *iOS
-13.0* or newer.
+14.0* or newer.
 
 ## Instructions
 
