@@ -56,33 +56,33 @@ User can control whether to show `Slider` and/or `Playback Buttons` using `isSli
 Initialize TimeSlider and add constraints to position it.
 
 ```swift
-    // Configure time slider
-    let timeSlider = TimeSlider()
-    timeSlider.labelMode = .ticks
-    timeSlider.addTarget(self, action: #selector(TimeSliderExample.timeSliderValueChanged(timeSlider:)), for: .valueChanged)
-    view.addSubview(timeSlider)
+// Configure time slider
+let timeSlider = TimeSlider()
+timeSlider.labelMode = .ticks
+timeSlider.addTarget(self, action: #selector(TimeSliderExample.timeSliderValueChanged(timeSlider:)), for: .valueChanged)
+view.addSubview(timeSlider)
 
-    // Add constraints to position the slider
-    let margin: CGFloat = 10.0
-    timeSlider.translatesAutoresizingMaskIntoConstraints = false
-    timeSlider.bottomAnchor.constraint(equalTo: mapView.attributionTopAnchor, constant: -margin).isActive = true
+// Add constraints to position the slider
+let margin: CGFloat = 10.0
+timeSlider.translatesAutoresizingMaskIntoConstraints = false
+timeSlider.bottomAnchor.constraint(equalTo: mapView.attributionTopAnchor, constant: -margin).isActive = true
 
-    if #available(iOS 11.0, *) {
-        timeSlider.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: margin).isActive = true
-        timeSlider.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -margin).isActive = true
-    }
-    else {
-        timeSlider.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: margin).isActive = true
-        timeSlider.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -margin).isActive = true
-    }
+if #available(iOS 11.0, *) {
+    timeSlider.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: margin).isActive = true
+    timeSlider.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -margin).isActive = true
+}
+else {
+    timeSlider.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: margin).isActive = true
+    timeSlider.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -margin).isActive = true
+}
 ```
 
 Use one of three initialize helper function to setup properties of the Time Slider.
 
 ```swift
-    public func initializeTimeProperties(geoView: AGSGeoView, observeGeoView: Bool, completion: @escaping (Error?)->Void)
-    public func initializeTimeProperties(timeAwareLayer: AGSTimeAware, completion: @escaping (Error?)->Void)
-    public func initializeTimeSteps(timeStepCount: Int, fullExtent: AGSTimeExtent, completion: @escaping (Error?)->Void)
+public func initializeTimeProperties(geoView: AGSGeoView, observeGeoView: Bool, completion: @escaping (Error?)->Void)
+public func initializeTimeProperties(timeAwareLayer: AGSTimeAware, completion: @escaping (Error?)->Void)
+public func initializeTimeSteps(timeStepCount: Int, fullExtent: AGSTimeExtent, completion: @escaping (Error?)->Void)
 ```
 
 To see it in action, try out the [Examples](../../Examples) and refer to [TimeSliderExample.swift](../../Examples/ArcGISToolkitExamples/TimeSliderExample.swift) in the project.
@@ -122,5 +122,3 @@ You can customize many visual elements of the TimeSlider such as -
 * `layerExtentFillColor`
 * `trackHeight`
 * `theme`
-
-
