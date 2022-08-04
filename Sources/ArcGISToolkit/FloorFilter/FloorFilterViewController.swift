@@ -203,7 +203,7 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
     
     override public func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        // Update the views that are visibile and their heights based on the state of the Floor Filter.
+        // Update the views that are visible and their heights based on the state of the Floor Filter.
         updateViewsVisibilityForState(state: state)
     }
     
@@ -217,10 +217,10 @@ public class FloorFilterViewController: UIViewController, FloorFilterViewControl
         buttonSizeDidChange()
         backgroundColorDidChange()
         
-        // Update the views that are visibile and their heights based on the state of the Floor Filter.
+        // Update the views that are visible and their heights based on the state of the Floor Filter.
         updateViewsVisibilityForState(state: state)
         
-        // Adjust the constraints and order of the views in the Floor Filter if placement is on top or bottom of the sceen.
+        // Adjust the constraints and order of the views in the Floor Filter if placement is on top or bottom of the scene.
         adjustConstraintsBasedOnPlacement()
     }
     

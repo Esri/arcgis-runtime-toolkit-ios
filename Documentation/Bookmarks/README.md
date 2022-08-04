@@ -8,7 +8,7 @@ The `BookmarksTableViewController` can be created using either an `AGSGeoView` o
 
 Clients must set the `delegate` property and implement the `bookmarksViewController:didSelect` delegate method in order to be notified when a bookmark is selected.
 
-The `BookmarksTableViewController` observes changes to the `map` or `scene` property on the `AGSGeoView` and also the map or scene's `bookmarks` property and will udpate the list of bookmarks accordingly.
+The `BookmarksTableViewController` observes changes to the `map` or `scene` property on the `AGSGeoView` and also the map or scene's `bookmarks` property and will update the list of bookmarks accordingly.
 
 ## Usage
 
