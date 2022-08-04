@@ -86,7 +86,7 @@ class ARExample: UIViewController {
         // Set ourself as location change delegate so we can get location data source events.
         arView.locationChangeHandlerDelegate = self
         
-        // Disble user interactions on the sceneView.
+        // Disable user interactions on the sceneView.
         arView.sceneView.interactionOptions.isEnabled = false
         
         // Set ourself as the ARKit session delegate.
@@ -406,7 +406,7 @@ extension ARExample: AGSGeoViewTouchDelegate {
             // We're in full-scale AR mode or have already placed the scene. Get the real world location for screen point from arView.
             guard let point = arView.arScreenToLocation(screenPoint: screenPoint) else { return }
             
-            // Create and place a graphic and shadown at the real world location.
+            // Create and place a graphic and shadow at the real world location.
             let shadowColor = UIColor.lightGray.withAlphaComponent(0.5)
             let shadow = AGSSimpleMarkerSceneSymbol(style: .sphere, color: shadowColor, height: 0.01, width: 0.25, depth: 0.25, anchorPosition: .center)
             let shadowGraphic = AGSGraphic(geometry: point, symbol: shadow)
@@ -455,7 +455,7 @@ extension ARExample {
             case .excessiveMotion:
                 message = "Try moving your device more slowly."
             case .initializing:
-                // Because ARKit gets reset often when using continuous GPS, only dipslay initializing message if we're not in continuous tracking mode.
+                // Because ARKit gets reset often when using continuous GPS, only display initializing message if we're not in continuous tracking mode.
                 if let sceneInfo = currentSceneInfo, sceneInfo.trackingMode != .continuous {
                     message = "Keep moving your device."
                 } else {
@@ -497,7 +497,7 @@ extension ARExample {
 // MARK: Scene creation methods
 extension ARExample {
     //
-    // These methods create the scenes and perform other intitialization required to set up the AR experiences.
+    // These methods create the scenes and perform other initialization required to set up the AR experiences.
     //
     
     /// Creates a scene based on the Streets base map.
