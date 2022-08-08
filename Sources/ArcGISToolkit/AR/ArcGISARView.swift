@@ -330,8 +330,14 @@ public class ArcGISARView: UIView {
     /// - Parameter screenPoint: The screen point to determine the real world transformation matrix from.
     /// - Returns: An `AGSTransformationMatrix` representing the real-world point corresponding to `screenPoint`.
     fileprivate func internalHitTest(screenPoint: CGPoint) -> AGSTransformationMatrix? {
-        // Use the `hitTest` method on ARSCNView to get the location of `screenPoint`.
-        let results = arSCNView.hitTest(screenPoint, types: .existingPlaneUsingExtent)
+        // Use the `raycastQuery` method on ARSCNView to get the location of `screenPoint`.
+        guard let query = arSCNView.raycastQuery(
+            from: screenPoint,
+            allowing: .existingPlaneGeometry,
+            alignment: .any
+        ) else { return nil }
+        
+        let results = arSCNView.session.raycast(query)
         
         // Get the worldTransform from the first result; if there's no worldTransform, return nil.
         guard let worldTransform = results.first?.worldTransform else { return nil }
@@ -347,7 +353,7 @@ public class ArcGISARView: UIView {
                                                     translationX: Double(worldTransform.columns.3.x),
                                                     translationY: Double(worldTransform.columns.3.y),
                                                     translationZ: Double(worldTransform.columns.3.z))
-
+        
         return hitTestMatrix
     }
 }
