@@ -14,7 +14,7 @@
 
 import UIKit
 
-/// A custom view for dislaying directions to the user.
+/// A custom view for displaying directions to the user.
 class UserDirectionsView: UIVisualEffectView {
     private let userDirectionsLabel: UILabel = {
         let label = UILabel(frame: .zero)

@@ -13,13 +13,8 @@ When the compass is tapped, the map orients back to north (zero bearing), the de
 ### Usage
 
 ```swift
-
-        let compass = Compass(mapView: mapView)
-        self.view.addSubview(compass)
+let compass = Compass(mapView: mapView)
+self.view.addSubview(compass)
 ```
 
 To see it in action, try out the [Examples](../../Examples) and refer to [CompassExample.swift](../../Examples/ArcGISToolkitExamples/CompassExample.swift) in the project.
-
-
-
-

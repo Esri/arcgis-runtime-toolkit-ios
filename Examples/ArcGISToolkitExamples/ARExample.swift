@@ -252,7 +252,7 @@ class ARExample: UIViewController {
         present(alertController, animated: true)
     }
     
-    /// Dislays the status view controller.
+    /// Displays the status view controller.
     ///
     /// - Parameter sender: The bar button item tapped on.
     @objc
