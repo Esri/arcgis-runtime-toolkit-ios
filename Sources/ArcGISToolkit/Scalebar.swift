@@ -584,9 +584,9 @@ internal extension ScalebarRenderer {
         
         // use a string with at least a few characters in case the number string only has 1
         // the dividers will be decimal values and we want to make sure they all fit
-        // very basic hueristics...
+        // very basic heuristics...
         let minSegmentTestString = (scaleDisplay.mapLengthString.count > 3) ? scaleDisplay.mapLengthString : "9.9"
-        // use 1.5 because the last segment, the text is right justified insted of center, which makes it harder to squeeze text in
+        // use 1.5 because the last segment, the text is right justified instead of center, which makes it harder to squeeze text in
         let minSegmentWidth = (minSegmentTestString.size(withAttributes: [.font: scalebar.font]).width * 1.5) + (Scalebar.labelXPad * 2)
         var maxNumSegments = Int(lineDisplayLength / minSegmentWidth)
         maxNumSegments = min(maxNumSegments, 4) // cap it at 4

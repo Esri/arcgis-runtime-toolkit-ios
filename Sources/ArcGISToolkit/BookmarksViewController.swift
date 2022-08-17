@@ -140,7 +140,7 @@ public class BookmarksViewController: UIViewController {
                 }
             }
             
-            // Add an observer to handle changesto the scene.bookmarks array.
+            // Add an observer to handle changes to the scene.bookmarks array.
             addBookmarksObserver(scene: sceneView.scene)
             
             // Add an observer to handle changes to the sceneView.scene.

@@ -34,7 +34,7 @@ import PackageDescription
 let package = Package(
     name: "arcgis-runtime-toolkit-ios",
     platforms: [
-        .iOS(.v13)
+        .iOS(.v14)
     ],
     products: [
         .library(
@@ -46,7 +46,7 @@ let package = Package(
         .package(
             name: "arcgis-runtime-ios",
             // path: localArcGISPackage
-            url: "https://github.com/Esri/arcgis-runtime-ios", .upToNextMinor(from: "100.14.0")
+            url: "https://github.com/Esri/arcgis-runtime-ios", .upToNextMinor(from: "100.15.0")
         )
     ],
     targets: [
