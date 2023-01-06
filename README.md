@@ -8,6 +8,13 @@ The ArcGIS Runtime SDK for iOS Toolkit contains components that will simplify yo
 [Examples](/Examples) project to see these components in action or read through the [Documentation](/Documentation) to
 learn more about them.
 
+
+>Try [ArcGIS Maps SDK for Swift version 200](https://github.com/Esri/arcgis-maps-sdk-swift-toolkit/)
+>
+>ArcGIS Runtime SDK for iOS version 100.15 is a long-term support release focused exclusively on bug fixes and minor updates. 
+>
+>ArcGIS Maps SDK for Swift version 200 builds on the proven architecture of 100.15, and provides a new API designed exclusively for developing iOS apps using Swift - Apple's modern, powerful, and intuitive programming language.
+
 To use Toolkit in your project:
 
 * **[Install with Swift Package Manager](#swift-package-manager)** - Add
